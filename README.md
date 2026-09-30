@@ -285,9 +285,10 @@ Kyuubu has siblings, each made for the same site, each MIT, each at
 
 - **Any size, one model.** The 2×2 up to the 7×7 run on the same few lines of
   geometry. There are no hand-written tables of face cycles.
-- **Real 3D in plain CSS.** Every sticker is an element placed with a
-  `matrix3d`. While a layer turns, the inside of the cube shows as plastic,
-  never as a hole.
+- **Real 3D in plain CSS.** Every sticker is an element given its whole
+  place on the screen in one `matrix3d`, worked out by the cube itself, with
+  nothing nested in 3D, so no browser can draw it flat. While a layer turns,
+  the inside of the cube shows as plastic, never as a hole.
 - **Every way of turning it.** Drag a sticker; roll the wheel over one; use a
   finger; press the keys cubers write with; or hand it notation from code.
 - **The layer follows your hand.** A dragged layer turns with the pointer,
@@ -1018,18 +1019,27 @@ for fixing one.
 
 ## Roadmap
 
-- A solve for the 4×4 and up, by reduction to a 3×3
-- Competition-style scrambles for the big cubes, which use wide turns
+- A solve for the 4×4 and up, by reduction to a 3×3 (today a big cube can
+  only take back every turn made on it)
+- Competition-style scrambles for the big cubes, which use wide turns (the
+  notation reads wide turns already; the scrambler does not make them yet)
 - More famous solves: the records before 2017 whose reconstructions are in
   forum threads, and the other events
-- A time for each move of a famous solve, where someone has measured them
+- Measured times for each move of the famous solves (the player takes a time
+  per move already, as `stepMs`; the records give only the whole time)
 - A drag that follows a real touch in the tests, not only a mouse
-- A Vue wrapper
 - Other shapes: 2×2×3, 3×3×2
 
-Left out on purpose: a shortest-possible solver (others do that well, and it
-teaches nobody the cube); a timer with inspection and penalties, which is an
-application and not a cube; and anything that needs a server. Kyuubu runs
+Done since the first release, and no longer on this list: Vue, Svelte and
+Angular (above, each proved from the packed tarball), the `<kyuubu-cube>`
+element for any page or framework, replaying and embedding a solve, famous
+record solves, and pasting a solve as it is written or as a link.
+
+Left out on purpose: a wrapper component for every framework (React has one;
+everywhere else the element or one `new CubeView` does the same job, with
+nothing more to keep up); a shortest-possible solver (others do that well,
+and it teaches nobody the cube); a timer with inspection and penalties,
+which is an application and not a cube; and anything that needs a server. Kyuubu runs
 from a static page and costs nothing to host.
 
 Ideas and pull requests are welcome.
