@@ -4,7 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-30
+
+The first stable release, published as a tarball on GitHub Releases.
+
+### Changed
+
+- The package is named `@johnmorrisdotca/kyuubu`, and its React component is imported from `@johnmorrisdotca/kyuubu/react`.
+
 ### Added
+
+- A tagged version builds the package and attaches its tarball to that version's GitHub release.
 
 - `solveSteps`: the layer-by-layer beginner's method for any 2×2 or 3×3, as named steps. Each step comes with its turns and the algorithms it uses.
 - `joinTurns`, which merges turns of the same layer in a row into one.
@@ -20,5 +30,6 @@ All notable changes to this project are documented here. The format follows [Kee
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/johnmorrisdotca/kyuubu/releases/tag/v0.1.0

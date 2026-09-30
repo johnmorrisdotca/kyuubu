@@ -1,7 +1,7 @@
 name: Release
 # A version tag builds the package and attaches its tarball to a GitHub release.
 # A project depends on that file at a pinned version, e.g. in package.json:
-#   "kyuubu": "https://github.com/johnmorrisdotca/kyuubu/releases/download/v0.1.0/kyuubu-0.1.0.tgz"
+#   "@johnmorrisdotca/kyuubu": "https://github.com/johnmorrisdotca/kyuubu/releases/download/v1.0.0/johnmorrisdotca-kyuubu-1.0.0.tgz"
 on:
   push:
     tags: ["v*"]

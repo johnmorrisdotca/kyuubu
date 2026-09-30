@@ -7,8 +7,7 @@
 **A turning cube for the browser, 2×2 to 7×7, drawn in CSS 3D. It needs no canvas, no WebGL and no framework.**
 
 [![CI](https://github.com/johnmorrisdotca/kyuubu/actions/workflows/ci.yml/badge.svg)](https://github.com/johnmorrisdotca/kyuubu/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/kyuubu.svg)](https://www.npmjs.com/package/kyuubu)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/kyuubu)](https://bundlephobia.com/package/kyuubu)
+[![release](https://img.shields.io/github/v/release/johnmorrisdotca/kyuubu)](https://github.com/johnmorrisdotca/kyuubu/releases)
 [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![types: TypeScript](https://img.shields.io/badge/types-TypeScript-3178c6.svg)](src/index.ts)
 
@@ -38,14 +37,16 @@
 ## Quick start
 
 ```sh
-pnpm add kyuubu      # or: npm install kyuubu
+pnpm add https://github.com/johnmorrisdotca/kyuubu/releases/download/v1.0.0/johnmorrisdotca-kyuubu-1.0.0.tgz
 ```
+
+Each release on GitHub carries the built package as a tarball; install the one you want by its address, and move to a newer one by changing the version in it.
 
 ```html
 <div id="cube" style="width: 400px; height: 400px"></div>
 
 <script type="module">
-  import { CubeView, cubeSolved } from "kyuubu";
+  import { CubeView, cubeSolved } from "@johnmorrisdotca/kyuubu";
 
   new CubeView(document.getElementById("cube"), {
     size: 3,
@@ -62,7 +63,7 @@ The cube fills the element it is given, so give that element a size.
 ### With React
 
 ```tsx
-import { Kyuubu, type KyuubuHandle } from "kyuubu/react";
+import { Kyuubu, type KyuubuHandle } from "@johnmorrisdotca/kyuubu/react";
 import { useRef } from "react";
 
 export function Cube() {
@@ -81,7 +82,7 @@ With no `className`, the box is a square as wide as its container, and `style` a
 ### Scramble, then check a solve on the server
 
 ```ts
-import { randomScramble, movesNotation, turnAll, solvedCube, undoAll, cubeSolved, parseMoves } from "kyuubu";
+import { randomScramble, movesNotation, turnAll, solvedCube, undoAll, cubeSolved, parseMoves } from "@johnmorrisdotca/kyuubu";
 
 const scramble = randomScramble(3, 25);
 movesNotation(scramble, 3); // "R U2 F' L ..."
@@ -131,7 +132,7 @@ Kyuubu uses [WCA](https://www.worldcubeassociation.org/regulations/#12a)-style n
 
 ## API
 
-Everything is exported from `kyuubu`. The React component is exported from `kyuubu/react`.
+Everything is exported from `@johnmorrisdotca/kyuubu`. The React component is exported from `@johnmorrisdotca/kyuubu/react`.
 
 ### The model
 
@@ -171,7 +172,7 @@ A **move** is `{ axis, layer, turns }`:
 `solveSteps(state, n)` works out the layer-by-layer solve most people learn first, for a 2×2 or 3×3 in any state. It returns `null` for other sizes.
 
 ```ts
-import { solveSteps, movesNotation } from "kyuubu";
+import { solveSteps, movesNotation } from "@johnmorrisdotca/kyuubu";
 
 for (const step of solveSteps(state, 3)!) {
   console.log(step.stage, movesNotation(step.moves, 3));
