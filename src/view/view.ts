@@ -134,7 +134,7 @@ type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { 
 /** One step of the queue: a turn, or several layers about one axis turned as one (a wide turn), and how long it should take when that was asked for. */
 type Queued = { moves: CubeMove[]; report: boolean; ms?: number };
 /** Where an element sits on the cube, before the cube is turned to be looked at: its own x, y and z as model vectors, its centre in pixels, and, for the plastic across a turning gap, the layer it closes. */
-type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number };
+type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number; drawn?: { transform: string; visible: boolean; z: string } };
 /** A layer turning: which way, how far so far, and which layers turn. */
 type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all"> };
 
@@ -501,16 +501,18 @@ export class CubeView {
       const out = apply(m, place.out);
       // Facing the eye, which sits `lens` pixels in front of the cube's centre.
       const facing = -out[0] * at[0] - out[1] * at[1] + out[2] * (lens - at[2]) > 1e-6;
-      element.style.visibility = facing ? "" : "hidden";
-      if (!facing) continue;
-      element.style.transform = `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}`;
-      if (spin === null || pieces === 1) {
-        element.style.zIndex = "0";
-        continue;
+      const transform = facing ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}` : (place.drawn?.transform ?? "");
+      let z = "0";
+      if (facing && spin !== null && pieces > 1) {
+        const piece = pieceOf[place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n)];
+        z = String(nearIsPositive ? piece : pieces - 1 - piece);
       }
-      const layer = place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n);
-      const piece = pieceOf[layer];
-      element.style.zIndex = String(nearIsPositive ? piece : pieces - 1 - piece);
+      // Only what changed is written: most of a cube stands still through a turn, and a style written is work for the page.
+      const was = place.drawn;
+      if (was?.visible !== facing) element.style.visibility = facing ? "" : "hidden";
+      if (was?.transform !== transform) element.style.transform = transform;
+      if (was?.z !== z) element.style.zIndex = z;
+      place.drawn = { transform, visible: facing, z };
     }
   }
 
@@ -664,20 +666,32 @@ export class CubeView {
   }
 
   private next(): void {
-    const job = this.queue.shift();
-    if (job === undefined) {
+    let job = this.queue.shift();
+    let move: CubeMove | undefined;
+    let quarters = 0;
+    let duration = 0;
+    // A turn given no time at all (reduced motion, or turns set to take none) is made at once, with every one waiting
+    // behind it that is given none either: nothing to see, so nothing to wait a frame of the screen for.
+    let jumped = false;
+    for (; job !== undefined; job = this.queue.shift()) {
+      move = job.moves[0];
+      quarters = move.turns === 3 ? -1 : move.turns;
+      const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
+      // Faster while turns are waiting behind this one, so a typed sequence never lags the hands; a turn given its own time keeps it.
+      duration = job.ms !== undefined ? (calm ? 0 : job.ms) : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
+      if (duration > 0) break;
+      for (const one of job.moves) this.shown = turnCube(this.shown, this.n, one);
+      jumped = true;
+    }
+    if (jumped) this.paint();
+    if (job === undefined || move === undefined) {
       this.animating = false;
       this.root.dataset.turning = "false";
       return;
     }
     this.animating = true;
     this.root.dataset.turning = "true";
-    const move = job.moves[0];
     this.lift(move, job.moves.slice(1));
-    const quarters = move.turns === 3 ? -1 : move.turns;
-    const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
-    // Faster while turns are waiting behind this one, so a typed sequence never lags the hands; a turn given its own time keeps it.
-    const duration = job.ms !== undefined ? (calm ? 0 : job.ms) : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
     const started = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / Math.max(duration, 1));

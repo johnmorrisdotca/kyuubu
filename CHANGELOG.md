@@ -23,6 +23,9 @@ All notable changes to this project are documented here. The format follows [Kee
   that begins on the cube is now the cube's; a touch beside it scrolls the
   page as before. The demo pages and the player's buttons no longer zoom on a
   double tap; two fingers still zoom.
+- On a device that asks for reduced motion, turns are made at once, however
+  many are waiting, where each used to wait for the next frame of the
+  screen: a whole solve no longer takes seconds to reach the solved cube.
 
 ## [1.3.1] - 2026-09-30
 
