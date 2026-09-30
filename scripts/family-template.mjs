@@ -41,6 +41,7 @@ const member = (id) => {
   return found;
 };
 const repo = (id) => `https://github.com/${OWNER}/${id}`;
+const site = (id) => `https://${OWNER}.github.io/${id}/`;
 const npm = (id) => `https://www.npmjs.com/package/@${OWNER}/${id}`;
 
 /** The lines of <head> every site shares: charset, viewport, title, description, theme colour, Open Graph. The page adds its icon and its stylesheets. */
@@ -88,10 +89,10 @@ export function familyUnreviewed({ id }) {
   return `<p class="unreviewed" id="unreviewed" lang="ja" hidden>この日本語は、まだ日本語を母語とする方の確認を受けていません。<a href="${repo(id)}/issues/new?template=fix-a-translation.md">訂正を歓迎します</a>。</p>`;
 }
 
-/** The footer: the page's own note (data-say="foot"), the install line and the licence, and the family, this package marked as the one being read. */
+/** The footer: the page's own note (data-say="foot"), the install line and the licence, and the family, each by its demo site, this package marked as the one being read. */
 export function familyFooter({ id }) {
   member(id);
-  const links = FAMILY.map((one) => `<a href="${repo(one.id)}"${one.id === id ? ` aria-current="page"` : ""}>${one.name}</a>`).join("");
+  const links = FAMILY.map((one) => `<a href="${site(one.id)}"${one.id === id ? ` aria-current="page"` : ""}>${one.name}</a>`).join("");
   return `<footer>
         <span data-say="foot"></span>
         <span><code>npm install @${OWNER}/${id}</code> · <a href="${repo(id)}/blob/main/LICENSE" data-say="licence"></a> © John Morris</span>
