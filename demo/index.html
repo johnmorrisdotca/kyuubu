@@ -90,6 +90,14 @@
           </section>
 
           <section class="fam-panel" role="tabpanel" id="panel-keys" aria-labelledby="tab-keys" hidden>
+            <div class="fam-row">
+              <span class="fam-label cube-wide-label" id="speed-label" data-say="speedLabel"></span>
+              <div class="fam-seg" id="speeds" role="group" aria-labelledby="speed-label" data-testid="speeds">
+                <button type="button" data-ms="80" data-say="speedFast"></button>
+                <button type="button" data-ms="160" data-say="speedNormal"></button>
+                <button type="button" data-ms="500" data-say="speedSlow"></button>
+              </div>
+            </div>
             <div class="fam-table-box">
               <table>
                 <thead><tr><th data-say="keysDo"></th><th data-say="keysDoes"></th></tr></thead>

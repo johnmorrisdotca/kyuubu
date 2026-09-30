@@ -25,7 +25,22 @@ export { faceMove, middleMove, moveNotation, movesNotation, parseMove, parseMove
 export { FULL_SCRAMBLE_LENGTHS, randomScramble, type ScrambleOptions } from "./scramble.ts";
 export { SOLVABLE_SIZES, SOLVE_ALGORITHMS, joinTurns, solveSteps, type SolveAlgorithm, type SolvePart, type SolveStage, type SolveStep } from "./solve.ts";
 export { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC, FACE_PROPERTIES, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
-export { moveForDrag, moveForWheel } from "./view/gestures.ts";
+export {
+  COMMIT_ANGLE,
+  DRAG_CLEAR_RATIO,
+  DRAG_DECIDE_PX,
+  DRAG_START_PX,
+  FLICK_ANGLE,
+  FLICK_SPEED,
+  dragAngle,
+  moveForDrag,
+  moveForRelease,
+  moveForWheel,
+  pastCommit,
+  pickDrag,
+  quartersForRelease,
+  type DragPick,
+} from "./view/gestures.ts";
 export { readKey, type KeyReading } from "./view/keys.ts";
 export { viewMatrix, type Mat3 } from "./view/geometry.ts";
 export { seededRandom } from "./random.ts";

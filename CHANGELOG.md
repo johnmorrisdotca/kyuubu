@@ -4,6 +4,43 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-30
+
+### Added
+
+- **The layer follows the drag.** A drag on a sticker, by mouse or by finger,
+  picks its layer once and then turns it with the pointer, forwards and back.
+  Nothing is a move while the pointer is down. Let go short of the point of
+  no return and the layer goes back with nothing recorded; at it or past it
+  the layer snaps on to the quarter turn, or the half turn if it was dragged
+  that far, and that is one move.
+- **`commitAngle`**, the point of no return in degrees: 30 unless given. Past
+  it the held layer brightens (`--kyuubu-commit-filter`) and the cube's
+  element carries `data-committed="true"`. `data-dragging` and `data-angle`
+  say the rest.
+- A drag that could be either of two layers waits a little longer before it
+  picks one.
+- Escape, a cancelled pointer, or a drag that wanders well off the cube puts
+  the layer back and records nothing.
+- `setTurnMs`, to change how long a turn made by a key, by notation or from
+  code takes, and a speed choice in the demo's Controls tab.
+- The rules as pure functions: `pickDrag`, `dragAngle`, `quartersForRelease`,
+  `pastCommit`, `moveForRelease`, the constants `COMMIT_ANGLE`,
+  `DRAG_START_PX`, `DRAG_DECIDE_PX`, `DRAG_CLEAR_RATIO`, `FLICK_SPEED` and
+  `FLICK_ANGLE`, and the type `DragPick`.
+
+### Changed
+
+- A drag no longer makes its turn the moment the pointer moves. `onTurn` is
+  called once for a dragged turn, after the layer has snapped home, and never
+  for one that went back. A short, fast flick still makes the quarter turn.
+  Turns made by keys, the wheel, notation and `turn()` are as they were.
+- A device that asks for reduced motion gets no turn animation, whatever
+  `turnMs` says.
+- Starting a drag finishes at once any turn still being animated.
+- The move record, the notation, saved solves and every existing option are
+  unchanged.
+
 ## [1.1.0] - 2026-09-30
 
 Everything here is added beside what was there: nothing exported has changed
@@ -100,7 +137,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.0...v1.0.1

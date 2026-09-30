@@ -71,3 +71,45 @@ export async function sound(page, errors) {
   expect(found.small, "something to tap is under 44px").toEqual([]);
   expect(errors, "the page complained").toEqual([]);
 }
+
+/**
+ * A sticker taken hold of with a real pointer, to be dragged by degrees: the
+ * middle sticker of the front face's right column, which dragged down turns
+ * the right face (R', forwards) and dragged up turns it back (R).
+ * `to(angle)` moves the pointer a few pixels at a time until the cube says
+ * the layer has reached that angle; `rest()` holds still long enough that
+ * letting go is no flick.
+ */
+export async function hold(page, nth = 5) {
+  const root = page.locator("[data-kyuubu]");
+  const box = await page.locator('[data-kyuubu] [data-face="F"]').nth(nth).boundingBox();
+  const from = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  let y = from.y;
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  const angle = async () => Number((await root.getAttribute("data-angle")) ?? 0);
+  return {
+    from,
+    angle,
+    async to(target) {
+      for (let steps = 0; steps < 400; steps += 1) {
+        const now = await angle();
+        if (Math.abs(now - target) <= 2) return now;
+        y += now < target ? 3 : -3;
+        await page.mouse.move(from.x, y);
+      }
+      throw new Error(`the layer never reached ${target} degrees`);
+    },
+    /** The pixels that drag the layer a quarter turn, as the cube works them out from its element. */
+    quarterPx: async () => {
+      const stage = await root.boundingBox();
+      return ((Math.min(stage.width, stage.height) * 0.9) / Math.sqrt(3)) * 0.7;
+    },
+    async by(dx, dy, steps = 3) {
+      y += dy;
+      await page.mouse.move(from.x + dx, y, { steps });
+    },
+    rest: () => page.waitForTimeout(160),
+    letGo: () => page.mouse.up(),
+  };
+}

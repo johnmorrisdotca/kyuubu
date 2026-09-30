@@ -290,6 +290,9 @@ Kyuubu has siblings, each made for the same site, each MIT, each at
   never as a hole.
 - **Every way of turning it.** Drag a sticker; roll the wheel over one; use a
   finger; press the keys cubers write with; or hand it notation from code.
+- **The layer follows your hand.** A dragged layer turns with the pointer,
+  forwards and back, and is a move only once it is let go past a point of no
+  return. Start a turn, think better of it, and take it back.
 - **A plain model under the view.** A cube is a string of `6 × n × n` letters
   and a turn is a pure function, so a cube is easy to store, send, snapshot
   in a test, or check again on a server.
@@ -334,7 +337,7 @@ as two turns, `R 2R`.
 
 | Input | On a sticker | Beside the cube |
 | --- | --- | --- |
-| Drag or swipe | Turns the layer carrying that sticker, the way you moved | Looks at the cube from anywhere |
+| Drag or swipe | The layer carrying that sticker turns with the pointer; let go to make the turn, or to let it go back | Looks at the cube from anywhere |
 | Wheel | Turns the sticker's row | Turns the view sideways |
 | <kbd>Ctrl</kbd> + wheel | Turns the sticker's column | Tips the view up or down |
 | <kbd>Shift</kbd> + wheel | Turns the sticker's face | |
@@ -349,6 +352,54 @@ as two turns, `R 2R`.
 
 Keys are heard when the cube has focus (`keyboard: "focus"`, the default) or
 anywhere on the page (`"page"`), never while the reader is typing in a field.
+
+### Dragging a layer
+
+A drag on a sticker, by mouse or by finger, holds its layer and turns it with
+the pointer. Nothing is a move while the pointer is down.
+
+- **The layer is picked once.** After a few pixels the drag says which of the
+  sticker's two layers it means. A drag that could be either waits a little
+  longer before it picks, and the layer picked stays picked for that drag.
+- **It turns both ways.** Drag back and the layer comes back; drag past
+  where it began and it turns the other way.
+- **There is a point of no return**, 30 degrees unless `commitAngle` says
+  otherwise. Let go short of it and the layer goes back: no move is made and
+  `onTurn` is not called. Let go at it or past it and the layer snaps on to
+  the quarter turn, and that is one move. Dragged the same distance past a
+  quarter turn, it is a half turn, recorded as one move (`R2`).
+- **You can see and feel the point.** Past it the held layer brightens, and
+  the cube's element carries `data-committed="true"`. The brightening is the
+  CSS filter in `--kyuubu-commit-filter` (`brightness(1.14)` unless you set
+  it; `none` turns it off).
+- **A flick still turns.** A short, fast drag, still moving when it is let
+  go, makes the quarter turn from short of the point, so quick hands lose
+  nothing.
+- **Giving up.** Escape, a cancelled pointer, or a drag that wanders well off
+  the cube's element puts the layer back, and nothing is recorded.
+- **`onTurn` is called once for a completed turn, after the layer has
+  snapped home**, and never for one that went back.
+
+While a layer is held the element carries `data-dragging="true"` and
+`data-angle` (whole degrees, forwards positive). The rules are exported as
+pure functions for tools and tests of your own: `pickDrag`, `dragAngle`,
+`quartersForRelease`, `pastCommit` and `moveForRelease`, with the constants
+`COMMIT_ANGLE`, `DRAG_START_PX`, `DRAG_DECIDE_PX`, `DRAG_CLEAR_RATIO`,
+`FLICK_SPEED` and `FLICK_ANGLE` (type `DragPick`).
+
+```ts
+quartersForRelease(22);         // 0: short of the point, it goes back
+quartersForRelease(38);         // 1: past it, a quarter turn
+quartersForRelease(-38);        // -1: the other way
+quartersForRelease(130);        // 2: a half turn
+quartersForRelease(12, 0.4);    // 1: a flick, 0.4 degrees a millisecond
+quartersForRelease(40, 0, 45);  // 0: with commitAngle 45
+```
+
+Turns made by a key, by notation or from code are animated over `turnMs`
+(160 ms a quarter turn; `setTurnMs` changes it, and the demo's Controls tab
+offers a slow setting). On a device that asks for reduced motion they are
+not animated at all, and a layer let go is put straight where it belongs.
 
 ## The model
 
@@ -528,7 +579,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.1.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.2.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -554,7 +605,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.1.0",
+  "generator": "kyuubu 1.2.0",
   "solves": [
     {
       "size": 3,
@@ -680,7 +731,8 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `state` | solved | The stickers to start with |
 | `interactive` | `true` | Whether a person can turn it. `turn()` always works |
 | `keyboard` | `"focus"` | `"focus"`, `"page"` or `"none"` |
-| `turnMs` | `160` | How long a quarter turn takes. Turns waiting in line go faster |
+| `turnMs` | `160` | How long a quarter turn made by a key, notation or code takes. Turns waiting in line go faster, and reduced motion gets none |
+| `commitAngle` | `30` | The point of no return of a dragged layer, in degrees, from 5 to 85 |
 | `yaw`, `pitch` | `-35`, `28` | The first view, in degrees |
 | `fill` | `0.9` | How much of its box the cube fills |
 | `colours` | standard | Face colours by letter: `{ U, R, F, D, L, B }` |
@@ -698,16 +750,19 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `state`, `size`, `host` | The state once every turn in line has finished; the side; the element |
 | `setLook(yaw, pitch)`, `resetLook()`, `looking` | The view |
 | `setInteractive(on)` | Lets a person turn it, or stops them |
+| `setTurnMs(ms)` | Changes how long a quarter turn takes |
 | `setTheme(theme)` | Changes colours, plastic or sticker shape on the cube as drawn |
 | `setLocale(locale)` | Changes the language of its accessible name |
 | `destroy()` | Removes the cube and every listener |
 
-The root element carries `data-kyuubu`, `data-state` and
-`data-turning="true" | "false"`, and each sticker `data-slot` and `data-face`.
-Tests can wait on these.
+The root element carries `data-kyuubu`, `data-state`,
+`data-turning="true" | "false"`, and while a layer is dragged `data-dragging`,
+`data-committed` and `data-angle`; each sticker carries `data-slot` and
+`data-face`. Tests can wait on these.
 
-Also exported, for tools of your own: `moveForDrag` and `moveForWheel` (the
-turn a drag or the wheel means over a sticker), `readKey` (the turn a key
+Also exported, for tools of your own: `moveForWheel` and `moveForDrag` (the
+turn the wheel means over a sticker, and the turn a whole drag means at
+once), `readKey` (the turn a key
 means; type `KeyReading`), `viewMatrix` (the way the cube is looked at; type
 `Mat3`), and the types `CubeViewOptions` and `CubeTheme`.
 
@@ -805,6 +860,7 @@ for fixing one.
 - Wide turns in the notation (`Rw`), and competition-style scrambles for the
   big cubes, which use them
 - Playback of a solve with a scrubber
+- A drag that follows a real touch in the tests, not only a mouse
 - A web component and a Vue wrapper
 - Other shapes: 2×2×3, 3×3×2
 

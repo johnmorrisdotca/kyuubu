@@ -45,3 +45,4 @@
 .cube-solves { max-height: 240px; overflow-y: auto; }
 .more pre + pre { margin-top: 8px; }
 .more pre code { font-weight: 400; }
+.cube-wide-label { flex: 1 1 100%; }

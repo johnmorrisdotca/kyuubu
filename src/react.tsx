@@ -47,7 +47,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
   useEffect(() => {
     handlers.current = { onTurn, onLook };
   }, [onTurn, onLook]);
-  const { colours, plastic, theme, locale, keyboard, turnMs, yaw, pitch, fill, label } = rest;
+  const { colours, plastic, theme, locale, keyboard, turnMs, commitAngle, yaw, pitch, fill, label } = rest;
   const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-")));
 
   useEffect(() => {
@@ -62,6 +62,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
       locale,
       keyboard,
       turnMs,
+      commitAngle,
       yaw,
       pitch,
       fill,
@@ -89,6 +90,10 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
   useEffect(() => {
     view.current?.setInteractive(interactive);
   }, [interactive]);
+
+  useEffect(() => {
+    if (turnMs !== undefined) view.current?.setTurnMs(turnMs);
+  }, [turnMs]);
 
   useImperativeHandle(ref, () => ({
     turn: (move, options) => view.current?.turn(move, options),

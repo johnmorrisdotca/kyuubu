@@ -3,7 +3,7 @@ import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
 import { axisVector, cssMatrix, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
-import { moveForDrag, moveForWheel } from "./gestures.ts";
+import { COMMIT_ANGLE, dragAngle, moveForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, type DragPick } from "./gestures.ts";
 import { readKey } from "./keys.ts";
 
 /**
@@ -13,7 +13,9 @@ import { readKey } from "./keys.ts";
  * then puts every colour where it landed and the group back as it was.
  *
  * Every hand does something:
- * - drag a sticker across the cube to turn the layer that carries it that way;
+ * - drag a sticker across the cube and the layer that carries it that way turns
+ *   with the pointer, forwards and back; let go past the point of no return
+ *   and the turn is made, short of it and the layer goes back;
  * - drag the space around the cube to turn the whole cube and look at it;
  * - the wheel over a sticker turns the layer carrying it sideways, Ctrl with
  *   the wheel the one carrying it up and down, Shift with the wheel the face
@@ -89,8 +91,14 @@ export type CubeViewOptions = {
   interactive?: boolean;
   /** Where the keys are listened for: the cube itself once it has focus (the default), the whole page, or nowhere. */
   keyboard?: "focus" | "page" | "none";
-  /** How long a quarter turn takes, in milliseconds. */
+  /** How long a quarter turn takes, in milliseconds, when it is made by a key, by notation or from code: 160 when left out. A device that asks for reduced motion gets no animation, whatever this says. `setTurnMs` changes it later. */
   turnMs?: number;
+  /**
+   * The point of no return of a dragged layer, in degrees: 30 when left out.
+   * A layer let go short of it goes back and no move is made; at it or past
+   * it, the turn is completed. From 5 to 85.
+   */
+  commitAngle?: number;
   /** How the cube is first seen: turned about its up axis, in degrees. */
   yaw?: number;
   /** How the cube is first seen: tipped towards the viewer, in degrees. */
@@ -106,8 +114,16 @@ export type CubeViewOptions = {
 };
 
 const EDGE = 300;
-const DRAG_START = 9;
 const WHEEL_STEP = 60;
+/** How far outside the cube's element a drag may wander before it is taken as given up: this share of the element's smaller side, and never less than `DRAG_LEAVE_LEAST` pixels. A half turn on a big cube is a long drag. */
+const DRAG_LEAVE = 0.25;
+const DRAG_LEAVE_LEAST = 32;
+/** How far back, in milliseconds, a drag's speed is measured from when it is let go. */
+const SPEED_WINDOW = 100;
+/** How a layer past the point of no return is shown, unless `--kyuubu-commit-filter` says otherwise. */
+const COMMIT_FILTER = "brightness(1.14)";
+
+type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { at: number; angle: number }[] };
 
 type Queued = { move: CubeMove; report: boolean };
 
@@ -141,7 +157,11 @@ export class CubeView {
   private frame = 0;
   private depth = 1;
   private wheelSum = 0;
-  private gesture: { id: number; x: number; y: number; slot: number | null; done: boolean; yaw: number; pitch: number } | null = null;
+  private gesture: { id: number; x: number; y: number; at: number; slot: number | null; done: boolean; yaw: number; pitch: number } | null = null;
+  /** The layer the pointer is holding, turned as far as it has been dragged. */
+  private drag: LiveDrag | null = null;
+  /** What ends a layer's snap after it is let go, run early when something cannot wait for it. */
+  private finishSnap: (() => void) | null = null;
   private readonly resize: ResizeObserver | null;
   private readonly cleanups: (() => void)[] = [];
 
@@ -151,6 +171,7 @@ export class CubeView {
       interactive: true,
       keyboard: "focus",
       turnMs: 160,
+      commitAngle: COMMIT_ANGLE,
       yaw: -35,
       pitch: 28,
       fill: 0.9,
@@ -175,6 +196,8 @@ export class CubeView {
     this.root.setAttribute("aria-label", this.label());
     this.root.dataset.kyuubu = "";
     this.root.dataset.turning = "false";
+    this.root.dataset.dragging = "false";
+    this.root.dataset.committed = "false";
     Object.assign(this.root.style, { position: "absolute", inset: "0", touchAction: "none", userSelect: "none", outline: "none", overflow: "hidden", cursor: "grab" });
     this.pivot = this.layer();
     this.still = this.layer();
@@ -254,6 +277,7 @@ export class CubeView {
 
   /** Put the stickers as given, at once, dropping any turn still to come. */
   setState(state: string, size: number = this.n): void {
+    this.settleDrag();
     this.queue = [];
     this.stopTurn();
     this.target = state;
@@ -268,6 +292,7 @@ export class CubeView {
 
   /** Turn a layer, animated after any turns already on their way. Told to `onTurn` only when `report` says so. */
   turn(move: CubeMove, { report = false, animate = true }: { report?: boolean; animate?: boolean } = {}): void {
+    this.settleDrag();
     this.target = turnCube(this.target, this.n, move);
     if (report) this.options.onTurn?.(move, this.target);
     if (!animate) {
@@ -279,6 +304,11 @@ export class CubeView {
     }
     this.queue.push({ move, report });
     if (!this.animating) this.next();
+  }
+
+  /** How long a quarter turn made by a key, by notation or from code takes, in milliseconds, from now on. */
+  setTurnMs(ms: number): void {
+    this.options.turnMs = Math.max(0, ms);
   }
 
   /** Look at the cube from another way round, in degrees. */
@@ -372,6 +402,142 @@ export class CubeView {
     this.pivot.style.transform = cssMatrix(this.view(), scale);
   }
 
+  /** How long a quarter turn takes now: no time at all on a device that asks for reduced motion. */
+  private quarterMs(): number {
+    const calm = this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    return calm ? 0 : this.options.turnMs;
+  }
+
+  /** The stickers of one layer gathered into the turning group, with the plastic that fills the gap: what a turn and a drag both start with. */
+  private lift(move: CubeMove): { moving: number[]; covers: HTMLDivElement[] } {
+    const { slots } = cubeSlots(this.n);
+    const moving = slots.map((slot, at) => (move.layer === "all" || layerOf(slot.centre, move.axis, this.n) === move.layer ? at : -1)).filter((at) => at >= 0);
+    for (const at of moving) this.turning.append(this.stickers[at]);
+    return { moving, covers: this.covers(move) };
+  }
+
+  /** The turning group put back as it was, its stickers still again. */
+  private lower(): void {
+    this.turning.style.transform = "";
+    for (const sticker of [...this.turning.children]) if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
+    this.turning.replaceChildren();
+    for (const cover of [...this.still.children]) if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
+  }
+
+  /** The pixels a pointer goes to drag a layer a quarter turn: seven tenths of the cube's edge as it is drawn. */
+  private quarterPx(): number {
+    const side = Math.min(this.host.clientWidth || EDGE * 1.8, this.host.clientHeight || this.host.clientWidth || EDGE * 1.8);
+    return ((side * this.options.fill) / Math.sqrt(3)) * 0.7;
+  }
+
+  private commitAngle(): number {
+    return Math.max(5, Math.min(85, this.options.commitAngle));
+  }
+
+  /** Whether the held layer is past the point of no return, said on the cube and shown on the layer. */
+  private markCommitted(committed: boolean): void {
+    this.root.dataset.committed = String(committed);
+    if (this.drag === null) delete this.root.dataset.angle;
+    for (const sticker of [...this.turning.children] as HTMLElement[]) {
+      if (sticker.dataset.slot === undefined) continue;
+      (sticker.firstChild as HTMLDivElement).style.filter = committed ? `var(--kyuubu-commit-filter, ${COMMIT_FILTER})` : "";
+    }
+  }
+
+  /** A drag has picked its layer: every turn still on its way is finished at once, and the layer is lifted to follow the pointer. */
+  private beginDrag(pick: DragPick, at: number): void {
+    this.settleDrag();
+    if (this.animating || this.queue.length > 0) {
+      this.queue = [];
+      this.stopTurn();
+      this.shown = this.target;
+      this.paint();
+    }
+    this.lift({ axis: pick.axis, layer: pick.layer, turns: 1 });
+    // Where the pointer went down counts as the first place the layer was: a flick is measured from there.
+    this.drag = { pick, angle: 0, committed: false, samples: [{ at, angle: 0 }] };
+    this.root.dataset.turning = "true";
+    this.root.dataset.dragging = "true";
+  }
+
+  /** The held layer turned to where the pointer now has it. Nothing is a move yet. */
+  private followDrag(angle: number, at: number): void {
+    const drag = this.drag;
+    if (drag === null) return;
+    drag.angle = angle;
+    this.root.dataset.angle = String(Math.round(angle));
+    drag.samples.push({ at, angle });
+    while (drag.samples.length > 1 && at - drag.samples[0].at > SPEED_WINDOW * 2) drag.samples.shift();
+    this.turning.style.transform = cssMatrix(rotation(drag.pick.axis, (angle * Math.PI) / 180));
+    const committed = pastCommit(angle, this.commitAngle());
+    if (committed !== drag.committed) {
+      drag.committed = committed;
+      this.markCommitted(committed);
+    }
+  }
+
+  /**
+   * The pointer has let go, or the drag was given up: the layer snaps to the
+   * nearest quarter turn the rules allow, or back, and only then, if it
+   * turned, is it a move and told to `onTurn`.
+   */
+  private endDrag(released: boolean, at: number): void {
+    const drag = this.drag;
+    if (drag === null) return;
+    this.drag = null;
+    const since = drag.samples.find((sample) => at - sample.at <= SPEED_WINDOW);
+    const speed = since === undefined ? 0 : (drag.angle - since.angle) / Math.max(at - since.at, 16);
+    const quarters = released ? quartersForRelease(drag.angle, speed, this.commitAngle()) : 0;
+    const move = moveForRelease(drag.pick, quarters);
+    this.markCommitted(false);
+    this.root.dataset.dragging = "false";
+    const from = drag.angle;
+    const to = quarters * 90;
+    const duration = this.quarterMs() * (Math.abs(to - from) / 90) ** 0.6;
+    this.animating = true;
+    const finish = () => {
+      cancelAnimationFrame(this.frame);
+      this.finishSnap = null;
+      this.lower();
+      if (move !== null) {
+        this.depth = 1;
+        this.target = turnCube(this.target, this.n, move);
+        this.shown = this.target;
+        this.paint();
+      }
+      this.animating = false;
+      this.root.dataset.turning = "false";
+      if (move !== null) this.options.onTurn?.(move, this.target);
+    };
+    this.finishSnap = finish;
+    const started = performance.now();
+    const step = (now: number) => {
+      const t = duration <= 0 ? 1 : Math.min(1, (now - started) / duration);
+      const eased = 1 - (1 - t) ** 3;
+      this.turning.style.transform = cssMatrix(rotation(drag.pick.axis, ((from + (to - from) * eased) * Math.PI) / 180));
+      if (t < 1) {
+        this.frame = requestAnimationFrame(step);
+        return;
+      }
+      finish();
+      this.next();
+    };
+    this.frame = requestAnimationFrame(step);
+  }
+
+  /** Before anything else changes the cube: a layer still held is put back, and one still snapping is finished at once, its move made. */
+  private settleDrag(): void {
+    if (this.drag !== null) {
+      this.drag = null;
+      if (this.gesture !== null) this.gesture.done = true;
+      this.markCommitted(false);
+      this.root.dataset.dragging = "false";
+      this.root.dataset.turning = "false";
+      this.lower();
+    }
+    this.finishSnap?.();
+  }
+
   private next(): void {
     const job = this.queue.shift();
     if (job === undefined) {
@@ -382,13 +548,10 @@ export class CubeView {
     this.animating = true;
     this.root.dataset.turning = "true";
     const { move } = job;
-    const { slots } = cubeSlots(this.n);
-    const moving = slots.map((slot, at) => (move.layer === "all" || layerOf(slot.centre, move.axis, this.n) === move.layer ? at : -1)).filter((at) => at >= 0);
-    for (const at of moving) this.turning.append(this.stickers[at]);
-    const covers = this.covers(move);
+    const { moving, covers } = this.lift(move);
     const quarters = move.turns === 3 ? -1 : move.turns;
     // Faster while turns are waiting behind this one, so a typed sequence never lags the hands.
-    const duration = (this.options.turnMs * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
+    const duration = (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
     const started = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / Math.max(duration, 1));
@@ -411,11 +574,15 @@ export class CubeView {
   private stopTurn(): void {
     cancelAnimationFrame(this.frame);
     this.animating = false;
+    this.finishSnap = null;
+    if (this.drag !== null) {
+      this.drag = null;
+      if (this.gesture !== null) this.gesture.done = true;
+    }
+    this.markCommitted(false);
+    this.root.dataset.dragging = "false";
     this.root.dataset.turning = "false";
-    this.turning.style.transform = "";
-    for (const sticker of [...this.turning.children]) if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
-    this.turning.replaceChildren();
-    for (const cover of [...this.still.children]) if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
+    this.lower();
   }
 
   /**
@@ -475,7 +642,7 @@ export class CubeView {
       this.root.setPointerCapture?.(event.pointerId);
       if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
       const slot = this.options.interactive ? this.slotAt(event.target) : null;
-      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, slot, done: false, yaw: this.yaw, pitch: this.pitch };
+      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch };
       this.root.style.cursor = "grabbing";
     });
     this.on(this.root, "pointermove", (event) => {
@@ -487,17 +654,36 @@ export class CubeView {
         this.setLook(gesture.yaw + dx * 0.45, gesture.pitch + dy * 0.45);
         return;
       }
-      if (Math.hypot(dx, dy) < DRAG_START) return;
-      gesture.done = true;
-      this.personTurns(moveForDrag(cubeSlots(this.n).slots[gesture.slot], this.n, this.view(), dx, dy));
+      // A drag that wanders well off the cube's element is given up: the layer goes back.
+      const box = this.root.getBoundingClientRect();
+      const room = Math.max(DRAG_LEAVE_LEAST, Math.min(box.width, box.height) * DRAG_LEAVE);
+      if (event.clientX < box.left - room || event.clientX > box.right + room || event.clientY < box.top - room || event.clientY > box.bottom + room) {
+        gesture.done = true;
+        this.endDrag(false, event.timeStamp);
+        return;
+      }
+      if (this.drag === null) {
+        // The layer is picked once, where the drag can be told, and stays picked: the angle is counted from where the pointer went down.
+        const pick = pickDrag(cubeSlots(this.n).slots[gesture.slot], this.n, this.view(), dx, dy);
+        if (pick === null) return;
+        this.beginDrag(pick, gesture.at);
+      }
+      if (this.drag !== null) this.followDrag(dragAngle(this.drag.pick, dx, dy, this.quarterPx()), event.timeStamp);
     });
-    const end = (event: PointerEvent) => {
+    const end = (released: boolean) => (event: PointerEvent) => {
       if (this.gesture?.id !== event.pointerId) return;
       this.gesture = null;
+      this.endDrag(released, event.timeStamp);
       this.root.style.cursor = this.options.interactive ? "grab" : "default";
     };
-    this.on(this.root, "pointerup", end);
-    this.on(this.root, "pointercancel", end);
+    this.on(this.root, "pointerup", end(true));
+    this.on(this.root, "pointercancel", end(false));
+    // Escape gives a held layer up, wherever the keys are listened for.
+    this.on(this.host.ownerDocument, "keydown", (event) => {
+      if (event.key !== "Escape" || this.drag === null) return;
+      if (this.gesture !== null) this.gesture.done = true;
+      this.endDrag(false, event.timeStamp);
+    });
     this.on(
       this.root,
       "wheel",

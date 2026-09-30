@@ -40,7 +40,7 @@ const WORDS = {
     undo: "Undo",
     reset: "Reset",
     frontOn: "Front on",
-    hint: "Drag a sticker to turn its layer. Drag beside the cube to look round it.",
+    hint: "Drag a sticker and its layer turns with you: let go early and it goes back. Drag beside the cube to look round it.",
     solvedBanner: "Solved: {time} s, {count} moves",
     tabSolve: "Solve",
     tabMoves: "Notation",
@@ -90,7 +90,11 @@ const WORDS = {
     keysDo: "Do this",
     keysDoes: "It does",
     k1: "Drag a sticker",
-    k1does: "Turns its layer the way you dragged",
+    k1does: "Its layer turns with the pointer, forwards and back. Let go early and it goes back; past the point where it brightens, the turn is made",
+    speedLabel: "Speed of turns made by keys, notation and the solve",
+    speedFast: "Fast",
+    speedNormal: "Normal",
+    speedSlow: "Slow",
     k2: "Drag beside the cube",
     k2does: "Looks at it from anywhere",
     k3: "Wheel on a sticker",
@@ -117,7 +121,7 @@ const WORDS = {
     undo: "元に戻す",
     reset: "リセット",
     frontOn: "正面に戻す",
-    hint: "ステッカーをドラッグすると、その層が回ります。キューブの外側をドラッグすると、見る向きが変わります。",
+    hint: "ステッカーをドラッグすると層が一緒に回り、途中で離すと元に戻ります。外側をドラッグすると見る向きが変わります。",
     solvedBanner: "完成: {time}秒、{count}手",
     tabSolve: "解き方",
     tabMoves: "回転記号",
@@ -167,7 +171,11 @@ const WORDS = {
     keysDo: "操作",
     keysDoes: "動き",
     k1: "ステッカーをドラッグ",
-    k1does: "ドラッグした方向に、その層が回ります",
+    k1does: "層がポインターに合わせて前後に回ります。途中で離すと元に戻り、明るくなる位置を過ぎて離すと回転が確定します",
+    speedLabel: "キー・回転記号・解き方で回す速さ",
+    speedFast: "速い",
+    speedNormal: "標準",
+    speedSlow: "ゆっくり",
     k2: "キューブの外側をドラッグ",
     k2does: "見る向きが変わります",
     k3: "ステッカーの上でホイール",
@@ -187,12 +195,12 @@ const WORDS = {
 
 const $ = (id) => document.getElementById(id);
 const stage = $("stage");
-const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const SOLVES = "kyuubu.page.solves";
 
 let view;
 let theme = { ...CUBE_THEMES.paper, colours: { ...CUBE_THEMES.paper.colours } };
 let themeName = "paper";
+let turnMs = 160;
 let scramble = [];
 let moves = [];
 let startedAt = null;
@@ -257,6 +265,7 @@ function draw() {
 
   for (const button of $("sizes").children) button.setAttribute("aria-pressed", String(Number(button.dataset.n) === n));
   for (const button of $("themes").children) button.setAttribute("aria-pressed", String(button.dataset.themeName === themeName));
+  for (const button of $("speeds").children) button.setAttribute("aria-pressed", String(Number(button.dataset.ms) === turnMs));
   for (const input of $("colours").querySelectorAll("input")) {
     input.value = input.dataset.face === "plastic" ? theme.plastic : theme.colours[input.dataset.face];
     input.previousElementSibling.textContent = say(input.dataset.face === "plastic" ? "plastic" : `face${input.dataset.face}`);
@@ -354,7 +363,7 @@ const play = (list) => {
 
 function make(n, state) {
   view?.destroy();
-  view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs: still ? 1 : 160, onTurn: (move) => { last = null; turned(move); } });
+  view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs, onTurn: (move) => { last = null; turned(move); } });
 }
 
 for (let n = 2; n <= 7; n += 1) {
@@ -392,6 +401,14 @@ for (const button of $("themes").children) {
     themeName = button.dataset.themeName;
     theme = { ...CUBE_THEMES[themeName], colours: { ...CUBE_THEMES[themeName].colours } };
     view.setTheme(theme);
+    draw();
+  });
+}
+
+for (const button of $("speeds").children) {
+  button.addEventListener("click", () => {
+    turnMs = Number(button.dataset.ms);
+    view.setTurnMs(turnMs);
     draw();
   });
 }

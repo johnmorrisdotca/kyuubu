@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 import { CUBE_THEMES, cubeSolved, parseMoves, solvedCube, turnAll } from "../dist/index.js";
 
-import { cube, id, open, panel, sound, tap } from "./page.mjs";
+import { cube, hold, id, open, panel, sound, tap } from "./page.mjs";
 
 const after = (n, notation) => turnAll(solvedCube(n), n, parseMoves(notation, n));
 
@@ -32,17 +32,13 @@ test("every size from 2×2 to 7×7 is a tap away", async ({ page }) => {
   await sound(page, errors);
 });
 
-test("a sticker dragged turns its layer, and Undo takes it back", async ({ page }) => {
+test("a sticker dragged past the point turns its layer, and Undo takes it back", async ({ page }) => {
   const errors = await open(page);
   // The middle sticker of the front face's right column, dragged down: the right face turns.
-  const sticker = page.locator('[data-kyuubu] [data-face="F"]').nth(5);
-  const box = await sticker.boundingBox();
-  const from = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  await page.mouse.move(from.x, from.y);
-  await page.mouse.down();
-  await page.mouse.move(from.x, from.y + 20, { steps: 4 });
-  await page.mouse.move(from.x, from.y + 60, { steps: 4 });
-  await page.mouse.up();
+  const held = await hold(page);
+  await held.to(50);
+  await held.rest();
+  await held.letGo();
   expect(await cube(page)).toBe(after(3, "R'"));
   await expect(page.locator(id("count"))).toHaveText("1");
   await panel(page, "moves");

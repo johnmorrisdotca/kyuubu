@@ -206,6 +206,27 @@ describe("the README on the solve", () => {
   });
 });
 
+describe("the README on dragging a layer", () => {
+  it("the releases it lists come to what it says", () => {
+    const { quartersForRelease, COMMIT_ANGLE, FLICK_SPEED } = kyuubu;
+    const shown = [...readme.matchAll(/^quartersForRelease\(([^)]*)\);\s+\/\/ (-?\d):/gm)];
+    expect(shown).toHaveLength(6);
+    for (const [, args, result] of shown) expect(quartersForRelease(...args.split(",").map(Number)), args).toBe(Number(result));
+    expect(readme).toContain(`**There is a point of no return**, ${COMMIT_ANGLE} degrees unless`);
+    expect(FLICK_SPEED).toBeLessThan(0.4);
+    const view = read("src/view/view.ts");
+    expect(readme).toContain("`--kyuubu-commit-filter` (`brightness(1.14)` unless");
+    expect(view).toContain('const COMMIT_FILTER = "brightness(1.14)";');
+    for (const name of ["data-dragging", "data-committed", "data-angle"]) expect(view).toContain(`dataset.${name.slice(5)}`);
+  });
+
+  it("the demo's hint and controls say it in both languages", () => {
+    const app = read("demo/app.js");
+    expect(app).toContain("let go early and it goes back");
+    expect(app).toContain("途中で離すと元に戻ります");
+  });
+});
+
 describe("the README on scrambles", () => {
   it("says what they are", () => {
     const scramble = randomScramble(3, 25, seededRandom("club night"));

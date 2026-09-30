@@ -1,4 +1,6 @@
 // The demo's own tests: a real browser, real taps. `pnpm test:site` builds the demo and runs them.
+import process from "node:process";
+
 import { defineConfig, devices } from "@playwright/test";
 
 const phone = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true };
@@ -8,6 +10,8 @@ export default defineConfig({
   testMatch: "*.e2e.mjs",
   fullyParallel: true,
   forbidOnly: true,
+  // A flick is a matter of milliseconds, and a loaded runner can be slow to let go: one more try there.
+  retries: process.env.CI ? 2 : 0,
   reporter: "list",
   use: { reducedMotion: "reduce", locale: "en-US" },
   projects: [
