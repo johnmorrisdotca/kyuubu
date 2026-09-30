@@ -37,7 +37,7 @@
 ## Quick start
 
 ```sh
-npm install kyuubu
+pnpm add kyuubu      # or: npm install kyuubu
 ```
 
 ```html
@@ -215,11 +215,11 @@ Ideas and pull requests are welcome.
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
 
 ```sh
-npm install
-npm test           # model, notation, gestures and keys
-npm run lint
-npm run typecheck
-npm run demo       # builds, then lays the demo out in _site/
+pnpm install
+pnpm test           # model, notation, gestures and keys
+pnpm lint
+pnpm typecheck
+pnpm demo       # builds, then lays the demo out in _site/
 ```
 
 ## Licence

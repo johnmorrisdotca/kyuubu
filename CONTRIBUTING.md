@@ -15,17 +15,17 @@ Open an [issue](https://github.com/johnmorrisdotca/kyuubu/issues). Include:
 ```sh
 git clone https://github.com/johnmorrisdotca/kyuubu.git
 cd kyuubu
-npm install
-npm test
+pnpm install
+pnpm test
 ```
 
 | Command | Does |
 | --- | --- |
-| `npm test` | Runs the tests (Vitest) |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript, strict |
-| `npm run build` | Compiles to `dist/` |
-| `npm run demo` | Builds, then stages the demo page in `_site/` (serve it with any static server) |
+| `pnpm test` | Runs the tests (Vitest) |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | TypeScript, strict |
+| `pnpm build` | Compiles to `dist/` |
+| `pnpm demo` | Builds, then stages the demo page in `_site/` (serve it with any static server) |
 
 ### How the code is laid out
 
