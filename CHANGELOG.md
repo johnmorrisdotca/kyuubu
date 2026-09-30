@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-09-30
+
+### Fixed
+
+- The package's `exports` name its built files directly. 1.0.0 and 1.0.1 on npm named source files that are not shipped, because they relied on a rewrite only `pnpm publish` performs, so neither could be imported when installed from npm. Install 1.0.2.
+
 ## [1.0.1] - 2026-09-30
 
 ### Fixed
