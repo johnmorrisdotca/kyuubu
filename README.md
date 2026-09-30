@@ -303,6 +303,12 @@ Kyuubu has siblings, each made for the same site, each MIT, each at
 - **A solve you can follow.** The beginner's layer-by-layer method for any
   2×2 or 3×3: each step with its name, what it is for, its turns and the
   algorithms it uses.
+- **Replay a record.** A scramble and its solve played on the cube at the
+  pace it was made, with play, pause, step, speed and repeat; famous record
+  solves included, each checked to end solved; and any solve pasted in, as
+  it is written or as a link.
+- **Embed it anywhere.** One `<kyuubu-cube>` tag, or an iframe for a site
+  that allows no scripts.
 - **Export and import.** A solve, scramble and moves together, as JSON that
   reads back in, as a few lines of plain text, or as CSV for a spreadsheet.
 - **Themes.** Every colour is an option and a CSS custom property, with
@@ -330,8 +336,24 @@ Kyuubu reads and writes the notation cubers use.
 cannot turn, so input can be checked before it is used: `M` on a 2×2, `4R`
 on a 3×3, or a letter that is not a turn.
 
-Not read: wide turns (`Rw`, `r`), which turn two layers at once. Write them
-as two turns, `R 2R`.
+`parseSolve(text, n)` reads a solve the way competitors and the people who
+reconstruct their solves write one, which is more than a key makes:
+
+| Written | Means |
+| --- | --- |
+| `Rw`, `Rw'`, `Rw2` | A wide turn: the face and the layer behind it, as one step (WCA regulations, article 12a) |
+| `3Rw` | Three layers deep, on a bigger cube |
+| `r` `l` `u` `d` `f` `b` | The same wide turns, as reconstructions write them |
+| `[r]` `[u]` `[f]`, `[l]` `[d]` `[b]` | The whole cube, turned the way that face turns |
+| `R2'`, `R3` | `R2`, and `R'` |
+| `// cross` | A comment, skipped to the end of its line |
+| `(R U R' U')`, `(U R' U' R)2` | Brackets are skipped; a number after one repeats what is inside |
+| `RUR'U'` | Moves run together with no spaces, as older reconstructions have them |
+
+It gives back the steps it read, each with its text, its layers and whether
+it counts as a move, or the first thing it could not read with its line and
+place. `readSolveLink(text)` reads the scramble and the solve out of a link to
+alg.cubing.net, so a person can paste the address.
 
 ## Controls
 
@@ -475,6 +497,119 @@ stageName("whiteLayer", "ja");    // "白の面"
 | `cornerCycle` | `R' F R' B2 R F' R' B2 R2` | Three top corners moved round |
 | `edgeCycle` | `R U' R U R U R U' R' U' R2` | Three top edges moved round |
 
+## Replay a solve
+
+A scramble and the moves that solved it, shown on a cube at the pace they
+were made: what a record looked like, a move at a time.
+
+```js
+import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
+
+mountPlayer(document.getElementById("solve"), {
+  scramble: "D R' U2 F2 D U' B2 R2 L' F U' B2 U2 F L F' D'",
+  solution: "x2 R' D2 R' D L' U L D R' U' R D L U' L' U' R U R' y' U R' U' R Rw' U' R U' R' U2 Rw U",
+  timeMs: 3130,
+  autoplay: true,
+});
+```
+
+That draws the cube with its controls: play and pause, a step back and
+forward, restart, where in the solve, the speed (the solve's own, a half, a
+quarter, a tenth) and repeat. The viewer can drag to look round the cube and
+cannot turn its layers. Options: `size`, `scramble`, `solution`, `timeMs`,
+`stepMs`, `autoplay`, `loop`, `controls`, `speed`, `theme`, `locale`,
+`onChange`, `onEnd`. The handle has `play()`, `pause()`, `step(1 | -1)`,
+`seek(n)`, `restart()`, `setSpeed()`, `setLoop()`, `setLocale()`,
+`setTheme()`, `status`, `plan`, `fault` and `destroy()`.
+
+**About the pace.** A reconstruction says how long the whole solve took and
+almost never when each move was made. So the moves are spread evenly over the
+recorded time: a 3.13 second solve takes 3.13 seconds, and the player says
+that the real one was not this even. Give `stepMs`, a time for every step,
+where you know them.
+
+**A solve that does not end solved** is played anyway, and the player says
+so. Only text that cannot be read is refused, with the piece it stopped at.
+
+Without a page, `planReplay(source)` reads, checks and times a solve, and
+`new Replay(cube, plan, options)` plays a plan on anything with `setState`
+and `turnTogether`, which `CubeView` has.
+
+### Embed a solve on any site
+
+One tag, where the page may run a script. It needs no build step:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
+<kyuubu-cube scramble="R U R' U'" moves="U R U' R'" time="2.5" controls autoplay></kyuubu-cube>
+```
+
+| Attribute | Means |
+| --- | --- |
+| `scramble`, `moves` | The scramble and the solve, as written |
+| `size` | The cube's side, 2 to 7: 3 when left out |
+| `time` | The solve's time in seconds; left out, a steady pace |
+| `autoplay`, `loop` | Start at once; begin again at the end |
+| `controls` | Shown unless `controls="false"` |
+| `speed` | The speed to start at: `1`, `0.5`, `0.25`, `0.1` |
+| `theme` | `standard`, `paper` or `stickerless` |
+| `lang` | `en` or `ja`; the page's language when left out |
+
+The element has `play()`, `pause()`, `step()`, `seek()`, `restart()` and
+`status`, and sends `kyuubu-step` after every step and `kyuubu-end` at the
+end. In a bundle, `import { defineCube } from "@johnmorrisdotca/kyuubu/element"`
+and call it, or import `@johnmorrisdotca/kyuubu/element/define`, which does.
+It is drawn in the page's own document, so the page's font, colour and the
+`--kyuubu-player-…` custom properties (`felt`, `radius`, `rule`, `button`,
+`ink`, `paper`, `focus`) dress it.
+
+An iframe, where the page allows no scripts (a forum, a blog):
+
+```html
+<iframe src="https://johnmorrisdotca.github.io/kyuubu/embed.html#scramble=R+U+R'+U'&moves=U+R+U'+R'&time=2.5" title="Kyuubu" width="360" height="600" style="border:0;max-width:100%" loading="lazy"></iframe>
+```
+
+The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`,
+`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`. The page stores
+nothing, tracks nothing and loads nothing from anywhere else. A browser takes
+an address of a few thousand characters, which is room for any solve of a
+3×3. The [famous solves page](https://johnmorrisdotca.github.io/kyuubu/famous.html)
+writes both snippets for whatever it is showing.
+
+### Famous solves
+
+`@johnmorrisdotca/kyuubu/famous` is a list of record-setting solves of the
+3×3, each with its time, solver, country, competition, the competition's
+dates, the scramble, the moves, who reconstructed it where the source says,
+and where it was published. It is its own entry, so a page that does not show
+it does not carry it.
+
+```js
+import { FAMOUS_SOLVES, famousSolve } from "@johnmorrisdotca/kyuubu/famous";
+
+const solve = famousSolve("park-3.13");
+mountPlayer(element, { scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs });
+```
+
+Every solve in it is played by a test from its scramble, and is in the list
+only because the cube ends solved. The list is short and has gaps: a record
+with no published reconstruction, or one that does not play out, is left out.
+
+**Where the records are.** The whole history of the 3×3 record, with a link
+to each reconstruction, is kept on the
+[Speedsolving wiki](https://www.speedsolving.com/wiki/index.php?title=History_of_World_Records/3x3x3),
+and the official results, for every event, are the
+[World Cube Association's records](https://www.worldcubeassociation.org/results/records).
+The times, names, competitions and dates here are the WCA's public results;
+the scrambles and moves are from the sources each entry names. Kyuubu is not
+affiliated with the WCA.
+
+**Add a solve.** Open an
+[Add a solve](https://github.com/johnmorrisdotca/kyuubu/issues/new?template=add-a-solve.md)
+issue with the scramble, the moves and where they were published, or send a
+pull request: `pnpm solve:check "<scramble>" "<moves>"` plays it and prints
+whether it ends solved and how many moves it is.
+
 ## Scrambles and seeds
 
 ```ts
@@ -579,7 +714,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.2.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.3.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -605,7 +740,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.2.0",
+  "generator": "kyuubu 1.3.0",
   "solves": [
     {
       "size": 3,
@@ -712,6 +847,30 @@ Types: `SolveStep` (`{ stage, moves, parts, algorithms }`), `SolvePart`
 Types: `SolveRecord` (`{ size, scramble, moves, ms?, at?, seed? }`),
 `SolveSummary`, `CliSurroundings`, `CliResult`.
 
+### Replay, the player and famous solves
+
+| Export | Signature | Does |
+| --- | --- | --- |
+| `parseSolve` | `(text, n) => SolveReading` | A solve as written, read into steps, or the first fault |
+| `parseSolveMove` | `(token, n) => step \| "unknown" \| "no-such-layer"` | One written step |
+| `solveMoves`, `applySolve` | `(steps) => CubeMove[]`, `(state, n, steps) => string` | The layers the steps turn; a cube after them |
+| `solveText`, `countSolveMoves` | `(steps) => string`, `(steps) => number` | The steps in standard form; how many count as moves |
+| `readSolveLink` | `(text) => SolveLink \| null` | The scramble and solve in a link to alg.cubing.net |
+| `planReplay` | `(source) => { ok, plan } \| { ok, fault }` | A solve read, checked and timed |
+| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `seek`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
+| `REPLAY_SPEEDS`, `REPLAY_STEP_MS`, `REPLAY_LOOP_REST_MS`, `MAX_REPLAY_STEPS` | | The speeds offered, the steady pace, the rest before a repeat, the longest solve |
+
+Types: `SolveMove`, `SolveReading`, `NotationFault`, `SolveLink`,
+`ReplaySource`, `ReplayPlan`, `ReplayFault`, `ReplayStatus`, `ReplayOptions`,
+`ReplayCube`, `ReplayClock`.
+
+From `@johnmorrisdotca/kyuubu/player`: `mountPlayer(element, options)`,
+`PLAYER_CSS`, and the types `PlayerOptions` and `PlayerHandle`. From
+`@johnmorrisdotca/kyuubu/element`: `defineCube(name?)`,
+`CUBE_ELEMENT_NAME`, `CUBE_ELEMENT_ATTRIBUTES` and the type
+`KyuubuCubeElement`. From `@johnmorrisdotca/kyuubu/famous`: `FAMOUS_SOLVES`,
+`famousSolve(id)` and the type `FamousSolve`.
+
 ### Words
 
 | Export | Does |
@@ -750,6 +909,8 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `state`, `size`, `host` | The state once every turn in line has finished; the side; the element |
 | `setLook(yaw, pitch)`, `resetLook()`, `looking` | The view |
 | `setInteractive(on)` | Lets a person turn it, or stops them |
+| `turnTogether(moves, { animate?, ms? })` | Turns several layers about one axis as one movement (a wide turn), in `ms` when given |
+| `busy` | Whether a turn asked for is still on its way |
 | `setTurnMs(ms)` | Changes how long a quarter turn takes |
 | `setTheme(theme)` | Changes colours, plastic or sticker shape on the cube as drawn |
 | `setLocale(locale)` | Changes the language of its accessible name |
@@ -857,11 +1018,12 @@ for fixing one.
 ## Roadmap
 
 - A solve for the 4×4 and up, by reduction to a 3×3
-- Wide turns in the notation (`Rw`), and competition-style scrambles for the
-  big cubes, which use them
-- Playback of a solve with a scrubber
+- Competition-style scrambles for the big cubes, which use wide turns
+- More famous solves: the records before 2017 whose reconstructions are in
+  forum threads, and the other events
+- A time for each move of a famous solve, where someone has measured them
 - A drag that follows a real touch in the tests, not only a mouse
-- A web component and a Vue wrapper
+- A Vue wrapper
 - Other shapes: 2×2×3, 3×3×2
 
 Left out on purpose: a shortest-possible solver (others do that well, and it

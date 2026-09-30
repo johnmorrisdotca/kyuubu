@@ -59,7 +59,7 @@ test("typed notation turns the cube, and what cannot be turned is refused", asyn
   await expect(page.locator(id("count"))).toHaveText("4");
   await page.locator(id("moves")).fill("R Q");
   await page.locator(id("moves")).press("Enter");
-  await expect(page.locator(id("error"))).toHaveText("That is not notation this cube can turn.");
+  await expect(page.locator(id("error"))).toHaveText("“Q” is not notation this cube can turn (line 1, place 3).");
   expect(await cube(page)).toBe(after(3, "R U R' U'"));
   await sound(page, errors);
 });
@@ -100,8 +100,13 @@ test("Solve it all solves it, and a cube with no method says which have one", as
   await tap(page, id("all"));
   expect(cubeSolved(await cube(page), 3)).toBe(true);
   await tap(page, `${id("sizes")} button[data-n="4"]`);
+  // No method for a 4×4 here, and nothing yet to take back: once it is scrambled there is, and it goes home.
   await expect(page.locator(id("next"))).toBeDisabled();
-  await expect(page.locator(id("step"))).toHaveText("Steps are shown for the 2×2 and the 3×3.");
+  await expect(page.locator(id("step"))).toContainText("take back every turn made");
+  await tap(page, id("scramble"));
+  await expect(page.locator(id("next"))).toBeEnabled();
+  await tap(page, id("all"));
+  expect(cubeSolved(await cube(page), 4)).toBe(true);
   await sound(page, errors);
 });
 

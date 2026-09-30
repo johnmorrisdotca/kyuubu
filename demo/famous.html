@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- The famous solves page's source. `pnpm site` fills each "family:" line from scripts/family-template.mjs and writes _site/famous.html. -->
+<html lang="en">
+  <head>
+    <!-- family:famousHead -->
+    <meta property="og:image" content="https://johnmorrisdotca.github.io/kyuubu/cube.png" />
+    <link rel="stylesheet" href="family.css" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <main>
+      <!-- family:famousHeader -->
+      <div class="cube-layout">
+        <div class="cube-side">
+          <section class="fam-felt cube-felt cube-watch" aria-labelledby="watch-title">
+            <h2 class="cube-watch-title" id="watch-title" data-testid="watch-title"></h2>
+            <div id="player" data-testid="player"></div>
+          </section>
+          <dl class="cube-facts" id="facts" data-testid="facts"></dl>
+        </div>
+
+        <div class="fam-panels cube-panels">
+          <div class="fam-tabs" role="tablist" id="tabs">
+            <button type="button" role="tab" id="tab-list" aria-controls="panel-list" aria-selected="true" data-say="tabList"></button>
+            <button type="button" role="tab" id="tab-paste" aria-controls="panel-paste" aria-selected="false" data-say="tabPaste"></button>
+            <button type="button" role="tab" id="tab-embed" aria-controls="panel-embed" aria-selected="false" data-say="tabEmbed"></button>
+          </div>
+
+          <section class="fam-panel" role="tabpanel" id="panel-list" aria-labelledby="tab-list">
+            <p class="fam-muted" data-say="listIntro"></p>
+            <ol class="cube-solve-list" id="list" data-testid="list"></ol>
+            <p class="fam-fine"><span data-say="listMore"></span> <a href="https://github.com/johnmorrisdotca/kyuubu/issues/new?template=add-a-solve.md" data-say="listAdd"></a></p>
+            <p class="fam-fine"><span data-say="listHistory"></span> <a href="https://www.speedsolving.com/wiki/index.php?title=History_of_World_Records/3x3x3" data-say="listWiki"></a> · <a href="https://www.worldcubeassociation.org/results/records" data-say="listWca"></a></p>
+          </section>
+
+          <section class="fam-panel" role="tabpanel" id="panel-paste" aria-labelledby="tab-paste" hidden>
+            <p class="fam-muted" data-say="pasteIntro"></p>
+            <form class="cube-paste" id="paste">
+              <label class="fam-label" for="p-scramble" data-say="pasteScramble"></label>
+              <input class="fam-field" data-mono="true" id="p-scramble" autocomplete="off" autocapitalize="off" spellcheck="false" data-testid="p-scramble" />
+              <label class="fam-label" for="p-moves" data-say="pasteMoves"></label>
+              <textarea class="fam-field cube-text" data-mono="true" id="p-moves" spellcheck="false" autocapitalize="off" data-testid="p-moves"></textarea>
+              <div class="cube-paste-row">
+                <label class="fam-label" for="p-time" data-say="pasteTime"></label>
+                <input class="fam-field" id="p-time" inputmode="decimal" autocomplete="off" data-testid="p-time" />
+                <label class="fam-label" for="p-size" data-say="pasteSize"></label>
+                <select class="fam-field" id="p-size" data-testid="p-size"></select>
+              </div>
+              <div class="fam-actions">
+                <button class="fam-button" data-primary="true" type="submit" data-say="pastePlay" data-testid="p-play"></button>
+              </div>
+            </form>
+            <p class="fam-fine" data-say="pasteHelp"></p>
+          </section>
+
+          <section class="fam-panel" role="tabpanel" id="panel-embed" aria-labelledby="tab-embed" hidden>
+            <p class="fam-muted" data-say="embedIntro"></p>
+            <h3 data-say="embedFrame"></h3>
+            <textarea class="fam-field cube-code" data-mono="true" id="e-frame" readonly spellcheck="false" data-say-label="embedFrame" data-testid="e-frame"></textarea>
+            <div class="fam-actions"><button class="fam-button" type="button" data-copy="e-frame" data-say="copy"></button></div>
+            <h3 data-say="embedTag"></h3>
+            <textarea class="fam-field cube-code" data-mono="true" id="e-tag" readonly spellcheck="false" data-say-label="embedTag" data-testid="e-tag"></textarea>
+            <div class="fam-actions"><button class="fam-button" type="button" data-copy="e-tag" data-say="copy"></button></div>
+            <h3 data-say="embedLink"></h3>
+            <textarea class="fam-field cube-code" data-mono="true" id="e-link" readonly spellcheck="false" data-say-label="embedLink" data-testid="e-link"></textarea>
+            <div class="fam-actions"><button class="fam-button" type="button" data-copy="e-link" data-say="copy"></button></div>
+            <p class="fam-fine" id="copied" aria-live="polite" data-testid="copied"></p>
+          </section>
+        </div>
+      </div>
+      <!-- family:unreviewed -->
+      <!-- family:footer -->
+    </main>
+    <!-- family:script -->
+    <script type="module" src="famous.js"></script>
+  </body>
+</html>

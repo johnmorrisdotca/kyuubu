@@ -39,6 +39,22 @@ export type CubeWords = {
   algSune: string;
   algCornerCycle: string;
   algEdgeCycle: string;
+  playerPlay: string;
+  playerPause: string;
+  playerBack: string;
+  playerOn: string;
+  playerAgain: string;
+  playerLoop: string;
+  playerSpeed: string;
+  playerOwnPace: string;
+  playerMoveOf: string;
+  playerScrub: string;
+  playerUnsolved: string;
+  playerCannotRead: string;
+  playerNoSuchLayer: string;
+  playerTooLong: string;
+  playerEvenPace: string;
+  playerCredit: string;
 };
 
 /** The two languages the package speaks. */
@@ -75,6 +91,22 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     algSune: "Sune",
     algCornerCycle: "Three corners round",
     algEdgeCycle: "Three edges round",
+    playerPlay: "Play",
+    playerPause: "Pause",
+    playerBack: "Back",
+    playerOn: "Forward",
+    playerAgain: "Restart",
+    playerLoop: "Repeat",
+    playerSpeed: "Speed",
+    playerOwnPace: "Real speed",
+    playerMoveOf: "Move {at} of {total}",
+    playerScrub: "Where in the solve",
+    playerUnsolved: "These moves do not end on a solved cube.",
+    playerCannotRead: "“{token}” is not a move (line {line}, place {column}).",
+    playerNoSuchLayer: "“{token}” turns a layer this cube does not have (line {line}, place {column}).",
+    playerTooLong: "That is too long to play.",
+    playerEvenPace: "The solve took {time} seconds. Its moves are spread evenly over that time here; the real solve was not this even.",
+    playerCredit: "Kyuubu",
   },
   ja: {
     cubeLabel: "{n}×{n}のキューブ",
@@ -105,6 +137,22 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     algSune: "Sune",
     algCornerCycle: "コーナーの三点交換",
     algEdgeCycle: "エッジの三点交換",
+    playerPlay: "再生",
+    playerPause: "一時停止",
+    playerBack: "戻る",
+    playerOn: "進む",
+    playerAgain: "最初から",
+    playerLoop: "くり返す",
+    playerSpeed: "速さ",
+    playerOwnPace: "実際の速さ",
+    playerMoveOf: "{total}手中{at}手目",
+    playerScrub: "ソルブの位置",
+    playerUnsolved: "この手順ではキューブはそろいません。",
+    playerCannotRead: "「{token}」は回転記号ではありません（{line}行目、{column}文字目）。",
+    playerNoSuchLayer: "「{token}」はこのキューブにない層を回します（{line}行目、{column}文字目）。",
+    playerTooLong: "長すぎて再生できません。",
+    playerEvenPace: "このソルブのタイムは{time}秒です。ここでは各手をその時間に均等に割り振っています。実際のソルブはこれほど均等ではありません。",
+    playerCredit: "Kyuubu",
   },
 };
 

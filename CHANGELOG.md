@@ -4,6 +4,52 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-30
+
+### Added
+
+- **A solve read as it is written down.** `parseSolve` reads what
+  competitors and reconstructions write: wide turns (`Rw`, `3Rw`, and the
+  lower-case `r`), rotations in both spellings (`x`, `[r]`), `R2'` and `R3`,
+  comments after `//`, brackets and a bracket repeated (`(U R' U' R)2`), and
+  moves run together with no spaces. It gives the steps, or the first thing
+  it could not read with its line and place. With it: `parseSolveMove`,
+  `solveMoves`, `applySolve`, `solveText`, `countSolveMoves`, and
+  `readSolveLink`, which reads a solve out of a link to alg.cubing.net.
+- **A replay.** `planReplay` reads, checks and times a scramble and its
+  solve; `Replay` plays the plan on a cube: play, pause, a step either way,
+  anywhere by `seek`, the solve's own pace or a half, a quarter or a tenth of
+  it, once or on repeat. A solve's recorded time is spread evenly over its
+  moves, and that is said wherever it is shown; a time for every step can be
+  given instead.
+- **A player**, `@johnmorrisdotca/kyuubu/player`: `mountPlayer` draws the
+  cube and those controls in an element, in English or Japanese.
+- **A custom element**, `@johnmorrisdotca/kyuubu/element`:
+  `<kyuubu-cube scramble="…" moves="…" time="3.13" controls autoplay loop>`.
+  `defineCube()` registers it, and `@johnmorrisdotca/kyuubu/element/define`
+  does so by being imported, for a page with one script tag.
+- **An embed page** on the demo site, `embed.html`, for an iframe on a site
+  that allows no scripts. The address carries the solve; nothing is stored.
+- **Famous solves**, `@johnmorrisdotca/kyuubu/famous`: twelve world record
+  solves of the 3×3, from 11.75 seconds in 2005 to 2.76 in 2026, each with
+  its solver, competition, dates, scramble, moves and source. A test plays
+  every one and fails if the cube does not end solved.
+- A famous solves page on the demo site: watch one, slow it down, paste a
+  solve or a link and play it, and copy the code to embed it.
+- `turnTogether` on `CubeView`, which turns several layers as one movement
+  in a time of its own, and `busy`.
+- An "Add a solve" issue template, and `pnpm solve:check`.
+
+### Changed
+
+- The demo's notation box takes several lines, comments and wide turns, says
+  which piece it could not read, and sends a pasted link to the famous solves
+  page.
+- The demo's solve buttons always offer a way back. On a 4×4 and up, where
+  there is no step-by-step method yet, they take back every turn made, the
+  last first. A solve the page plays keeps one steady pace, at the speed
+  chosen under Controls, and no longer speeds up as its turns queue.
+
 ## [1.2.0] - 2026-09-30
 
 ### Added
@@ -137,7 +183,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.1...v1.0.2

@@ -18,7 +18,7 @@ export default tseslint.config(
   {
     files: ["demo/**/*.js"],
     languageOptions: {
-      globals: { console: "readonly", URL: "readonly", Blob: "readonly", document: "readonly", localStorage: "readonly", matchMedia: "readonly", navigator: "readonly", performance: "readonly", requestAnimationFrame: "readonly", cancelAnimationFrame: "readonly", setTimeout: "readonly" },
+      globals: { console: "readonly", URL: "readonly", Blob: "readonly", document: "readonly", localStorage: "readonly", matchMedia: "readonly", navigator: "readonly", performance: "readonly", requestAnimationFrame: "readonly", cancelAnimationFrame: "readonly", setTimeout: "readonly", URLSearchParams: "readonly", location: "readonly", history: "readonly" },
     },
   },
 );

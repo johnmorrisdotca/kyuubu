@@ -14,22 +14,32 @@ const parts = {
     ogTitle: "Kyuubu キューブ",
     ogDescription: "A turning cube for the browser, in CSS 3D. 2×2 to 7×7, with a solve you can follow.",
   }),
-  header: familyHeader({ id }),
+  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }] }),
+  famousHead: familyHead({
+    id,
+    title: "Kyuubu · famous solves, played move for move",
+    description: "World record solves of the 3×3 cube played at the speed they were made, from their published scrambles and reconstructions. Slow one down, step through it, paste any solve and play it, and embed it on your own page.",
+    ogTitle: "Kyuubu キューブ · famous solves",
+    ogDescription: "Record solves of the 3×3, move for move, at the speed they were made.",
+  }),
+  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }] }),
   unreviewed: familyUnreviewed({ id }),
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
 };
 
-const source = readFileSync("demo/index.html", "utf8");
-const page = source.replace(/<!-- family:(\w+) -->/g, (whole, name) => {
-  if (!(name in parts)) throw new Error(`demo/index.html asks for family:${name}, which the template does not have`);
-  return parts[name];
-});
+const fillPage = (file) =>
+  readFileSync(`demo/${file}`, "utf8").replace(/<!-- family:(\w+) -->/g, (whole, name) => {
+    if (!(name in parts)) throw new Error(`demo/${file} asks for family:${name}, which the template does not have`);
+    return parts[name];
+  });
+const page = fillPage("index.html");
 
 rmSync("_site", { recursive: true, force: true });
 mkdirSync("_site", { recursive: true });
 writeFileSync("_site/index.html", page);
-for (const file of ["family.css", "site.css", "app.js"]) cpSync(`demo/${file}`, `_site/${file}`);
+writeFileSync("_site/famous.html", fillPage("famous.html"));
+for (const file of ["family.css", "site.css", "app.js", "famous.js", "embed.html"]) cpSync(`demo/${file}`, `_site/${file}`);
 cpSync("docs/cube.png", "_site/cube.png");
 cpSync("dist", "_site/dist", { recursive: true });
 console.log("_site/ is ready: serve it, or let the Pages workflow publish it.");

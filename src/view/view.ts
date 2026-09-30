@@ -125,7 +125,8 @@ const COMMIT_FILTER = "brightness(1.14)";
 
 type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { at: number; angle: number }[] };
 
-type Queued = { move: CubeMove; report: boolean };
+/** One step of the queue: a turn, or several layers about one axis turned as one (a wide turn), and how long it should take when that was asked for. */
+type Queued = { moves: CubeMove[]; report: boolean; ms?: number };
 
 /**
  * A cube on the screen. `new CubeView(element, { size: 3 })` draws it in the
@@ -302,8 +303,41 @@ export class CubeView {
       this.paint();
       return;
     }
-    this.queue.push({ move, report });
+    this.queue.push({ moves: [move], report });
     if (!this.animating) this.next();
+  }
+
+  /**
+   * Several layers about one axis turned together, the same way and as far,
+   * as one movement: a wide turn (`Rw` is the right face and the layer behind
+   * it). `ms`, when given, is how long the whole movement takes, whatever
+   * `turnMs` says, so a replay can keep a solve's own pace; a device that
+   * asks for reduced motion still gets none. Never told to `onTurn`. Moves
+   * that do not share an axis and a distance are turned one after another.
+   */
+  turnTogether(moves: readonly CubeMove[], { animate = true, ms }: { animate?: boolean; ms?: number } = {}): void {
+    if (moves.length === 0) return;
+    const together = moves.every((move) => move.axis === moves[0].axis && move.turns === moves[0].turns && move.layer !== "all") || moves.length === 1;
+    if (!together) {
+      for (const move of moves) this.turnTogether([move], { animate, ms: ms === undefined ? undefined : ms / moves.length });
+      return;
+    }
+    this.settleDrag();
+    for (const move of moves) this.target = turnCube(this.target, this.n, move);
+    if (!animate) {
+      this.queue = [];
+      this.stopTurn();
+      this.shown = this.target;
+      this.paint();
+      return;
+    }
+    this.queue.push({ moves: [...moves], report: false, ms });
+    if (!this.animating) this.next();
+  }
+
+  /** Whether a turn asked for is still on its way. */
+  get busy(): boolean {
+    return this.animating || this.queue.length > 0;
   }
 
   /** How long a quarter turn made by a key, by notation or from code takes, in milliseconds, from now on. */
@@ -409,11 +443,12 @@ export class CubeView {
   }
 
   /** The stickers of one layer gathered into the turning group, with the plastic that fills the gap: what a turn and a drag both start with. */
-  private lift(move: CubeMove): { moving: number[]; covers: HTMLDivElement[] } {
+  private lift(move: CubeMove, others: readonly CubeMove[] = []): { moving: number[]; covers: HTMLDivElement[] } {
     const { slots } = cubeSlots(this.n);
-    const moving = slots.map((slot, at) => (move.layer === "all" || layerOf(slot.centre, move.axis, this.n) === move.layer ? at : -1)).filter((at) => at >= 0);
+    const layers = new Set([move, ...others].map((one) => one.layer));
+    const moving = slots.map((slot, at) => (layers.has("all") || layers.has(layerOf(slot.centre, move.axis, this.n)) ? at : -1)).filter((at) => at >= 0);
     for (const at of moving) this.turning.append(this.stickers[at]);
-    return { moving, covers: this.covers(move) };
+    return { moving, covers: this.covers(move, layers) };
   }
 
   /** The turning group put back as it was, its stickers still again. */
@@ -547,11 +582,12 @@ export class CubeView {
     }
     this.animating = true;
     this.root.dataset.turning = "true";
-    const { move } = job;
-    const { moving, covers } = this.lift(move);
+    const move = job.moves[0];
+    const { moving, covers } = this.lift(move, job.moves.slice(1));
     const quarters = move.turns === 3 ? -1 : move.turns;
-    // Faster while turns are waiting behind this one, so a typed sequence never lags the hands.
-    const duration = (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
+    const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
+    // Faster while turns are waiting behind this one, so a typed sequence never lags the hands; a turn given its own time keeps it.
+    const duration = job.ms !== undefined ? (calm ? 0 : job.ms) : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
     const started = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / Math.max(duration, 1));
@@ -561,7 +597,7 @@ export class CubeView {
         this.frame = requestAnimationFrame(step);
         return;
       }
-      this.shown = turnCube(this.shown, this.n, move);
+      for (const one of job.moves) this.shown = turnCube(this.shown, this.n, one);
       this.turning.style.transform = "";
       for (const at of moving) this.still.append(this.stickers[at]);
       for (const cover of covers) cover.remove();
@@ -590,14 +626,14 @@ export class CubeView {
    * of the gap the turn opens, one turning and one still, so the reader sees
    * plastic where the layers part and never through the cube.
    */
-  private covers(move: CubeMove): HTMLDivElement[] {
-    if (move.layer === "all") return [];
+  private covers(move: CubeMove, layers: ReadonlySet<number | "all"> = new Set([move.layer])): HTMLDivElement[] {
+    if (layers.has("all")) return [];
     const unit = this.unit();
     const out = axisVector(move.axis);
     const frame = FACE_FRAMES[CUBE_FACE_ORDER.find((face) => FACE_FRAMES[face].normal[move.axis] === 1)!];
     const edges: number[] = [];
-    if (move.layer > 0) edges.push(2 * move.layer - this.n);
-    if (move.layer < this.n - 1) edges.push(2 * move.layer - this.n + 2);
+    // A gap opens wherever a turning layer meets a still one.
+    for (let layer = 0; layer < this.n - 1; layer += 1) if (layers.has(layer) !== layers.has(layer + 1)) edges.push(2 * layer - this.n + 2);
     const made: HTMLDivElement[] = [];
     for (const edge of edges) {
       for (const group of [this.still, this.turning]) {

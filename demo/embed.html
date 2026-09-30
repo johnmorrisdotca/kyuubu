@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- A solve and nothing else, for another site's iframe. Everything it shows comes from its own address:
+     embed.html#scramble=R+U&moves=U'+R'&time=3.13&size=3&theme=paper&lang=ja&autoplay=1&loop=1&controls=0
+     (the same after a ? works too). It stores nothing, tracks nothing and loads nothing from anywhere else. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Kyuubu · a solve</title>
+    <style>
+      html, body { margin: 0; }
+      body { font: 15px/1.4 ui-rounded, "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, -apple-system, "Segoe UI", sans-serif; color: CanvasText; background: Canvas; padding: 8px; }
+      #solve { max-width: min(100%, 78vh); margin: 0 auto; }
+      .credit { display: block; text-align: right; font-size: 12px; opacity: .7; color: inherit; margin-top: 4px; min-height: 24px; }
+    </style>
+  </head>
+  <body>
+    <div id="solve"></div>
+    <a class="credit" id="credit" href="https://johnmorrisdotca.github.io/kyuubu/famous.html" target="_blank" rel="noopener">Kyuubu</a>
+    <script type="module">
+      import { mountPlayer } from "./dist/player.js";
+      import { CUBE_THEMES } from "./dist/index.js";
+      const read = () => new URLSearchParams((location.hash.length > 1 ? location.hash.slice(1) : location.search.slice(1)));
+      let player = null;
+      const draw = () => {
+        const q = read();
+        const on = (name, otherwise) => (q.has(name) ? q.get(name) !== "0" && q.get(name) !== "false" : otherwise);
+        const lang = q.get("lang") === "ja" ? "ja" : q.get("lang") === "en" ? "en" : undefined;
+        if (lang !== undefined) document.documentElement.lang = lang;
+        const time = Number(q.get("time"));
+        const speed = Number(q.get("speed"));
+        player?.destroy();
+        player = mountPlayer(document.getElementById("solve"), {
+          size: q.has("size") ? Number(q.get("size")) : 3,
+          scramble: q.get("scramble") ?? "",
+          solution: q.get("moves") ?? "",
+          timeMs: time > 0 ? time * 1000 : undefined,
+          autoplay: on("autoplay", false),
+          loop: on("loop", false),
+          controls: on("controls", true),
+          speed: speed > 0 ? speed : undefined,
+          theme: q.get("theme") in CUBE_THEMES ? CUBE_THEMES[q.get("theme")] : undefined,
+          locale: lang,
+          onChange: (status) => parent !== window && parent.postMessage({ kyuubu: "step", ...status }, "*"),
+          onEnd: () => parent !== window && parent.postMessage({ kyuubu: "end" }, "*"),
+        });
+        const here = new URL("famous.html", location.href);
+        here.hash = q.toString();
+        document.getElementById("credit").href = here.href;
+      };
+      addEventListener("hashchange", draw);
+      draw();
+    </script>
+  </body>
+</html>

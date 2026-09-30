@@ -63,4 +63,32 @@ export {
 export { STRINGS, type CliWords, type KyuubuStrings } from "./strings.ts";
 export { WORDS, algorithmName, fill, languageOf, stageName, stageSays, type CubeWords, type KyuubuLanguage } from "./words.ts";
 export { MAX_CLI_COUNT, MAX_CLI_LENGTH, cubeNet, runCli, type CliResult, type CliSurroundings } from "./cli.ts";
+export {
+  applySolve,
+  countSolveMoves,
+  parseSolve,
+  parseSolveMove,
+  readSolveLink,
+  solveMoves,
+  solveText,
+  type NotationFault,
+  type SolveLink,
+  type SolveMove,
+  type SolveReading,
+} from "./reconstruction.ts";
+export {
+  MAX_REPLAY_STEPS,
+  REPLAY_LOOP_REST_MS,
+  REPLAY_SPEEDS,
+  REPLAY_STEP_MS,
+  Replay,
+  planReplay,
+  type ReplayClock,
+  type ReplayCube,
+  type ReplayFault,
+  type ReplayOptions,
+  type ReplayPlan,
+  type ReplaySource,
+  type ReplayStatus,
+} from "./replay.ts";
 export { VERSION } from "./version.ts";

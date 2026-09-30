@@ -103,3 +103,23 @@ published again. The workflow can also be run by hand.
 
 This project follows the [Code of Conduct](CODE_OF_CONDUCT.md). By taking
 part, you agree to it.
+
+## Adding a famous solve
+
+The list in `src/famous.data.ts` holds record solves whose scramble and
+reconstruction are published. To add one:
+
+1. Find where the scramble and the moves were published. The
+   [Speedsolving wiki's history of the 3×3 record](https://www.speedsolving.com/wiki/index.php?title=History_of_World_Records/3x3x3)
+   links a reconstruction for most records; the time, the name, the
+   competition and its dates are in the
+   [World Cube Association's results](https://www.worldcubeassociation.org/results/records).
+2. Run `pnpm solve:check "<scramble>" "<moves>"`, or give it the
+   alg.cubing.net link. It must say the cube ends solved.
+3. Add the entry, in order of time, with its `source` and the day you read
+   it as `checked`. Take the moves and drop the comments. Keep only what the
+   WCA's public results say about the solver: name, country, competition,
+   dates and time.
+4. `pnpm test` plays every solve in the list.
+
+Or open an "Add a solve" issue with the same things, and someone will.

@@ -14,7 +14,8 @@ import {
   fromJSON,
   fromText,
   movesNotation,
-  parseMoves,
+  parseSolve,
+  readSolveLink,
   randomScramble,
   solveSteps,
   solvedCube,
@@ -33,6 +34,7 @@ const WORDS = {
     pitch: "A turning cube for the browser, 2×2 to 7×7, drawn in CSS 3D. Drag a sticker to turn its layer, or type cubers' notation, and follow the layer-by-layer solve one step at a time.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
+    toFamous: "Famous solves",
     time: "Time",
     moves: "Moves",
     size: "Size",
@@ -50,16 +52,17 @@ const WORDS = {
     solveIntro: "The layer-by-layer method most people learn first, worked out for the cube as it is now.",
     nextStep: "Show the next step",
     allSteps: "Solve it all",
-    stepsOnly: "Steps are shown for the 2×2 and the 3×3.",
+    stepsOnly: "This page has no step-by-step method for this size, so these two take back every turn made, the last one first.",
     itsSolved: "It is solved.",
     uses: "Algorithm:",
     typeLabel: "Moves in notation",
     turn: "Turn",
     badMoves: "That is not notation this cube can turn.",
+    badMovesAt: "“{token}” is not notation this cube can turn (line {line}, place {column}).",
     scrambleWas: "Scramble",
     yourMoves: "Your moves",
     none: "Nothing yet.",
-    notationHelp: "R L U D F B turn a face clockwise. R' is the other way and R2 is a half turn. M E S are the middle layers, x y z the whole cube, and 2R the second layer in on a bigger cube.",
+    notationHelp: "R L U D F B turn a face clockwise. R' is the other way and R2 is a half turn. M E S are the middle layers, x y z the whole cube, and 2R the second layer in on a bigger cube. Rw or r is a wide turn. Anything after // is a comment and is skipped, so a solve can be pasted as it is written; paste a link to alg.cubing.net and it is played on the famous solves page.",
     saveIntro: "This solve as plain text: the scramble and your moves. Copy it, or paste one here (text or JSON) and load it.",
     saveLabel: "A solve, as text or JSON",
     copy: "Copy",
@@ -114,6 +117,7 @@ const WORDS = {
     pitch: "ブラウザで回せるキューブです（2×2〜7×7、CSS 3Dで描画）。ステッカーをドラッグして層を回すか、回転記号を入力します。一段ずつそろえる解き方を、1ステップずつ確認できます。",
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
+    toFamous: "有名なソルブ",
     time: "タイム",
     moves: "手数",
     size: "大きさ",
@@ -131,16 +135,17 @@ const WORDS = {
     solveIntro: "多くの人が最初に覚える、一段ずつそろえる解き方です。いまのキューブの状態から手順を求めます。",
     nextStep: "次のステップ",
     allSteps: "最後までそろえる",
-    stepsOnly: "手順を表示できるのは2×2と3×3です。",
+    stepsOnly: "このサイズには解き方の手順がありません。この二つのボタンは、回した手を最後から順に戻します。",
     itsSolved: "そろっています。",
     uses: "使う手順:",
     typeLabel: "回転記号を入力",
     turn: "回す",
     badMoves: "このキューブでは回せない記号です。",
+    badMovesAt: "「{token}」はこのキューブでは回せない記号です（{line}行目、{column}文字目）。",
     scrambleWas: "スクランブル",
     yourMoves: "回した手順",
     none: "まだありません。",
-    notationHelp: "R L U D F B は面を時計回りに回します。R' は反時計回り、R2 は180度です。M E S は中央の層、x y z はキューブ全体、2R は大きいキューブで外から2番目の層です。",
+    notationHelp: "R L U D F B は面を時計回りに回します。R' は反時計回り、R2 は180度です。M E S は中央の層、x y z はキューブ全体、2R は大きいキューブで外から2番目の層です。Rw や r はワイド（2層回し）です。// のあとはコメントとして読み飛ばすので、ソルブを書かれたまま貼り付けられます。alg.cubing.net のリンクを貼ると「有名なソルブ」のページで再生します。",
     saveIntro: "いまのソルブをテキストで表示します（スクランブルと回した手順）。コピーするか、ここに貼り付けて（テキストまたはJSON）読み込めます。",
     saveLabel: "ソルブ（テキストまたはJSON）",
     copy: "コピー",
@@ -233,8 +238,10 @@ function draw() {
   $("saved").textContent = note === null ? "" : say(note);
 
   const can = SOLVABLE_SIZES.includes(n);
-  $("next").disabled = !can;
-  $("all").disabled = !can;
+  // Always a way back: the method where there is one, and every turn taken back where there is not.
+  const stuck = !can && scramble.length + moves.length === 0;
+  $("next").disabled = stuck;
+  $("all").disabled = stuck;
   const step = $("step");
   step.replaceChildren();
   const line = (tag, text, className) => {
@@ -354,11 +361,22 @@ function turned(move) {
   draw();
 }
 
+// A turn the page makes to show something is given its own time, so a run of them keeps one steady pace a person can follow, at the speed chosen under Controls.
+const shownMs = () => turnMs * 1.75;
 const play = (list) => {
   for (const move of list) {
-    view.turn(move);
+    view.turnTogether([move], { ms: shownMs() });
     turned(move);
   }
+};
+// The last turn made taken back, from the moves and then from the scramble: the way home on a cube with no method here.
+const takeBack = () => {
+  const move = moves.pop() ?? scramble.pop();
+  if (move === undefined) return false;
+  timed = false;
+  stop();
+  view.turnTogether([undoOf(move)], { ms: shownMs() });
+  return true;
 };
 
 function make(n, state) {
@@ -459,24 +477,49 @@ const stepOnce = () => {
   return true;
 };
 $("next").addEventListener("click", () => {
+  if (!SOLVABLE_SIZES.includes(view.size)) {
+    takeBack();
+    last = null;
+    draw();
+    return;
+  }
   if (!stepOnce()) {
     last = null;
     draw();
   }
 });
 $("all").addEventListener("click", () => {
-  for (let guard = 0; guard < 60 && stepOnce(); guard += 1);
+  if (!SOLVABLE_SIZES.includes(view.size)) while (takeBack());
+  else for (let guard = 0; guard < 60 && stepOnce(); guard += 1);
   draw();
 });
 
 $("type").addEventListener("submit", (event) => {
   event.preventDefault();
-  const read = parseMoves($("moves").value, view.size);
-  $("error").textContent = read === null ? say("badMoves") : "";
-  if (read === null) return;
+  const typed = $("moves").value;
+  // A link to a reconstruction is a whole solve, scramble and all: the famous solves page plays those.
+  const link = readSolveLink(typed);
+  if (link !== null) {
+    const q = new URLSearchParams({ scramble: link.scramble, moves: link.solution });
+    location.href = `famous.html#${q}`;
+    return;
+  }
+  const read = parseSolve(typed, view.size);
+  $("error").textContent = read.ok ? "" : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
+  if (!read.ok) return;
   last = null;
-  play(read);
+  for (const step of read.steps) {
+    view.turnTogether(step.moves, { ms: shownMs() });
+    for (const move of step.moves) turned(move);
+  }
   $("moves").value = "";
+});
+
+// Enter turns what is typed; Shift and Enter makes a new line, as a pasted solve of several lines has.
+$("moves").addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+  event.preventDefault();
+  $("type").requestSubmit();
 });
 
 $("copy").addEventListener("click", async () => {

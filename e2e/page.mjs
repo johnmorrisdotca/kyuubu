@@ -9,18 +9,24 @@ import { expect, test } from "@playwright/test";
 const site = join(dirname(fileURLToPath(import.meta.url)), "..", "_site");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png" };
 
-/** Open the demo with a query, and collect anything the page complains of. */
-export async function open(page, query = "?lang=en") {
+/** The built site answered at http://kyuubu.test/, with no port and no server. */
+export async function serve(page) {
   if (!existsSync(join(site, "index.html"))) throw new Error("_site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(String(error)));
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
   await page.route("http://kyuubu.test/**", (route) => {
     const { pathname } = new URL(route.request().url());
     const file = join(site, pathname === "/" ? "index.html" : pathname);
     if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
     return route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" });
   });
+}
+
+/** Open the demo with a query, and collect anything the page complains of. */
+export async function open(page, query = "?lang=en") {
+  if (!existsSync(join(site, "index.html"))) throw new Error("_site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(String(error)));
+  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
+  await serve(page);
   await page.goto(`http://kyuubu.test/${query}`);
   await expect(page.locator("[data-kyuubu]")).toBeVisible();
   return errors;
