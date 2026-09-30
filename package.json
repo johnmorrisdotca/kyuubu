@@ -1,25 +1,95 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
-  "version": "1.0.2",
-  "description": "A turning cube for the browser: 2×2 to 7×7, in CSS 3D, turned by drag, mouse wheel, touch or cubers' notation. No framework needed; a small React wrapper included.",
+  "version": "1.1.0",
+  "description": "Turning cube for the browser: a 3D twisty-puzzle cube simulator in the manner of the Rubik's Cube, 2×2 to 7×7, in plain CSS 3D. Turn it by drag, touch, wheel, keys or cubers' notation. Seeded scrambles, a layer-by-layer beginner's solve shown step by step, themes, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "cube",
     "rubiks-cube",
-    "speedcubing",
-    "puzzle",
-    "css-3d",
+    "rubiks",
+    "rubik",
+    "magic-cube",
     "twisty-puzzle",
-    "react"
+    "puzzle",
+    "speedcubing",
+    "speedcube",
+    "cubing",
+    "cube-simulator",
+    "virtual-cube",
+    "3d-cube",
+    "css-3d",
+    "css3d",
+    "no-canvas",
+    "2x2",
+    "3x3",
+    "4x4",
+    "5x5",
+    "6x6",
+    "7x7",
+    "nxn",
+    "nxn-cube",
+    "scramble",
+    "scrambler",
+    "scramble-generator",
+    "cube-scramble",
+    "seeded",
+    "cube-solver",
+    "solver",
+    "layer-by-layer",
+    "beginner-method",
+    "lbl",
+    "cube-notation",
+    "notation",
+    "algorithm",
+    "algorithms",
+    "cube-model",
+    "cube-state",
+    "puzzle-game",
+    "game",
+    "drag",
+    "touch",
+    "keyboard",
+    "accessible",
+    "theming",
+    "themes",
+    "color-scheme",
+    "typescript",
+    "javascript",
+    "react",
+    "react-component",
+    "vue",
+    "svelte",
+    "angular",
+    "vanilla-js",
+    "esm",
+    "zero-dependencies",
+    "cli",
+    "command-line",
+    "json",
+    "csv",
+    "export",
+    "import",
+    "i18n",
+    "japanese",
+    "education"
   ],
-  "author": "John Morris <john@johnmorris.ca>",
-  "license": "MIT",
   "homepage": "https://johnmorrisdotca.github.io/kyuubu/",
+  "bugs": {
+    "url": "https://github.com/johnmorrisdotca/kyuubu/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnmorrisdotca/kyuubu.git"
   },
-  "bugs": "https://github.com/johnmorrisdotca/kyuubu/issues",
+  "license": "MIT",
+  "author": {
+    "name": "John Morris",
+    "email": "john@johnmorris.ca",
+    "url": "https://johnmorris.ca"
+  },
   "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,19 +100,31 @@
       "default": "./dist/react.js"
     }
   },
+  "bin": {
+    "kyuubu": "bin/kyuubu.mjs"
+  },
   "files": [
     "dist",
+    "bin",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/mark-esm.mjs",
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "demo": "pnpm build && node demo/stage.mjs",
+    "site": "pnpm build && node scripts/site.mjs",
+    "demo": "pnpm site",
+    "test:site": "pnpm site && playwright test",
+    "test:cli": "pnpm build && node scripts/check-cli.mjs",
+    "test:package": "pnpm build && node scripts/check-package.mjs",
+    "docs:make": "node scripts/docs.mjs",
     "prepublishOnly": "pnpm check"
   },
   "peerDependencies": {
@@ -55,6 +137,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@types/react": "^19",
     "eslint": "^10.11.0",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -63,10 +146,8 @@
     "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.0"
   },
-  "types": "./dist/index.d.ts",
-  "engines": {
-    "node": ">=20"
+  "publishConfig": {
+    "access": "public"
   },
-  "packageManager": "pnpm@10.11.0",
-  "main": "./dist/index.js"
+  "packageManager": "pnpm@10.11.0"
 }

@@ -4,6 +4,64 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-30
+
+Everything here is added beside what was there: nothing exported has changed
+its meaning, and every scramble made from a random source of your own comes
+out as it did.
+
+### Added
+
+- **A command line.** `kyuubu` in a terminal on Linux, macOS or Windows:
+  scrambles (`--seed`, `--size`, `--length`, `--count`, `--faces`), turns
+  applied and the cube drawn unfolded (`--apply`), a check that turns solve a
+  scramble (`--verify`, by exit code), and the layer-by-layer solve
+  (`--solve`). `--json`, `--lang`, `--stdin`, `--no-color`. `runCli` is the
+  whole of it as a pure function, and `cubeNet` draws a cube as text.
+- **Export and import of a solve**: `toJSON` and `fromJSON` (versioned JSON,
+  which trusts nothing it reads and works the cube out again), `toText` and
+  `fromText` (a few plain lines of notation), `toCSV` (a list of solves for a
+  spreadsheet, safe to open), and `summarize`. Types `SolveRecord` and
+  `SolveSummary`.
+- **Scrambles from a seed**: `seededRandom("any text")` gives the same
+  numbers on every device, so `randomScramble(3, 25, seededRandom(seed))` is
+  the same scramble for everybody. And `randomScramble` takes
+  `{ faces: true }` to turn only the outer faces.
+- **Theming.** Every face's colour, the plastic and the shape of a sticker
+  are CSS custom properties (`--kyuubu-up` and the rest) as well as options.
+  A `theme` option, `setTheme` to change the look of a cube already drawn,
+  and three looks in `CUBE_THEMES`: `standard`, `paper` and `stickerless`.
+  `DEFAULT_PLASTIC`, `FACE_PROPERTIES` and the type `CubeTheme`.
+- **English and Japanese.** The cube's accessible name follows a `locale`
+  option or the page's `lang`, with `setLocale` to change it. `stageName`,
+  `stageSays` and `algorithmName` name the steps of a solve, say what each is
+  for and name its algorithms, in either language. `WORDS`, `STRINGS`, `fill`
+  and `languageOf`. Every Japanese line is listed in `docs/strings-ja.md`.
+  The Japanese has not yet been reviewed by a native reader.
+- `VERSION`, and a doc comment on every export.
+- The React component takes `theme` and `locale`, and its handle has
+  `setTheme`.
+- A new demo site in the family's look, light and dark, in English and
+  Japanese: the solve shown step by step with each step's name and reason,
+  solves kept on the device and saved as text, JSON or CSV, and themes.
+- The README's examples are run by a test. Vue, Svelte, Angular, React and a
+  plain page are each built from the packed tarball and turned in Chromium
+  and WebKit by `scripts/check-frameworks.mjs`.
+- `scripts/check-package.mjs` packs the package with npm, installs the
+  tarball in an empty project, imports every entry by `import` and by
+  `require`, and runs the command. It runs in CI on Linux, macOS and Windows
+  and before every publish.
+
+### Changed
+
+- A sticker's colour is written on the page as `var(--kyuubu-up, #f7f7f2)`
+  where no colour was given in code, and as the colour itself where one was.
+  It looks the same; a test that read a sticker's inline style would see the
+  difference.
+- On a page whose `lang` is Japanese, the cube's default accessible name is
+  in Japanese. A `label` of your own is left as it is.
+- CI runs on Node 22 and 24. The package still runs on Node 20.
+
 ## [1.0.2] - 2026-09-30
 
 ### Fixed
@@ -42,7 +100,9 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.2...v1.1.0
+[1.0.2]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/johnmorrisdotca/kyuubu/releases/tag/v0.1.0

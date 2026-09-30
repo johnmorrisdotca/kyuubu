@@ -13,6 +13,7 @@ import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
  * those, one on the negative side is one.
  */
 
+/** A face as the notation names it. */
 export type CubeFaceLetter = "R" | "L" | "U" | "D" | "F" | "B";
 
 const FACE_AXES: Record<CubeFaceLetter, { axis: CubeAxis; positive: boolean }> = {

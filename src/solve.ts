@@ -56,6 +56,7 @@ export const SOLVE_ALGORITHMS = {
   cornerCycle: "R' F R' B2 R F' R' B2 R2",
   edgeCycle: "R U' R U R U R U' R' U' R2",
 } as const;
+/** The name of one of the method's algorithms: a key of `SOLVE_ALGORITHMS`. */
 export type SolveAlgorithm = keyof typeof SOLVE_ALGORITHMS;
 
 /** The sizes the method is written for. */

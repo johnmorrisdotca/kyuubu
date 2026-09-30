@@ -1,0 +1,47 @@
+/* Kyuubu's own: the cube on its felt, and what sits round it. Everything else is family.css. */
+:root { --intro-room: 11.5rem; --intro-room-wide: 6.5rem; }
+
+.cube-layout { display: grid; gap: 14px; }
+.cube-layout > * { min-width: 0; }
+.cube-side { display: grid; gap: 14px; align-content: start; }
+@media (min-width: 900px) {
+  .cube-layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+}
+
+/* The felt holds the clock and the count above the cube, and a line of help below it. */
+.cube-felt { display: grid; gap: 8px; padding: 14px 14px 12px; }
+.cube-hud { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.cube-hud small { display: block; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
+.cube-hud b { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+.cube-hud div:last-child { text-align: right; }
+/* The cube fills its stage, which is a square as wide as the felt and never taller than the window leaves room for. */
+.cube-stage { position: relative; width: 100%; max-width: min(560px, 62vh); aspect-ratio: 1; margin: 0 auto; }
+.cube-stage [data-kyuubu]:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; border-radius: 12px; }
+/* Room for two lines in either language, so the felt never changes height. */
+.cube-felt .fam-hint { margin: 0; min-height: 4em; display: grid; place-items: center; }
+@media (min-width: 540px) { .cube-felt .fam-hint { min-height: 2.6em; } }
+.cube-felt .fam-hint[data-tone="good"] { opacity: 1; font-weight: 700; color: var(--gold); }
+
+.cube-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 540px) { .cube-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cube-sizes { display: grid; grid-template-columns: repeat(6, minmax(44px, 1fr)); width: 100%; }
+.cube-sizes button { padding: 0 2px; }
+
+/* One panel shows at a time; each keeps to its own height. */
+.cube-panels .fam-tabs button { padding: 0 4px; font-size: .9rem; }
+.cube-step { display: grid; gap: 4px; min-height: 7.5rem; align-content: start; }
+.cube-step b { font-size: 1.05rem; }
+.cube-done { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-height: 220px; overflow-y: auto; font-size: .85rem; }
+.cube-done li { display: grid; grid-template-columns: minmax(7.5rem, auto) 1fr; gap: 4px 12px; padding: 6px 2px; border-bottom: 1px solid var(--rule); }
+.cube-done li:last-child { border-bottom: 0; }
+.cube-done li span { color: var(--muted); }
+.cube-form { display: flex; gap: 8px; }
+.cube-form .fam-field { flex: 1 1 8rem; }
+.cube-log { min-height: 1.4em; color: var(--muted); }
+.cube-text { width: 100%; min-height: 7.5rem; }
+.cube-colours { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.cube-colours label { display: grid; gap: 4px; font-size: .75rem; color: var(--muted); }
+.cube-colours input { width: 100%; height: 44px; padding: 3px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); cursor: pointer; }
+.cube-solves { max-height: 240px; overflow-y: auto; }
+.more pre + pre { margin-top: 8px; }
+.more pre code { font-weight: 400; }

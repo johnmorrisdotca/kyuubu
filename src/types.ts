@@ -15,15 +15,19 @@
  * and is never counted as a move.
  */
 
+/** An axis of the cube: 0 is x (to the right), 1 is y (up) and 2 is z (towards the viewer). */
 export type CubeAxis = 0 | 1 | 2;
 
 /** One, two or three quarter turns, counter-clockwise seen from the axis's positive end. */
 export type CubeTurns = 1 | 2 | 3;
 
+/** One turn: a layer, or the whole cube, turned about an axis by one, two or three quarter turns. */
 export type CubeMove = {
+  /** The axis turned about. */
   axis: CubeAxis;
   /** The layer, 0 to n − 1 from the axis's negative side; "all" for the whole cube. */
   layer: number | "all";
+  /** How far: one, two or three quarter turns by the right-hand rule. */
   turns: CubeTurns;
 };
 

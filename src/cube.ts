@@ -14,6 +14,7 @@ import type { CubeAxis, CubeMove, CubeTurns, StickerSlot, Vec3 } from "./types.t
 
 /** The faces in the order a state is written: up, right, front, down, left, back. Each letter is also that face's colour when solved. */
 export const CUBE_FACE_ORDER = ["U", "R", "F", "D", "L", "B"] as const;
+/** A face's letter: U, R, F, D, L or B. */
 export type CubeFace = (typeof CUBE_FACE_ORDER)[number];
 
 /** Which way each face looks, and its rows and columns as the face is seen from outside, in the order above. */
@@ -170,6 +171,7 @@ export function isCubeState(state: string, n: number): boolean {
 
 const AXES = "xyz";
 
+/** Moves written three characters each, such as `x23y02z*1`: compact, and readable without knowing the cube's size. */
 export function encodeCubeMoves(moves: readonly CubeMove[]): string {
   return moves.map((move) => `${AXES[move.axis]}${move.layer === "all" ? "*" : move.layer}${move.turns}`).join("");
 }

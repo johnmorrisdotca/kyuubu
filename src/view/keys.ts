@@ -8,12 +8,14 @@ import type { CubeMove } from "../types.ts";
  * reaches that many layers in from the face the next letter names, so on a
  * 4×4 "2" then "R" turns the layer next to R.
  */
+/** What a key means: a turn, a depth for the next face letter, or nothing. */
 export type KeyReading = { move: CubeMove } | { depth: number } | null;
 
 const FACES = new Set(["R", "L", "U", "D", "F", "B"]);
 const MIDDLES = new Set(["M", "E", "S"]);
 const WHOLE = new Set(["X", "Y", "Z"]);
 
+/** What a key means on a cube of side `n`, given the depth a digit before it set (1 where none did). */
 export function readKey(key: string, shift: boolean, n: number, depth: number): KeyReading {
   if (/^[1-9]$/.test(key)) return { depth: Number(key) };
   // A shifted digit or letter arrives as its capital (or a symbol), so the letter is read by its capital and Shift says the way.

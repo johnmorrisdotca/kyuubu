@@ -10,12 +10,14 @@ import type { CubeAxis, Vec3 } from "../types.ts";
 /** A 3×3 matrix, rows of three. */
 export type Mat3 = readonly [Vec3, Vec3, Vec3];
 
+/** The matrix that changes nothing. */
 export const IDENTITY: Mat3 = [
   [1, 0, 0],
   [0, 1, 0],
   [0, 0, 1],
 ];
 
+/** A matrix applied to a vector. */
 export function apply(m: Mat3, v: Vec3): Vec3 {
   return [
     m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
@@ -24,6 +26,7 @@ export function apply(m: Mat3, v: Vec3): Vec3 {
   ];
 }
 
+/** Two matrices as one: `b` first, then `a`. */
 export function multiply(a: Mat3, b: Mat3): Mat3 {
   const col = (j: number): Vec3 => [b[0][j], b[1][j], b[2][j]];
   const cols = [apply(a, col(0)), apply(a, col(1)), apply(a, col(2))];
@@ -48,6 +51,7 @@ export function viewMatrix(yaw: number, pitch: number): Mat3 {
   return multiply(rotation(0, (pitch * Math.PI) / 180), rotation(1, (yaw * Math.PI) / 180));
 }
 
+/** A model vector as CSS has it: y down. */
 export function toCss(v: Vec3): Vec3 {
   return [v[0], -v[1], v[2]];
 }
@@ -70,10 +74,12 @@ export function cssMatrix(m: Mat3, scale = 1): string {
   return placement(apply(m, [scale, 0, 0]), apply(m, [0, -scale, 0]), apply(m, [0, 0, scale]), [0, 0, 0]);
 }
 
+/** The cross product of two vectors. */
 export function cross(a: Vec3, b: Vec3): Vec3 {
   return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 }
 
+/** The unit vector along an axis. */
 export function axisVector(axis: CubeAxis): Vec3 {
   return axis === 0 ? [1, 0, 0] : axis === 1 ? [0, 1, 0] : [0, 0, 1];
 }

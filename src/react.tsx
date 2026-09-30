@@ -2,7 +2,7 @@ import { useEffect, useImperativeHandle, useRef, type CSSProperties, type Ref } 
 
 import type { CubeFace } from "./cube.ts";
 import type { CubeMove } from "./types.ts";
-import { CubeView, type CubeViewOptions } from "./view/view.ts";
+import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
 
 /** What a parent can ask of the cube on the screen. */
 export type KyuubuHandle = {
@@ -12,10 +12,13 @@ export type KyuubuHandle = {
   setState: (state: string) => void;
   /** Back to the way it was first seen. */
   resetLook: () => void;
+  /** Change its colours, its plastic or the shape of its stickers, without redrawing it. */
+  setTheme: (theme: CubeTheme) => void;
   /** The stickers once every turn asked for is done. */
   state: () => string;
 };
 
+/** The component's props: every option of `CubeView`, a `state` the parent may keep, and the box's `className`, `style` and `data-*`. */
 export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
   /**
    * The stickers the cube starts with. Read when the cube is made, and again
@@ -44,7 +47,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
   useEffect(() => {
     handlers.current = { onTurn, onLook };
   }, [onTurn, onLook]);
-  const { colours, plastic, keyboard, turnMs, yaw, pitch, fill, label } = rest;
+  const { colours, plastic, theme, locale, keyboard, turnMs, yaw, pitch, fill, label } = rest;
   const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-")));
 
   useEffect(() => {
@@ -55,6 +58,8 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
       interactive,
       colours,
       plastic,
+      theme,
+      locale,
       keyboard,
       turnMs,
       yaw,
@@ -71,7 +76,11 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
     };
     // Made again only for what cannot be changed on a cube already drawn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, keyboard, plastic, yaw, pitch, fill, label, JSON.stringify(colours ?? {})]);
+  }, [size, keyboard, plastic, yaw, pitch, fill, label, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
+
+  useEffect(() => {
+    if (locale !== undefined) view.current?.setLocale(locale);
+  }, [locale]);
 
   useEffect(() => {
     if (state !== undefined && view.current !== null && view.current.state !== state) view.current.setState(state);
@@ -85,6 +94,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
     turn: (move, options) => view.current?.turn(move, options),
     setState: (next) => view.current?.setState(next),
     resetLook: () => view.current?.resetLook(),
+    setTheme: (next) => view.current?.setTheme(next),
     state: () => view.current?.state ?? state ?? "",
   }));
 
