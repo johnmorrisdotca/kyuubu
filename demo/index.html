@@ -96,6 +96,8 @@
               <button id="solve" type="button">Reset</button>
               <button id="look" type="button">Front on</button>
             </div>
+            <button id="next" type="button" style="width: 100%; margin-top: 6px">Show the next step</button>
+            <p class="log" id="step" aria-live="polite"></p>
           </section>
 
           <section class="card">
@@ -135,7 +137,7 @@ new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });</c
     </main>
 
     <script type="module">
-      import { CubeView, FULL_SCRAMBLE_LENGTHS, countsAsMove, cubeSolved, moveNotation, movesNotation, parseMoves, randomScramble, solvedCube, undoOf } from "./dist/index.js";
+      import { CubeView, FULL_SCRAMBLE_LENGTHS, SOLVABLE_SIZES, countsAsMove, cubeSolved, moveNotation, movesNotation, parseMoves, randomScramble, solveSteps, solvedCube, undoOf } from "./dist/index.js";
 
       const $ = (id) => document.getElementById(id);
       const stage = $("stage");
@@ -202,6 +204,16 @@ new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });</c
       });
       $("solve").addEventListener("click", () => { view.setState(solvedCube(view.size)); clear(); });
       $("look").addEventListener("click", () => view.resetLook());
+      const STAGES = { hold: "Hold white on the bottom", whiteCross: "White cross", whiteCorners: "White corners", whiteLayer: "White layer", middleLayer: "Middle layer", yellowCross: "Yellow cross", yellowFace: "Yellow face", yellowCorners: "Yellow corners", yellowEdges: "Yellow edges" };
+      // The layer-by-layer method, one step at a time: what the step is for, and its turns, made on the cube.
+      $("next").addEventListener("click", () => {
+        const n = view.size;
+        if (!SOLVABLE_SIZES.includes(n)) { $("step").textContent = "Steps are shown for the 2×2 and 3×3."; return; }
+        const [step] = solveSteps(view.state, n);
+        if (step === undefined) { $("step").textContent = "It's solved."; return; }
+        $("step").textContent = `${STAGES[step.stage]}: ${movesNotation(step.moves, n)}`;
+        for (const move of step.moves) { view.turn(move); turned(move); }
+      });
       $("type").addEventListener("submit", (event) => {
         event.preventDefault();
         const read = parseMoves($("moves").value, view.size);

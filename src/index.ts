@@ -23,6 +23,7 @@ export {
 } from "./cube.ts";
 export { faceMove, middleMove, moveNotation, movesNotation, parseMove, parseMoves, wholeMove, type CubeFaceLetter } from "./notation.ts";
 export { FULL_SCRAMBLE_LENGTHS, randomScramble } from "./scramble.ts";
+export { SOLVABLE_SIZES, SOLVE_ALGORITHMS, joinTurns, solveSteps, type SolveAlgorithm, type SolvePart, type SolveStage, type SolveStep } from "./solve.ts";
 export { CubeView, DEFAULT_COLOURS, type CubeViewOptions } from "./view/view.ts";
 export { moveForDrag, moveForWheel } from "./view/gestures.ts";
 export { readKey, type KeyReading } from "./view/keys.ts";

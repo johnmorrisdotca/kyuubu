@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `solveSteps`: the layer-by-layer beginner's method for any 2×2 or 3×3, as named steps. Each step comes with its turns and the algorithms it uses.
+- `joinTurns`, which merges turns of the same layer in a row into one.
+
 ## [0.1.0] - 2026-09-30
 
 ### Added

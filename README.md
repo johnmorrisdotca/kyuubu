@@ -32,6 +32,7 @@
   - That makes a cube easy to store, send over the wire, snapshot in a test, or re-check on a server.
 - **Notation in and out.** It reads and writes `R U R' U'`, `2R2`, `M'`, `x` and more.
 - **Seedable scrambles.** Pass your own random source and every browser gets the same scramble.
+- **A solve you can follow.** `solveSteps` gives the beginner's layer-by-layer method for any 2×2 or 3×3, one named step at a time.
 - **Small and typed.** It has no runtime dependencies and is written in strict TypeScript. The optional React component has a single peer dependency, React itself.
 
 ## Quick start
@@ -165,6 +166,31 @@ A **move** is `{ axis, layer, turns }`:
 | `randomScramble` | `(n, length, random = Math.random) => CubeMove[]`: never repeats an axis twice in a row, and never leaves the cube solved |
 | `FULL_SCRAMBLE_LENGTHS` | Competition-style lengths by size: `{ 2: 11, 3: 25, 4: 40, 5: 60, 6: 80, 7: 100 }` |
 
+### A solve a person can follow
+
+`solveSteps(state, n)` works out the layer-by-layer solve most people learn first, for a 2×2 or 3×3 in any state. It returns `null` for other sizes.
+
+```ts
+import { solveSteps, movesNotation } from "kyuubu";
+
+for (const step of solveSteps(state, 3)!) {
+  console.log(step.stage, movesNotation(step.moves, 3));
+}
+// hold          x2
+// whiteCross    D R' D'
+// whiteCorners  U2 R U R' U' R U R' U'
+// middleLayer   U R U' R' U' F' U F
+// yellowCross   F R U R' U' F'
+// yellowFace    R U R' U R U2 R'
+// yellowCorners R' F R' B2 R F' R' B2 R2
+// yellowEdges   R U' R U R U R U' R' U' R2
+```
+
+- The cube is held with white on the bottom. The `hold` step, if one is needed, is the whole-cube turn that puts it there.
+- The 3×3 goes white cross, white corners, middle layer, yellow cross, yellow face, yellow corners, yellow edges. The 2×2 goes white layer, yellow face, yellow corners.
+- Each step's `parts` split it into lining-up turns and whole algorithms (`cornerIn`, `edgeRight`, `edgeLeft`, `yellowCross`, `sune`, `cornerCycle`, `edgeCycle`), so a page can say which algorithm to use and when. `SOLVE_ALGORITHMS` gives each one in notation.
+- Every step is a short search over the moves a beginner is taught, so it reads like the method, not like a computer's shortest solve. A whole 3×3 takes a few milliseconds.
+
 ### `new CubeView(element, options)`
 
 | Option | Default | Meaning |
@@ -203,7 +229,7 @@ It works in every evergreen browser with CSS 3D transforms and Pointer Events: C
 
 ## Roadmap
 
-- A step-by-step beginner's solver for 2×2 and 3×3.
+- A solver for 4×4 and up, by reduction to a 3×3.
 - Pattern and algorithm playback, with a scrubber.
 - Stickerless and custom themes.
 - Other shapes: 2×2×3, 3×3×2.
