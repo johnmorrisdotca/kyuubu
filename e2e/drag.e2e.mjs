@@ -173,3 +173,32 @@ test("the speed of turns made by keys and notation is chosen under Controls", as
   expect(await cube(page)).toBe(after("R"));
   await sound(page, errors);
 });
+
+// Safari on a phone once drew the cube as one flat face after letting go of its 3D layers. The cube asks for none now:
+// every sticker carries its own place on the screen, so even a browser that draws everything flat, as the WebKit these
+// tests run does, shows three whole faces.
+test("draws three whole faces with no 3D context to lose", async ({ page }) => {
+  await open(page);
+  const nested = await page.locator("[data-kyuubu], [data-kyuubu] *").evaluateAll((all) => all.filter((element) => getComputedStyle(element).transformStyle === "preserve-3d").length);
+  expect(nested).toBe(0);
+  await expect(page.locator("[data-kyuubu] [data-slot]:visible")).toHaveCount(27);
+  const faces = await page.locator("[data-kyuubu] [data-slot]:visible").evaluateAll((all) => [...new Set(all.map((element) => element.dataset.face))].sort().join(""));
+  expect(faces).toBe("FRU");
+  // Stickers side by side, not piled on one another: 27 of them cover 27 different places.
+  const places = await page.locator("[data-kyuubu] [data-slot]:visible").evaluateAll((all) => new Set(all.map((element) => { const box = element.getBoundingClientRect(); return `${Math.round(box.x / 4)},${Math.round(box.y / 4)}`; })).size);
+  expect(places).toBe(27);
+});
+
+// A touch that begins on the cube turns it and never scrolls or zooms the page; one beside the cube is the page's.
+test("keeps a touch that begins on the cube from scrolling or zooming the page", async ({ page }) => {
+  await open(page);
+  const refused = await page.evaluate(() => {
+    const touch = (target) => {
+      const event = new window.Event("touchstart", { bubbles: true, cancelable: true });
+      target.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    return { cube: touch(document.querySelector("[data-kyuubu] [data-slot]")), page: touch(document.querySelector("h1") ?? document.body) };
+  });
+  expect(refused).toEqual({ cube: true, page: false });
+});

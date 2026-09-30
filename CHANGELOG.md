@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-30
+
+### Fixed
+
+- The cube could still be drawn flat on an iPhone, one face and nothing
+  behind it, most often while a famous solve played. The cause was the way it
+  was drawn: stickers placed in 3D inside a turned group, which Safari can
+  flatten into the group's plane when it lets go of its 3D layers. The cube
+  no longer asks the browser for any 3D context (no `preserve-3d`). Every
+  sticker is given its whole place on the screen in one transform, worked out
+  from the way the cube is looked at and how far a layer has turned; the cube
+  decides itself which stickers face the viewer and which part of a turning
+  cube is drawn in front. A browser that draws everything flat still shows
+  the whole cube.
+- On a phone, dragging up or down on the cube could scroll the page instead
+  of turning a layer, and a quick second tap could zoom the page. A touch
+  that begins on the cube is now the cube's; a touch beside it scrolls the
+  page as before. The demo pages and the player's buttons no longer zoom on a
+  double tap; two fingers still zoom.
+
 ## [1.3.1] - 2026-09-30
 
 ### Fixed

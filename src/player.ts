@@ -64,7 +64,7 @@ export const PLAYER_CSS = `
 .kyuubu-player{display:grid;gap:.5rem;font:inherit;color:inherit;max-width:100%}
 .kyuubu-player-cube{aspect-ratio:1;width:100%;position:relative;background:var(--kyuubu-player-felt,transparent);border-radius:var(--kyuubu-player-radius,12px);touch-action:none}
 .kyuubu-player-row{display:flex;flex-wrap:wrap;gap:.375rem;align-items:center}
-.kyuubu-player button{font:inherit;color:inherit;min-height:44px;min-width:44px;padding:0 .75rem;border-radius:999px;border:1px solid var(--kyuubu-player-rule,color-mix(in srgb,currentColor 28%,transparent));background:var(--kyuubu-player-button,transparent);cursor:pointer}
+.kyuubu-player button{touch-action:manipulation;font:inherit;color:inherit;min-height:44px;min-width:44px;padding:0 .75rem;border-radius:999px;border:1px solid var(--kyuubu-player-rule,color-mix(in srgb,currentColor 28%,transparent));background:var(--kyuubu-player-button,transparent);cursor:pointer}
 .kyuubu-player button[aria-pressed="true"],.kyuubu-player button[data-main]{background:var(--kyuubu-player-ink,currentColor);border-color:var(--kyuubu-player-ink,currentColor)}
 .kyuubu-player button[aria-pressed="true"]>span,.kyuubu-player button[data-main]>span{color:var(--kyuubu-player-paper,Canvas);mix-blend-mode:normal}
 .kyuubu-player button:focus-visible,.kyuubu-player input:focus-visible{outline:2px solid var(--kyuubu-player-focus,Highlight);outline-offset:2px}

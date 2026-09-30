@@ -1,5 +1,7 @@
 /* Kyuubu's own: the cube on its felt, and what sits round it. Everything else is family.css. */
 :root { --intro-room: 11.5rem; --intro-room-wide: 6.5rem; }
+/* A quick second tap on a phone presses a button again, never zooms the page; two fingers still zoom it. */
+.cube-page { touch-action: manipulation; }
 
 .cube-layout { display: grid; gap: 14px; }
 .cube-layout > * { min-width: 0; }

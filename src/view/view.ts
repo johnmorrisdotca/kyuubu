@@ -1,16 +1,22 @@
 import { CUBE_FACE_ORDER, FACE_FRAMES, cubeSlots, faceOfNormal, layerOf, solvedCube, turnCube, type CubeFace } from "../cube.ts";
 import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
-import type { CubeMove, StickerSlot, Vec3 } from "../types.ts";
+import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
-import { axisVector, cssMatrix, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
+import { apply, axisVector, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
 import { COMMIT_ANGLE, dragAngle, moveForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, type DragPick } from "./gestures.ts";
 import { readKey } from "./keys.ts";
 
 /**
- * THE CUBE ON THE SCREEN, in plain DOM and CSS 3D: no canvas, no WebGL, no
- * framework. A sticker is a square element placed in 3D with a `matrix3d`;
- * a turn gathers the stickers of its layer into a group and turns the group,
- * then puts every colour where it landed and the group back as it was.
+ * THE CUBE ON THE SCREEN, in plain DOM and CSS: no canvas, no WebGL, no
+ * framework. A sticker is a square element given its whole place on the
+ * screen in one `matrix3d`, worked out here from the way the cube is looked
+ * at and how far a turning layer has gone; a turn gathers the stickers of
+ * its layer into a group, then puts every colour where it landed.
+ *
+ * Nothing is nested in 3D (no `preserve-3d`): which stickers face the viewer
+ * and which part of a turning cube is in front are decided here, not by the
+ * browser. Safari on a phone can let go of nested 3D layers and draw a cube
+ * as one flat face; a cube that asks for no 3D context cannot be flattened.
  *
  * Every hand does something:
  * - drag a sticker across the cube and the layer that carries it that way turns
@@ -127,6 +133,10 @@ type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { 
 
 /** One step of the queue: a turn, or several layers about one axis turned as one (a wide turn), and how long it should take when that was asked for. */
 type Queued = { moves: CubeMove[]; report: boolean; ms?: number };
+/** Where an element sits on the cube, before the cube is turned to be looked at: its own x, y and z as model vectors, its centre in pixels, and, for the plastic across a turning gap, the layer it closes. */
+type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number };
+/** A layer turning: which way, how far so far, and which layers turn. */
+type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all"> };
 
 /**
  * A cube on the screen. `new CubeView(element, { size: 3 })` draws it in the
@@ -153,6 +163,8 @@ export class CubeView {
   private readonly still: HTMLDivElement;
   private readonly turning: HTMLDivElement;
   private stickers: HTMLDivElement[] = [];
+  private readonly places = new Map<HTMLElement, Placed>();
+  private spin: Spin | null = null;
   private queue: Queued[] = [];
   private animating = false;
   private frame = 0;
@@ -199,7 +211,7 @@ export class CubeView {
     this.root.dataset.turning = "false";
     this.root.dataset.dragging = "false";
     this.root.dataset.committed = "false";
-    Object.assign(this.root.style, { position: "absolute", inset: "0", touchAction: "none", userSelect: "none", outline: "none", overflow: "hidden", cursor: "grab" });
+    Object.assign(this.root.style, { position: "absolute", inset: "0", touchAction: "none", userSelect: "none", outline: "none", cursor: "grab" });
     this.pivot = this.layer();
     this.still = this.layer();
     this.turning = this.layer();
@@ -391,7 +403,7 @@ export class CubeView {
 
   private layer(): HTMLDivElement {
     const div = document.createElement("div");
-    Object.assign(div.style, { position: "absolute", left: "0", top: "0", width: "0", height: "0", transformStyle: "preserve-3d" });
+    Object.assign(div.style, { position: "absolute", left: "0", top: "0", width: "0", height: "0" });
     return div;
   }
 
@@ -403,6 +415,7 @@ export class CubeView {
   private build(): void {
     this.still.replaceChildren();
     this.turning.replaceChildren();
+    this.places.clear();
     const unit = this.unit();
     const { slots } = cubeSlots(this.n);
     this.stickers = slots.map((slot, at) => {
@@ -415,9 +428,8 @@ export class CubeView {
         height: `${unit}px`,
         left: `${-unit / 2}px`,
         top: `${-unit / 2}px`,
-        backfaceVisibility: "hidden",
-        transform: placement(frame.right, frame.down, frame.normal, this.surface(slot)),
       });
+      this.places.set(sticker, { right: frame.right, down: frame.down, out: frame.normal, at: this.surface(slot), slot: at });
       const face = document.createElement("div");
       Object.assign(face.style, { position: "absolute", pointerEvents: "none" });
       sticker.append(face);
@@ -426,6 +438,7 @@ export class CubeView {
     });
     this.dress();
     this.paint();
+    this.draw();
   }
 
   private surface(slot: StickerSlot): Vec3 {
@@ -448,10 +461,64 @@ export class CubeView {
 
   /** Fit the cube to its space and turn it the way it is looked at. */
   private look(): void {
+    this.draw();
+  }
+
+  /**
+   * Every element given its place on the screen: turned the way the cube is
+   * looked at, and a turning layer's by how far it has gone. An element
+   * facing away is hidden. While a layer turns, the cube is in pieces along
+   * the axis (the turning layers and the still ones between them), each a
+   * block whose faces never cover one another; the pieces are stacked so the
+   * one nearer the eye is drawn over the one behind. Only the turning group
+   * is redrawn when `turningOnly`, as each frame of a turn is.
+   */
+  private draw(turningOnly = false): void {
     const side = Math.min(this.host.clientWidth || EDGE * 1.8, this.host.clientHeight || this.host.clientWidth || EDGE * 1.8);
     const scale = (side * this.options.fill) / (EDGE * Math.sqrt(3));
-    this.root.style.perspective = `${Math.round(side * 3.2)}px`;
-    this.pivot.style.transform = cssMatrix(this.view(), scale);
+    const lens = Math.round(side * 3.2);
+    const view = this.view();
+    const spin = this.spin;
+    const turned = spin === null ? view : multiply(view, rotation(spin.axis, spin.radians));
+    const { slots } = cubeSlots(this.n);
+    // The pieces a turn makes, numbered from the axis's negative side, and whether that side is the far one.
+    const pieceOf: number[] = [];
+    if (spin !== null && !spin.layers.has("all")) {
+      for (let layer = 0, piece = 0; layer < this.n; layer += 1) {
+        if (layer > 0 && spin.layers.has(layer) !== spin.layers.has(layer - 1)) piece += 1;
+        pieceOf.push(piece);
+      }
+    }
+    const pieces = pieceOf.length === 0 ? 1 : pieceOf[pieceOf.length - 1] + 1;
+    const nearIsPositive = spin === null || apply(view, axisVector(spin.axis))[2] >= 0;
+    const scaled = (m: Mat3, v: Vec3) => apply(m, v).map((value) => value * scale) as unknown as Vec3;
+    const elements = turningOnly ? ([...this.turning.children] as HTMLElement[]) : [...this.places.keys()];
+    for (const element of elements) {
+      const place = this.places.get(element);
+      if (place === undefined) continue;
+      const m = element.parentElement === this.turning ? turned : view;
+      const at = scaled(m, place.at);
+      const out = apply(m, place.out);
+      // Facing the eye, which sits `lens` pixels in front of the cube's centre.
+      const facing = -out[0] * at[0] - out[1] * at[1] + out[2] * (lens - at[2]) > 1e-6;
+      element.style.visibility = facing ? "" : "hidden";
+      if (!facing) continue;
+      element.style.transform = `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}`;
+      if (spin === null || pieces === 1) {
+        element.style.zIndex = "0";
+        continue;
+      }
+      const layer = place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n);
+      const piece = pieceOf[layer];
+      element.style.zIndex = String(nearIsPositive ? piece : pieces - 1 - piece);
+    }
+  }
+
+  /** The turning group turned this far about the spin's axis, and drawn. */
+  private spinTo(radians: number): void {
+    if (this.spin === null) return;
+    this.spin = { ...this.spin, radians };
+    this.draw(true);
   }
 
   /** How long a quarter turn takes now: no time at all on a device that asks for reduced motion. */
@@ -466,15 +533,20 @@ export class CubeView {
     const layers = new Set([move, ...others].map((one) => one.layer));
     const moving = slots.map((slot, at) => (layers.has("all") || layers.has(layerOf(slot.centre, move.axis, this.n)) ? at : -1)).filter((at) => at >= 0);
     for (const at of moving) this.turning.append(this.stickers[at]);
-    return { moving, covers: this.covers(move, layers) };
+    const covers = this.covers(move, layers);
+    this.spin = { axis: move.axis, radians: 0, layers };
+    this.draw();
+    return { moving, covers };
   }
 
   /** The turning group put back as it was, its stickers still again. */
   private lower(): void {
-    this.turning.style.transform = "";
     for (const sticker of [...this.turning.children]) if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
     this.turning.replaceChildren();
     for (const cover of [...this.still.children]) if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
+    for (const element of [...this.places.keys()]) if (element.dataset.cover !== undefined) this.places.delete(element);
+    this.spin = null;
+    this.draw();
   }
 
   /** The pixels a pointer goes to drag a layer a quarter turn: seven tenths of the cube's edge as it is drawn. */
@@ -521,7 +593,7 @@ export class CubeView {
     this.root.dataset.angle = String(Math.round(angle));
     drag.samples.push({ at, angle });
     while (drag.samples.length > 1 && at - drag.samples[0].at > SPEED_WINDOW * 2) drag.samples.shift();
-    this.turning.style.transform = cssMatrix(rotation(drag.pick.axis, (angle * Math.PI) / 180));
+    this.spinTo((angle * Math.PI) / 180);
     const committed = pastCommit(angle, this.commitAngle());
     if (committed !== drag.committed) {
       drag.committed = committed;
@@ -567,7 +639,7 @@ export class CubeView {
     const step = (now: number) => {
       const t = duration <= 0 ? 1 : Math.min(1, (now - started) / duration);
       const eased = 1 - (1 - t) ** 3;
-      this.turning.style.transform = cssMatrix(rotation(drag.pick.axis, ((from + (to - from) * eased) * Math.PI) / 180));
+      this.spinTo(((from + (to - from) * eased) * Math.PI) / 180);
       if (t < 1) {
         this.frame = requestAnimationFrame(step);
         return;
@@ -601,7 +673,7 @@ export class CubeView {
     this.animating = true;
     this.root.dataset.turning = "true";
     const move = job.moves[0];
-    const { moving, covers } = this.lift(move, job.moves.slice(1));
+    this.lift(move, job.moves.slice(1));
     const quarters = move.turns === 3 ? -1 : move.turns;
     const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
     // Faster while turns are waiting behind this one, so a typed sequence never lags the hands; a turn given its own time keeps it.
@@ -610,15 +682,13 @@ export class CubeView {
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / Math.max(duration, 1));
       const eased = 1 - (1 - t) ** 3;
-      this.turning.style.transform = cssMatrix(rotation(move.axis, (eased * quarters * Math.PI) / 2));
+      this.spinTo((eased * quarters * Math.PI) / 2);
       if (t < 1) {
         this.frame = requestAnimationFrame(step);
         return;
       }
       for (const one of job.moves) this.shown = turnCube(this.shown, this.n, one);
-      this.turning.style.transform = "";
-      for (const at of moving) this.still.append(this.stickers[at]);
-      for (const cover of covers) cover.remove();
+      this.lower();
       this.paint();
       this.next();
     };
@@ -654,7 +724,10 @@ export class CubeView {
     for (let layer = 0; layer < this.n - 1; layer += 1) if (layers.has(layer) !== layers.has(layer + 1)) edges.push(2 * layer - this.n + 2);
     const made: HTMLDivElement[] = [];
     for (const edge of edges) {
-      for (const group of [this.still, this.turning]) {
+      const below = (edge + this.n - 2) / 2;
+      // One square closes the piece below the gap, facing up the axis, and one the piece above it, facing down.
+      for (const [layer, facing] of [[below, 1], [below + 1, -1]] as const) {
+        const group = layers.has(layer) ? this.turning : this.still;
         const cover = document.createElement("div");
         cover.dataset.cover = "";
         Object.assign(cover.style, {
@@ -665,8 +738,8 @@ export class CubeView {
           top: `${-EDGE / 2}px`,
           background: this.plastic(),
           pointerEvents: "none",
-          transform: placement(frame.right, frame.down, out, out.map((value) => (value * edge * unit) / 2) as unknown as Vec3),
         });
+        this.places.set(cover, { right: frame.right, down: frame.down, out: out.map((value) => value * facing) as unknown as Vec3, at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3, layer });
         group.append(cover);
         made.push(cover);
       }
@@ -691,6 +764,15 @@ export class CubeView {
   }
 
   private listen(): void {
+    // A touch that begins on the cube is the cube's: Safari on a phone scrolls the page up and down, or zooms it on a
+    // second tap, from such a touch unless the touch itself is refused, whatever `touch-action` says. The pointer events
+    // a drag is read from still come. A touch beside the cube's element is the page's, as ever.
+    const refuse = (event: TouchEvent) => {
+      if (event.cancelable) event.preventDefault();
+    };
+    this.on(this.root, "touchstart", refuse, false);
+    this.on(this.root, "touchmove", refuse, false);
+    this.on(this.root, "dblclick", (event) => event.preventDefault(), false);
     this.on(this.root, "pointerdown", (event) => {
       if (event.button !== 0 && event.pointerType === "mouse") return;
       this.root.setPointerCapture?.(event.pointerId);
