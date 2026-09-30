@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-30
+
+### Fixed
+
+- The package resolves under `require` as well as `import` (Node 22 and later load its ES modules either way), so a test runner that compiles to CommonJS, such as Playwright's, can import it.
+
 ## [1.0.0] - 2026-09-30
 
 The first stable release, published as a tarball on GitHub Releases.
@@ -30,6 +36,7 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/johnmorrisdotca/kyuubu/releases/tag/v0.1.0

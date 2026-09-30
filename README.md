@@ -37,7 +37,7 @@
 ## Quick start
 
 ```sh
-pnpm add https://github.com/johnmorrisdotca/kyuubu/releases/download/v1.0.0/johnmorrisdotca-kyuubu-1.0.0.tgz
+pnpm add https://github.com/johnmorrisdotca/kyuubu/releases/download/v1.0.1/johnmorrisdotca-kyuubu-1.0.1.tgz
 ```
 
 Each release on GitHub carries the built package as a tarball; install the one you want by its address, and move to a newer one by changing the version in it.

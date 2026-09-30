@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A turning cube for the browser: 2×2 to 7×7, in CSS 3D, turned by drag, mouse wheel, touch or cubers' notation. No framework needed; a small React wrapper included.",
   "keywords": [
     "cube",
@@ -28,11 +28,11 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "default": "./dist/index.js"
       },
       "./react": {
         "types": "./dist/react.d.ts",
-        "import": "./dist/react.js"
+        "default": "./dist/react.js"
       }
     }
   },
