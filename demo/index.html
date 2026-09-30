@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kyuubu, a turning cube</title>
+    <style>
+      :root { color-scheme: light dark; --ink: #1d1b18; --paper: #f6f1e7; --muted: #6b6457; --wood: #c9a36a; }
+      @media (prefers-color-scheme: dark) { :root { --ink: #ede6d8; --paper: #1b1a17; --muted: #a39b8b; --wood: #6f5533; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: var(--ink); background: var(--paper); }
+      main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+      h1 { margin: 0; font-size: 2rem; }
+      h1 span { color: var(--muted); font-weight: 400; margin-left: 8px; }
+      .stage { position: relative; width: 100%; aspect-ratio: 1; max-height: 70vh; margin: 16px auto; border-radius: 12px; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--wood) 55%, var(--paper)), var(--wood)); }
+      .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--muted); background: transparent; color: inherit; cursor: pointer; }
+      .solved { color: #0a7a3b; font-weight: 600; }
+      code { font-size: 0.9em; }
+      .said { min-height: 1.5em; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Kyuubu <span>キューブ</span></h1>
+      <p>A turning cube, drawn in CSS 3D. Drag a sticker to turn its layer; drag around the cube to look at it. The wheel over a sticker turns the layer under it, Ctrl with the wheel the layer across it, Shift with the wheel the face. Keys: <code>R L U D F B</code> (Shift for the other way), <code>M E S</code>, <code>x y z</code>, a number first for an inner layer, and the arrows to look around.</p>
+      <div class="bar">
+        <label>Size <select id="size"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+        <button id="scramble" type="button">Scramble</button>
+        <button id="undo" type="button">Undo</button>
+        <button id="reset" type="button">Solve</button>
+        <button id="look" type="button">Reset view</button>
+      </div>
+      <div class="stage" id="stage"></div>
+      <p class="said" id="said" aria-live="polite"></p>
+    </main>
+    <script type="module">
+      import { CubeView, FULL_SCRAMBLE_LENGTHS, countsAsMove, cubeSolved, moveNotation, movesNotation, randomScramble, solvedCube, undoOf } from "./dist/index.js";
+
+      const stage = document.getElementById("stage");
+      const said = document.getElementById("said");
+      let moves = [];
+      let view;
+      const tell = () => {
+        const n = view.size;
+        const turns = moves.filter(countsAsMove).length;
+        said.innerHTML = moves.length === 0 ? "" : cubeSolved(view.state, n) ? `<span class="solved">Solved in ${turns} moves.</span>` : `${turns} moves: ${moves.slice(-12).map((m) => moveNotation(m, n)).join(" ")}`;
+      };
+      const make = (n) => {
+        view?.destroy();
+        moves = [];
+        view = new CubeView(stage, { size: n, keyboard: "page", onTurn: (move) => { moves.push(move); tell(); } });
+        tell();
+      };
+      make(3);
+      document.getElementById("size").addEventListener("change", (event) => make(Number(event.target.value)));
+      document.getElementById("scramble").addEventListener("click", () => {
+        const n = view.size;
+        const scramble = randomScramble(n, FULL_SCRAMBLE_LENGTHS[n] ?? 25);
+        view.setState(solvedCube(n));
+        for (const move of scramble) view.turn(move);
+        moves = [];
+        said.textContent = `Scramble: ${movesNotation(scramble, n)}`;
+      });
+      document.getElementById("undo").addEventListener("click", () => {
+        const last = moves.pop();
+        if (last !== undefined) view.turn(undoOf(last));
+        tell();
+      });
+      document.getElementById("reset").addEventListener("click", () => { view.setState(solvedCube(view.size)); moves = []; tell(); });
+      document.getElementById("look").addEventListener("click", () => view.resetLook());
+    </script>
+  </body>
+</html>

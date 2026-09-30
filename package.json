@@ -1,0 +1,66 @@
+{
+  "name": "kyuubu",
+  "version": "0.1.0",
+  "description": "A turning cube for the browser: 2×2 to 7×7, in CSS 3D, turned by drag, mouse wheel, touch or cubers' notation. No framework needed; a small React wrapper included.",
+  "keywords": [
+    "cube",
+    "rubiks-cube",
+    "speedcubing",
+    "puzzle",
+    "css-3d",
+    "twisty-puzzle",
+    "react"
+  ],
+  "author": "John Morris <john@johnmorris.ca>",
+  "license": "MIT",
+  "homepage": "https://johnmorrisdotca.github.io/kyuubu/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnmorrisdotca/kyuubu.git"
+  },
+  "bugs": "https://github.com/johnmorrisdotca/kyuubu/issues",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./react": "./src/react.tsx"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./react": {
+        "types": "./dist/react.d.ts",
+        "import": "./dist/react.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/mark-esm.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "demo": "npm run build && node demo/stage.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "react": "^19",
+    "typescript": "^5",
+    "vitest": "^5.0.0"
+  }
+}
