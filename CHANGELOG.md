@@ -4,6 +4,37 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-30
+
+### Added
+
+- **Show me on the cube.** The next move of a solve, marked on the cube
+  itself: the layer that turns is lit and the rest dimmed, and an arrow lies
+  across its stickers the way to drag them, with a dot on the sticker to take
+  hold of. Beside the cube the move is given in notation and in plain words
+  ("Turn the right face towards you.", 「右の面を手前に回します。」). The person
+  makes the move by hand and the guide moves on; a turn it did not ask for is
+  said to be one, with a button to take it back and an arrow for turning it
+  back by hand. It walks the layer-by-layer method step by step (2×2 and
+  3×3) or any moves as written, wide turns and turns of the whole cube among
+  them, on every size from 2×2 to 7×7. The arrow is worked out with the
+  drag's own rules and drawn again whenever the cube is looked at from
+  somewhere else; a test proves that following it makes exactly its move, for
+  every face, slice, wide turn and direction from 2×2 to 5×5. New:
+  `mountGuide` and `GUIDE_CSS`; the pure `Guide`, `dragHint`,
+  `movementSays`, `movementText` and `rotationKeys`; `HINT_MIN_FACING` and
+  `HINT_MIN_FOLLOW`; on `CubeView`, `showHint(moves)`, `hint` and
+  `on("turn" | "look", listener)`; the custom properties `--kyuubu-hint-colour`,
+  `--kyuubu-hint-edge`, `--kyuubu-hint-dim` and `--kyuubu-hint-opacity`.
+- The player can hand the cube to the viewer to follow a solve by hand: a
+  "Turn it yourself" button, the `guide` option and attribute, `guide=1` on
+  the embed page, and `follow(on)` and `following` on its handle.
+- The demo has "Show me on the cube" beside the step-by-step solve, and for
+  moves typed under Notation.
+- **Rounded corners.** The cube's own corners are rounded like the plastic of
+  a real cube, by default. `rounded: false` makes them square again, and
+  `theme.cornerRadius` or `--kyuubu-corner-radius` says how round.
+
 ## [1.3.2] - 2026-09-30
 
 ### Fixed
@@ -227,7 +258,9 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.2...v1.4.0
+[1.3.2]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...v1.2.0

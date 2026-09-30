@@ -55,6 +55,47 @@ export type CubeWords = {
   playerTooLong: string;
   playerEvenPace: string;
   playerCredit: string;
+  guideSideR: string;
+  guideSideL: string;
+  guideSideU: string;
+  guideSideD: string;
+  guideSideF: string;
+  guideSideB: string;
+  guideFace: string;
+  guideInner: string;
+  guideWide: string;
+  guideMiddleM: string;
+  guideMiddleE: string;
+  guideMiddleS: string;
+  guideTowards: string;
+  guideAway: string;
+  guideToRight: string;
+  guideToLeft: string;
+  guideClockwise: string;
+  guideAnticlockwise: string;
+  guideTurn: string;
+  guideHalf: string;
+  guideWholeX: string;
+  guideWholeXPrime: string;
+  guideWholeX2: string;
+  guideWholeY: string;
+  guideWholeYPrime: string;
+  guideWholeY2: string;
+  guideWholeZ: string;
+  guideWholeZPrime: string;
+  guideWholeZ2: string;
+  guideDrag: string;
+  guideDragHalf: string;
+  guideDragSlab: string;
+  guideLook: string;
+  guideWholeHow: string;
+  guideOff: string;
+  guideOffHow: string;
+  guideTakeBack: string;
+  guideDoIt: string;
+  guideDone: string;
+  guideLabel: string;
+  playerFollow: string;
 };
 
 /** The two languages the package speaks. */
@@ -107,6 +148,47 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     playerTooLong: "That is too long to play.",
     playerEvenPace: "The solve took {time} seconds. Its moves are spread evenly over that time here; the real solve was not this even.",
     playerCredit: "Kyuubu",
+    guideSideR: "right",
+    guideSideL: "left",
+    guideSideU: "top",
+    guideSideD: "bottom",
+    guideSideF: "front",
+    guideSideB: "back",
+    guideFace: "the {side} face",
+    guideInner: "layer {depth} in from the {side}",
+    guideWide: "the {count} layers on the {side}",
+    guideMiddleM: "the middle layer between left and right",
+    guideMiddleE: "the middle layer between top and bottom",
+    guideMiddleS: "the middle layer between front and back",
+    guideTowards: "towards you",
+    guideAway: "away from you",
+    guideToRight: "to the right",
+    guideToLeft: "to the left",
+    guideClockwise: "clockwise, as you look at the front",
+    guideAnticlockwise: "anticlockwise, as you look at the front",
+    guideTurn: "Turn {layers} {way}.",
+    guideHalf: "Turn {layers} half way round.",
+    guideWholeX: "Turn the whole cube so that the front goes to the top.",
+    guideWholeXPrime: "Turn the whole cube so that the front goes to the bottom.",
+    guideWholeX2: "Turn the whole cube upside down, rolling it forwards.",
+    guideWholeY: "Turn the whole cube so that the front goes to the left.",
+    guideWholeYPrime: "Turn the whole cube so that the front goes to the right.",
+    guideWholeY2: "Turn the whole cube round, so that the back comes to the front.",
+    guideWholeZ: "Turn the whole cube so that the top goes to the right.",
+    guideWholeZPrime: "Turn the whole cube so that the top goes to the left.",
+    guideWholeZ2: "Turn the whole cube upside down, rolling it sideways.",
+    guideDrag: "Take hold of the sticker with the dot, and drag it along the arrow.",
+    guideDragHalf: "A half turn: drag twice as far, or make two quarter turns the same way.",
+    guideDragSlab: "{count} layers turn together: drag each of them along the arrow.",
+    guideLook: "Drag beside the cube to look round it, until you can see a side of the lit layer.",
+    guideWholeHow: "No drag on a sticker does this: press {key}, or choose “{button}”.",
+    guideOff: "You turned {made}, not {wanted}.",
+    guideOffHow: "Take it back to carry on from where you were, or turn it back yourself.",
+    guideTakeBack: "Take it back",
+    guideDoIt: "Turn it for me",
+    guideDone: "That was the last move.",
+    guideLabel: "What to turn next",
+    playerFollow: "Turn it yourself",
   },
   ja: {
     cubeLabel: "{n}×{n}のキューブ",
@@ -153,6 +235,47 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     playerTooLong: "長すぎて再生できません。",
     playerEvenPace: "このソルブのタイムは{time}秒です。ここでは各手をその時間に均等に割り振っています。実際のソルブはこれほど均等ではありません。",
     playerCredit: "Kyuubu",
+    guideSideR: "右",
+    guideSideL: "左",
+    guideSideU: "上",
+    guideSideD: "下",
+    guideSideF: "前",
+    guideSideB: "後ろ",
+    guideFace: "{side}の面",
+    guideInner: "{side}から{depth}番目の層",
+    guideWide: "{side}側の{count}層",
+    guideMiddleM: "左右の間の中央の層",
+    guideMiddleE: "上下の間の中央の層",
+    guideMiddleS: "前後の間の中央の層",
+    guideTowards: "手前に",
+    guideAway: "奥に",
+    guideToRight: "右に",
+    guideToLeft: "左に",
+    guideClockwise: "正面から見て時計回りに",
+    guideAnticlockwise: "正面から見て反時計回りに",
+    guideTurn: "{layers}を{way}回します。",
+    guideHalf: "{layers}を半回転させます。",
+    guideWholeX: "キューブ全体を回して、前の面を上にします。",
+    guideWholeXPrime: "キューブ全体を回して、前の面を下にします。",
+    guideWholeX2: "キューブ全体を前に転がして、上下を逆にします。",
+    guideWholeY: "キューブ全体を回して、前の面を左にします。",
+    guideWholeYPrime: "キューブ全体を回して、前の面を右にします。",
+    guideWholeY2: "キューブ全体を回して、後ろの面を前にします。",
+    guideWholeZ: "キューブ全体を回して、上の面を右にします。",
+    guideWholeZPrime: "キューブ全体を回して、上の面を左にします。",
+    guideWholeZ2: "キューブ全体を横に転がして、上下を逆にします。",
+    guideDrag: "点のあるステッカーを持って、矢印に沿ってドラッグします。",
+    guideDragHalf: "半回転です。2倍の距離をドラッグするか、同じ向きに2回回します。",
+    guideDragSlab: "{count}つの層を一緒に回します。それぞれを矢印に沿ってドラッグします。",
+    guideLook: "キューブの外側をドラッグして、光っている層の側面が見えるまで見る向きを変えます。",
+    guideWholeHow: "ステッカーのドラッグではできません。{key}を押すか、「{button}」を選びます。",
+    guideOff: "{wanted}ではなく{made}を回しました。",
+    guideOffHow: "取り消して元の位置から続けるか、自分で回して戻します。",
+    guideTakeBack: "取り消す",
+    guideDoIt: "代わりに回す",
+    guideDone: "これが最後の手でした。",
+    guideLabel: "次に回す手",
+    playerFollow: "自分で回す",
   },
 };
 

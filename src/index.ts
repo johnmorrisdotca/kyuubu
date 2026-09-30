@@ -24,7 +24,10 @@ export {
 export { faceMove, middleMove, moveNotation, movesNotation, parseMove, parseMoves, wholeMove, type CubeFaceLetter } from "./notation.ts";
 export { FULL_SCRAMBLE_LENGTHS, randomScramble, type ScrambleOptions } from "./scramble.ts";
 export { SOLVABLE_SIZES, SOLVE_ALGORITHMS, joinTurns, solveSteps, type SolveAlgorithm, type SolvePart, type SolveStage, type SolveStep } from "./solve.ts";
-export { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC, FACE_PROPERTIES, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
+export { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC, FACE_PROPERTIES, type CubeTheme, type CubeViewEvents, type CubeViewOptions } from "./view/view.ts";
+export { HINT_MIN_FACING, HINT_MIN_FOLLOW, dragHint, type DragHint, type HintArrow } from "./view/hint.ts";
+export { Guide, movementSays, movementText, rotationKeys, type GuideHeard, type GuideSource, type GuideStep } from "./guide.ts";
+export { GUIDE_CSS, mountGuide, type GuideHandle, type GuidePanelOptions } from "./guide-panel.ts";
 export {
   COMMIT_ANGLE,
   DRAG_CLEAR_RATIO,

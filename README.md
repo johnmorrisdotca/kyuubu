@@ -304,6 +304,10 @@ Kyuubu has siblings, each made for the same site, each MIT, each at
 - **A solve you can follow.** The beginner's layer-by-layer method for any
   2×2 or 3×3: each step with its name, what it is for, its turns and the
   algorithms it uses.
+- **Shown on the cube.** The next move of a solve, or of any moves, marked on
+  the cube itself: the layer lit, an arrow the way to drag it, the move in
+  notation and in plain words. It waits for your hand, moves on when you
+  make the move, and says so, with a way back, when you make another.
 - **Replay a record.** A scramble and its solve played on the cube at the
   pace it was made, with play, pause, step, speed and repeat; famous record
   solves included, each checked to end solved; and any solve pasted in, as
@@ -498,6 +502,52 @@ stageName("whiteLayer", "ja");    // "白の面"
 | `cornerCycle` | `R' F R' B2 R F' R' B2 R2` | Three top corners moved round |
 | `edgeCycle` | `R U' R U R U R U' R' U' R2` | Three top edges moved round |
 
+## Show me on the cube
+
+The next move of a solve drawn on the cube: the layer that turns is lit and
+the rest dimmed, an arrow lies across its stickers the way to drag them, and
+beside the cube the move is given in notation and in plain words. The
+person makes the move with their own hand, and the guide moves on.
+
+```ts
+import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
+
+const view = new CubeView(cubeElement, { size: 3, state });
+mountGuide(guideElement, view, { method: true });            // the layer-by-layer method, step by step
+mountGuide(guideElement, view, { moves: "R U R' U' Rw x" }); // or any moves, as written
+```
+
+- **The arrow is the drag.** It is worked out with the drag's own rules
+  (`pickDrag` and `moveForRelease`, above), run backwards: a sticker is
+  chosen only if a drag along the arrow from it is read as exactly that
+  move. A test proves it for every face, slice, wide turn and direction on
+  every size from 2×2 to 5×5, from seven sides.
+- **It follows your eye.** Look round the cube and the arrow is drawn again
+  from where you are, on a side you can see. Where no side of the layer can
+  be seen, it says to look round.
+- **Half turns, wide turns and the whole cube.** A half turn is one long
+  drag or two quarter turns the same way. A wide turn (`Rw`) is lit as one
+  slab under one arrow, and each of its layers is dragged in turn. A turn of
+  the whole cube (`x`) cannot be dragged: the guide names its key and has a
+  button that makes it.
+- **A turn it did not ask for** is said to be one ("You turned U, not R."),
+  with a button to take it back, and an arrow on the cube for turning it
+  back by hand.
+- **Words**, in English and Japanese: "Turn the right face towards you."
+  (`R'`), 「右の面を手前に回します。」. The line is announced to a screen reader
+  once for each move, and on a device that asks for reduced motion nothing on
+  the arrow moves.
+
+Underneath, each part can be used alone. `view.showHint(moves)` lights a
+layer and draws its arrow on any `CubeView`, and `view.hint` says which
+sticker to take hold of and which way to drag it; `dragHint(moves, n, view)`
+works that out with no page at all. `new Guide(state, n, source)` walks a
+list or the method as a pure state machine (`next`, `heard(move)`,
+`takeBack()`, `makeNext()`), and `movementSays` puts a move in words.
+The player has it too: `mountPlayer(element, { …, guide: true })`, or its
+"Turn it yourself" button, hands the viewer the cube to follow a solve by
+hand.
+
 ## Replay a solve
 
 A scramble and the moves that solved it, shown on a cube at the pace they
@@ -517,11 +567,14 @@ mountPlayer(document.getElementById("solve"), {
 That draws the cube with its controls: play and pause, a step back and
 forward, restart, where in the solve, the speed (the solve's own, a half, a
 quarter, a tenth) and repeat. The viewer can drag to look round the cube and
-cannot turn its layers. Options: `size`, `scramble`, `solution`, `timeMs`,
-`stepMs`, `autoplay`, `loop`, `controls`, `speed`, `theme`, `locale`,
-`onChange`, `onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
+cannot turn its layers, until they press "Turn it yourself": then the cube
+is theirs, the solve's next move is shown on it (see *Show me on the cube*),
+and each move they make brings the next. Options: `size`, `scramble`,
+`solution`, `timeMs`, `stepMs`, `autoplay`, `loop`, `controls`, `speed`,
+`theme`, `locale`, `guide` (start with the cube handed over), `onChange`,
+`onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
 `seek(n)`, `restart()` (back to the scrambled cube, waiting), `setSpeed()`, `setLoop()`, `setLocale()`,
-`setTheme()`, `status`, `plan`, `fault` and `destroy()`.
+`setTheme()`, `follow(on)` and `following`, `status`, `plan`, `fault` and `destroy()`.
 
 **About the pace.** A reconstruction says how long the whole solve took and
 almost never when each move was made. So the moves are spread evenly over the
@@ -555,6 +608,7 @@ One tag, where the page may run a script. It needs no build step:
 | `speed` | The speed to start at: `1`, `0.5`, `0.25`, `0.1` |
 | `theme` | `standard`, `paper` or `stickerless` |
 | `lang` | `en` or `ja`; the page's language when left out |
+| `guide` | Start with the cube handed to the viewer, to follow the solve by hand |
 
 The element has `play()`, `pause()`, `step()`, `seek()`, `restart()` and
 `status`, and sends `kyuubu-step` after every step and `kyuubu-end` at the
@@ -571,7 +625,7 @@ An iframe, where the page allows no scripts (a forum, a blog):
 ```
 
 The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`,
-`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`. The page stores
+`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`, `guide=1`. The page stores
 nothing, tracks nothing and loads nothing from anywhere else. A browser takes
 an address of a few thousand characters, which is room for any solve of a
 3×3. The [famous solves page](https://johnmorrisdotca.github.io/kyuubu/famous.html)
@@ -715,7 +769,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.3.2", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.4.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -741,7 +795,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.3.2",
+  "generator": "kyuubu 1.4.0",
   "solves": [
     {
       "size": 3,
@@ -872,6 +926,23 @@ From `@johnmorrisdotca/kyuubu/player`: `mountPlayer(element, options)`,
 `KyuubuCubeElement`. From `@johnmorrisdotca/kyuubu/famous`: `FAMOUS_SOLVES`,
 `famousSolve(id)` and the type `FamousSolve`.
 
+### Show me on the cube
+
+| Export | Signature | Does |
+| --- | --- | --- |
+| `mountGuide` | `(element, view, options) => GuideHandle` | The guide beside a cube: the next move on the cube and in words. Options: `moves` or `method`, `locale`, `onChange`, `onEnd`. The handle has `guide`, `takeBack()`, `makeNext()`, `load(source)`, `setLocale()`, `destroy()` |
+| `GUIDE_CSS` | | The guide's stylesheet, put in the page once; it colours through `--kyuubu-guide-ink`, `alert`, `button`, `rule` and `focus` |
+| `Guide` | `new Guide(state, n, source)` | The walk itself, with no page: `next`, `heard(move)` (`"done"`, `"part"`, `"off"` or `"back"`), `detours`, `takeBack()`, `makeNext()`, `done`, `finished`, `state` |
+| `dragHint` | `(moves, n, view) => DragHint \| null` | The sticker to take hold of and the way to drag it that makes these turns, from this view; `null` for a turn of the whole cube |
+| `HINT_MIN_FACING`, `HINT_MIN_FOLLOW` | `0.2`, `0.5` | How squarely a face must face the viewer to carry an arrow; how closely the arrow must go the layer's way |
+| `movementSays` | `(moves, n, language?) => string \| null` | A movement in plain words: "Turn the right face towards you." |
+| `movementText` | `(moves, n) => string` | A movement in notation, wide turns as `Rw` |
+| `rotationKeys` | `(move) => string` | The keys for a turn of the whole cube: `X`, `Shift+X`, `X X` |
+
+Types: `GuideSource` (`{ moves }` or `{ method: true }`), `GuideStep`,
+`GuideHeard`, `GuidePanelOptions`, `GuideHandle`, `DragHint`, `HintArrow`,
+`CubeViewEvents`.
+
 ### Words
 
 | Export | Does |
@@ -895,9 +966,10 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `commitAngle` | `30` | The point of no return of a dragged layer, in degrees, from 5 to 85 |
 | `yaw`, `pitch` | `-35`, `28` | The first view, in degrees |
 | `fill` | `0.9` | How much of its box the cube fills |
+| `rounded` | `true` | Rounds the cube's corners like a real cube's plastic; `false` for square |
 | `colours` | standard | Face colours by letter: `{ U, R, F, D, L, B }` |
 | `plastic` | `"#111"` | The colour between stickers |
-| `theme` | | A whole look at once: `{ colours, plastic, stickerInset, stickerRadius }` |
+| `theme` | | A whole look at once: `{ colours, plastic, stickerInset, stickerRadius, cornerRadius }` |
 | `locale` | the page's `lang` | `"en"` or `"ja"`, for the accessible name |
 | `label` | `"A 3×3 cube"` | Its accessible name |
 | `onTurn` | | `(move, state)` for every turn a person makes |
@@ -916,12 +988,18 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `setTurnMs(ms)` | Changes how long a quarter turn takes |
 | `setTheme(theme)` | Changes colours, plastic or sticker shape on the cube as drawn |
 | `setLocale(locale)` | Changes the language of its accessible name |
+| `showHint(moves)` | Lights the layer the turns are of, dims the rest, and draws the arrow to drag; `null` takes it away (see *Show me on the cube*) |
+| `hint` | What the hint shows from where the cube is looked at now: the sticker to take hold of, the way to drag, or `face: null` to look round first |
+| `on(type, listener)` | Listens for `"turn"` or `"look"`, as `onTurn` and `onLook` are told, as many listeners as wanted; returns what stops it |
 | `destroy()` | Removes the cube and every listener |
 
 The root element carries `data-kyuubu`, `data-state`,
 `data-turning="true" | "false"`, and while a layer is dragged `data-dragging`,
-`data-committed` and `data-angle`; each sticker carries `data-slot` and
-`data-face`. Tests can wait on these.
+`data-committed` and `data-angle`, and while a hint is shown `data-hint`
+(`"drag"`, `"look"` or `"whole"`); each sticker carries `data-slot` and
+`data-face`, and under a hint `data-hint-lit` and, on the one to take hold
+of, `data-hint-grab`. The arrow is `[data-hint-arrow]`, with the way to drag
+on the screen in `data-drag`. Tests can wait on these.
 
 Also exported, for tools of your own: `moveForWheel` and `moveForDrag` (the
 turn the wheel means over a sticker, and the turn a whole drag means at
@@ -956,6 +1034,18 @@ property.
 | `--kyuubu-plastic` | `plastic` | `#111` | The plastic between stickers and inside the cube |
 | `--kyuubu-sticker-inset` | `theme.stickerInset` | `6%` | How far a sticker sits in from the edge of its square |
 | `--kyuubu-sticker-radius` | `theme.stickerRadius` | `14%` | How round a sticker's corners are |
+| `--kyuubu-corner-radius` | `theme.cornerRadius` | `15px` | How round the cube's own corners are, on a cube 300px across (it scales with the cube); `0` is square, as is `rounded: false` |
+
+A hint on the cube (`showHint`, and so the guide) is coloured by its own
+properties, which work the same in light and dark, since the cube is drawn
+the same on both:
+
+| Custom property | Default | Is |
+| --- | --- | --- |
+| `--kyuubu-hint-colour` | `#fff` | The arrow, and the ring round every sticker of the layer to turn |
+| `--kyuubu-hint-edge` | `rgba(17, 17, 17, 0.85)` | The edge round the arrow, so that it shows on a white sticker too |
+| `--kyuubu-hint-dim` | `brightness(0.62) saturate(0.7)` | The CSS filter on every sticker the hint does not light; `none` dims nothing |
+| `--kyuubu-hint-opacity` | `0.96` | How solid the arrow is |
 
 `CUBE_THEMES` holds three looks: `standard`, `stickerless` (colour to the
 edge of every piece) and `paper`, which is the one the demo site wears:
@@ -1033,7 +1123,8 @@ for fixing one.
 Done since the first release, and no longer on this list: Vue, Svelte and
 Angular (above, each proved from the packed tarball), the `<kyuubu-cube>`
 element for any page or framework, replaying and embedding a solve, famous
-record solves, and pasting a solve as it is written or as a link.
+record solves, pasting a solve as it is written or as a link, and each move
+shown on the cube with an arrow to follow.
 
 Left out on purpose: a wrapper component for every framework (React has one;
 everywhere else the element or one `new CubeView` does the same job, with

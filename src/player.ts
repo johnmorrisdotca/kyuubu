@@ -1,5 +1,6 @@
 import { planReplay, Replay, REPLAY_SPEEDS, type ReplayFault, type ReplayPlan, type ReplaySource, type ReplayStatus } from "./replay.ts";
 import { solvedCube } from "./cube.ts";
+import { mountGuide, type GuideHandle } from "./guide-panel.ts";
 import { CubeView, type CubeTheme } from "./view/view.ts";
 import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
 
@@ -10,7 +11,10 @@ import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
  * element; the custom element and the embed page are this and nothing more.
  *
  * The viewer can drag to look round the cube, and cannot turn its layers:
- * the solve is someone's, and is shown as it was. It is drawn in the page's own document (no shadow root), takes the page's
+ * the solve is someone's, and is shown as it was. Until they ask to turn it
+ * themselves ("Turn it yourself", or `guide`): then the cube is theirs, the
+ * solve's next move is shown on it with an arrow, and each move they make
+ * brings the next. It is drawn in the page's own document (no shadow root), takes the page's
  * font and text colour, and everything it colours is a CSS custom property
  * beginning `--kyuubu-player-`, so a page can dress it.
  */
@@ -27,6 +31,8 @@ export type PlayerOptions = ReplaySource & {
   speed?: number;
   /** The cube's colours. */
   theme?: CubeTheme;
+  /** Start with the cube for the viewer to turn themselves, the solve's next move shown on it, rather than played for them. */
+  guide?: boolean;
   /** English or Japanese; the page's `lang` when left out. */
   locale?: KyuubuLanguage;
   /** Called after every step, and whenever it starts, stops or is moved. */
@@ -41,7 +47,7 @@ export type PlayerHandle = {
   readonly plan: ReplayPlan | null;
   readonly fault: ReplayFault | null;
   /** Another solve on the same cube, in place of the one showing. The speed and the repeat are kept unless given. */
-  load(source: ReplaySource, how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }): void;
+  load(source: ReplaySource, how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean }): void;
   play(): void;
   pause(): void;
   /** One step on (1) or back (-1). */
@@ -53,6 +59,10 @@ export type PlayerHandle = {
   setLoop(loop: boolean): void;
   setLocale(locale: KyuubuLanguage): void;
   setTheme(theme: CubeTheme): void;
+  /** Hand the cube to the viewer to turn, the next move shown on it (true), or take it back to be played (false). */
+  follow(on: boolean): void;
+  /** Whether the viewer is turning it themselves. */
+  readonly following: boolean;
   readonly status: ReplayStatus | null;
   /** Take it off the page, with every listener. */
   destroy(): void;
@@ -72,6 +82,7 @@ export const PLAYER_CSS = `
 .kyuubu-player-at{font-variant-numeric:tabular-nums;font-size:.875em;opacity:.8;margin-inline-start:auto}
 .kyuubu-player-note{font-size:.8125em;opacity:.75;margin:0}
 .kyuubu-player-note[data-tone="bad"]{opacity:1;font-weight:600}
+.kyuubu-player-guide{padding:.25rem 0}
 .kyuubu-player-credit{font-size:.75em;opacity:.7;color:inherit;margin-inline-start:auto}
 `;
 
@@ -130,6 +141,41 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   let speeds: HTMLButtonElement[] = [];
   let playButton: ReturnType<typeof button> | null = null;
   let loopButton: ReturnType<typeof button> | null = null;
+  let followButton: ReturnType<typeof button> | null = null;
+  const guideBox = doc.createElement("div");
+  guideBox.className = "kyuubu-player-guide";
+  /** The viewer's own turns: the guide, and the step of the solve it started from. */
+  let follow: { panel: GuideHandle; from: number } | null = null;
+  const followed = () => (follow === null ? null : Math.min(plan?.steps.length ?? 0, follow.from + follow.panel.guide.done));
+
+  /** The cube handed to the viewer, from where the solve stands, with its next move shown on it. */
+  const startFollow = () => {
+    if (follow !== null || replay === null || plan === null) return;
+    replay.pause();
+    const from = replay.status.position;
+    view.setState(plan.states[from], plan.size);
+    view.setInteractive(true);
+    root.append(guideBox);
+    const panel = mountGuide(guideBox, view, { moves: plan.steps.slice(from), locale: language, onChange: () => paint() });
+    follow = { panel, from };
+    paint();
+  };
+  /** The cube taken back to be played, at the step the viewer reached; any turn of their own that was not the solve's is let go. */
+  const stopFollow = () => {
+    if (follow === null) return;
+    const reached = followed()!;
+    follow.panel.destroy();
+    follow = null;
+    guideBox.remove();
+    view.setInteractive(false);
+    replay?.seek(reached);
+    paint();
+  };
+  /** A control of the replay, pressed while the viewer is turning the cube: first the cube is taken back. */
+  const played = (act: () => void) => () => {
+    stopFollow();
+    act();
+  };
 
   const paint = () => {
     root.dataset.lang = language;
@@ -143,12 +189,16 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       playButton.el.dataset.act = status?.playing === true ? "pause" : "play";
     }
     if (loopButton !== null) loopButton.el.setAttribute("aria-pressed", String(status?.loop === true));
+    if (followButton !== null) followButton.el.setAttribute("aria-pressed", String(follow !== null));
+    root.dataset.following = String(follow !== null);
     for (const one of speeds) one.setAttribute("aria-pressed", String(Number(one.dataset.speed) === status?.speed));
     if (status !== null) {
+      const position = followed() ?? status.position;
+      root.dataset.position = String(position);
       scrub.max = String(status.total);
-      scrub.value = String(status.position);
+      scrub.value = String(position);
       scrub.setAttribute("aria-label", say("playerScrub"));
-      at.textContent = say("playerMoveOf", { at: status.position, total: status.total });
+      at.textContent = say("playerMoveOf", { at: position, total: status.total });
     }
     if (fault !== null) {
       note.dataset.tone = "bad";
@@ -165,13 +215,20 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   };
 
   /** A solve put on the cube, in place of the one before. */
-  const show = (source: ReplaySource, how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }) => {
+  const show = (source: ReplaySource, how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean }) => {
+    if (follow !== null) {
+      follow.panel.destroy();
+      follow = null;
+      guideBox.remove();
+      view.setInteractive(false);
+    }
     replay?.destroy();
     replay = null;
     labelled = [];
     speeds = [];
     playButton = null;
     loopButton = null;
+    followButton = null;
     root.replaceChildren(stage);
     const planned = planReplay(source);
     plan = planned.ok ? planned.plan : null;
@@ -180,7 +237,8 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     else build(plan, how);
     root.append(note);
     paint();
-    if (plan !== null && how.autoplay === true) replay!.play();
+    if (plan !== null && how.guide === true) startFollow();
+    else if (plan !== null && how.autoplay === true) replay!.play();
   };
 
   const build = (plan: ReplayPlan, how: { speed?: number; loop?: boolean; controls?: boolean }) => {
@@ -196,17 +254,20 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     if (how.controls !== false) {
       const main = doc.createElement("div");
       main.className = "kyuubu-player-row";
-      const again = button("playerAgain", () => replay!.restart(), "again");
-      const back = button("playerBack", () => replay!.step(-1), "back");
-      playButton = button("playerPlay", () => (replay!.status.playing ? replay!.pause() : replay!.play()), "play");
+      const again = button("playerAgain", played(() => replay!.restart()), "again");
+      const back = button("playerBack", played(() => replay!.step(-1)), "back");
+      playButton = button("playerPlay", played(() => (replay!.status.playing ? replay!.pause() : replay!.play())), "play");
       playButton.el.dataset.main = "";
-      const on = button("playerOn", () => replay!.step(1), "on");
+      const on = button("playerOn", played(() => replay!.step(1)), "on");
       labelled.push(again, back, on);
       main.append(playButton.el, back.el, on.el, again.el);
       scrub.type = "range";
       scrub.min = "0";
       scrub.step = "1";
-      scrub.addEventListener("input", () => replay!.seek(Number(scrub.value)));
+      scrub.oninput = () => {
+        stopFollow();
+        replay!.seek(Number(scrub.value));
+      };
       const where = doc.createElement("div");
       where.className = "kyuubu-player-row";
       where.append(scrub, at);
@@ -226,8 +287,9 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
         pace.append(el);
       }
       loopButton = button("playerLoop", () => replay!.setLoop(!replay!.status.loop), "loop");
-      labelled.push(loopButton);
-      pace.append(loopButton.el);
+      followButton = button("playerFollow", () => (follow === null ? startFollow() : stopFollow()), "follow");
+      labelled.push(loopButton, followButton);
+      pace.append(loopButton.el, followButton.el);
       root.append(main, where, pace);
     }
   };
@@ -240,24 +302,30 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     get fault() {
       return fault;
     },
-    load: (source, how = {}) => show(source, { speed: how.speed ?? replay?.status.speed, loop: how.loop ?? replay?.status.loop, controls: how.controls ?? options.controls, autoplay: how.autoplay }),
-    play: () => replay?.play(),
-    pause: () => replay?.pause(),
-    step: (by) => replay?.step(by),
-    seek: (position) => replay?.seek(position),
-    restart: () => replay?.restart(),
+    load: (source, how = {}) => show(source, { speed: how.speed ?? replay?.status.speed, loop: how.loop ?? replay?.status.loop, controls: how.controls ?? options.controls, autoplay: how.autoplay, guide: how.guide }),
+    play: played(() => replay?.play()),
+    pause: played(() => replay?.pause()),
+    step: (by) => played(() => replay?.step(by))(),
+    seek: (position) => played(() => replay?.seek(position))(),
+    restart: played(() => replay?.restart()),
     setSpeed: (speed) => replay?.setSpeed(speed),
     setLoop: (loop) => replay?.setLoop(loop),
     setLocale: (locale) => {
       language = locale;
       view.setLocale(locale);
+      follow?.panel.setLocale(locale);
       paint();
+    },
+    follow: (on) => (on ? startFollow() : stopFollow()),
+    get following() {
+      return follow !== null;
     },
     setTheme: (theme) => view.setTheme(theme),
     get status() {
       return replay?.status ?? null;
     },
     destroy: () => {
+      follow?.panel.destroy();
       replay?.destroy();
       view.destroy();
       root.remove();

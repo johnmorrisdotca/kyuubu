@@ -19,6 +19,7 @@
               <div><small data-say="moves"></small><b id="count" data-testid="count">0</b></div>
             </div>
             <div class="cube-stage" id="stage" data-testid="stage"></div>
+            <div class="cube-guide" id="guide" data-testid="guide" hidden></div>
             <p class="fam-hint" id="hint" data-testid="hint" aria-live="polite"></p>
           </section>
           <div class="fam-seg cube-sizes" id="sizes" role="group" data-say-label="size" data-testid="sizes"></div>
@@ -44,7 +45,9 @@
             <div class="fam-actions">
               <button class="fam-button" data-primary="true" id="next" type="button" data-say="nextStep" data-testid="next"></button>
               <button class="fam-button" id="all" type="button" data-say="allSteps" data-testid="all"></button>
+              <button class="fam-button" id="show" type="button" aria-pressed="false" data-say="showMe" data-testid="show"></button>
             </div>
+            <p class="fam-fine" data-say="showMeIntro"></p>
             <div class="cube-step" id="step" data-testid="step" aria-live="polite"></div>
             <ol class="cube-done" id="done" data-testid="done"></ol>
           </section>
@@ -54,6 +57,9 @@
               <textarea class="fam-field cube-moves" data-mono="true" id="moves" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="R U R' U'" data-say-label="typeLabel" data-testid="moves"></textarea>
               <button class="fam-button" data-primary="true" type="submit" data-say="turn" data-testid="turn"></button>
             </form>
+            <div class="fam-actions">
+              <button class="fam-button" id="show-typed" type="button" data-say="showTyped" data-testid="show-typed"></button>
+            </div>
             <p class="fam-error" id="error" data-testid="error" aria-live="polite"></p>
             <h3 data-say="scrambleWas"></h3>
             <p class="fam-notation cube-log" id="scrambled" data-testid="scrambled"></p>

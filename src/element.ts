@@ -17,7 +17,7 @@ import { languageOf } from "./words.ts";
  */
 
 /** The attributes the element reads. Changing any draws the player afresh. */
-export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang"] as const;
+export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "guide"] as const;
 
 /** The name the element is registered under. */
 export const CUBE_ELEMENT_NAME = "kyuubu-cube";
@@ -65,6 +65,7 @@ function build(): CustomElementConstructor {
         solution: this.getAttribute("moves") ?? "",
         timeMs: time > 0 ? time * 1000 : undefined,
         autoplay: has("autoplay"),
+        guide: has("guide"),
         controls: !this.hasAttribute("controls") || has("controls"),
         loop: has("loop"),
         speed: speed > 0 ? speed : undefined,

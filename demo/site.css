@@ -22,6 +22,8 @@
 /* Room for two lines in either language, so the felt never changes height. */
 .cube-felt .fam-hint { margin: 0; min-height: 4em; display: grid; place-items: center; }
 @media (min-width: 540px) { .cube-felt .fam-hint { min-height: 2.6em; } }
+/* Show me on the cube: the guide sits on the felt under the cube, in the felt's own colours. */
+.cube-guide { --kyuubu-guide-ink: var(--gold); --kyuubu-guide-alert: #ffc9b8; --kyuubu-guide-button: rgba(0,0,0,.28); --kyuubu-guide-rule: rgba(255,255,255,.35); --kyuubu-guide-focus: var(--gold); min-height: 9.5em; }
 .cube-felt .fam-hint[data-tone="good"] { opacity: 1; font-weight: 700; color: var(--gold); }
 
 .cube-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }

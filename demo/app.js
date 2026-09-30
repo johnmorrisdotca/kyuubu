@@ -13,6 +13,7 @@ import {
   fill,
   fromJSON,
   fromText,
+  mountGuide,
   movesNotation,
   parseSolve,
   readSolveLink,
@@ -25,6 +26,7 @@ import {
   toCSV,
   toJSON,
   toText,
+  undoAll,
   undoOf,
 } from "./dist/index.js";
 
@@ -52,6 +54,9 @@ const WORDS = {
     solveIntro: "The layer-by-layer method most people learn first, worked out for the cube as it is now.",
     nextStep: "Show the next step",
     allSteps: "Solve it all",
+    showMe: "Show me on the cube",
+    showMeIntro: "Show me on the cube marks the layer to turn and draws an arrow the way to drag it, one move at a time, and waits for you to make it.",
+    showTyped: "Show me on the cube",
     stepsOnly: "This page has no step-by-step method for this size, so these two take back every turn made, the last one first.",
     itsSolved: "It is solved.",
     uses: "Algorithm:",
@@ -135,6 +140,9 @@ const WORDS = {
     solveIntro: "多くの人が最初に覚える、一段ずつそろえる解き方です。いまのキューブの状態から手順を求めます。",
     nextStep: "次のステップ",
     allSteps: "最後までそろえる",
+    showMe: "キューブの上で教えて",
+    showMeIntro: "「キューブの上で教えて」は、回す層に印を付け、ドラッグする向きを矢印で示します。1手ずつ、回すのを待ちます。",
+    showTyped: "キューブの上で教えて",
     stepsOnly: "このサイズには解き方の手順がありません。この二つのボタンは、回した手を最後から順に戻します。",
     itsSolved: "そろっています。",
     uses: "使う手順:",
@@ -216,13 +224,14 @@ let done = [];
 let last = null;
 let note = null;
 let solves = [];
+let guide = null;
 try {
   solves = fromJSON(localStorage.getItem(SOLVES) ?? "") ?? [];
 } catch {
   // A browser that keeps nothing starts with an empty list.
 }
 
-const page = familyLanguage({ id: "kyuubu", words: WORDS, onChange: (lang) => { view.setLocale(lang); draw(); } });
+const page = familyLanguage({ id: "kyuubu", words: WORDS, onChange: (lang) => { view.setLocale(lang); guide?.setLocale(lang); draw(); } });
 const say = (key, values) => fill(page.word(key), values);
 const record = () => ({ size: view.size, scramble, moves });
 
@@ -233,6 +242,9 @@ function draw() {
   $("log").textContent = moves.length === 0 ? say("none") : movesNotation(moves.slice(-60), n);
   $("scrambled").textContent = scramble.length === 0 ? say("none") : movesNotation(scramble, n);
   $("hint").textContent = banner === null ? say("hint") : say("solvedBanner", banner);
+  $("hint").hidden = guide !== null && banner === null;
+  $("guide").hidden = guide === null;
+  $("show").setAttribute("aria-pressed", String(guide !== null));
   $("hint").dataset.tone = banner === null ? "" : "good";
   if (document.activeElement !== $("text")) $("text").value = scramble.length + moves.length === 0 ? "" : toText(record());
   $("saved").textContent = note === null ? "" : say(note);
@@ -242,6 +254,7 @@ function draw() {
   const stuck = !can && scramble.length + moves.length === 0;
   $("next").disabled = stuck;
   $("all").disabled = stuck;
+  $("show").disabled = stuck && guide === null;
   const step = $("step");
   step.replaceChildren();
   const line = (tag, text, className) => {
@@ -379,7 +392,19 @@ const takeBack = () => {
   return true;
 };
 
+// Show me on the cube: the next move marked on the cube, with an arrow the way to drag it, and made by the person. The method where there is one; every turn taken back where there is not; or moves typed in.
+function showMe(source) {
+  unguide();
+  guide = mountGuide($("guide"), view, { ...source, locale: page.lang });
+  draw();
+}
+function unguide() {
+  guide?.destroy();
+  guide = null;
+}
+
 function make(n, state) {
+  unguide();
   view?.destroy();
   view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs, onTurn: (move) => { last = null; turned(move); } });
 }
@@ -442,6 +467,7 @@ for (const tab of tabs) {
 }
 
 $("scramble").addEventListener("click", () => {
+  unguide();
   const n = view.size;
   view.setState(solvedCube(n));
   clear();
@@ -451,12 +477,14 @@ $("scramble").addEventListener("click", () => {
   draw();
 });
 $("undo").addEventListener("click", () => {
+  unguide();
   const move = moves.pop();
   if (move !== undefined) view.turn(undoOf(move));
   last = null;
   draw();
 });
 $("reset").addEventListener("click", () => {
+  unguide();
   view.setState(solvedCube(view.size));
   clear();
   draw();
@@ -477,6 +505,7 @@ const stepOnce = () => {
   return true;
 };
 $("next").addEventListener("click", () => {
+  unguide();
   if (!SOLVABLE_SIZES.includes(view.size)) {
     takeBack();
     last = null;
@@ -489,9 +518,26 @@ $("next").addEventListener("click", () => {
   }
 });
 $("all").addEventListener("click", () => {
+  unguide();
   if (!SOLVABLE_SIZES.includes(view.size)) while (takeBack());
   else for (let guard = 0; guard < 60 && stepOnce(); guard += 1);
   draw();
+});
+
+$("show").addEventListener("click", () => {
+  if (guide !== null) unguide();
+  else if (SOLVABLE_SIZES.includes(view.size)) showMe({ method: true });
+  else showMe({ moves: undoAll([...scramble, ...moves]) });
+  last = null;
+  draw();
+});
+$("show-typed").addEventListener("click", () => {
+  const read = parseSolve($("moves").value, view.size);
+  $("error").textContent = read.ok ? "" : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
+  if (!read.ok || read.steps.length === 0) return;
+  showMe({ moves: read.steps });
+  $("moves").value = "";
+  $("stage").scrollIntoView({ block: "nearest" });
 });
 
 $("type").addEventListener("submit", (event) => {
@@ -507,6 +553,7 @@ $("type").addEventListener("submit", (event) => {
   const read = parseSolve(typed, view.size);
   $("error").textContent = read.ok ? "" : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
   if (!read.ok) return;
+  unguide();
   last = null;
   for (const step of read.steps) {
     view.turnTogether(step.moves, { ms: shownMs() });

@@ -2,8 +2,9 @@ import { CUBE_FACE_ORDER, FACE_FRAMES, cubeSlots, faceOfNormal, layerOf, solvedC
 import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
-import { apply, axisVector, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
+import { apply, axisVector, cross, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
 import { COMMIT_ANGLE, dragAngle, moveForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, type DragPick } from "./gestures.ts";
+import { dragHint, type DragHint } from "./hint.ts";
 import { readKey } from "./keys.ts";
 
 /**
@@ -56,6 +57,8 @@ export type CubeTheme = {
   stickerInset?: string;
   /** How round a sticker's corners are, as a CSS length or percentage. `"14%"` when left out. */
   stickerRadius?: string;
+  /** How round the cube's own corners are, as a CSS length on a cube drawn 300px across (it grows and shrinks with the cube): `"15px"` when left out, `"0"` for square. Never more than nearly half a sticker. */
+  cornerRadius?: string;
 };
 
 /**
@@ -91,6 +94,8 @@ export type CubeViewOptions = {
   plastic?: string;
   /** A whole look at once: colours, plastic and the shape of a sticker. `colours` and `plastic` given beside it win. */
   theme?: CubeTheme;
+  /** Whether the cube's corners are rounded, like the plastic of a real one: true when left out. The theme's `cornerRadius` says how round. */
+  rounded?: boolean;
   /** The language of the cube's accessible name: English or Japanese. Left out, it follows the page's `lang`. */
   locale?: KyuubuLanguage;
   /** Whether a person can turn it. A look-only cube still turns when asked (`turn`). */
@@ -128,6 +133,19 @@ const DRAG_LEAVE_LEAST = 32;
 const SPEED_WINDOW = 100;
 /** How a layer past the point of no return is shown, unless `--kyuubu-commit-filter` says otherwise. */
 const COMMIT_FILTER = "brightness(1.14)";
+/** The colour of a hint's arrow and of the ring round the stickers it lights, unless `--kyuubu-hint-colour` says otherwise. */
+const HINT_COLOUR = "#fff";
+/** The edge drawn round the arrow so that it shows on a white sticker too, unless `--kyuubu-hint-edge` says otherwise. */
+const HINT_EDGE = "rgba(17, 17, 17, 0.85)";
+/** How the stickers a hint does not light are shown, unless `--kyuubu-hint-dim` says otherwise. */
+const HINT_DIM = "brightness(0.62) saturate(0.7)";
+const SVG = "http://www.w3.org/2000/svg";
+
+/** What a cube tells the listeners `on` adds: a turn a person made, with the stickers after it; and the view turned, in degrees. */
+export type CubeViewEvents = {
+  turn: (move: CubeMove, state: string) => void;
+  look: (yaw: number, pitch: number) => void;
+};
 
 type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { at: number; angle: number }[] };
 
@@ -151,7 +169,13 @@ export class CubeView {
   /** The element the cube was made in. */
   readonly host: HTMLElement;
   private options: Required<Omit<CubeViewOptions, "state" | "onTurn" | "onLook" | "colours" | "plastic" | "theme" | "label" | "locale">> & Pick<CubeViewOptions, "onTurn" | "onLook" | "label">;
-  private theme: { colours: Partial<Record<CubeFace, string>>; plastic?: string; stickerInset?: string; stickerRadius?: string };
+  private theme: { colours: Partial<Record<CubeFace, string>>; plastic?: string; stickerInset?: string; stickerRadius?: string; cornerRadius?: string };
+  private readonly listeners: { turn: Set<CubeViewEvents["turn"]>; look: Set<CubeViewEvents["look"]> } = { turn: new Set(), look: new Set() };
+  /** The turn a hint is shown for, and what it came to from where the cube is looked at now. */
+  private hintMoves: CubeMove[] | null = null;
+  private hintNow: DragHint | null = null;
+  private arrow: HTMLDivElement | null = null;
+  private arrowKey = "";
   private language: KyuubuLanguage;
   private n: number;
   private target: string;
@@ -188,6 +212,7 @@ export class CubeView {
       yaw: -35,
       pitch: 28,
       fill: 0.9,
+      rounded: true,
       // An option passed as undefined, as a wrapper passes every prop it was not given, leaves the default standing.
       ...(Object.fromEntries(Object.entries(options).filter(([key, value]) => value !== undefined && !["colours", "plastic", "theme", "locale"].includes(key))) as CubeViewOptions),
     };
@@ -234,7 +259,7 @@ export class CubeView {
       seen.observe(this.root);
       this.cleanups.push(() => seen.disconnect());
     }
-    this.listen();
+    this.hands();
   }
 
   /** The stickers as they will be once every turn asked for has finished. */
@@ -284,12 +309,30 @@ export class CubeView {
   /** The plastic and the shape of every sticker, as the theme has them now. */
   private dress(): void {
     const plastic = this.plastic();
+    const corner = this.corner();
+    const { slots } = cubeSlots(this.n);
     for (const sticker of this.stickers) {
       sticker.style.background = plastic;
+      // The corners of a face that are the cube's own corners are rounded, so the plastic reads as a real cube's.
+      const slot = slots[Number(sticker.dataset.slot)];
+      const frame = FACE_FRAMES[faceOfNormal(slot.normal)];
+      const col = (frame.right.reduce((sum, value, k) => sum + value * slot.centre[k], 0) + this.n - 1) / 2;
+      const row = (frame.down.reduce((sum, value, k) => sum + value * slot.centre[k], 0) + this.n - 1) / 2;
+      const last = this.n - 1;
+      sticker.style.borderTopLeftRadius = row === 0 && col === 0 ? corner : "";
+      sticker.style.borderTopRightRadius = row === 0 && col === last ? corner : "";
+      sticker.style.borderBottomLeftRadius = row === last && col === 0 ? corner : "";
+      sticker.style.borderBottomRightRadius = row === last && col === last ? corner : "";
       const face = sticker.firstChild as HTMLDivElement;
       face.style.inset = this.theme.stickerInset ?? "var(--kyuubu-sticker-inset, 6%)";
       face.style.borderRadius = this.theme.stickerRadius ?? "var(--kyuubu-sticker-radius, 14%)";
     }
+  }
+
+  /** How round the cube's corners are drawn: never more than nearly half a sticker, and nothing when the cube is not rounded. */
+  private corner(): string {
+    if (!this.options.rounded) return "";
+    return `min(${this.theme.cornerRadius ?? "var(--kyuubu-corner-radius, 15px)"}, ${Math.round(this.unit() * 0.45)}px)`;
   }
 
   /** Whether a person can turn it now. */
@@ -307,6 +350,7 @@ export class CubeView {
     this.shown = state;
     if (size !== this.n) {
       this.n = size;
+      this.hintMoves = null;
       this.root.setAttribute("aria-label", this.label());
       this.build();
     }
@@ -317,7 +361,7 @@ export class CubeView {
   turn(move: CubeMove, { report = false, animate = true }: { report?: boolean; animate?: boolean } = {}): void {
     this.settleDrag();
     this.target = turnCube(this.target, this.n, move);
-    if (report) this.options.onTurn?.(move, this.target);
+    if (report) this.told(move);
     if (!animate) {
       this.queue = [];
       this.stopTurn();
@@ -381,6 +425,52 @@ export class CubeView {
     this.pitch = Math.max(-89, Math.min(89, pitch));
     this.look();
     this.options.onLook?.(this.yaw, this.pitch);
+    for (const listener of [...this.listeners.look]) listener(this.yaw, this.pitch);
+  }
+
+  /** A turn a person made, told to `onTurn` and to every listener. */
+  private told(move: CubeMove): void {
+    this.options.onTurn?.(move, this.target);
+    for (const listener of [...this.listeners.turn]) listener(move, this.target);
+  }
+
+  /**
+   * Listen for what the cube tells `onTurn` and `onLook`, beside them, as
+   * many listeners as are wanted: `"turn"` for every turn a person makes,
+   * `"look"` whenever the view turns. Returns what stops listening.
+   */
+  on(type: "turn", listener: CubeViewEvents["turn"]): () => void;
+  on(type: "look", listener: CubeViewEvents["look"]): () => void;
+  on(type: keyof CubeViewEvents, listener: CubeViewEvents[keyof CubeViewEvents]): () => void {
+    const set = this.listeners[type] as Set<typeof listener>;
+    set.add(listener);
+    return () => {
+      set.delete(listener);
+    };
+  }
+
+  /**
+   * Show on the cube how to make a turn: the layer that turns is lit and the
+   * rest dimmed, and an arrow lies across the stickers the way to drag them,
+   * worked out afresh whenever the cube is looked at from somewhere else. The
+   * arrow is the drag's own rules run backwards, so a drag along it from the
+   * sticker at its tail is that turn. Several layers about one axis turned as
+   * far (a wide turn) are lit as one slab with one arrow; each is dragged on
+   * its own. A turn of the whole cube lights nothing: no drag on a sticker
+   * makes it. `null` takes the hint away. Nothing about the cube changes.
+   */
+  showHint(moves: CubeMove | readonly CubeMove[] | null): void {
+    const list = moves === null ? [] : Array.isArray(moves) ? [...(moves as readonly CubeMove[])] : [moves as CubeMove];
+    this.hintMoves = list.length === 0 ? null : list;
+    this.hintNow = null;
+    this.arrowKey = "";
+    this.light();
+    this.draw();
+  }
+
+  /** What the hint shows from where the cube is looked at now: the layers lit, the sticker to take hold of and the way to drag it; null with no hint, or for a turn of the whole cube. */
+  get hint(): DragHint | null {
+    return this.hintNow;
   }
 
   /** Back to the way it was first seen. */
@@ -395,6 +485,8 @@ export class CubeView {
 
   /** Take the cube off the page, with every listener it added. */
   destroy(): void {
+    this.listeners.turn.clear();
+    this.listeners.look.clear();
     this.stopTurn();
     this.resize?.disconnect();
     for (const clean of this.cleanups) clean();
@@ -437,8 +529,149 @@ export class CubeView {
       return sticker;
     });
     this.dress();
+    this.light();
     this.paint();
     this.draw();
+  }
+
+  /** The stickers of the layer a hint is for lit, with a ring round each, and every other sticker dimmed; or all as they were, with no hint. */
+  private light(): void {
+    const moves = this.hintMoves;
+    const layers = new Set(moves === null || moves.some((move) => move.layer === "all") ? [] : moves.map((move) => move.layer as number));
+    const axis = moves?.[0]?.axis ?? 0;
+    const { slots } = cubeSlots(this.n);
+    const ring = `0 0 0 ${Math.max(1.5, this.unit() * 0.055).toFixed(2)}px var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
+    const hinting = layers.size > 0;
+    for (const sticker of this.stickers) {
+      const lit = hinting && layers.has(layerOf(slots[Number(sticker.dataset.slot)].centre, axis, this.n));
+      const face = sticker.firstChild as HTMLDivElement;
+      face.style.boxShadow = lit ? ring : "";
+      sticker.style.filter = hinting && !lit ? `var(--kyuubu-hint-dim, ${HINT_DIM})` : "";
+      if (lit) sticker.dataset.hintLit = "";
+      else delete sticker.dataset.hintLit;
+    }
+  }
+
+  /** Where the hint's arrow is drawn from here, or nowhere: the layer's side cannot be seen, it is a turn of the whole cube, or a layer is turning. */
+  private drawHint(view: Mat3, scale: number, lens: number): void {
+    const moves = this.hintMoves;
+    const whole = moves !== null && moves.some((move) => move.layer === "all");
+    const hint = moves === null || whole ? null : dragHint(moves, this.n, view);
+    this.hintNow = hint;
+    if (moves === null) delete this.root.dataset.hint;
+    else this.root.dataset.hint = whole ? "whole" : hint?.face === null || hint === null ? "look" : "drag";
+    for (const sticker of this.stickers) {
+      const grab = hint?.grab === Number(sticker.dataset.slot);
+      if (grab && sticker.dataset.hintGrab === undefined) sticker.dataset.hintGrab = "";
+      else if (!grab && sticker.dataset.hintGrab !== undefined) delete sticker.dataset.hintGrab;
+    }
+    const arrow = hint?.arrow ?? null;
+    if (arrow === null || hint === null || this.spin !== null) {
+      if (this.arrow !== null) this.arrow.style.visibility = "hidden";
+      return;
+    }
+    const half = this.unit() / 2;
+    const length = arrow.length * half;
+    const width = arrow.width * half;
+    const element = this.arrowElement();
+    const key = `${length.toFixed(1)}|${width.toFixed(1)}|${hint.quarters}|${this.n}`;
+    if (key !== this.arrowKey) {
+      this.arrowKey = key;
+      this.drawArrow(element, length, width, hint.quarters === 2);
+    }
+    const scaled = (v: Vec3) => apply(view, v).map((value) => value * scale) as unknown as Vec3;
+    // Its middle, half its length on from the sticker it starts at, lifted a hair off the face.
+    const middle = arrow.from.map((value, k) => (value + (arrow.along[k] * arrow.length) / 2) * half + arrow.normal[k] * 0.6) as unknown as Vec3;
+    element.style.transform = `perspective(${lens}px) ${placement(scaled(arrow.along), scaled(cross(arrow.along, arrow.normal)), apply(view, arrow.normal), scaled(middle))}`;
+    element.style.visibility = "";
+    element.dataset.drag = hint.drag!.map((value) => value.toFixed(4)).join(",");
+  }
+
+  /** The element the hint's arrow is drawn in: one, above every sticker, taking no pointer. */
+  private arrowElement(): HTMLDivElement {
+    if (this.arrow !== null) return this.arrow;
+    const element = document.createElement("div");
+    element.dataset.hintArrow = "";
+    element.setAttribute("aria-hidden", "true");
+    Object.assign(element.style, { position: "absolute", pointerEvents: "none", zIndex: "100", visibility: "hidden" });
+    this.pivot.append(element);
+    this.arrow = element;
+    return element;
+  }
+
+  /**
+   * The arrow itself, `length` by `width` pixels on a cube 300 across: a dot
+   * at its tail where the sticker is taken hold of, a shaft, and a head; two
+   * heads for a half turn. Drawn in its colour with an edge round it, so it
+   * shows on every sticker; where motion is welcome, a mark runs along it.
+   */
+  private drawArrow(element: HTMLDivElement, length: number, width: number, half: boolean): void {
+    for (const running of element.getAnimations?.({ subtree: true }) ?? []) running.cancel();
+    const unit = this.unit();
+    const shaft = Math.min(width * 0.6, unit * (width > unit * 1.01 ? 0.3 : 0.2));
+    const headWide = Math.min(width * 0.92, shaft * 3.2);
+    const headLong = headWide * 0.72;
+    const mid = width / 2;
+    const edge = Math.max(1, unit * 0.035);
+    Object.assign(element.style, { width: `${length}px`, height: `${width}px`, left: `${-length / 2}px`, top: `${-width / 2}px` });
+    const svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("width", String(length));
+    svg.setAttribute("height", String(width));
+    svg.setAttribute("viewBox", `0 0 ${length} ${width}`);
+    svg.style.overflow = "visible";
+    svg.style.display = "block";
+    svg.style.opacity = "var(--kyuubu-hint-opacity, 0.96)";
+    const heads = half ? [length, length - headLong * 0.78] : [length];
+    const shapes = (): SVGElement[] => {
+      const made: SVGElement[] = [];
+      const dot = document.createElementNS(SVG, "circle");
+      dot.setAttribute("cx", "0");
+      dot.setAttribute("cy", String(mid));
+      dot.setAttribute("r", String(shaft * 0.95));
+      made.push(dot);
+      const bar = document.createElementNS(SVG, "rect");
+      bar.setAttribute("x", "0");
+      bar.setAttribute("y", String(mid - shaft / 2));
+      bar.setAttribute("width", String(Math.max(0, heads[heads.length - 1] - headLong * 0.9)));
+      bar.setAttribute("height", String(shaft));
+      made.push(bar);
+      for (const tip of heads) {
+        const head = document.createElementNS(SVG, "polygon");
+        head.setAttribute("points", `${tip - headLong},${mid - headWide / 2} ${tip},${mid} ${tip - headLong},${mid + headWide / 2}`);
+        made.push(head);
+      }
+      return made;
+    };
+    // The edge first, all of it, then the colour over it: one outline round the whole arrow.
+    const outline = document.createElementNS(SVG, "g");
+    outline.style.fill = "none";
+    outline.style.stroke = `var(--kyuubu-hint-edge, ${HINT_EDGE})`;
+    outline.style.strokeWidth = String(edge * 2);
+    outline.style.strokeLinejoin = "round";
+    outline.append(...shapes());
+    const body = document.createElementNS(SVG, "g");
+    body.style.fill = `var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
+    body.append(...shapes());
+    svg.append(outline, body);
+    const calm = this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    if (!calm) {
+      const runner = document.createElementNS(SVG, "circle");
+      runner.setAttribute("cx", "0");
+      runner.setAttribute("cy", String(mid));
+      runner.setAttribute("r", String(shaft * 0.32));
+      runner.style.fill = `var(--kyuubu-hint-edge, ${HINT_EDGE})`;
+      svg.append(runner);
+      runner.animate?.(
+        [
+          { transform: "translateX(0px)", opacity: 0 },
+          { transform: `translateX(${(length - headLong) * 0.2}px)`, opacity: 1, offset: 0.2 },
+          { transform: `translateX(${(length - headLong) * 0.85}px)`, opacity: 1, offset: 0.85 },
+          { transform: `translateX(${length - headLong}px)`, opacity: 0 },
+        ],
+        { duration: 1400, iterations: Infinity, easing: "ease-in-out" },
+      );
+    }
+    element.replaceChildren(svg);
   }
 
   private surface(slot: StickerSlot): Vec3 {
@@ -514,6 +747,7 @@ export class CubeView {
       if (was?.z !== z) element.style.zIndex = z;
       place.drawn = { transform, visible: facing, z };
     }
+    if (!turningOnly) this.drawHint(view, scale, lens);
   }
 
   /** The turning group turned this far about the spin's axis, and drawn. */
@@ -634,7 +868,7 @@ export class CubeView {
       }
       this.animating = false;
       this.root.dataset.turning = "false";
-      if (move !== null) this.options.onTurn?.(move, this.target);
+      if (move !== null) this.told(move);
     };
     this.finishSnap = finish;
     const started = performance.now();
@@ -751,6 +985,7 @@ export class CubeView {
           left: `${-EDGE / 2}px`,
           top: `${-EDGE / 2}px`,
           background: this.plastic(),
+          borderRadius: this.corner(),
           pointerEvents: "none",
         });
         this.places.set(cover, { right: frame.right, down: frame.down, out: out.map((value) => value * facing) as unknown as Vec3, at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3, layer });
@@ -771,23 +1006,23 @@ export class CubeView {
     this.turn(move, { report: true });
   }
 
-  private on<K extends keyof HTMLElementEventMap>(element: HTMLElement | Document, type: K, handler: (event: HTMLElementEventMap[K]) => void, passive = true): void {
+  private bind<K extends keyof HTMLElementEventMap>(element: HTMLElement | Document, type: K, handler: (event: HTMLElementEventMap[K]) => void, passive = true): void {
     const listener = handler as EventListener;
     element.addEventListener(type, listener, { passive });
     this.cleanups.push(() => element.removeEventListener(type, listener));
   }
 
-  private listen(): void {
+  private hands(): void {
     // A touch that begins on the cube is the cube's: Safari on a phone scrolls the page up and down, or zooms it on a
     // second tap, from such a touch unless the touch itself is refused, whatever `touch-action` says. The pointer events
     // a drag is read from still come. A touch beside the cube's element is the page's, as ever.
     const refuse = (event: TouchEvent) => {
       if (event.cancelable) event.preventDefault();
     };
-    this.on(this.root, "touchstart", refuse, false);
-    this.on(this.root, "touchmove", refuse, false);
-    this.on(this.root, "dblclick", (event) => event.preventDefault(), false);
-    this.on(this.root, "pointerdown", (event) => {
+    this.bind(this.root, "touchstart", refuse, false);
+    this.bind(this.root, "touchmove", refuse, false);
+    this.bind(this.root, "dblclick", (event) => event.preventDefault(), false);
+    this.bind(this.root, "pointerdown", (event) => {
       if (event.button !== 0 && event.pointerType === "mouse") return;
       this.root.setPointerCapture?.(event.pointerId);
       if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
@@ -795,7 +1030,7 @@ export class CubeView {
       this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch };
       this.root.style.cursor = "grabbing";
     });
-    this.on(this.root, "pointermove", (event) => {
+    this.bind(this.root, "pointermove", (event) => {
       const gesture = this.gesture;
       if (gesture === null || gesture.id !== event.pointerId || gesture.done) return;
       const dx = event.clientX - gesture.x;
@@ -826,15 +1061,15 @@ export class CubeView {
       this.endDrag(released, event.timeStamp);
       this.root.style.cursor = this.options.interactive ? "grab" : "default";
     };
-    this.on(this.root, "pointerup", end(true));
-    this.on(this.root, "pointercancel", end(false));
+    this.bind(this.root, "pointerup", end(true));
+    this.bind(this.root, "pointercancel", end(false));
     // Escape gives a held layer up, wherever the keys are listened for.
-    this.on(this.host.ownerDocument, "keydown", (event) => {
+    this.bind(this.host.ownerDocument, "keydown", (event) => {
       if (event.key !== "Escape" || this.drag === null) return;
       if (this.gesture !== null) this.gesture.done = true;
       this.endDrag(false, event.timeStamp);
     });
-    this.on(
+    this.bind(
       this.root,
       "wheel",
       (event) => {
@@ -860,7 +1095,7 @@ export class CubeView {
     if (this.options.keyboard === "none") return;
     if (this.options.keyboard === "focus") this.root.tabIndex = 0;
     const keysOn: HTMLElement | Document = this.options.keyboard === "page" ? document : this.root;
-    this.on(
+    this.bind(
       keysOn,
       "keydown",
       (event) => {
