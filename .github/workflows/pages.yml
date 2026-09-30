@@ -22,9 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm install
-      - run: npm run typecheck
-      - run: npm test
+          cache: npm
+      - run: npm ci
+      - run: npm run check
 
   deploy:
     needs: test
@@ -37,7 +37,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm install
+          cache: npm
+      - run: npm ci
       - run: npm run demo
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

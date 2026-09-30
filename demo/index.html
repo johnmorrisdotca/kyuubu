@@ -3,72 +3,213 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kyuubu, a turning cube</title>
+    <title>Kyuubu, a turning cube for the browser</title>
+    <meta name="description" content="A turning cube from 2×2 to 7×7, drawn in CSS 3D with no canvas and no framework. Drag, wheel, touch or type cubers' notation." />
+    <meta property="og:title" content="Kyuubu キューブ" />
+    <meta property="og:description" content="A turning cube for the browser, in CSS 3D. 2×2 to 7×7, drag, wheel, touch and notation." />
+    <meta property="og:image" content="https://johnmorrisdotca.github.io/kyuubu/cube.png" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111'/%3E%3Crect x='4' y='4' width='7' height='7' rx='1.5' fill='%23c8102e'/%3E%3Crect x='12.5' y='4' width='7' height='7' rx='1.5' fill='%23f7f7f2'/%3E%3Crect x='21' y='4' width='7' height='7' rx='1.5' fill='%23009b48'/%3E%3Crect x='4' y='12.5' width='7' height='7' rx='1.5' fill='%23ffd500'/%3E%3Crect x='12.5' y='12.5' width='7' height='7' rx='1.5' fill='%230046ad'/%3E%3Crect x='21' y='12.5' width='7' height='7' rx='1.5' fill='%23ff5800'/%3E%3Crect x='4' y='21' width='7' height='7' rx='1.5' fill='%23009b48'/%3E%3Crect x='12.5' y='21' width='7' height='7' rx='1.5' fill='%23c8102e'/%3E%3Crect x='21' y='21' width='7' height='7' rx='1.5' fill='%23f7f7f2'/%3E%3C/svg%3E" />
     <style>
-      :root { color-scheme: light dark; --ink: #1d1b18; --paper: #f6f1e7; --muted: #6b6457; --wood: #c9a36a; }
-      @media (prefers-color-scheme: dark) { :root { --ink: #ede6d8; --paper: #1b1a17; --muted: #a39b8b; --wood: #6f5533; } }
+      :root {
+        color-scheme: dark;
+        --bg: #0f1013;
+        --panel: #17191e;
+        --line: #2a2d35;
+        --ink: #eceae4;
+        --muted: #9a9ca5;
+        --accent: #ffd500;
+        --good: #3ddc84;
+      }
       * { box-sizing: border-box; }
-      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: var(--ink); background: var(--paper); }
-      main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
-      h1 { margin: 0; font-size: 2rem; }
-      h1 span { color: var(--muted); font-weight: 400; margin-left: 8px; }
-      .stage { position: relative; width: 100%; aspect-ratio: 1; max-height: 70vh; margin: 16px auto; border-radius: 12px; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--wood) 55%, var(--paper)), var(--wood)); }
-      .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-      button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--muted); background: transparent; color: inherit; cursor: pointer; }
-      .solved { color: #0a7a3b; font-weight: 600; }
-      code { font-size: 0.9em; }
-      .said { min-height: 1.5em; color: var(--muted); }
+      html, body { margin: 0; background: var(--bg); color: var(--ink); }
+      body { font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+      a { color: var(--accent); }
+      main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
+      header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+      h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.02em; }
+      h1 span { color: var(--muted); font-weight: 400; margin-left: 10px; font-size: 0.6em; }
+      h2.section { margin: 40px 0 12px; font-size: 1.2rem; }
+      .links { display: flex; gap: 16px; font-size: 0.95rem; }
+      .pitch { color: var(--muted); max-width: 60ch; margin: 8px 0 24px; }
+      .layout { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+      @media (min-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) 320px; } }
+      .stage {
+        position: relative; width: 100%; aspect-ratio: 1; max-height: 78vh; border-radius: 20px;
+        background: radial-gradient(circle at 50% 38%, #2b2f3a 0%, #15171c 62%, #0d0e11 100%);
+        border: 1px solid var(--line); overflow: hidden;
+      }
+      .hud { position: absolute; left: 16px; right: 16px; top: 14px; display: flex; justify-content: space-between; pointer-events: none; font-variant-numeric: tabular-nums; z-index: 1; }
+      .hud b { font-size: 1.6rem; font-weight: 600; }
+      .hud small { display: block; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .banner { position: absolute; inset: auto 0 18px 0; text-align: center; font-weight: 700; color: var(--good); opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 1; }
+      .banner.on { opacity: 1; transform: none; }
+      aside { display: flex; flex-direction: column; gap: 16px; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+      .card h2 { margin: 0 0 10px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+      .sizes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      button, input { font: inherit; color: inherit; }
+      button { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #20232a; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+      button:hover { border-color: #444955; background: #262a33; }
+      button[aria-pressed="true"] { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+      button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+      form { display: flex; gap: 6px; }
+      input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #0f1115; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem; color: var(--muted); min-height: 3em; word-spacing: 0.2em; margin: 8px 0 0; overflow-wrap: anywhere; }
+      .error { color: #ff6b6b; font-size: 0.85rem; min-height: 1.2em; margin: 6px 0 0; }
+      dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 0.92rem; }
+      dt { white-space: nowrap; }
+      dd { margin: 0; color: var(--muted); }
+      kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--line); border-bottom-width: 2px; background: #1d2027; }
+      pre { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; overflow-x: auto; font-size: 0.85rem; }
+      footer { margin-top: 40px; color: var(--muted); font-size: 0.9rem; }
     </style>
   </head>
   <body>
     <main>
-      <h1>Kyuubu <span>キューブ</span></h1>
-      <p>A turning cube, drawn in CSS 3D. Drag a sticker to turn its layer; drag around the cube to look at it. The wheel over a sticker turns the layer under it, Ctrl with the wheel the layer across it, Shift with the wheel the face. Keys: <code>R L U D F B</code> (Shift for the other way), <code>M E S</code>, <code>x y z</code>, a number first for an inner layer, and the arrows to look around.</p>
-      <div class="bar">
-        <label>Size <select id="size"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
-        <button id="scramble" type="button">Scramble</button>
-        <button id="undo" type="button">Undo</button>
-        <button id="reset" type="button">Solve</button>
-        <button id="look" type="button">Reset view</button>
-      </div>
-      <div class="stage" id="stage"></div>
-      <p class="said" id="said" aria-live="polite"></p>
-    </main>
-    <script type="module">
-      import { CubeView, FULL_SCRAMBLE_LENGTHS, countsAsMove, cubeSolved, moveNotation, movesNotation, randomScramble, solvedCube, undoOf } from "./dist/index.js";
+      <header>
+        <h1>Kyuubu <span>キューブ</span></h1>
+        <nav class="links">
+          <a href="https://github.com/johnmorrisdotca/kyuubu">GitHub</a>
+          <a href="https://www.npmjs.com/package/kyuubu">npm</a>
+          <a href="https://github.com/johnmorrisdotca/kyuubu#api">API</a>
+        </nav>
+      </header>
+      <p class="pitch">A turning cube for the browser, from 2×2 to 7×7, drawn in CSS 3D. No canvas, no WebGL, no framework. Turn it by dragging, with the wheel, with a finger, or by typing moves.</p>
 
-      const stage = document.getElementById("stage");
-      const said = document.getElementById("said");
-      let moves = [];
+      <div class="layout">
+        <div class="stage" id="stage" data-testid="stage">
+          <div class="hud">
+            <div><small>Time</small><b id="time">0.00</b></div>
+            <div style="text-align: right"><small>Moves</small><b id="count">0</b></div>
+          </div>
+          <div class="banner" id="banner" aria-live="polite"></div>
+        </div>
+
+        <aside>
+          <section class="card">
+            <h2>Cube</h2>
+            <div class="sizes" id="sizes"></div>
+            <div class="row">
+              <button class="primary" id="scramble" type="button">Scramble</button>
+              <button id="undo" type="button">Undo</button>
+              <button id="solve" type="button">Reset</button>
+              <button id="look" type="button">Front on</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Type moves</h2>
+            <form id="type">
+              <input id="moves" autocomplete="off" spellcheck="false" placeholder="R U R' U'" aria-label="Moves in notation" />
+              <button type="submit">Turn</button>
+            </form>
+            <p class="error" id="error"></p>
+            <p class="log" id="log"></p>
+          </section>
+
+          <section class="card">
+            <h2>Controls</h2>
+            <dl>
+              <dt>Drag a sticker</dt><dd>turns its layer that way</dd>
+              <dt>Drag around it</dt><dd>looks from anywhere</dd>
+              <dt>Wheel on a sticker</dt><dd>turns its row</dd>
+              <dt><kbd>Ctrl</kbd> + wheel</dt><dd>turns its column</dd>
+              <dt><kbd>Shift</kbd> + wheel</dt><dd>turns its face</dd>
+              <dt><kbd>R</kbd> <kbd>U</kbd> <kbd>F</kbd> <kbd>L</kbd> <kbd>D</kbd> <kbd>B</kbd></dt><dd>face turns, <kbd>Shift</kbd> for prime</dd>
+              <dt><kbd>M</kbd> <kbd>E</kbd> <kbd>S</kbd></dt><dd>middle slices</dd>
+              <dt><kbd>X</kbd> <kbd>Y</kbd> <kbd>Z</kbd></dt><dd>turn the whole cube</dd>
+              <dt><kbd>2</kbd> then <kbd>R</kbd></dt><dd>the second layer in</dd>
+              <dt>Arrows</dt><dd>look around</dd>
+            </dl>
+          </section>
+        </aside>
+      </div>
+
+      <h2 class="section">One line to put one on your page</h2>
+      <pre><code>import { CubeView } from "kyuubu";
+
+new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });</code></pre>
+
+      <footer>MIT © John Morris · <a href="https://github.com/johnmorrisdotca/kyuubu">Source on GitHub</a></footer>
+    </main>
+
+    <script type="module">
+      import { CubeView, FULL_SCRAMBLE_LENGTHS, countsAsMove, cubeSolved, moveNotation, movesNotation, parseMoves, randomScramble, solvedCube, undoOf } from "./dist/index.js";
+
+      const $ = (id) => document.getElementById(id);
+      const stage = $("stage");
       let view;
-      const tell = () => {
+      let moves = [];
+      let startedAt = null;
+      let scrambled = false;
+      let frame = 0;
+
+      const show = () => {
         const n = view.size;
-        const turns = moves.filter(countsAsMove).length;
-        said.innerHTML = moves.length === 0 ? "" : cubeSolved(view.state, n) ? `<span class="solved">Solved in ${turns} moves.</span>` : `${turns} moves: ${moves.slice(-12).map((m) => moveNotation(m, n)).join(" ")}`;
+        $("count").textContent = String(moves.filter(countsAsMove).length);
+        $("log").textContent = moves.slice(-24).map((move) => moveNotation(move, n)).join(" ");
       };
+      const tick = () => {
+        $("time").textContent = startedAt === null ? "0.00" : ((performance.now() - startedAt) / 1000).toFixed(2);
+      };
+      const run = () => { tick(); frame = requestAnimationFrame(run); };
+      const stop = () => { cancelAnimationFrame(frame); frame = 0; };
+      const banner = (text) => { $("banner").textContent = text; $("banner").classList.toggle("on", text !== ""); };
+      const clear = () => { moves = []; startedAt = null; scrambled = false; stop(); tick(); banner(""); show(); };
+
+      // Every turn a person makes: counted, timed from the first after a scramble, and cheered when it solves.
+      const turned = (move) => {
+        moves.push(move);
+        if (scrambled && startedAt === null && countsAsMove(move)) { startedAt = performance.now(); run(); }
+        show();
+        if (scrambled && cubeSolved(view.state, view.size)) {
+          stop(); tick(); scrambled = false;
+          banner(`Solved in ${$("time").textContent}s and ${$("count").textContent} moves`);
+        }
+      };
+
       const make = (n) => {
         view?.destroy();
-        moves = [];
-        view = new CubeView(stage, { size: n, keyboard: "page", onTurn: (move) => { moves.push(move); tell(); } });
-        tell();
+        view = new CubeView(stage, { size: n, keyboard: "page", onTurn: turned });
+        clear();
+        for (const button of $("sizes").children) button.setAttribute("aria-pressed", String(Number(button.dataset.n) === n));
       };
+
+      for (let n = 2; n <= 7; n += 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.n = String(n);
+        button.textContent = `${n}×${n}`;
+        button.addEventListener("click", () => make(n));
+        $("sizes").append(button);
+      }
       make(3);
-      document.getElementById("size").addEventListener("change", (event) => make(Number(event.target.value)));
-      document.getElementById("scramble").addEventListener("click", () => {
+
+      $("scramble").addEventListener("click", () => {
         const n = view.size;
-        const scramble = randomScramble(n, FULL_SCRAMBLE_LENGTHS[n] ?? 25);
         view.setState(solvedCube(n));
+        const scramble = randomScramble(n, FULL_SCRAMBLE_LENGTHS[n] ?? 25);
         for (const move of scramble) view.turn(move);
-        moves = [];
-        said.textContent = `Scramble: ${movesNotation(scramble, n)}`;
+        clear();
+        scrambled = true;
+        $("log").textContent = `Scramble: ${movesNotation(scramble, n)}`;
       });
-      document.getElementById("undo").addEventListener("click", () => {
+      $("undo").addEventListener("click", () => {
         const last = moves.pop();
         if (last !== undefined) view.turn(undoOf(last));
-        tell();
+        show();
       });
-      document.getElementById("reset").addEventListener("click", () => { view.setState(solvedCube(view.size)); moves = []; tell(); });
-      document.getElementById("look").addEventListener("click", () => view.resetLook());
+      $("solve").addEventListener("click", () => { view.setState(solvedCube(view.size)); clear(); });
+      $("look").addEventListener("click", () => view.resetLook());
+      $("type").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const read = parseMoves($("moves").value, view.size);
+        $("error").textContent = read === null ? "That isn't notation this cube can turn." : "";
+        if (read === null) return;
+        for (const move of read) { view.turn(move); turned(move); }
+        $("moves").value = "";
+      });
     </script>
   </body>
 </html>

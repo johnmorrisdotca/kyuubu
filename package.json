@@ -45,9 +45,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/mark-esm.mjs",
     "test": "vitest run",
+    "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "demo": "npm run build && node demo/stage.mjs",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run check"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -58,9 +60,17 @@
     }
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/react": "^19",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "react": "^19",
     "typescript": "^5",
+    "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.0"
+  },
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
   }
 }
