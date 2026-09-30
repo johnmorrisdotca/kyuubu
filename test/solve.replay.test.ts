@@ -240,7 +240,14 @@ describe("a replay", () => {
     expect(replay.status.position).toBe(0);
     replay.step(-1);
     expect(replay.status.position).toBe(0);
+    replay.seek(3);
+    replay.play();
     replay.restart();
+    expect(replay.status).toMatchObject({ position: 0, playing: false });
+    expect(asked.at(-1)).toBe(`set:${plan.start.slice(0, 9)}`);
+    wind(5000);
+    expect(replay.status.position).toBe(0);
+    replay.play();
     expect(replay.status).toMatchObject({ position: 1, playing: true });
     replay.destroy();
     wind(5000);

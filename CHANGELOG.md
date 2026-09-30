@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-30
+
+### Fixed
+
+- On a phone, a cube could come back into view drawn flat: one face, and
+  nothing behind it. Seen in Safari on an iPhone after choosing a second
+  famous solve. Three things are done about it. The player keeps one cube for
+  its whole life and loads each solve onto it (`load(source)` on the player's
+  handle), where the famous solves page used to make a new cube for every
+  solve. The cube makes its layers afresh whenever it comes back into view
+  (`redraw()` on `CubeView`). And the famous solves page brings the cube into
+  view before it plays, so a solve is no longer played out of sight below
+  the fold.
+
+### Changed
+
+- The player's restart goes back to the scrambled cube and waits there, and
+  its button says so ("To the scramble"). It used to begin playing again at
+  once, so the scramble the record was solved from was never seen standing
+  still.
+
 ## [1.3.0] - 2026-09-30
 
 ### Added
@@ -183,7 +204,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.0.2...v1.1.0

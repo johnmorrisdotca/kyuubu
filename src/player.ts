@@ -1,4 +1,5 @@
 import { planReplay, Replay, REPLAY_SPEEDS, type ReplayFault, type ReplayPlan, type ReplaySource, type ReplayStatus } from "./replay.ts";
+import { solvedCube } from "./cube.ts";
 import { CubeView, type CubeTheme } from "./view/view.ts";
 import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
 
@@ -39,6 +40,8 @@ export type PlayerHandle = {
   /** The solve as it was read, or why it could not be. */
   readonly plan: ReplayPlan | null;
   readonly fault: ReplayFault | null;
+  /** Another solve on the same cube, in place of the one showing. The speed and the repeat are kept unless given. */
+  load(source: ReplaySource, how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }): void;
   play(): void;
   pause(): void;
   /** One step on (1) or back (-1). */
@@ -102,10 +105,11 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   root.append(stage);
   host.replaceChildren(root);
 
-  const planned = planReplay(options);
-  const plan = planned.ok ? planned.plan : null;
-  const fault = planned.ok ? null : planned.fault;
-  const view = new CubeView(stage, { size: plan?.size ?? 3, state: plan?.start, theme: options.theme, locale: language, keyboard: "none", interactive: false });
+  let plan: ReplayPlan | null = null;
+  let fault: ReplayFault | null = null;
+  // One cube for as long as the player lives, whatever solves it is given: a cube made afresh for each is a
+  // second set of 3D layers before the first is let go, which a phone does not always have room for.
+  const view = new CubeView(stage, { size: 3, theme: options.theme, locale: language, keyboard: "none", interactive: false });
 
   const button = (key: keyof (typeof WORDS)["en"], act: () => void, name: string) => {
     const el = doc.createElement("button");
@@ -119,11 +123,11 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   const note = doc.createElement("p");
   note.className = "kyuubu-player-note";
   let replay: Replay | null = null;
-  const labelled: { el: HTMLElement; text: HTMLElement; key: keyof (typeof WORDS)["en"] }[] = [];
+  let labelled: { el: HTMLElement; text: HTMLElement; key: keyof (typeof WORDS)["en"] }[] = [];
   const scrub = doc.createElement("input");
   const at = doc.createElement("span");
   at.className = "kyuubu-player-at";
-  const speeds: HTMLButtonElement[] = [];
+  let speeds: HTMLButtonElement[] = [];
   let playButton: ReturnType<typeof button> | null = null;
   let loopButton: ReturnType<typeof button> | null = null;
 
@@ -160,17 +164,36 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     note.hidden = note.textContent === "";
   };
 
-  if (plan !== null) {
+  /** A solve put on the cube, in place of the one before. */
+  const show = (source: ReplaySource, how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }) => {
+    replay?.destroy();
+    replay = null;
+    labelled = [];
+    speeds = [];
+    playButton = null;
+    loopButton = null;
+    root.replaceChildren(stage);
+    const planned = planReplay(source);
+    plan = planned.ok ? planned.plan : null;
+    fault = planned.ok ? null : planned.fault;
+    if (plan === null) view.setState(solvedCube(3), 3);
+    else build(plan, how);
+    root.append(note);
+    paint();
+    if (plan !== null && how.autoplay === true) replay!.play();
+  };
+
+  const build = (plan: ReplayPlan, how: { speed?: number; loop?: boolean; controls?: boolean }) => {
     replay = new Replay(view, plan, {
-      speed: options.speed,
-      loop: options.loop,
+      speed: how.speed,
+      loop: how.loop,
       onChange: (status) => {
         paint();
         options.onChange?.(status);
       },
       onEnd: options.onEnd,
     });
-    if (options.controls !== false) {
+    if (how.controls !== false) {
       const main = doc.createElement("div");
       main.className = "kyuubu-player-row";
       const again = button("playerAgain", () => replay!.restart(), "again");
@@ -207,14 +230,17 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       pace.append(loopButton.el);
       root.append(main, where, pace);
     }
-  }
-  root.append(note);
-  paint();
-  if (plan !== null && options.autoplay === true) replay!.play();
+  };
+  show(options, options);
 
   return {
-    plan,
-    fault,
+    get plan() {
+      return plan;
+    },
+    get fault() {
+      return fault;
+    },
+    load: (source, how = {}) => show(source, { speed: how.speed ?? replay?.status.speed, loop: how.loop ?? replay?.status.loop, controls: how.controls ?? options.controls, autoplay: how.autoplay }),
     play: () => replay?.play(),
     pause: () => replay?.pause(),
     step: (by) => replay?.step(by),

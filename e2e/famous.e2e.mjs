@@ -44,8 +44,12 @@ test("pause, a step either way, restart, the scrubber, the speed and repeat", as
   await expect(act("loop")).toHaveAttribute("aria-pressed", "true");
   await player(page).locator("input[type=range]").fill("5");
   await expect(player(page)).toHaveAttribute("data-position", "5");
+  // Restart goes back to the scrambled cube and waits there.
+  await act("play").click();
   await act("again").click();
-  await expect(player(page)).toHaveAttribute("data-playing", "true");
+  await expect(player(page)).toHaveAttribute("data-playing", "false");
+  await expect(player(page)).toHaveAttribute("data-position", "0");
+  await expect(player(page).locator("[data-kyuubu]")).not.toHaveAttribute("data-state", /^(.)\1{8}/);
 });
 
 test("a pasted solve with comments and wide turns plays; a bad one says which piece; an unsolved one says so", async ({ page }) => {

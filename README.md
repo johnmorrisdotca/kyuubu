@@ -518,8 +518,8 @@ forward, restart, where in the solve, the speed (the solve's own, a half, a
 quarter, a tenth) and repeat. The viewer can drag to look round the cube and
 cannot turn its layers. Options: `size`, `scramble`, `solution`, `timeMs`,
 `stepMs`, `autoplay`, `loop`, `controls`, `speed`, `theme`, `locale`,
-`onChange`, `onEnd`. The handle has `play()`, `pause()`, `step(1 | -1)`,
-`seek(n)`, `restart()`, `setSpeed()`, `setLoop()`, `setLocale()`,
+`onChange`, `onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
+`seek(n)`, `restart()` (back to the scrambled cube, waiting), `setSpeed()`, `setLoop()`, `setLocale()`,
 `setTheme()`, `status`, `plan`, `fault` and `destroy()`.
 
 **About the pace.** A reconstruction says how long the whole solve took and
@@ -714,7 +714,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.3.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.3.1", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -740,7 +740,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.3.0",
+  "generator": "kyuubu 1.3.1",
   "solves": [
     {
       "size": 3,
@@ -911,6 +911,7 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `setInteractive(on)` | Lets a person turn it, or stops them |
 | `turnTogether(moves, { animate?, ms? })` | Turns several layers about one axis as one movement (a wide turn), in `ms` when given |
 | `busy` | Whether a turn asked for is still on its way |
+| `redraw()` | Takes the cube out of the page and puts it straight back, so the browser makes its layers again. Done by itself when the cube comes back into view |
 | `setTurnMs(ms)` | Changes how long a quarter turn takes |
 | `setTheme(theme)` | Changes colours, plastic or sticker shape on the cube as drawn |
 | `setLocale(locale)` | Changes the language of its accessible name |

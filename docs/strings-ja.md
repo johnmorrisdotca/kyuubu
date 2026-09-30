@@ -39,7 +39,7 @@ open a *Fix a translation* issue with the string's name. `{n}` and the other bra
 | `playerPause` | Pause | 一時停止 |
 | `playerBack` | Back | 戻る |
 | `playerOn` | Forward | 進む |
-| `playerAgain` | Restart | 最初から |
+| `playerAgain` | To the scramble | スクランブルに戻す |
 | `playerLoop` | Repeat | くり返す |
 | `playerSpeed` | Speed | 速さ |
 | `playerOwnPace` | Real speed | 実際の速さ |

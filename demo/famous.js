@@ -123,8 +123,13 @@ function draw() {
   const solve = showing;
   const famous = solve.id !== undefined;
   $("watch-title").textContent = famous ? say("watch", { solver: solve.solver, time: say("seconds", { time: secs(solve.timeMs) }) }) : say("yours");
-  player?.destroy();
-  player = mountPlayer($("player"), { size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs, locale: page.lang });
+  // One player, and one cube, for every solve shown: a new solve is loaded onto it.
+  const source = { size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs };
+  if (player === null) player = mountPlayer($("player"), { ...source, locale: page.lang });
+  else {
+    player.setLocale(page.lang);
+    player.load(source);
+  }
 
   for (const item of $("list").children) item.firstChild.setAttribute("aria-pressed", String(item.dataset.id === solve.id));
 
@@ -192,6 +197,8 @@ for (const solve of FAMOUS_SOLVES) {
   button.addEventListener("click", () => {
     showing = solve;
     draw();
+    // On a phone the list is below the cube: bring the cube into view, then play, so the solve is not over before it is seen.
+    $("watch-title").scrollIntoView({ block: "start", behavior: "auto" });
     player.play();
   });
   item.append(button);
@@ -216,6 +223,7 @@ $("paste").addEventListener("submit", (event) => {
   const time = Number($("p-time").value.replace(",", "."));
   showing = { size: Number($("p-size").value), scramble: $("p-scramble").value, solution: $("p-moves").value, timeMs: time > 0 ? time * 1000 : undefined };
   draw();
+  $("watch-title").scrollIntoView({ block: "start", behavior: "auto" });
   player.play();
 });
 

@@ -212,6 +212,16 @@ export class CubeView {
     this.look();
     this.resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => this.look());
     this.resize?.observe(host);
+    // Safari on a phone can let go of the 3D layers of a cube that is out of sight, and then draws it flat when
+    // it comes back: one face of it, and nothing behind. Taking the cube out of the page and putting it straight
+    // back as it comes into view makes the browser build its layers again, and is nothing a person can see.
+    if (typeof IntersectionObserver !== "undefined") {
+      const seen = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) this.redraw();
+      });
+      seen.observe(this.root);
+      this.cleanups.push(() => seen.disconnect());
+    }
     this.listen();
   }
 
@@ -338,6 +348,14 @@ export class CubeView {
   /** Whether a turn asked for is still on its way. */
   get busy(): boolean {
     return this.animating || this.queue.length > 0;
+  }
+
+  /** The cube taken out of the page and put straight back, so that the browser makes its layers again. Nothing about it changes. */
+  redraw(): void {
+    const pivot = this.pivot;
+    pivot.remove();
+    void this.root.offsetWidth;
+    this.root.append(pivot);
   }
 
   /** How long a quarter turn made by a key, by notation or from code takes, in milliseconds, from now on. */

@@ -232,10 +232,11 @@ export class Replay {
     this.tell();
   }
 
-  /** From the scrambled cube again, and run. */
+  /** Back to the scrambled cube, and wait there: the solve as it was before its first move, until it is played. */
   restart(): void {
+    this.running = false;
+    this.stop();
     this.seek(0);
-    this.play();
   }
 
   /** One step on, or one back, and stop there. A step on is turned; a step back is shown at once. */
