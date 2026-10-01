@@ -665,6 +665,82 @@ issue with the scramble, the moves and where they were published, or send a
 pull request: `pnpm solve:check "<scramble>" "<moves>"` plays it and prints
 whether it ends solved and how many moves it is.
 
+## A cube drawn small, medium or large
+
+`scale` is the same three names Toranpu's cards take (a cube's `size` is its
+side, so the setting is `scale` here). Small is for a list or a picker: every
+side from 2×2 to 7×7 is drawn in 72 pixels, look-only, and the box is one
+steady square, never wider than its container.
+
+```ts
+new CubeView(box, { size: 4, scale: "small" });    // 72 pixels wide, and square
+new CubeView(box, { size: 3, scale: "large", interactive: false });
+new CubeView(box, { size: 3, width: 100 });        // any width
+```
+
+The React component takes `scale` and `width` as props, and the elements below
+take them as attributes.
+
+## A cube that keeps turning
+
+For a background or a widget, `keepScrambling` turns a random layer, waits,
+and turns another, at a pace you choose. It never turns about the axis it just
+used, and it never queues a turn behind one that is still moving.
+
+```ts
+import { CubeView, keepScrambling } from "@johnmorrisdotca/kyuubu";
+
+const view = new CubeView(box, { size: 3, scale: "medium", interactive: false });
+const loop = keepScrambling(view, { pace: "slow" });   // every 4 seconds
+loop.setPace(0.5);                                     // every half second
+loop.stop();                                           // the cube stays as it is
+loop.start();
+loop.destroy();                                        // lets go of the page
+```
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `pace` | `1` | Seconds between turns, never under `0.2`, or `"fast"` (0.5), `"normal"` (1), `"slow"` (4) |
+| `faces` | `false` | Turn only the six outer faces |
+| `random` | `Math.random` | A `() => number` in [0, 1); seeded, the same cube turns the same way |
+| `autoplay` | `true` | Start by itself |
+
+It costs nothing nobody can see. A hidden tab is left alone and the cube carries
+on when the tab comes back (it listens for `visibilitychange`). A device that
+asks for reduced motion gets a cube that stays still: `running` is `false` and
+no timer is set.
+
+As a tag, with nothing to build:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
+<kyuubu-scramble size="3" pace="slow" scale="small"></kyuubu-scramble>
+```
+
+| Attribute | Means |
+| --- | --- |
+| `size` | The cube's side, 2 to 7: 3 when left out |
+| `pace` | Seconds between turns, or `fast`, `normal`, `slow` |
+| `paused` | Does not turn until `play()` |
+| `scale`, `width` | `small`, `medium` or `large`, or a width in pixels |
+| `theme` | `standard`, `paper` or `stickerless` |
+| `faces` | Outer faces only |
+| `seed` | The same turns every time |
+| `interactive` | Lets a person turn it; off for a small one |
+| `lang` | `en` or `ja` |
+
+It has `play()`, `pause()`, `running` and `cube` (the `CubeView`). In a bundle,
+`defineScramble` from `@johnmorrisdotca/kyuubu/element` registers it. An iframe
+for a page that allows no scripts:
+
+```html
+<iframe src="https://johnmorrisdotca.github.io/kyuubu/embed-scramble.html#pace=slow&scale=medium" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%"></iframe>
+```
+
+The address carries `size`, `pace`, `scale`, `width`, `theme`, `faces`, `seed`
+and `paused`. The [turning cubes page](https://johnmorrisdotca.github.io/kyuubu/cubes.html)
+shows it at all three scales.
+
 ## Scrambles and seeds
 
 ```ts
@@ -769,7 +845,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.5.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.6.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -795,7 +871,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.5.0",
+  "generator": "kyuubu 1.6.0",
   "solves": [
     {
       "size": 3,
@@ -926,6 +1002,24 @@ From `@johnmorrisdotca/kyuubu/player`: `mountPlayer(element, options)`,
 `KyuubuCubeElement`. From `@johnmorrisdotca/kyuubu/famous`: `FAMOUS_SOLVES`,
 `famousSolve(id)` and the type `FamousSolve`.
 
+### Scale and the cube that keeps turning
+
+| Export | Is |
+| --- | --- |
+| `CUBE_SCALES` | `["small", "medium", "large"]`; the type is `CubeScale` |
+| `CUBE_SCALE_PX` | `{ small: 72, medium: 160, large: 300 }` |
+| `CUBE_SCALE_INTERACTIVE` | Whether a cube of each scale is turned by a hand unless told: `small` is not |
+| `cubeWidthPx` | `(scale?, width?) => number \| null`: the width a cube is drawn at |
+| `isCubeScale` | `(value) => boolean` |
+| `keepScrambling` | `(cube, options?) => KeepScramblingHandle`: `start`, `stop`, `setPace`, `running`, `destroy` |
+| `SCRAMBLE_PACES` | `{ fast: 0.5, normal: 1, slow: 4 }`, in seconds; the type is `ScramblePace` |
+| `SCRAMBLE_DEFAULT_PACE`, `SCRAMBLE_SHORTEST` | `1` and `0.2` seconds |
+| `paceSeconds` | `(pace?) => number`: a pace as seconds |
+| `nextTurn` | `(n, last, random, faces) => CubeMove`: one random layer, never about the last axis |
+| `prefersReducedMotion` | `() => boolean` |
+
+Types: `KeepScramblingOptions`, `Scrambled` (what the loop turns: a `CubeView` is one), `ScramblePage`.
+
 ### Show me on the cube
 
 | Export | Signature | Does |
@@ -960,7 +1054,9 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | --- | --- | --- |
 | `size` | required | The cube's side, 2 or more |
 | `state` | solved | The stickers to start with |
-| `interactive` | `true` | Whether a person can turn it. `turn()` always works |
+| `scale` | | `"small"` (72 pixels), `"medium"` (160) or `"large"` (300): the box is given that width and kept square. Left out, the cube fills its box. A `small` cube is look-only unless `interactive` says otherwise |
+| `width` | | How wide it is drawn, in pixels, in place of `scale`'s |
+| `interactive` | `true` | Whether a person can turn it. `turn()` always works. `false` at `small` |
 | `keyboard` | `"focus"` | `"focus"`, `"page"` or `"none"` |
 | `turnMs` | `160` | How long a quarter turn made by a key, notation or code takes. Turns waiting in line go faster, and reduced motion gets none |
 | `commitAngle` | `30` | The point of no return of a dragged layer, in degrees, from 5 to 85 |
@@ -982,6 +1078,7 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `state`, `size`, `host` | The state once every turn in line has finished; the side; the element |
 | `setLook(yaw, pitch)`, `resetLook()`, `looking` | The view |
 | `setInteractive(on)` | Lets a person turn it, or stops them |
+| `setScale(scale?, width?)` | Draws it at a scale or a width, or with neither, back to filling its box |
 | `turnTogether(moves, { animate?, ms? })` | Turns several layers about one axis as one movement (a wide turn), in `ms` when given |
 | `busy` | Whether a turn asked for is still on its way |
 | `redraw()` | Takes the cube out of the page and puts it straight back. Kept for pages that call it; since 1.3.2 the cube asks for no 3D context, so there are no layers for a browser to lose |

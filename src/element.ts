@@ -107,3 +107,5 @@ export function defineCube(name: string = CUBE_ELEMENT_NAME): void {
   made ??= build();
   customElements.define(name, name === CUBE_ELEMENT_NAME ? made : class extends made {});
 }
+
+export { SCRAMBLE_ELEMENT_ATTRIBUTES, SCRAMBLE_ELEMENT_NAME, defineScramble, paceFromAttribute, type KyuubuScrambleElement } from "./scramble-element.ts";

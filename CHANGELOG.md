@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-01
+
+### Added
+
+- **The cube drawn small, medium or large.** A `scale` option (and a `width`
+  in pixels) on `CubeView`, a prop on the React component and an attribute on
+  the elements. Small is 72 pixels, for a list or a picker, and look-only
+  unless asked; medium is 160; large is 300. The box is one steady square.
+  `setScale()` changes it later.
+- **A cube that keeps turning.** `keepScrambling(view, { pace })` turns random
+  layers on its own, every half second, second or four seconds, or any pace
+  from 0.2 seconds; `stop()`, `start()` and `setPace()`. It is paused on a
+  hidden tab and stays still for a device that asks for reduced motion.
+- **`<kyuubu-scramble>`**, the same as a tag, and `embed-scramble.html` for an
+  iframe.
+- **A turning cubes page in the demo** (`cubes.html`): the cube at three
+  scales turning at a pace you choose, every size small for a list, and the
+  embed, in English and Japanese.
+
 ## [1.5.0] - 2026-10-01
 
 ### Added

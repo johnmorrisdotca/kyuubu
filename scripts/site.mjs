@@ -14,7 +14,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ",
     ogDescription: "A turning cube for the browser, in CSS 3D. 2×2 to 7×7, with a solve you can follow.",
   }),
-  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }] }),
+  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }] }),
   famousHead: familyHead({
     id,
     title: "Kyuubu · famous solves, played move for move",
@@ -22,7 +22,15 @@ const parts = {
     ogTitle: "Kyuubu キューブ · famous solves",
     ogDescription: "Record solves of the 3×3, move for move, at the speed they were made.",
   }),
-  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }] }),
+  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }] }),
+  cubesHead: familyHead({
+    id,
+    title: "Kyuubu · a cube that keeps turning, big or small",
+    description: "A cube that turns random layers by itself at a pace you choose, drawn small, medium or large: for a background, a widget or a list. It stops on a hidden tab and stays still for a device that asks for less motion. Embed it with a tag or an iframe.",
+    ogTitle: "Kyuubu キューブ · a cube that keeps turning",
+    ogDescription: "A cube that keeps turning by itself, at a pace you choose, small, medium or large.",
+  }),
+  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }] }),
   unreviewed: familyUnreviewed({ id }),
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
@@ -39,7 +47,8 @@ rmSync("_site", { recursive: true, force: true });
 mkdirSync("_site", { recursive: true });
 writeFileSync("_site/index.html", page);
 writeFileSync("_site/famous.html", fillPage("famous.html"));
-for (const file of ["family.css", "site.css", "app.js", "famous.js", "embed.html"]) cpSync(`demo/${file}`, `_site/${file}`);
+writeFileSync("_site/cubes.html", fillPage("cubes.html"));
+for (const file of ["family.css", "site.css", "app.js", "famous.js", "cubes.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `_site/${file}`);
 cpSync("docs/cube.png", "_site/cube.png");
 cpSync("dist", "_site/dist", { recursive: true });
 console.log("_site/ is ready: serve it, or let the Pages workflow publish it.");

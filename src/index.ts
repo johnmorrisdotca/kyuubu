@@ -46,6 +46,8 @@ export {
 } from "./view/gestures.ts";
 export { readKey, type KeyReading } from "./view/keys.ts";
 export { viewMatrix, type Mat3 } from "./view/geometry.ts";
+export { CUBE_SCALES, CUBE_SCALE_INTERACTIVE, CUBE_SCALE_PX, cubeWidthPx, isCubeScale, type CubeScale } from "./scale.ts";
+export { SCRAMBLE_DEFAULT_PACE, SCRAMBLE_PACES, SCRAMBLE_SHORTEST, keepScrambling, nextTurn, paceSeconds, prefersReducedMotion, type KeepScramblingHandle, type KeepScramblingOptions, type Scrambled, type ScramblePace, type ScramblePage } from "./scrambler.ts";
 export { seededRandom } from "./random.ts";
 export {
   MAX_RECORDS,

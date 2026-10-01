@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- The turning cubes page's source. `pnpm site` fills each "family:" line from scripts/family-template.mjs and writes _site/cubes.html. -->
+<html lang="en">
+  <head>
+    <!-- family:cubesHead -->
+    <meta property="og:image" content="https://johnmorrisdotca.github.io/kyuubu/cube.png" />
+    <link rel="stylesheet" href="family.css" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <main class="cube-page">
+      <!-- family:cubesHeader -->
+      <section class="fam-felt cube-felt" aria-labelledby="widget-title" data-testid="widget">
+        <h2 class="cube-watch-title" id="widget-title" data-say="widgetTitle"></h2>
+        <p data-say="widgetText"></p>
+        <div class="cube-row" data-testid="cube-row">
+          <figure><kyuubu-scramble id="widget-large" scale="large" pace="normal" theme="paper" data-testid="widget-large"></kyuubu-scramble><figcaption data-say="scaleLarge"></figcaption></figure>
+          <figure><kyuubu-scramble id="widget-medium" scale="medium" pace="normal" theme="paper" size="4" data-testid="widget-medium"></kyuubu-scramble><figcaption data-say="scaleMedium"></figcaption></figure>
+          <figure><kyuubu-scramble id="widget-small" scale="small" pace="normal" theme="paper" size="2" data-testid="widget-small"></kyuubu-scramble><figcaption data-say="scaleSmall"></figcaption></figure>
+        </div>
+      </section>
+
+      <section class="fam-panel" aria-labelledby="pace-label">
+        <div class="fam-row">
+          <span class="fam-label cube-wide-label" id="pace-label" data-say="paceLabel"></span>
+          <div class="fam-seg" id="paces" role="group" aria-labelledby="pace-label" data-testid="paces">
+            <button type="button" data-pace="fast" aria-pressed="false" data-say="paceFast"></button>
+            <button type="button" data-pace="normal" aria-pressed="true" data-say="paceNormal"></button>
+            <button type="button" data-pace="slow" aria-pressed="false" data-say="paceSlow"></button>
+          </div>
+        </div>
+        <div class="fam-actions">
+          <button class="fam-button" id="widget-toggle" type="button" aria-pressed="true" data-testid="widget-toggle"></button>
+        </div>
+      </section>
+
+      <section class="fam-panel" aria-labelledby="picker-title">
+        <h2 id="picker-title" data-say="pickerTitle"></h2>
+        <p class="fam-muted" data-say="pickerText"></p>
+        <div class="cube-picker" id="picker" data-testid="picker"></div>
+        <p class="fam-fine" id="picked" aria-live="polite" data-testid="picked"></p>
+      </section>
+
+      <section class="more" aria-labelledby="embed-title">
+        <h2 id="embed-title" data-say="embedTitle"></h2>
+        <p data-say="embedText"></p>
+        <pre><code>&lt;script type="module" src="https://unpkg.com/@johnmorrisdotca/kyuubu/dist/element-define.js"&gt;&lt;/script&gt;
+&lt;kyuubu-scramble size="3" pace="slow" scale="small"&gt;&lt;/kyuubu-scramble&gt;</code></pre>
+        <pre><code>&lt;iframe src="https://johnmorrisdotca.github.io/kyuubu/embed-scramble.html#pace=slow&amp;scale=medium" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%"&gt;&lt;/iframe&gt;</code></pre>
+        <iframe src="embed-scramble.html#pace=slow&scale=medium&theme=paper" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%" data-testid="embedded"></iframe>
+      </section>
+      <!-- family:unreviewed -->
+      <!-- family:footer -->
+    </main>
+    <!-- family:script -->
+    <script type="module" src="cubes.js"></script>
+  </body>
+</html>

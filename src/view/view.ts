@@ -1,4 +1,5 @@
 import { CUBE_FACE_ORDER, FACE_FRAMES, cubeSlots, faceOfNormal, layerOf, solvedCube, turnCube, type CubeFace } from "../cube.ts";
+import { CUBE_SCALE_INTERACTIVE, cubeWidthPx, type CubeScale } from "../scale.ts";
 import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
@@ -98,7 +99,11 @@ export type CubeViewOptions = {
   rounded?: boolean;
   /** The language of the cube's accessible name: English or Japanese. Left out, it follows the page's `lang`. */
   locale?: KyuubuLanguage;
-  /** Whether a person can turn it. A look-only cube still turns when asked (`turn`). */
+  /** How big it is drawn: `small` (72 pixels, for a list or a picker), `medium` (160) or `large` (300). The host is given that width and kept square. Left out, the cube fills the box it is in. `width` wins over it. A `small` cube is look-only unless `interactive` says otherwise. */
+  scale?: CubeScale;
+  /** How wide it is drawn, in pixels, in place of `scale`'s. */
+  width?: number;
+  /** Whether a person can turn it. A look-only cube still turns when asked (`turn`). True when left out, except at `small`. */
   interactive?: boolean;
   /** Where the keys are listened for: the cube itself once it has focus (the default), the whole page, or nowhere. */
   keyboard?: "focus" | "page" | "none";
@@ -170,7 +175,7 @@ type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all
 export class CubeView {
   /** The element the cube was made in. */
   readonly host: HTMLElement;
-  private options: Required<Omit<CubeViewOptions, "state" | "onTurn" | "onLook" | "colours" | "plastic" | "theme" | "label" | "locale">> & Pick<CubeViewOptions, "onTurn" | "onLook" | "label">;
+  private options: Required<Omit<CubeViewOptions, "state" | "onTurn" | "onLook" | "colours" | "plastic" | "theme" | "label" | "locale" | "scale" | "width">> & Pick<CubeViewOptions, "onTurn" | "onLook" | "label">;
   private theme: { colours: Partial<Record<CubeFace, string>>; plastic?: string; stickerInset?: string; stickerRadius?: string; cornerRadius?: string };
   private readonly listeners: { turn: Set<CubeViewEvents["turn"]>; look: Set<CubeViewEvents["look"]> } = { turn: new Set(), look: new Set() };
   /** The turn a hint is shown for, and what it came to from where the cube is looked at now. */
@@ -201,13 +206,15 @@ export class CubeView {
   private drag: LiveDrag | null = null;
   /** What ends a layer's snap after it is let go, run early when something cannot wait for it. */
   private finishSnap: (() => void) | null = null;
+  private sized = { width: "", height: "", maxWidth: "", aspectRatio: "" };
+  private sizedByScale = false;
   private readonly resize: ResizeObserver | null;
   private readonly cleanups: (() => void)[] = [];
 
   constructor(host: HTMLElement, options: CubeViewOptions) {
     this.host = host;
     this.options = {
-      interactive: true,
+      interactive: options.scale === undefined ? true : CUBE_SCALE_INTERACTIVE[options.scale],
       keyboard: "focus",
       turnMs: 160,
       commitAngle: COMMIT_ANGLE,
@@ -246,6 +253,7 @@ export class CubeView {
     this.root.append(this.pivot);
     Object.assign(this.pivot.style, { left: "50%", top: "50%" });
     host.append(this.root);
+    this.setScale(options.scale, options.width);
 
     this.build();
     this.look();
@@ -344,6 +352,34 @@ export class CubeView {
   private corner(): string {
     if (!this.options.rounded) return "";
     return `min(${this.theme.cornerRadius ?? "var(--kyuubu-corner-radius, 15px)"}, ${Math.round(this.unit() * 0.45)}px)`;
+  }
+
+  /**
+   * Draw the cube at a scale, or at a width in pixels (which wins), or with
+   * neither, back to filling the box it is in. The box keeps one steady
+   * square, never wider than its container, so nothing round it moves when
+   * the cube does. The cube's own `interactive` is not touched.
+   */
+  setScale(scale?: CubeScale, width?: number): void {
+    const px = cubeWidthPx(scale, width);
+    const box = this.host.style;
+    if (px === null) {
+      box.width = this.sized.width;
+      box.height = this.sized.height;
+      box.maxWidth = this.sized.maxWidth;
+      box.aspectRatio = this.sized.aspectRatio;
+      this.sizedByScale = false;
+    } else {
+      if (!this.sizedByScale) this.sized = { width: box.width, height: box.height, maxWidth: box.maxWidth, aspectRatio: box.aspectRatio };
+      this.sizedByScale = true;
+      box.width = `${px}px`;
+      box.height = "auto";
+      box.maxWidth = "100%";
+      box.aspectRatio = "1 / 1";
+      if (this.host.ownerDocument.defaultView?.getComputedStyle(this.host).position === "static") box.position = "relative";
+    }
+    this.root.style.cursor = this.options.interactive ? "grab" : "default";
+    if (this.stickers.length > 0) this.look();
   }
 
   /** Whether a person can turn it now. */

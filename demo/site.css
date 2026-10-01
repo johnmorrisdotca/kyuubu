@@ -68,3 +68,13 @@
 .cube-paste { display: grid; gap: 6px; }
 .cube-paste-row { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 8px; align-items: center; }
 .cube-code { width: 100%; min-height: 5.5rem; font-size: .8rem; }
+
+/* A cube that keeps turning: each cube keeps its one square, so nothing moves while they turn. */
+.cube-row { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; margin: 14px 0; }
+.cube-row figure { margin: 0; display: grid; gap: 6px; justify-items: center; max-width: 100%; }
+.cube-row figcaption { font-size: .8rem; color: var(--muted); }
+.cube-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.cube-pick { display: grid; justify-items: center; gap: 4px; min-width: 88px; min-height: 44px; padding: 8px; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); color: inherit; cursor: pointer; font: inherit; user-select: none; -webkit-user-select: none; }
+.cube-pick span { display: block; pointer-events: none; }
+.cube-pick small { font-size: .8rem; }
+.cube-row kyuubu-scramble, .cube-pick { user-select: none; -webkit-user-select: none; }

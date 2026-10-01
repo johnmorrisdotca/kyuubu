@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- A cube that keeps turning and nothing else, for another site's iframe or a page's background. Everything it shows comes from its own address:
+     embed-scramble.html#size=3&pace=slow&scale=medium&theme=paper&faces=1&seed=club&paused=1
+     (the same after a ? works too). `pace` is seconds between turns, or fast, normal or slow. It turns nothing on a hidden tab or for a device that
+     asks for reduced motion. It stores nothing, tracks nothing and loads nothing from anywhere else. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Kyuubu · a cube that keeps turning</title>
+    <style>
+      html, body { margin: 0; }
+      body { background: transparent; padding: 0; display: grid; place-items: center; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+      kyuubu-scramble { max-width: 100%; }
+    </style>
+  </head>
+  <body>
+    <kyuubu-scramble id="cube"></kyuubu-scramble>
+    <script type="module">
+      import "./dist/element-define.js";
+      const read = () => new URLSearchParams(location.hash.length > 1 ? location.hash.slice(1) : location.search.slice(1));
+      const cube = document.getElementById("cube");
+      const draw = () => {
+        const q = read();
+        // A cube with no scale or width fills the window's shorter side.
+        for (const name of ["size", "pace", "scale", "width", "theme", "faces", "seed", "paused", "interactive"]) {
+          if (q.has(name)) cube.setAttribute(name, q.get(name));
+          else cube.removeAttribute(name);
+        }
+        if (!q.has("scale") && !q.has("width")) cube.setAttribute("width", String(Math.min(innerWidth, innerHeight)));
+      };
+      addEventListener("hashchange", draw);
+      draw();
+      document.documentElement.dataset.ready = "true";
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </body>
+</html>

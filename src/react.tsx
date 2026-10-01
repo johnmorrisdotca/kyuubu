@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, type CSSProperties, type Ref } from "react";
 
 import type { CubeFace } from "./cube.ts";
+import { CUBE_SCALE_INTERACTIVE } from "./scale.ts";
 import type { CubeMove } from "./types.ts";
 import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
 
@@ -48,7 +49,9 @@ export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
  * square as wide as its container, and a `className` must position it
  * (relative or absolute) and give it a size.
  */
-export function Kyuubu({ ref, className, style, size, state, interactive = true, hint = null, onTurn, onLook, ...rest }: KyuubuProps) {
+export function Kyuubu({ ref, className, style, size, state, interactive: interactiveGiven, hint = null, onTurn, onLook, ...rest }: KyuubuProps) {
+  const { scale, width } = rest;
+  const interactive = interactiveGiven ?? (scale === undefined ? true : CUBE_SCALE_INTERACTIVE[scale]);
   const box = useRef<HTMLDivElement>(null);
   const view = useRef<CubeView | null>(null);
   const handlers = useRef({ onTurn, onLook });
@@ -65,6 +68,8 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
       size,
       state,
       interactive,
+      scale,
+      width,
       colours,
       plastic,
       theme,
@@ -106,6 +111,10 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
   useEffect(() => {
     if (state !== undefined && view.current !== null && view.current.state !== state) view.current.setState(state);
   }, [state]);
+
+  useEffect(() => {
+    view.current?.setScale(scale, width);
+  }, [scale, width]);
 
   useEffect(() => {
     view.current?.setInteractive(interactive);
