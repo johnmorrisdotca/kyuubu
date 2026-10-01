@@ -14,8 +14,8 @@
 <p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a></p>
 
 <p align="center">
-  <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, part way through its solve: the white corners step, its turns and the algorithm it uses, with the steps already done listed under it" width="720">
-  <img src="docs/phone.jpg" alt="The same page on a phone in dark mode and in Japanese" width="220">
+  <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links and five cloth patches: the Solve tab names the White cross step with its turn and lists the steps already taken" width="720">
+  <img src="docs/phone.jpg" alt="The same cube on a phone in dark mode, in Japanese: the timer and move count above it, the 2×2 to 7×7 sizes and the scramble and undo buttons under it" width="220">
 </p>
 
 A 3D cube simulator, a cube model, a scramble generator and a beginner's
