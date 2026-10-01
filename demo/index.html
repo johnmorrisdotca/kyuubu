@@ -22,7 +22,7 @@
             <div class="cube-guide" id="guide" data-testid="guide" hidden></div>
             <p class="fam-hint" id="hint" data-testid="hint" aria-live="polite"></p>
           </section>
-          <div class="fam-seg cube-sizes" id="sizes" role="group" data-say-label="size" data-testid="sizes"></div>
+          <div class="fam-seg cube-sizes" id="sizes" role="group" data-say-label="size" data-testid="sizes" data-help-en="How big the cube is, from 2×2 to 7×7. Choosing a size starts a new, solved cube." data-help-ja="キューブの大きさです（2×2〜7×7）。選ぶと、そろった新しいキューブから始まります。"></div>
           <div class="cube-actions">
             <button class="fam-button" data-primary="true" id="scramble" type="button" data-say="scramble" data-testid="scramble"></button>
             <button class="fam-button" id="undo" type="button" data-say="undo" data-testid="undo"></button>
@@ -87,16 +87,16 @@
 
           <section class="fam-panel" role="tabpanel" id="panel-look" aria-labelledby="tab-look" hidden>
             <p class="fam-muted" data-say="lookIntro"></p>
-            <div class="fam-seg" id="themes" role="group" data-say-label="themeLabel" data-testid="themes">
+            <div class="fam-seg" id="themes" role="group" data-say-label="themeLabel" data-testid="themes" data-help-en="Choose how the cube looks: paper, standard or stickerless. Your own colours below are dropped." data-help-ja="キューブの見た目（ペーパー・標準・ステッカーなし）を選びます。下で変えた色は元に戻ります。">
               <button type="button" data-theme-name="paper" data-say="themePaper"></button>
               <button type="button" data-theme-name="standard" data-say="themeStandard"></button>
               <button type="button" data-theme-name="stickerless" data-say="themeStickerless"></button>
             </div>
-            <div class="cube-colours" id="colours" data-testid="colours"></div>
+            <div class="cube-colours" id="colours" data-testid="colours" data-help-en="Tap a colour to change it for one face of the cube, or for the plastic between the stickers." data-help-ja="色をタップすると、その面の色（またはステッカーのあいだのプラスチックの色）を変えられます。"></div>
           </section>
 
           <section class="fam-panel" role="tabpanel" id="panel-keys" aria-labelledby="tab-keys" hidden>
-            <div class="fam-row">
+            <div class="fam-row" data-help-en="How fast each turn is drawn: Fast, Normal or Slow. It applies to keys, typed moves and the solve." data-help-ja="1回の回転を表示する速さです（速い・ふつう・遅い）。キー、入力した回転記号、解き方に使われます。">
               <span class="fam-label cube-wide-label" id="speed-label" data-say="speedLabel"></span>
               <div class="fam-seg" id="speeds" role="group" aria-labelledby="speed-label" data-testid="speeds">
                 <button type="button" data-ms="80" data-say="speedFast"></button>

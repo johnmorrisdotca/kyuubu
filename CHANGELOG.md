@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- **A Help switch in the demo.** Beside the language chooser in the family header, shared by every demo. Off (the default) the pages are as they were; on, each option row (the size, the look, the colours, the speed of turns, the pace of the small cubes) says in one plain line what it does, in English or Japanese, and every button in it has the same words as its hover text. Kept on the device.
+
+
 ## [1.6.0] - 2026-10-01
 
 ### Added
