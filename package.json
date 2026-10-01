@@ -151,6 +151,7 @@
     "test:site": "pnpm site && playwright test",
     "test:cli": "pnpm build && node scripts/check-cli.mjs",
     "test:package": "pnpm build && node scripts/check-package.mjs",
+    "family:readme": "node scripts/family-readme.mjs",
     "test:frameworks": "pnpm build && node scripts/check-frameworks.mjs",
     "docs:make": "node scripts/docs.mjs",
     "prepublishOnly": "pnpm check",

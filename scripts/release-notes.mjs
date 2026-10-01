@@ -5,7 +5,7 @@
 // It prints the text under `## [1.7.0]`, up to the next version's heading or the link list at the foot, and exits
 // with an error, printing nothing, when the changelog has no such version or nothing is written under it.
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { URL, fileURLToPath } from "node:url";
 import process from "node:process";
 
 /** The text a changelog has under one version's heading, or `null` when there is none. */

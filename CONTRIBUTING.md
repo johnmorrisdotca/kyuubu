@@ -72,6 +72,10 @@ pnpm dlx serve _site   # or any static server
   `scripts/family-template.mjs` are the same files in every package of the
   family, held by a hash in the tests: do not edit them here. What is
   Kyuubu's own goes in `demo/site.css`.
+- **The list of the family in the README is made, not written.** `pnpm family:readme` writes it between its
+  markers from `scripts/family-template.mjs` (the names, the Japanese names and a line on each), and
+  `scripts/family-readme.mjs` is the same file in every package. To add a package or change a line, change the
+  template in every repository, bump `FAMILY_TEMPLATE_VERSION` and record the new hash in `test/family.test.js`.
 - **No dependencies.** The package has none at run time and should stay so.
   React stays an optional peer.
 - One change per pull request, with a line in `CHANGELOG.md` under
