@@ -111,3 +111,28 @@ test("in Japanese, the words change and the page still fits", async ({ page }) =
   await expect(page.locator(id("widget-toggle"))).toHaveText("回すのをやめる");
   await sound(page, errors);
 });
+
+test("a cube with no scale leaves its box as the page sized it, and one given a scale gives it back", async ({ page }) => {
+  await open(page);
+  const result = await page.evaluate(async () => {
+    const { CubeView } = await import("/dist/index.js");
+    const box = document.createElement("div");
+    box.style.cssText = "width: 300px; height: 280px; position: relative";
+    document.body.append(box);
+    const view = new CubeView(box, { size: 3 });
+    const plain = box.style.cssText;
+    view.setScale("small");
+    const small = [box.style.width, box.style.height, box.style.aspectRatio];
+    view.setScale(undefined, 100);
+    const wide = box.style.width;
+    view.setScale();
+    const back = [box.style.width, box.style.height, box.style.aspectRatio];
+    view.destroy();
+    box.remove();
+    return { plain, small, wide, back };
+  });
+  expect(result.plain).toBe("width: 300px; height: 280px; position: relative;");
+  expect(result.small).toEqual(["72px", "auto", "1 / 1"]);
+  expect(result.wide).toBe("100px");
+  expect(result.back).toEqual(["300px", "280px", ""]);
+});

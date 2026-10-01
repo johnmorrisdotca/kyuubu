@@ -364,6 +364,8 @@ export class CubeView {
     const px = cubeWidthPx(scale, width);
     const box = this.host.style;
     if (px === null) {
+      // A cube never given a scale leaves its box exactly as the page sized it.
+      if (!this.sizedByScale) return;
       box.width = this.sized.width;
       box.height = this.sized.height;
       box.maxWidth = this.sized.maxWidth;
