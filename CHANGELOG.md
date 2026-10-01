@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-01
+
+### Added
+
+- The React component shows the visual guide too: a `hint` prop (moves, or
+  null for none) and `showHint` on its handle, as `CubeView` has. A hint is
+  shown again on a cube made afresh, and a new array of the same moves on
+  every render changes nothing.
+- The React component passes `rounded` through, as every other option is.
+
 ## [1.4.1] - 2026-09-30
 
 ### Fixed

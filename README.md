@@ -769,7 +769,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.4.1", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.5.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -795,7 +795,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.4.1",
+  "generator": "kyuubu 1.5.0",
   "solves": [
     {
       "size": 3,
@@ -1011,10 +1011,17 @@ means; type `KeyReading`), `viewMatrix` (the way the cube is looked at; type
 
 This component takes every `CubeView` option as a prop, plus `className`,
 `style` and any `data-*` (type `KyuubuProps`). Its `ref` (type
-`KyuubuHandle`) gives `turn`, `setState`, `resetLook`, `setTheme` and
-`state`. When the `state` prop changes to something the cube is not already
-showing, the cube shows it, so a parent can keep the state and hand it back
-without the cube jumping.
+`KyuubuHandle`) gives `turn`, `setState`, `resetLook`, `setTheme`, `state`
+and `showHint`. When the `state` prop changes to something the cube is not
+already showing, the cube shows it, so a parent can keep the state and hand it
+back without the cube jumping.
+
+The `hint` prop shows moves on the cube the way the visual guide does (the
+layer lit, an arrow the way to drag it); null shows nothing:
+
+```tsx
+<Kyuubu size={3} state={state} hint={nextStep.moves.slice(0, 1)} onTurn={(move, now) => setState(now)} />
+```
 
 ## Theming
 

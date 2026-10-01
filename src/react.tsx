@@ -16,6 +16,8 @@ export type KyuubuHandle = {
   setTheme: (theme: CubeTheme) => void;
   /** The stickers once every turn asked for is done. */
   state: () => string;
+  /** Show on the cube how to make these moves (the layer lit, an arrow the way to drag), or nothing with null. The `hint` prop does the same. */
+  showHint: (moves: CubeMove | readonly CubeMove[] | null) => void;
 };
 
 /** The component's props: every option of `CubeView`, a `state` the parent may keep, and the box's `className`, `style` and `data-*`. */
@@ -30,6 +32,12 @@ export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
   style?: CSSProperties;
   ref?: Ref<KyuubuHandle>;
   colours?: Partial<Record<CubeFace, string>>;
+  /**
+   * Moves to show on the cube, the way the visual guide shows them: the layer
+   * lit and an arrow the way to drag it. Null or left out shows nothing. Shown
+   * again whenever it changes, and on a cube made afresh.
+   */
+  hint?: CubeMove | readonly CubeMove[] | null;
   /** Anything a test or a page wants on the cube's box. */
   [data: `data-${string}`]: string | undefined;
 };
@@ -40,14 +48,15 @@ export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
  * square as wide as its container, and a `className` must position it
  * (relative or absolute) and give it a size.
  */
-export function Kyuubu({ ref, className, style, size, state, interactive = true, onTurn, onLook, ...rest }: KyuubuProps) {
+export function Kyuubu({ ref, className, style, size, state, interactive = true, hint = null, onTurn, onLook, ...rest }: KyuubuProps) {
   const box = useRef<HTMLDivElement>(null);
   const view = useRef<CubeView | null>(null);
   const handlers = useRef({ onTurn, onLook });
   useEffect(() => {
     handlers.current = { onTurn, onLook };
   }, [onTurn, onLook]);
-  const { colours, plastic, theme, locale, keyboard, turnMs, commitAngle, yaw, pitch, fill, label } = rest;
+  const { colours, plastic, theme, locale, keyboard, turnMs, commitAngle, yaw, pitch, fill, label, rounded } = rest;
+  const hinted = useRef(hint);
   const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-")));
 
   useEffect(() => {
@@ -67,17 +76,28 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
       pitch,
       fill,
       label,
+      rounded,
       onTurn: (move, now) => handlers.current.onTurn?.(move, now),
       onLook: (y, p) => handlers.current.onLook?.(y, p),
     });
     view.current = made;
+    if (hinted.current !== null) made.showHint(hinted.current);
     return () => {
       made.destroy();
       view.current = null;
     };
     // Made again only for what cannot be changed on a cube already drawn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, keyboard, plastic, yaw, pitch, fill, label, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
+  }, [size, keyboard, plastic, yaw, pitch, fill, label, rounded, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
+
+  // The hint is shown again only when it says something else: a parent that makes a new array of the same moves on every render changes nothing.
+  const hintKey = JSON.stringify(hint);
+  useEffect(() => {
+    hinted.current = hint;
+    view.current?.showHint(hint);
+    // The moves themselves, compared by what they say.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hintKey]);
 
   useEffect(() => {
     if (locale !== undefined) view.current?.setLocale(locale);
@@ -101,6 +121,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive = true,
     resetLook: () => view.current?.resetLook(),
     setTheme: (next) => view.current?.setTheme(next),
     state: () => view.current?.state ?? state ?? "",
+    showHint: (moves) => view.current?.showHint(moves),
   }));
 
   // With no class of its own the box is a square as wide as its container; a class says where it sits and how big it is, and is left to.
