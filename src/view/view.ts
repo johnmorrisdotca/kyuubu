@@ -152,7 +152,9 @@ type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { 
 /** One step of the queue: a turn, or several layers about one axis turned as one (a wide turn), and how long it should take when that was asked for. */
 type Queued = { moves: CubeMove[]; report: boolean; ms?: number };
 /** Where an element sits on the cube, before the cube is turned to be looked at: its own x, y and z as model vectors, its centre in pixels, and, for the plastic across a turning gap, the layer it closes. */
-type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number; drawn?: { transform: string; visible: boolean; z: string } };
+type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number; corners?: RoundCorner[]; drawn?: { transform: string; visible: boolean; z: string; round: string } };
+/** A corner of a sticker that is a corner of the cube: the style that rounds it, and the cube's corner it is, as a direction from the centre (each part 1 or −1). */
+type RoundCorner = { property: "borderTopLeftRadius" | "borderTopRightRadius" | "borderBottomLeftRadius" | "borderBottomRightRadius"; vertex: Vec3 };
 /** A layer turning: which way, how far so far, and which layers turn. */
 type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all"> };
 
@@ -319,10 +321,19 @@ export class CubeView {
       const col = (frame.right.reduce((sum, value, k) => sum + value * slot.centre[k], 0) + this.n - 1) / 2;
       const row = (frame.down.reduce((sum, value, k) => sum + value * slot.centre[k], 0) + this.n - 1) / 2;
       const last = this.n - 1;
-      sticker.style.borderTopLeftRadius = row === 0 && col === 0 ? corner : "";
-      sticker.style.borderTopRightRadius = row === 0 && col === last ? corner : "";
-      sticker.style.borderBottomLeftRadius = row === last && col === 0 ? corner : "";
-      sticker.style.borderBottomRightRadius = row === last && col === last ? corner : "";
+      // Which of them are rounded is decided as the cube is drawn (`draw`): only a corner on the cube's outline is.
+      const corners: RoundCorner[] = [];
+      const at = (across: number, down: number): Vec3 => frame.normal.map((value, k) => value + across * frame.right[k] + down * frame.down[k]) as unknown as Vec3;
+      if (row === 0 && col === 0) corners.push({ property: "borderTopLeftRadius", vertex: at(-1, -1) });
+      if (row === 0 && col === last) corners.push({ property: "borderTopRightRadius", vertex: at(1, -1) });
+      if (row === last && col === 0) corners.push({ property: "borderBottomLeftRadius", vertex: at(-1, 1) });
+      if (row === last && col === last) corners.push({ property: "borderBottomRightRadius", vertex: at(1, 1) });
+      for (const property of ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomLeftRadius", "borderBottomRightRadius"] as const) sticker.style[property] = "";
+      const place = this.places.get(sticker);
+      if (place !== undefined) {
+        place.corners = corner === "" ? [] : corners;
+        if (place.drawn !== undefined) place.drawn = { ...place.drawn, round: "" };
+      }
       const face = sticker.firstChild as HTMLDivElement;
       face.style.inset = this.theme.stickerInset ?? "var(--kyuubu-sticker-inset, 6%)";
       face.style.borderRadius = this.theme.stickerRadius ?? "var(--kyuubu-sticker-radius, 14%)";
@@ -745,7 +756,23 @@ export class CubeView {
       if (was?.visible !== facing) element.style.visibility = facing ? "" : "hidden";
       if (was?.transform !== transform) element.style.transform = transform;
       if (was?.z !== z) element.style.zIndex = z;
-      place.drawn = { transform, visible: facing, z };
+      // A cube's corner is rounded only where it is on the outline: where all three faces that meet at it face the eye,
+      // it is in the middle of the picture, and three rounded corners there would leave a hole to the felt behind.
+      let round = "";
+      if (facing && place.corners !== undefined && place.corners.length > 0) {
+        const corner = this.corner();
+        const radii = place.corners.map((one) => {
+          const inside = one.vertex.every((sign, axis) => {
+            const normal = [0, 0, 0] as [number, number, number];
+            normal[axis] = sign;
+            return apply(m, normal)[2] > 1e-6;
+          });
+          return inside ? "0px" : corner;
+        });
+        round = radii.join("|");
+        if (was?.round !== round) place.corners.forEach((one, k) => (element.style[one.property] = radii[k]));
+      }
+      place.drawn = { transform, visible: facing, z, round: round || (was?.round ?? "") };
     }
     if (!turningOnly) this.drawHint(view, scale, lens);
   }

@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-30
+
+### Fixed
+
+- A rounded cube showed a small hole to the felt at the corner nearest the
+  eye, where three faces meet and each had rounded its corner. A corner of
+  the cube is now rounded only where it is on the cube's outline, worked out
+  as the cube is turned and looked round.
+
 ## [1.4.0] - 2026-09-30
 
 ### Added
