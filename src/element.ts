@@ -1,4 +1,5 @@
 import { mountPlayer, type PlayerHandle } from "./player.ts";
+import { reflectAttributes } from "./reflect.ts";
 import type { ReplayStatus } from "./replay.ts";
 import { CUBE_THEMES } from "./view/view.ts";
 import { languageOf } from "./words.ts";
@@ -22,8 +23,32 @@ export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "au
 /** The name the element is registered under. */
 export const CUBE_ELEMENT_NAME = "kyuubu-cube";
 
-/** What the element adds to an ordinary one. */
+/**
+ * What the element adds to an ordinary one. Every attribute is also a property
+ * that writes it, as React, Vue and Svelte set them: reading gives the text of the
+ * attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `guide`) reads as a boolean.
+ */
 export type KyuubuCubeElement = HTMLElement & {
+  get size(): string | null;
+  set size(value: string | number | boolean | null | undefined);
+  get scramble(): string | null;
+  set scramble(value: string | number | boolean | null | undefined);
+  get moves(): string | null;
+  set moves(value: string | number | boolean | null | undefined);
+  get time(): string | null;
+  set time(value: string | number | boolean | null | undefined);
+  get autoplay(): boolean;
+  set autoplay(value: boolean | string | null | undefined);
+  get controls(): boolean;
+  set controls(value: boolean | string | null | undefined);
+  get loop(): boolean;
+  set loop(value: boolean | string | null | undefined);
+  get speed(): string | null;
+  set speed(value: string | number | boolean | null | undefined);
+  get theme(): string | null;
+  set theme(value: string | number | boolean | null | undefined);
+  get guide(): boolean;
+  set guide(value: boolean | string | null | undefined);
   play(): void;
   pause(): void;
   step(by: 1 | -1): void;
@@ -35,7 +60,7 @@ export type KyuubuCubeElement = HTMLElement & {
 let made: CustomElementConstructor | null = null;
 
 function build(): CustomElementConstructor {
-  return class KyuubuCube extends HTMLElement {
+  const element = class KyuubuCube extends HTMLElement {
     static observedAttributes = [...CUBE_ELEMENT_ATTRIBUTES];
     private player: PlayerHandle | null = null;
 
@@ -95,6 +120,8 @@ function build(): CustomElementConstructor {
       return this.player?.status ?? null;
     }
   };
+  reflectAttributes(element, CUBE_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop", "guide"], onByDefault: ["controls"] });
+  return element;
 }
 
 /**

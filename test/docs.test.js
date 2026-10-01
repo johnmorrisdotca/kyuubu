@@ -335,10 +335,85 @@ describe("the README's reference", () => {
     expect(rows["Scrambles from the command line at once"]).toBe(String(MAX_CLI_COUNT));
   });
 
-  it("names the family as each sibling names itself, and the trademark once", () => {
-    for (const name of ["Korokoro", "Hitotsu", "Toranpu", "Tane", "Narabe", "Tenka", "Kumimoji"]) expect(readme).toContain(`https://github.com/johnmorrisdotca/${name.toLowerCase()}`);
+  it("lists every package of the family, once, with its kana, as the demo's footer does, and the trademark once", () => {
+    // The template lists the packages it knows; the three that came after it are here until it does.
+    const NEWER = [
+      { id: "hikidashi", name: "Hikidashi", kana: "引き出し" },
+      { id: "chizu", name: "Chizu", kana: "地図" },
+      { id: "bushu", name: "Bushu", kana: "部首" },
+    ];
+    const template = read("scripts/family-template.mjs");
+    const known = [...template.matchAll(/\{ id: "([\w-]+)", name: "(\w+)", kana: "([^"]+)" \}/g)].map((match) => ({ id: match[1], name: match[2], kana: match[3] }));
+    const family = [...known, ...NEWER.filter((one) => !known.some((has) => has.id === one.id))];
+    const from = readme.indexOf("### The family");
+    const block = readme.slice(from, readme.indexOf("\n## ", from));
+    const listed = [...block.matchAll(/^- \[(\w+)\]\(https:\/\/github\.com\/johnmorrisdotca\/([\w-]+)\) \(([^,)]+)[,)]/gm)];
+    expect(listed.map((match) => match[2])).toEqual(family.map((one) => one.id));
+    for (const match of listed) {
+      const one = family.find((entry) => entry.id === match[2]);
+      expect([match[1], match[3]], match[2]).toEqual([one.name, one.kana]);
+    }
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+    expect(block).toContain(`Kyuubu is one of ${words[family.length]} packages`);
+    expect(block).toContain("**This package is Kyuubu.**");
+    expect(family.length).toBeGreaterThanOrEqual(19);
     expect(readme.match(/is a trademark of its owner/g)).toHaveLength(1);
     expect(readme).toContain("**Japanese: included; not yet reviewed by a native reader.");
+  });
+});
+
+describe("the community files", () => {
+  it("SECURITY.md and CODE_OF_CONDUCT.md are the family's master text (the shared .github repository's), a copy of which is kept in scripts/community", () => {
+    for (const file of ["SECURITY.md", "CODE_OF_CONDUCT.md"]) expect(read(file), file).toBe(read(`scripts/community/${file}`));
+  });
+
+  it("CONTRIBUTING.md carries the family's house rules and the README points to the security policy", () => {
+    const contributing = read("CONTRIBUTING.md");
+    for (const rule of ["Open an issue first", "No runtime dependencies", "kebab case", "CC0 or public domain only", "Needs Node 22 or later"]) expect(contributing, rule).toContain(rule);
+    expect(readme).toContain("[security policy](./SECURITY.md)");
+  });
+});
+
+describe("Node", () => {
+  it("is 22 or later in the package, the README, CONTRIBUTING and CI, and never 20", () => {
+    expect(pkg.engines.node).toBe(">=22");
+    expect(readme).toContain("Node 22 or later");
+    expect(readme).not.toMatch(/Node 20/);
+    expect(read("CONTRIBUTING.md")).not.toMatch(/Node 20/);
+    expect(read(".github/workflows/ci.yml")).toContain("node: [22, 24]");
+  });
+});
+
+describe("the release notes", () => {
+  it("are the changelog's section for the version, which the Release workflow puts on the GitHub release", async () => {
+    const { releaseNotes } = await import("../scripts/release-notes.mjs");
+    const log = "# Changelog\n\n## [Unreleased]\n\n## [1.2.0] - 2026-01-02\n\n### Added\n\n- A thing.\n\n## [1.1.0] - 2026-01-01\n\n- Older.\n\n[Unreleased]: https://example.test\n";
+    expect(releaseNotes(log, "1.2.0")).toBe("### Added\n\n- A thing.");
+    expect(releaseNotes(log, "1.1.0")).toBe("- Older.");
+    expect(releaseNotes(log, "9.9.9")).toBeNull();
+    expect(releaseNotes(log, "Unreleased")).toBeNull();
+    expect(releaseNotes(read("CHANGELOG.md"), VERSION)?.length).toBeGreaterThan(40);
+    const workflow = read(".github/workflows/release.yml");
+    expect(workflow).toContain("scripts/release-notes.mjs");
+    expect(workflow).not.toContain("See CHANGELOG.md.");
+  });
+});
+
+describe("the README's accessibility", () => {
+  it("says what the source does: a labelled application that takes focus, a live guide, an alert, buttons that report pressed, reduced motion", () => {
+    const section = readme.slice(readme.indexOf("## Accessibility"), readme.indexOf("## Languages"));
+    expect(section.length).toBeGreaterThan(500);
+    const view = read("src/view/view.ts");
+    expect(view).toContain('this.root.setAttribute("role", "application")');
+    expect(view).toContain("this.root.tabIndex = 0");
+    expect(view).toContain('this.options.keyboard === "focus"');
+    expect(read("src/guide-panel.ts")).toContain('"aria-live", "polite"');
+    expect(read("src/guide-panel.ts")).toContain('"role", "alert"');
+    expect(read("src/player.ts")).toContain('"aria-pressed"');
+    expect(read("src/player.ts")).toContain('"aria-label", say("playerScrub")');
+    expect(view).toContain("prefers-reduced-motion: reduce");
+    expect(read("src/scrambler.ts")).toContain("prefers-reduced-motion: reduce");
+    expect(readme).toContain("e2e/properties.e2e.mjs");
   });
 });
 

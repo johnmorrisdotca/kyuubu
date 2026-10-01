@@ -1,4 +1,5 @@
 import { seededRandom } from "./random.ts";
+import { reflectAttributes } from "./reflect.ts";
 import { CUBE_SCALES, isCubeScale, type CubeScale } from "./scale.ts";
 import { SCRAMBLE_PACES, keepScrambling, type KeepScramblingHandle, type ScramblePace } from "./scrambler.ts";
 import { CUBE_THEMES, CubeView } from "./view/view.ts";
@@ -22,8 +23,30 @@ export const SCRAMBLE_ELEMENT_ATTRIBUTES = ["size", "pace", "paused", "scale", "
 /** The name the element is registered under. */
 export const SCRAMBLE_ELEMENT_NAME = "kyuubu-scramble";
 
-/** What the element adds to an ordinary one. */
+/**
+ * What the element adds to an ordinary one. Every attribute is also a property
+ * that writes it, as React, Vue and Svelte set them: reading gives the text of the
+ * attribute, or `null`, and a flag (`paused`, `faces`, `interactive`) reads as a boolean.
+ */
 export type KyuubuScrambleElement = HTMLElement & {
+  get size(): string | null;
+  set size(value: string | number | boolean | null | undefined);
+  get pace(): string | null;
+  set pace(value: string | number | boolean | null | undefined);
+  get paused(): boolean;
+  set paused(value: boolean | string | null | undefined);
+  get scale(): string | null;
+  set scale(value: string | number | boolean | null | undefined);
+  get width(): string | null;
+  set width(value: string | number | boolean | null | undefined);
+  get theme(): string | null;
+  set theme(value: string | number | boolean | null | undefined);
+  get faces(): boolean;
+  set faces(value: boolean | string | null | undefined);
+  get interactive(): boolean;
+  set interactive(value: boolean | string | null | undefined);
+  get seed(): string | null;
+  set seed(value: string | number | boolean | null | undefined);
   play(): void;
   pause(): void;
   readonly running: boolean;
@@ -41,7 +64,7 @@ export function paceFromAttribute(value: string | null): number | ScramblePace |
 }
 
 function build(): CustomElementConstructor {
-  return class KyuubuScramble extends HTMLElement {
+  const element = class KyuubuScramble extends HTMLElement {
     static observedAttributes = [...SCRAMBLE_ELEMENT_ATTRIBUTES];
     private view: CubeView | null = null;
     private loop: KeepScramblingHandle | null = null;
@@ -113,6 +136,8 @@ function build(): CustomElementConstructor {
       return this.view;
     }
   };
+  reflectAttributes(element, SCRAMBLE_ELEMENT_ATTRIBUTES, { flags: ["paused", "faces", "interactive"] });
+  return element;
 }
 
 /** Every scale the element takes, for a page that lists them. */

@@ -4,10 +4,20 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-01
+
+### Added
+
+- **Every attribute of `<kyuubu-cube>` and `<kyuubu-scramble>` is also a property that writes it.** React 19, Vue 3 and Svelte 5 set a property rather than an attribute on a custom element that has one of the name, so the elements are now drawn the same way from markup, from `setAttribute` and from a framework: `cube.size = 4`, `cube.autoplay = true`, `scramble.paused = false`. Numbers are written as text, a flag reads as a boolean, `controls` (on unless it says otherwise) is written `"false"` to turn it off, the methods are untouched and `lang` stays the browser's own. `e2e/properties.e2e.mjs` sets every one in Chromium and WebKit, and `KyuubuCubeElement` and `KyuubuScrambleElement` type them.
+- A README Accessibility section, held to the source by a test.
+- `SECURITY.md`, and a `CODE_OF_CONDUCT.md` that is the family's shared text, with the copy a test holds them to in `scripts/community`.
+- The README's family list names all nineteen packages, read from one table by a test.
+
 ### Changed
 
-- **A Help switch in the demo.** Beside the language chooser in the family header, shared by every demo. Off (the default) the pages are as they were; on, each option row (the size, the look, the colours, the speed of turns, the pace of the small cubes) says in one plain line what it does, in English or Japanese, and every button in it has the same words as its hover text. Kept on the device.
-
+- **Node 22 or later**: `engines` is `>=22`, as the README, CONTRIBUTING and CI already tested. Node 20 is end-of-life.
+- The GitHub release's notes are that version's section of this changelog, not a pointer to it (`scripts/release-notes.mjs`).
+- **A Help switch in the demo.** Beside the language chooser in the family header, shared by every demo. Off (the default) the pages are as they were; on, each option row (the size, the look, the colours, the speed of turns, the pace of the small cubes) says in one plain line what it does, in English or Japanese, and every button in it has the same words as its hover text. Kept on the device. The README's pictures are retaken with it.
 
 ## [1.6.0] - 2026-10-01
 
@@ -301,7 +311,10 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.3.0...v1.3.1

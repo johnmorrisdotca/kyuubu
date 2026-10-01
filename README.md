@@ -14,7 +14,7 @@
 <p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a></p>
 
 <p align="center">
-  <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links and five cloth patches: the Solve tab names the White cross step with its turn and lists the steps already taken" width="720">
+  <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links, five cloth patches and the Help switch: the Solve tab names the White cross step with its turn and lists the steps already taken" width="720">
   <img src="docs/phone.jpg" alt="The same cube on a phone in dark mode, in Japanese: the timer and move count above it, the 2×2 to 7×7 sizes and the scramble and undo buttons under it" width="220">
 </p>
 
@@ -230,7 +230,7 @@ release names it. The examples above are the ones it builds.
   is about 10 kB (4 kB gzipped). The view is about 17 kB (6 kB gzipped), and
   everything together 43 kB (16 kB gzipped).
 - **Where it runs.** Every current browser with CSS 3D transforms and Pointer
-  Events. The model, the solver and the command line run in Node 20 and
+  Events. The model, the solver and the command line run in Node 22 and
   later.
 
 ## Architecture
@@ -258,6 +258,7 @@ src/
 ├── random.ts            a seeded random source
 ├── react.tsx            the "/react" entry: the cube as a React component
 ├── reconstruction.ts    a solve as competitors write it down, with wide turns and rotations
+├── reflect.ts           makes each attribute of a custom element a property too, as React, Vue and Svelte set them
 ├── record.ts            a solve kept as versioned JSON, plain text or CSV, and read back
 ├── replay.ts            a solve played back at the pace it was made
 ├── scale.ts             how big a cube is drawn, as a setting: small, medium or large
@@ -310,26 +311,30 @@ project* issue and we will add you.
 
 ### The family
 
-Kyuubu has siblings, each made for the same site, each MIT, each at
+Kyuubu is one of nineteen packages, each made for the same site, each MIT, each at
 [github.com/johnmorrisdotca](https://github.com/johnmorrisdotca):
 
-- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ, the sound
-  of something small rolling along): a dice roller and a dice notation
-  parser, with the exact odds of every roll.
-- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ, "one"): a
-  colour-card shedding game for two to eight, with the house rules as options
-  and a computer player.
-- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ, the everyday
-  Japanese word for a deck of playing cards): ten card games as pure
-  TypeScript rules, with computer players.
-- [Tane](https://github.com/johnmorrisdotca/tane) (種, a seed, the kind you
-  plant): seeded random numbers and daily seeds.
-- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ, "line them up"):
-  one rules engine for forty-eight abstract board games.
-- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下, "under heaven"):
-  world conquest for two to six, on a map of the real world.
-- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字, "letters
-  put together"): the crossword tile race, in English and Japanese.
+- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ, the sound of something small rolling): dice, with notation, exact odds and games.
+- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ, how Japanese says "cube"): a turning cube for the browser, 2×2 to 7×7.
+- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ, "one"): a colour-card game, named for the call a player makes with one card left.
+- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ, the everyday Japanese word for a deck of playing cards): card games as pure rules.
+- [Tane](https://github.com/johnmorrisdotca/tane) (種, a seed, the kind you plant): seeded random numbers and daily seeds.
+- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ, "line them up"): a rules engine for gomoku, Reversi, Go, checkers and many more.
+- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下, "under heaven"): a world-conquest game for two to six.
+- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字, "letters put together"): a crossword tile race in English and Japanese.
+- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ, "joining"): a line-joining puzzle.
+- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ, the rattle of mahjong tiles being shuffled): mahjong tiles and a matching solitaire.
+- [Suido](https://github.com/johnmorrisdotca/suido) (水道, "waterworks"): a pipe puzzle.
+- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ, the Japanese word for dominoes): dominoes and Mexican Train.
+- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉, "words"): word lists and word-game rules.
+- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六, backgammon's Japanese name): backgammon and its variants.
+- [Kazu](https://github.com/johnmorrisdotca/kazu) (数, "number"): grid number puzzles, Sudoku and five more.
+- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮, "labyrinth"): mazes to draw a line through.
+- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し, "a drawer"): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty.
+- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図, "map"): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts.
+- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首, "radical", the part a kanji is sorted by): find a kanji by the parts it is made of.
+
+**This package is Kyuubu.** The demos share one header and footer, which link the family together.
 
 ## Features
 
@@ -668,6 +673,16 @@ It is drawn in the page's own document, so the page's font, colour and the
 `--kyuubu-player-…` custom properties (`felt`, `radius`, `rule`, `button`,
 `ink`, `paper`, `focus`) dress it.
 
+**In a framework, an attribute is also a property.** React 19, Vue 3 and
+Svelte 5 set a property rather than an attribute on a custom element that has
+one of the name, so `<kyuubu-cube size={4}>` is `cube.size = 4`. Every attribute
+in the table above, and every one of `<kyuubu-scramble>` below, is a property
+that writes the attribute: a number is its text, `true` turns a flag on and
+`false` or `null` turns it off (`controls`, which is on unless it says
+otherwise, is written `"false"`), and reading gives the attribute's text, or a
+boolean for a flag. The methods are untouched, and `lang` is the browser's own.
+`e2e/properties.e2e.mjs` sets every one in Chromium and WebKit.
+
 An iframe, where the page allows no scripts (a forum, a blog):
 
 ```html
@@ -810,7 +825,7 @@ device, and a scramble made from it is pinned by a test: the seed
 
 ## The command line
 
-Installing the package puts `kyuubu` on the path. It needs Node 20 or later
+Installing the package puts `kyuubu` on the path. It needs Node 22 or later
 and nothing else, and runs the same on Linux, macOS and Windows.
 
 ```sh
@@ -895,7 +910,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.6.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.7.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -921,7 +936,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.6.0",
+  "generator": "kyuubu 1.7.0",
   "solves": [
     {
       "size": 3,
@@ -1249,6 +1264,26 @@ Edge, Firefox and Safari 15 or later, on desktop and mobile. There is
 nothing to polyfill. It is tested in Chromium and in WebKit, Safari's
 engine, at phone size with touch.
 
+## Accessibility
+
+- **The cube is one control.** Its box is a `role="application"` named "A 3×3
+  cube" (3×3のキューブ in Japanese; the `label` option changes it), and with the
+  default `keyboard: "focus"` it is a tab stop, so every turn can be made from
+  the keyboard (see [Controls](#controls)) as well as by a pointer.
+- **A solve is said, not only shown.** The guide's line is a polite live
+  region, read out once for each move, in sentences ("Turn the right face
+  towards you.") as well as notation; a turn it did not ask for is announced
+  as an alert. The player's controls are real buttons with names, the speeds,
+  Loop and Follow report whether they are pressed, and the scrubber has a name.
+- **Motion is optional.** A device that asks for reduced motion gets turns
+  made at once, a cube that keeps turning stays still, and the guide's arrow
+  does not move.
+- **What it does not do.** Which colour is where is not read out: a person who
+  cannot see the cube hears what to turn and what was turned, not the state of
+  the faces.
+
+`test/docs.test.js` checks each of these against the source.
+
 ## Languages
 
 English and Japanese, for everything the package says: the cube's accessible
@@ -1301,7 +1336,9 @@ pnpm check   # lint, types, tests and a build
 pnpm site    # build the demo into ./_site, then serve it
 ```
 
-Please follow the [code of conduct](./CODE_OF_CONDUCT.md).
+Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make the
+solver or a parser run for very long, or text that gets out of the cube into
+the page, is for the [security policy](./SECURITY.md), not a public issue.
 
 ## Changes
 
