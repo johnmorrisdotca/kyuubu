@@ -11,7 +11,7 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a></p>
 
 <p align="center">
   <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, part way through its solve: the white corners step, its turns and the algorithm it uses, with the steps already done listed under it" width="720">
@@ -232,6 +232,56 @@ release names it. The examples above are the ones it builds.
 - **Where it runs.** Every current browser with CSS 3D transforms and Pointer
   Events. The model, the solver and the command line run in Node 20 and
   later.
+
+## Architecture
+
+The cube, its notation, the solver and the famous solves are plain functions
+over a string, with no DOM: the state is one letter a sticker, and every turn
+returns a new string. Drawing is its own layer under `view/`, in plain DOM and
+CSS with no canvas, and the player, the custom elements and the React
+component are thin wrappers over it, each its own entry point, so a page loads
+only what it uses.
+
+```text
+src/
+├── cli.ts               the command line as a pure function: arguments in, text and an exit code out
+├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
+├── element-define.ts    the "/element/define" entry: registers the custom elements by being imported
+├── element.ts           the "/element" entry: the player as a <kyuubu-cube> custom element
+├── famous.data.ts       the record solves, each with its published source, newest first
+├── famous.ts            the "/famous" entry: record solves of the 3×3, played back move for move
+├── guide-panel.ts       the panel beside a cube: the next movement in notation and words, and an arrow on the cube
+├── guide.ts             a solve to follow with your own hands, one movement at a time, with detours taken back
+├── index.ts             the main entry: the cube, notation, solver, famous solves, and the player to mount
+├── notation.ts          the standard notation, for reading a move out and for the keys that make one
+├── player.ts            the "/player" entry: a solve on a page, with play, pause, step and speed controls
+├── random.ts            a seeded random source
+├── react.tsx            the "/react" entry: the cube as a React component
+├── reconstruction.ts    a solve as competitors write it down, with wide turns and rotations
+├── record.ts            a solve kept as versioned JSON, plain text or CSV, and read back
+├── replay.ts            a solve played back at the pace it was made
+├── scale.ts             how big a cube is drawn, as a setting: small, medium or large
+├── scramble-element.ts  <kyuubu-scramble>: a cube that keeps turning by itself, as a custom element
+├── scramble.ts          how long a full scramble is for each size, and making one from a seed
+├── scrambler.ts         a cube that turns one random layer, waits, and turns another, at a pace you choose
+├── solve.ts             a layer-by-layer solve a person can follow, step by step, for any size
+├── strings.ts           every word the package says to a person, in English and Japanese
+├── types.ts             the vocabulary of a turning cube of any size
+├── version.ts           the package's version, as in package.json
+├── words.ts             the words the cube itself says, in English and Japanese
+└── view/  the cube drawn on the screen in plain DOM and CSS
+    ├── geometry.ts  the screen's geometry: from the cube's model to CSS
+    ├── gestures.ts  from a hand to a turn: which layer a drag or a wheel means
+    ├── hint.ts      where to drag: the sticker and the direction that make a given turn
+    ├── keys.ts      the keyboard, in the notation cubers write
+    └── view.ts      the cube on the screen: every sticker placed by one matrix3d, with no canvas or framework
+```
+
+Tests live in `test/`, apart from the code, and `test/docs.test.js` runs the
+README's examples. `bin/` is the few lines that hand the command line the real
+process, `scripts/` builds the demo and its API reference page and checks the
+package as npm packs it, `demo/` is the site published on GitHub Pages, and
+`e2e/` taps it in real browsers.
 
 ## The name
 
@@ -906,6 +956,8 @@ The shape of the JSON, which is what to keep if you keep solves:
   it back as the `state` option.
 
 ## API
+
+The [API reference](https://johnmorrisdotca.github.io/kyuubu/api.html) lists every export of every entry point with its signature and its doc comment. It is made from the source by `pnpm site`, so it cannot fall behind the code.
 
 Everything is exported from `@johnmorrisdotca/kyuubu`; the React component
 from `@johnmorrisdotca/kyuubu/react`. Every export has a doc comment, which

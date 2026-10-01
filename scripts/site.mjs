@@ -3,6 +3,7 @@
 // scripts/family-template.mjs, which every package in the family shares unchanged.
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
+import { API_CSS, apiPage } from "./api.mjs";
 import { FAMILY_SCRIPT, familyFooter, familyHead, familyHeader, familyUnreviewed } from "./family-template.mjs";
 
 const id = "kyuubu";
@@ -14,7 +15,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ",
     ogDescription: "A turning cube for the browser, in CSS 3D. 2×2 to 7×7, with a solve you can follow.",
   }),
-  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }] }),
+  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
   famousHead: familyHead({
     id,
     title: "Kyuubu · famous solves, played move for move",
@@ -22,7 +23,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ · famous solves",
     ogDescription: "Record solves of the 3×3, move for move, at the speed they were made.",
   }),
-  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }] }),
+  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
   cubesHead: familyHead({
     id,
     title: "Kyuubu · a cube that keeps turning, big or small",
@@ -30,7 +31,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ · a cube that keeps turning",
     ogDescription: "A cube that keeps turning by itself, at a pace you choose, small, medium or large.",
   }),
-  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }] }),
+  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "api.html", say: "toApi" }] }),
   unreviewed: familyUnreviewed({ id }),
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
@@ -51,4 +52,7 @@ writeFileSync("_site/cubes.html", fillPage("cubes.html"));
 for (const file of ["family.css", "site.css", "app.js", "famous.js", "cubes.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `_site/${file}`);
 cpSync("docs/cube.png", "_site/cube.png");
 cpSync("dist", "_site/dist", { recursive: true });
+// The API reference, made from the source: every export of every entry point.
+writeFileSync("_site/api.css", API_CSS);
+writeFileSync("_site/api.html", apiPage({ id, name: "Kyuubu", icon: /rel="icon" href="([^"]+)"/.exec(page)?.[1] ?? "" }));
 console.log("_site/ is ready: serve it, or let the Pages workflow publish it.");
