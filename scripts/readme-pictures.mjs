@@ -1,4 +1,4 @@
-// Takes the pictures the README shows, from the built demo in `_site/`: `pnpm pictures` (builds the demo, then runs this).
+// Takes the pictures the README shows, from the built demo in `site/`: `pnpm pictures` (builds the demo, then runs this).
 // The page is served to a browser without a port, never fetched from the live site, and the same each run:
 // `Math.random` is a seeded generator, so the scramble is the same, and motion is reduced.
 // Output: docs/desktop.jpg (1280 wide, light, English) and docs/phone.jpg (390 by 844, dark, Japanese).
@@ -9,13 +9,13 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const site = join(root, "_site");
+const site = join(root, "site");
 const docs = join(root, "docs");
 const host = "http://kyuubu.test";
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png" };
 const QUALITY = 76;
 
-if (!existsSync(join(site, "index.html"))) throw new Error("_site/ is not built: run `pnpm pictures` (it builds the demo first)");
+if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm pictures` (it builds the demo first)");
 const browser = await chromium.launch();
 
 /** Scramble a 3×3 and take `steps` steps of its solve, each one named under the cube. */

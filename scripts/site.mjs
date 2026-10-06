@@ -1,4 +1,4 @@
-// Builds the static demo for GitHub Pages into ./_site: the page, its two stylesheets, its
+// Builds the static demo for GitHub Pages into ./site: the page, its two stylesheets, its
 // script and the compiled library. The header, the footer and the language chooser come from
 // scripts/family-template.mjs, which every package in the family shares unchanged.
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -44,15 +44,15 @@ const fillPage = (file) =>
   });
 const page = fillPage("index.html");
 
-rmSync("_site", { recursive: true, force: true });
-mkdirSync("_site", { recursive: true });
-writeFileSync("_site/index.html", page);
-writeFileSync("_site/famous.html", fillPage("famous.html"));
-writeFileSync("_site/cubes.html", fillPage("cubes.html"));
-for (const file of ["family.css", "site.css", "app.js", "famous.js", "cubes.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `_site/${file}`);
-cpSync("docs/cube.png", "_site/cube.png");
-cpSync("dist", "_site/dist", { recursive: true });
+rmSync("site", { recursive: true, force: true });
+mkdirSync("site", { recursive: true });
+writeFileSync("site/index.html", page);
+writeFileSync("site/famous.html", fillPage("famous.html"));
+writeFileSync("site/cubes.html", fillPage("cubes.html"));
+for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
+cpSync("docs/cube.png", "site/cube.png");
+cpSync("dist", "site/dist", { recursive: true });
 // The API reference, made from the source: every export of every entry point.
-writeFileSync("_site/api.css", API_CSS);
-writeFileSync("_site/api.html", apiPage({ id, name: "Kyuubu", icon: /rel="icon" href="([^"]+)"/.exec(page)?.[1] ?? "" }));
-console.log("_site/ is ready: serve it, or let the Pages workflow publish it.");
+writeFileSync("site/api.css", API_CSS);
+writeFileSync("site/api.html", apiPage({ id, name: "Kyuubu", icon: /rel="icon" href="([^"]+)"/.exec(page)?.[1] ?? "" }));
+console.log("site/ is ready: serve it, or let the Pages workflow publish it.");

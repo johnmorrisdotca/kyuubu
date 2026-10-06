@@ -1346,7 +1346,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). In short:
 ```sh
 pnpm install
 pnpm check   # lint, types, tests and a build
-pnpm site    # build the demo into ./_site, then serve it
+pnpm site    # build the demo into ./site, then serve it
 ```
 
 Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make the

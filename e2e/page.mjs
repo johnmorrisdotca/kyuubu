@@ -1,4 +1,4 @@
-// What every test of the demo starts from: the built page in `_site/`, served
+// What every test of the demo starts from: the built page in `site/`, served
 // without a port, and the cube's state read off the page.
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -6,12 +6,12 @@ import { fileURLToPath } from "node:url";
 
 import { expect, test } from "@playwright/test";
 
-const site = join(dirname(fileURLToPath(import.meta.url)), "..", "_site");
+const site = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png" };
 
 /** The built site answered at http://kyuubu.test/, with no port and no server. */
 export async function serve(page) {
-  if (!existsSync(join(site, "index.html"))) throw new Error("_site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
+  if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
   await page.route("http://kyuubu.test/**", (route) => {
     const { pathname } = new URL(route.request().url());
     const file = join(site, pathname === "/" ? "index.html" : pathname);
@@ -22,7 +22,7 @@ export async function serve(page) {
 
 /** Open the demo with a query, and collect anything the page complains of. */
 export async function open(page, query = "?lang=en") {
-  if (!existsSync(join(site, "index.html"))) throw new Error("_site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
+  if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
   const errors = [];
   page.on("pageerror", (error) => errors.push(String(error)));
   page.on("console", (message) => message.type() === "error" && errors.push(message.text()));

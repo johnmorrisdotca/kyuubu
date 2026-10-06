@@ -460,11 +460,11 @@ describe("the demo site", () => {
   it("loads the family's stylesheet before its own, and restyles nothing of the family's", () => {
     const page = read("demo/index.html");
     expect(page.indexOf('href="family.css"')).toBeGreaterThan(0);
-    expect(page.indexOf('href="site.css"')).toBeGreaterThan(page.indexOf('href="family.css"'));
+    expect(page.indexOf('href="kyuubu.css"')).toBeGreaterThan(page.indexOf('href="family.css"'));
     for (const name of ["head", "header", "unreviewed", "footer", "script"]) expect(page).toContain(`<!-- family:${name} -->`);
     expect(page).not.toMatch(/<style/);
     // Its own stylesheet styles its own classes, and the two variables the family leaves to a page.
-    const own = read("demo/site.css").replace(/\/\*[\s\S]*?\*\//g, "");
+    const own = read("demo/kyuubu.css").replace(/\/\*[\s\S]*?\*\//g, "");
     for (const rule of own.matchAll(/(^|\})\s*([^{}@]+)\{/g)) {
       const selector = rule[2].trim();
       if (selector === ":root") continue;
