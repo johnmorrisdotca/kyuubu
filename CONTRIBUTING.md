@@ -107,6 +107,7 @@ pnpm site           # builds the demo into ./site
 | `src/record.ts` | A solve as JSON, text and CSV |
 | `src/words.ts`, `src/strings.ts` | Every word the package says, in English and Japanese |
 | `src/cli.ts`, `bin/kyuubu.mjs` | The command line: a pure function, and the few lines that hand it the process |
+| `src/cuboid/` | The cuboid (a box-shaped puzzle): its model, notation, scramble, view, player and element |
 | `src/view/` | The CSS 3D view, its geometry, and how drags, the wheel and keys become turns |
 | `src/react.tsx` | The React wrapper |
 | `test/` | Tests for all of the above, and for the documents |

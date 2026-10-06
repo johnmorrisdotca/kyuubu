@@ -15,7 +15,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ",
     ogDescription: "A turning cube for the browser, in CSS 3D. 2×2 to 7×7, with a solve you can follow.",
   }),
-  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
+  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "cuboids.html", say: "toCuboids" }, { href: "api.html", say: "toApi" }] }),
   famousHead: familyHead({
     id,
     title: "Kyuubu · famous solves, played move for move",
@@ -23,7 +23,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ · famous solves",
     ogDescription: "Record solves of the 3×3, move for move, at the speed they were made.",
   }),
-  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
+  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }, { href: "cuboids.html", say: "toCuboids" }, { href: "api.html", say: "toApi" }] }),
   cubesHead: familyHead({
     id,
     title: "Kyuubu · a cube that keeps turning, big or small",
@@ -31,7 +31,15 @@ const parts = {
     ogTitle: "Kyuubu キューブ · a cube that keeps turning",
     ogDescription: "A cube that keeps turning by itself, at a pace you choose, small, medium or large.",
   }),
-  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "api.html", say: "toApi" }] }),
+  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "cuboids.html", say: "toCuboids" }, { href: "api.html", say: "toApi" }] }),
+  cuboidsHead: familyHead({
+    id,
+    title: "Kyuubu · cuboids, the turning puzzles that are not cubes",
+    description: "Turning puzzles shaped like a box: the Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3, a 3×3×4 pillar and any a×b×c from 1 to 7 on a side. A layer turns a quarter only where its slice is square, and a half turn everywhere. Free and open source.",
+    ogTitle: "Kyuubu キューブ · cuboids",
+    ogDescription: "Floppy, Tower, Domino and any box-shaped turning puzzle, in CSS 3D.",
+  }),
+  cuboidsHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
   unreviewed: familyUnreviewed({ id }),
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
@@ -49,8 +57,10 @@ mkdirSync("site", { recursive: true });
 writeFileSync("site/index.html", page);
 writeFileSync("site/famous.html", fillPage("famous.html"));
 writeFileSync("site/cubes.html", fillPage("cubes.html"));
-for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "snippets.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
+writeFileSync("site/cuboids.html", fillPage("cuboids.html"));
+for (const file of ["family.css", "kyuubu.css", "cuboids.css", "app.js", "famous.js", "cubes.js", "cuboids.js", "snippets.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
 cpSync("docs/cube.png", "site/cube.png");
+cpSync("docs/cuboids.jpg", "site/cuboids.jpg");
 cpSync("dist", "site/dist", { recursive: true });
 // The API reference, made from the source: every export of every entry point.
 writeFileSync("site/api.css", API_CSS);

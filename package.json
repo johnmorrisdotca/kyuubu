@@ -27,6 +27,12 @@
     "7x7",
     "nxn",
     "nxn-cube",
+    "3x3x4",
+    "2x2x3",
+    "1x3x3",
+    "floppy-cube",
+    "non-square-cube",
+    "cuboid",
     "scramble",
     "scrambler",
     "scramble-generator",
@@ -92,7 +98,8 @@
   "type": "module",
   "author": "John Morris",
   "sideEffects": [
-    "./dist/element-define.js"
+    "./dist/element-define.js",
+    "./dist/cuboid/element-define.js"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -127,6 +134,31 @@
       "types": "./dist/element-define.d.ts",
       "import": "./dist/element-define.js",
       "default": "./dist/element-define.js"
+    },
+    "./cuboid": {
+      "types": "./dist/cuboid/index.d.ts",
+      "import": "./dist/cuboid/index.js",
+      "default": "./dist/cuboid/index.js"
+    },
+    "./cuboid/draw": {
+      "types": "./dist/cuboid/draw.d.ts",
+      "import": "./dist/cuboid/draw.js",
+      "default": "./dist/cuboid/draw.js"
+    },
+    "./cuboid/play": {
+      "types": "./dist/cuboid/play.d.ts",
+      "import": "./dist/cuboid/play.js",
+      "default": "./dist/cuboid/play.js"
+    },
+    "./cuboid/element": {
+      "types": "./dist/cuboid/element.d.ts",
+      "import": "./dist/cuboid/element.js",
+      "default": "./dist/cuboid/element.js"
+    },
+    "./cuboid/element/define": {
+      "types": "./dist/cuboid/element-define.d.ts",
+      "import": "./dist/cuboid/element-define.js",
+      "default": "./dist/cuboid/element-define.js"
     }
   },
   "bin": {
