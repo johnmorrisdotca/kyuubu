@@ -20,7 +20,7 @@ import { parseCuboidDims, type CuboidDims } from "./model.ts";
  */
 
 /** The attributes the element reads. Changing any draws the player afresh. */
-export const CUBOID_ELEMENT_ATTRIBUTES = ["dims", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang"] as const;
+export const CUBOID_ELEMENT_ATTRIBUTES = ["dims", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "readout", "movelist", "scrub"] as const;
 
 /** The name the element is registered under. */
 export const CUBOID_ELEMENT_NAME = "kyuubu-cuboid";
@@ -28,7 +28,7 @@ export const CUBOID_ELEMENT_NAME = "kyuubu-cuboid";
 /**
  * What the element adds to an ordinary one. Every attribute is also a property
  * that writes it, as React, Vue and Svelte set them: reading gives the text of
- * the attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`) reads as a boolean.
+ * the attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `readout`, `movelist`, `scrub`) reads as a boolean.
  */
 export type KyuubuCuboidElement = HTMLElement & {
   get dims(): string | null;
@@ -49,6 +49,12 @@ export type KyuubuCuboidElement = HTMLElement & {
   set speed(value: string | number | boolean | null | undefined);
   get theme(): string | null;
   set theme(value: string | number | boolean | null | undefined);
+  get readout(): boolean;
+  set readout(value: boolean | string | null | undefined);
+  get movelist(): boolean;
+  set movelist(value: boolean | string | null | undefined);
+  get scrub(): boolean;
+  set scrub(value: boolean | string | null | undefined);
   play(): void;
   pause(): void;
   step(by: 1 | -1): void;
@@ -96,6 +102,9 @@ function build(): CustomElementConstructor {
         loop: has("loop"),
         speed: speed > 0 ? speed : undefined,
         theme: theme !== null && theme in CUBE_THEMES ? CUBE_THEMES[theme as keyof typeof CUBE_THEMES] : undefined,
+        readout: this.hasAttribute("readout") ? has("readout") : undefined,
+        moveList: this.hasAttribute("movelist") ? has("movelist") : undefined,
+        animateScrub: this.hasAttribute("scrub") ? has("scrub") : undefined,
         locale: this.hasAttribute("lang") ? languageOf(this.getAttribute("lang")) : undefined,
         onChange: (status) => this.dispatchEvent(new CustomEvent("kyuubu-step", { detail: status, bubbles: true })),
         onEnd: () => this.dispatchEvent(new CustomEvent("kyuubu-end", { bubbles: true })),
@@ -121,7 +130,7 @@ function build(): CustomElementConstructor {
       return this.player?.status ?? null;
     }
   };
-  reflectAttributes(element, CUBOID_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop"], onByDefault: ["controls"] });
+  reflectAttributes(element, CUBOID_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop"], onByDefault: ["controls", "readout", "movelist", "scrub"] });
   return element;
 }
 

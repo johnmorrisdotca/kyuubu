@@ -60,8 +60,13 @@ cannot turn is never picked.
 
 `dims` is `3x3x1`, `3×3×1`, `3 3 1` or `3,3,1`; the other attributes are the
 `<kyuubu-cuboid>`'s own: `scramble`, `moves`, `time`, `autoplay`, `controls`,
-`loop`, `speed`, `theme` and `lang`, and it has `play()`, `pause()`, `step()`,
-`seek()` and `restart()`. `mountCuboidPlayer` from
+`loop`, `speed`, `theme` and `lang`, and `readout`, `movelist` and `scrub`, each on
+unless `"false"`, as on the cube, and it has `play()`, `pause()`, `step()`,
+`seek()` and `restart()`. Under the puzzle it names the move just made in large
+type (`R2`, with "Right face, twice" beside it, `cuboidMoveName` is the words
+alone) and lists the scramble and the solve as buttons, and the slider turns the
+puzzle where it goes; a cuboid has no x, y or z, and a half turn of a layer that
+is not square is written `R2`. `mountCuboidPlayer` from
 `@johnmorrisdotca/kyuubu/cuboid/play` is the same without the tag, and
 `planCuboidReplay` reads, checks and times a solve for the replay the cube
 uses. The [cuboids page](https://johnmorrisdotca.github.io/kyuubu/cuboids.html)

@@ -41,6 +41,6 @@ export {
 } from "./notation.ts";
 export { CUBOID_RANDOM_STATE_MAX, cuboidScrambleLength, hasRandomStateScramble, randomCuboidScramble } from "./scramble.ts";
 export { CUBOID_PRESETS, cuboidPreset, type CuboidPreset } from "./presets.ts";
-export { CUBOID_WORDS, faultSays, type CuboidWords } from "./words.ts";
+export { CUBOID_WORDS, cuboidMoveName, faultSays, type CuboidWords } from "./words.ts";
 export { planCuboidReplay, type CuboidReplayFault, type CuboidReplayPlan, type CuboidReplaySource } from "./replay.ts";
 export { HALF_TURN_COMMIT, cuboidDragAngle, cuboidMoveForRelease, cuboidPastCommit, cuboidQuartersForRelease, pickCuboidDrag, readCuboidKey, type CuboidDragPick, type CuboidKeyReading } from "./gestures.ts";

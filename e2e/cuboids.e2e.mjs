@@ -269,3 +269,27 @@ test("the tag plays a solve on a cuboid, forward and back", async ({ page }) => 
   expect(cuboidMoveNotation({ axis: 0, layer: 1, turns: 2 }, [3, 3, 1])).toBe("M2");
   await sound(page, errors);
 });
+
+test("the cuboid player names the move just made and lists them, each a button that takes it there, and the slider turns the puzzle", async ({ page }) => {
+  const errors = await open(page);
+  const element = page.locator("kyuubu-cuboid#embedded");
+  await expect(element.locator(stage)).toBeVisible();
+  // A half turn of a layer that is not square is written R2, and there is no x, y or z to say.
+  await expect(element.locator("[data-kyuubu-code]")).toHaveText("M2");
+  await expect(element.locator("[data-kyuubu-says]")).toHaveText("Middle slice, twice");
+  await expect(element.locator("[data-kyuubu-moves] button")).toHaveText(["U2", "R2", "M2", "M2", "R2", "U2"]);
+  await expect(element.locator('[data-kyuubu-moves] button[aria-current="step"]')).toHaveText("M2");
+  await element.locator('button[data-act="on"]').click();
+  await expect(element.locator("[data-kyuubu-code]")).toHaveText("M2");
+  await expect(element.locator('[data-kyuubu-moves] button[aria-current="step"]')).toHaveAttribute("data-index", "3");
+  // A move pressed takes the puzzle there: the one before it, the scramble's first half turn.
+  await element.locator('[data-kyuubu-moves] button[data-index="1"]').click();
+  await expect(element.locator(stage)).toHaveAttribute("data-turning", "false");
+  expect(await element.locator(stage).getAttribute("data-state")).toBe(after([3, 3, 1], "U2 R2"));
+  // The slider goes to the end, turning the puzzle on the way, and ends solved.
+  await element.locator('input[type="range"]').fill("3");
+  await expect(element.locator(stage)).toHaveAttribute("data-turning", "false");
+  expect(await element.locator(stage).getAttribute("data-state")).toBe(solvedCuboid([3, 3, 1]));
+  await expect(element.locator(".kyuubu-cuboid-player-at")).toHaveText("Move 3 of 3");
+  await sound(page, errors);
+});

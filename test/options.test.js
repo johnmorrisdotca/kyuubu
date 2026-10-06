@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
+import { CUBOID_ELEMENT_ATTRIBUTES } from "../src/cuboid/element.ts";
 import { CUBE_ELEMENT_ATTRIBUTES } from "../src/element.ts";
 import { CUBE_OPTIONS, CUBE_OPTIONS_LEFT_OUT, CUBE_OPTION_GROUPS, CUBE_THEMES, REPLAY_SPEEDS } from "../src/index.ts";
 import { SCRAMBLE_ELEMENT_ATTRIBUTES } from "../src/scramble-element.ts";
@@ -18,6 +19,8 @@ const keysOf = (path, opening, closing = "\n};") => {
 
 const view = keysOf("src/view/view.ts", "export type CubeViewOptions = {");
 const player = [...keysOf("src/player.ts", "export type PlayerOptions = ReplaySource & {"), ...keysOf("src/replay.ts", "export type ReplaySource = {")];
+const cuboid = keysOf("src/cuboid/draw.ts", "export type CuboidViewOptions = {");
+const cuboidPlayer = [...keysOf("src/cuboid/play.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"), ...keysOf("src/cuboid/replay.ts", "export type CuboidReplaySource = {")];
 const names = (maker) => CUBE_OPTIONS.flatMap((option) => (option.names[maker] === undefined ? [] : [option.names[maker]]));
 
 describe("the choices the package offers", () => {
@@ -41,19 +44,34 @@ describe("the choices the package offers", () => {
     for (const name of SCRAMBLE_ELEMENT_ATTRIBUTES) expect(turning.has(name), `<kyuubu-scramble ${name}>`).toBe(true);
   });
 
+  it("has every option of the cuboid's view and player, and of its custom element", () => {
+    expect(cuboid).toContain("dims");
+    expect(cuboidPlayer).toContain("dims");
+    expect(cuboidPlayer).toContain("moveList");
+    const viewNames = new Set(names("cuboid").map((name) => name.split(".")[0]));
+    for (const name of cuboid) expect(viewNames.has(name) || `cuboid.${name}` in CUBE_OPTIONS_LEFT_OUT, `cuboid view option ${name}`).toBe(true);
+    const playerNames = new Set(names("cuboidPlayer"));
+    for (const name of cuboidPlayer) expect(playerNames.has(name) || `cuboidPlayer.${name}` in CUBE_OPTIONS_LEFT_OUT, `cuboid player option ${name}`).toBe(true);
+    const element = new Set(names("cuboidElement"));
+    for (const name of CUBOID_ELEMENT_ATTRIBUTES) expect(element.has(name), `<kyuubu-cuboid ${name}>`).toBe(true);
+  });
+
   it("names nothing that is not there: every name a row gives is an option or an attribute", () => {
     const base = (name) => name.split(".")[0];
     for (const name of names("view")) expect(view, name).toContain(base(name));
     for (const name of names("player")) expect(player, name).toContain(name);
     for (const name of names("cube")) expect(CUBE_ELEMENT_ATTRIBUTES, name).toContain(name);
     for (const name of names("turning")) expect(SCRAMBLE_ELEMENT_ATTRIBUTES, name).toContain(name);
+    for (const name of names("cuboid")) expect(cuboid, name).toContain(base(name));
+    for (const name of names("cuboidPlayer")) expect(cuboidPlayer, name).toContain(name);
+    for (const name of names("cuboidElement")) expect(CUBOID_ELEMENT_ATTRIBUTES, name).toContain(name);
   });
 
   it("gives every left-out name a reason, and every one is a name that is there", () => {
     for (const [name, why] of Object.entries(CUBE_OPTIONS_LEFT_OUT)) {
       expect(why.length, name).toBeGreaterThan(15);
       const [maker, option] = name.split(".");
-      expect(maker === "view" ? view : player, name).toContain(option);
+      expect({ view, player, cuboid, cuboidPlayer }[maker], name).toContain(option);
     }
   });
 

@@ -9,6 +9,7 @@ import {
   cuboidDragAngle,
   cuboidFaces,
   cuboidMoveLegal,
+  cuboidMoveName,
   cuboidMoveNotation,
   cuboidName,
   cuboidPermutationOf,
@@ -400,6 +401,31 @@ describe("a solve played back", () => {
     expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "R2 F", solution: "" })).toEqual({ ok: false, fault: { part: "scramble", token: "F", at: 3, fault: "whole-puzzle" } });
     expect(planCuboidReplay({ dims: [1, 1, 1], scramble: "", solution: "" })).toEqual({ ok: false, fault: { part: "dims" } });
     expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "", solution: "R2 ".repeat(2001) })).toEqual({ ok: false, fault: { part: "length" } });
+  });
+});
+
+describe("the words for a cuboid's moves", () => {
+  it("names each move a cuboid writes, in both languages, and the half turn of a layer that is not square", () => {
+    expect(cuboidMoveName("R2")).toBe("Right face, twice");
+    expect(cuboidMoveName("U'")).toBe("Top face, anticlockwise");
+    expect(cuboidMoveName("2R")).toBe("Right layer 2, clockwise");
+    expect(cuboidMoveName("M2")).toBe("Middle slice, twice");
+    expect(cuboidMoveName("R2", "ja")).toBe("右の面、2回");
+    for (const dims of NAMED) {
+      const scramble = randomCuboidScramble(dims, 30, seededRandom("words"));
+      for (const move of scramble) {
+        const code = cuboidMoveNotation(move, dims);
+        for (const language of ["en", "ja"] as const) {
+          const said = cuboidMoveName(code, language);
+          expect(said, `${dims.join("x")} ${code}`).toEqual(expect.any(String));
+          expect(said, code).not.toMatch(/[{}]/);
+        }
+      }
+    }
+  });
+
+  it("is nothing for what a cuboid has no such move as: a wide turn, a rotation, or text that is not a move", () => {
+    for (const text of ["", "Rw", "3Uw", "x", "y2", "z'", "R3", "r", "0R", "8R", "R2'"]) expect(cuboidMoveName(text), text).toBeNull();
   });
 });
 

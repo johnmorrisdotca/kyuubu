@@ -1,3 +1,4 @@
+import { moveName } from "../move-name.ts";
 import { fill, type KyuubuLanguage } from "../words.ts";
 
 import type { CuboidFault } from "./notation.ts";
@@ -52,4 +53,18 @@ export function faultSays(fault: CuboidFault, token: string, language: KyuubuLan
   const words = CUBOID_WORDS[language];
   const text = { unknown: words.faultUnknown, "no-such-layer": words.faultNoSuchLayer, "half-turn-only": words.faultHalfTurnOnly, "whole-puzzle": words.faultWholePuzzle }[fault];
   return fill(text, { token, half: token.replace(/['2]$/, "") + "2" });
+}
+
+/**
+ * What a move of a cuboid turns, in a few plain words, in English or Japanese:
+ * `R2` is "Right face, twice", `2U2` "Up layer 2, twice", `M2` "Middle slice,
+ * twice". It reads what `cuboidMoveNotation` writes (a face, a digit and a
+ * face, M, E or S, then nothing, `'` or `2`); null for anything else, and for
+ * the cube's wide turns and rotations, which a cuboid has none of.
+ *
+ * @example
+ * cuboidMoveName("R2"); // "Right face, twice"
+ */
+export function cuboidMoveName(code: string, language: KyuubuLanguage = "en"): string | null {
+  return /^([2-7]?[RLUDFB]|[MES])(2|')?$/.test(code) ? moveName(code, language) : null;
 }
