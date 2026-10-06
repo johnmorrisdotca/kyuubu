@@ -87,6 +87,7 @@ export type CubeWords = {
   guideDrag: string;
   guideDragHalf: string;
   guideDragSlab: string;
+  guideDragSeam: string;
   guideLook: string;
   guideWholeHow: string;
   guideOff: string;
@@ -96,6 +97,30 @@ export type CubeWords = {
   guideDone: string;
   guideLabel: string;
   playerFollow: string;
+  playerMovesLabel: string;
+  playerScrambleLabel: string;
+  playerSolutionLabel: string;
+  playerScrambleOf: string;
+  playerBeforeScramble: string;
+  playerHeard: string;
+  playerToken: string;
+  moveFace: string;
+  moveLayers: string;
+  moveLayer: string;
+  moveSliceM: string;
+  moveSliceE: string;
+  moveSliceS: string;
+  moveSliceWay: string;
+  moveWhole: string;
+  moveSays: string;
+  moveCw: string;
+  moveCcw: string;
+  moveTwice: string;
+  moveCount2: string;
+  moveCount3: string;
+  moveCount4: string;
+  moveCount5: string;
+  moveCount6: string;
 };
 
 /** The two languages the package speaks. */
@@ -180,6 +205,7 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDrag: "Take hold of the sticker with the dot, and drag it along the arrow.",
     guideDragHalf: "A half turn: drag twice as far, or make two quarter turns the same way.",
     guideDragSlab: "{count} layers turn together: drag each of them along the arrow.",
+    guideDragSeam: "Two layers turn together: put a finger on the line between them, at the dot, and drag along the arrow. Or drag each of them in turn.",
     guideLook: "Drag beside the cube to look round it, until you can see a side of the lit layer.",
     guideWholeHow: "No drag on a sticker does this: press {key}, or choose “{button}”.",
     guideOff: "You turned {made}, not {wanted}.",
@@ -189,6 +215,30 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDone: "That was the last move.",
     guideLabel: "What to turn next",
     playerFollow: "Turn it yourself",
+    playerMovesLabel: "The moves",
+    playerScrambleLabel: "Scramble",
+    playerSolutionLabel: "Solution",
+    playerScrambleOf: "Scramble move {at} of {total}",
+    playerBeforeScramble: "The solved cube, before the scramble",
+    playerHeard: "{code}: {name}. {where}.",
+    playerToken: "{code}: {name}. {where}",
+    moveFace: "{side} face",
+    moveLayers: "{side} {count} layers",
+    moveLayer: "{side} layer {depth}",
+    moveSliceM: "Middle slice",
+    moveSliceE: "Equator slice",
+    moveSliceS: "Standing slice",
+    moveSliceWay: "{slice}, same way as {side} {amount}",
+    moveWhole: "Whole cube on {axis}",
+    moveSays: "{what}, {amount}",
+    moveCw: "clockwise",
+    moveCcw: "anticlockwise",
+    moveTwice: "twice",
+    moveCount2: "two",
+    moveCount3: "three",
+    moveCount4: "four",
+    moveCount5: "five",
+    moveCount6: "six",
   },
   ja: {
     cubeLabel: "{n}×{n}のキューブ",
@@ -267,6 +317,7 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDrag: "点のあるステッカーを持って、矢印に沿ってドラッグします。",
     guideDragHalf: "半回転です。2倍の距離をドラッグするか、同じ向きに2回回します。",
     guideDragSlab: "{count}つの層を一緒に回します。それぞれを矢印に沿ってドラッグします。",
+    guideDragSeam: "2つの層を一緒に回します。2つの層の間の線の上の点に指を置いて、矢印に沿ってドラッグします。1つずつドラッグしても回せます。",
     guideLook: "キューブの外側をドラッグして、光っている層の側面が見えるまで見る向きを変えます。",
     guideWholeHow: "ステッカーのドラッグではできません。{key}を押すか、「{button}」を選びます。",
     guideOff: "{wanted}ではなく{made}を回しました。",
@@ -276,6 +327,30 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDone: "これが最後の手でした。",
     guideLabel: "次に回す手",
     playerFollow: "自分で回す",
+    playerMovesLabel: "手順",
+    playerScrambleLabel: "スクランブル",
+    playerSolutionLabel: "ソルブ",
+    playerScrambleOf: "スクランブル{total}手中{at}手目",
+    playerBeforeScramble: "スクランブル前のそろったキューブ",
+    playerHeard: "{code}：{name}。{where}。",
+    playerToken: "{code}：{name}。{where}",
+    moveFace: "{side}の面",
+    moveLayers: "{side}の{count}層",
+    moveLayer: "{side}から{depth}層目",
+    moveSliceM: "中の層（左右の間）",
+    moveSliceE: "中の層（上下の間）",
+    moveSliceS: "中の層（前後の間）",
+    moveSliceWay: "{slice}、{side}の{amount}と同じ向き",
+    moveWhole: "キューブ全体を{axis}軸で",
+    moveSays: "{what}、{amount}",
+    moveCw: "時計回り",
+    moveCcw: "反時計回り",
+    moveTwice: "2回",
+    moveCount2: "2",
+    moveCount3: "3",
+    moveCount4: "4",
+    moveCount5: "5",
+    moveCount6: "6",
   },
 };
 

@@ -49,7 +49,7 @@ mkdirSync("site", { recursive: true });
 writeFileSync("site/index.html", page);
 writeFileSync("site/famous.html", fillPage("famous.html"));
 writeFileSync("site/cubes.html", fillPage("cubes.html"));
-for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
+for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "snippets.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
 cpSync("docs/cube.png", "site/cube.png");
 cpSync("dist", "site/dist", { recursive: true });
 // The API reference, made from the source: every export of every entry point.

@@ -28,6 +28,8 @@ export { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC, FACE_PROPERTIE
 export { HINT_MIN_FACING, HINT_MIN_FOLLOW, dragHint, type DragHint, type HintArrow } from "./view/hint.ts";
 export { Guide, movementSays, movementText, rotationKeys, type GuideHeard, type GuideSource, type GuideStep } from "./guide.ts";
 export { GUIDE_CSS, mountGuide, type GuideHandle, type GuidePanelOptions } from "./guide-panel.ts";
+export { moveName } from "./move-name.ts";
+export { MOVE_LIST_CSS, mountMoveList, type MoveListGroup, type MoveListHandle, type MoveListItem, type MoveListOptions } from "./move-list.ts";
 export {
   COMMIT_ANGLE,
   DRAG_CLEAR_RATIO,
@@ -35,14 +37,18 @@ export {
   DRAG_START_PX,
   FLICK_ANGLE,
   FLICK_SPEED,
+  SEAM_BAND,
   dragAngle,
   moveForDrag,
   moveForRelease,
+  movesForRelease,
   moveForWheel,
   pastCommit,
   pickDrag,
   quartersForRelease,
+  seamsAt,
   type DragPick,
+  type Seam,
 } from "./view/gestures.ts";
 export { readKey, type KeyReading } from "./view/keys.ts";
 export { viewMatrix, type Mat3 } from "./view/geometry.ts";
@@ -84,10 +90,14 @@ export {
 export {
   MAX_REPLAY_STEPS,
   REPLAY_LOOP_REST_MS,
+  REPLAY_SCRAMBLE_STEP_MS,
+  REPLAY_SCRUB_MS,
+  REPLAY_SCRUB_TURNS,
   REPLAY_SPEEDS,
   REPLAY_STEP_MS,
   Replay,
   planReplay,
+  scrubPath,
   type ReplayClock,
   type ReplayCube,
   type ReplayFault,
@@ -95,5 +105,6 @@ export {
   type ReplayPlan,
   type ReplaySource,
   type ReplayStatus,
+  type ScrubPath,
 } from "./replay.ts";
 export { VERSION } from "./version.ts";

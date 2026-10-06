@@ -45,8 +45,7 @@ const WORDS = {
     fRecord: "It was",
     fBy: "Reconstructed by",
     fSource: "Source",
-    fScramble: "Scramble",
-    fMoves: "Moves",
+    animateScrub: "Turn the cube as the slider moves",
     seconds: "{time} seconds",
     dates: "{from} to {to}",
     "world record": "The world record",
@@ -93,8 +92,7 @@ const WORDS = {
     fRecord: "当時",
     fBy: "手順の再現",
     fSource: "出典",
-    fScramble: "スクランブル",
-    fMoves: "手順",
+    animateScrub: "スライダーに合わせてキューブを回す",
     seconds: "{time}秒",
     dates: "{from}〜{to}",
     "world record": "世界記録",
@@ -129,7 +127,7 @@ function draw() {
   $("watch-title").textContent = famous ? say("watch", { solver: solve.solver, time: say("seconds", { time: secs(solve.timeMs) }) }) : say("yours");
   // One player, and one cube, for every solve shown: a new solve is loaded onto it.
   const source = { size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs };
-  if (player === null) player = mountPlayer($("player"), { ...source, locale: page.lang });
+  if (player === null) player = mountPlayer($("player"), { ...source, locale: page.lang, animateScrub: $("animate-scrub").getAttribute("aria-pressed") === "true" });
   else {
     player.setLocale(page.lang);
     player.load(source);
@@ -162,16 +160,6 @@ function draw() {
     fact("fBy", solve.reconstructedBy);
     fact("fSource", `${new URL(solve.source).hostname} · ${say("sourceRead", { day: solve.checked })}`, solve.source);
   }
-  const code = (key, text) => {
-    const dt = document.createElement("dt");
-    dt.textContent = say(key);
-    const dd = document.createElement("dd");
-    dd.className = "fam-notation cube-lines";
-    dd.textContent = text;
-    facts.append(dt, dd);
-  };
-  code("fScramble", solve.scramble);
-  code("fMoves", solve.solution);
 
   const q = paramsOf(solve);
   const base = new URL(".", location.href).href;
@@ -229,6 +217,12 @@ $("paste").addEventListener("submit", (event) => {
   draw();
   $("watch-title").scrollIntoView({ block: "start", behavior: "auto" });
   player.play();
+});
+
+$("animate-scrub").addEventListener("click", () => {
+  const on = $("animate-scrub").getAttribute("aria-pressed") !== "true";
+  $("animate-scrub").setAttribute("aria-pressed", String(on));
+  player?.setAnimateScrub(on);
 });
 
 for (const button of document.querySelectorAll("[data-copy]")) {

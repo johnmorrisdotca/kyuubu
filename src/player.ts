@@ -1,6 +1,8 @@
 import { planReplay, Replay, REPLAY_SPEEDS, type ReplayFault, type ReplayPlan, type ReplaySource, type ReplayStatus } from "./replay.ts";
 import { solvedCube } from "./cube.ts";
 import { mountGuide, type GuideHandle } from "./guide-panel.ts";
+import { mountMoveList, type MoveListGroup, type MoveListHandle } from "./move-list.ts";
+import { moveName } from "./move-name.ts";
 import { CubeView, type CubeTheme } from "./view/view.ts";
 import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
 
@@ -33,6 +35,12 @@ export type PlayerOptions = ReplaySource & {
   theme?: CubeTheme;
   /** Start with the cube for the viewer to turn themselves, the solve's next move shown on it, rather than played for them. */
   guide?: boolean;
+  /** Show the code of the move just made in large type, with what it turns in words, and say it to a screen reader as it changes. True unless said otherwise; with `controls: false`, off unless this says true. */
+  readout?: boolean;
+  /** Show the moves as buttons, the one just made marked and scrolled into view, each one taking the replay to it. True unless said otherwise; with `controls: false`, off unless this says true. */
+  moveList?: boolean;
+  /** Whether moving the slider, or choosing a move, turns the cube between where it was and where it goes: forwards going on, each turn undone going back, a long jump catching up at once. True unless said otherwise. */
+  animateScrub?: boolean;
   /** English or Japanese; the page's `lang` when left out. */
   locale?: KyuubuLanguage;
   /** Called after every step, and whenever it starts, stops or is moved. */
@@ -59,6 +67,10 @@ export type PlayerHandle = {
   setLoop(loop: boolean): void;
   setLocale(locale: KyuubuLanguage): void;
   setTheme(theme: CubeTheme): void;
+  /** Whether moving the slider turns the cube between where it was and where it goes. */
+  setAnimateScrub(on: boolean): void;
+  /** Whether it does. */
+  readonly animatingScrub: boolean;
   /** Hand the cube to the viewer to turn, the next move shown on it (true), or take it back to be played (false). */
   follow(on: boolean): void;
   /** Whether the viewer is turning it themselves. */
@@ -84,6 +96,11 @@ export const PLAYER_CSS = `
 .kyuubu-player-note[data-tone="bad"]{opacity:1;font-weight:600}
 .kyuubu-player-guide{padding:.25rem 0}
 .kyuubu-player-credit{font-size:.75em;opacity:.7;color:inherit;margin-inline-start:auto}
+.kyuubu-player-readout{display:flex;align-items:center;gap:.75rem;min-height:3.75rem}
+.kyuubu-player-code{flex:none;box-sizing:border-box;min-width:4.6ch;padding:.35rem .5rem;border-radius:12px;border:2px solid var(--kyuubu-player-ink,currentColor);font:700 2.25rem/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-ligatures:none;text-align:center}
+.kyuubu-player-says{display:grid;gap:.125rem;min-width:0;font-weight:600}
+.kyuubu-player-says small{min-height:1.25em;font-size:.8125rem;font-weight:400;opacity:.8}
+.kyuubu-player-live{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 `;
 
 function addStyle(doc: Document): void {
@@ -115,6 +132,22 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   stage.className = "kyuubu-player-cube";
   root.append(stage);
   host.replaceChildren(root);
+  // Arrow keys step, Home and End go to the first and last move: from any button of the player, while the viewer is not turning the cube themselves.
+  root.addEventListener("keydown", (event) => {
+    if (replay === null || plan === null || follow !== null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+    const target = event.target as HTMLElement;
+    if (target.closest("[data-kyuubu-moves]") !== null || target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) return;
+    const scramble = plan.scramble.length;
+    const now = stateNow();
+    let to: number | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") to = now + 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") to = now - 1;
+    else if (event.key === "Home") to = scramble + 1;
+    else if (event.key === "End") to = scramble + plan.steps.length;
+    if (to === null) return;
+    event.preventDefault();
+    goState(Math.max(1, to));
+  });
 
   let plan: ReplayPlan | null = null;
   let fault: ReplayFault | null = null;
@@ -139,6 +172,37 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   const at = doc.createElement("span");
   at.className = "kyuubu-player-at";
   let speeds: HTMLButtonElement[] = [];
+  let animateScrub = options.animateScrub !== false;
+  /** The code of the move just made, and what it turns; the list of moves; and the line a screen reader is told. */
+  const readout = doc.createElement("div");
+  readout.className = "kyuubu-player-readout";
+  readout.setAttribute("aria-hidden", "true");
+  readout.dataset.kyuubuReadout = "";
+  const codeBox = doc.createElement("span");
+  codeBox.className = "kyuubu-player-code";
+  codeBox.dataset.kyuubuCode = "";
+  const saysBox = doc.createElement("span");
+  saysBox.className = "kyuubu-player-says";
+  const saysName = doc.createElement("span");
+  saysName.dataset.kyuubuSays = "";
+  const saysWhere = doc.createElement("small");
+  saysWhere.dataset.kyuubuWhere = "";
+  saysBox.append(saysName, saysWhere);
+  readout.append(codeBox, saysBox);
+  const live = doc.createElement("div");
+  live.className = "kyuubu-player-live";
+  live.setAttribute("role", "status");
+  live.setAttribute("aria-live", "polite");
+  live.setAttribute("aria-atomic", "true");
+  live.dataset.kyuubuLive = "";
+  const listBox = doc.createElement("div");
+  listBox.className = "kyuubu-player-moves";
+  let moves: MoveListHandle | null = null;
+  let showReadout = false;
+  let showList = false;
+  let told = "";
+  let quiet = true;
+  let toldTimer: ReturnType<typeof setTimeout> | null = null;
   let playButton: ReturnType<typeof button> | null = null;
   let loopButton: ReturnType<typeof button> | null = null;
   let followButton: ReturnType<typeof button> | null = null;
@@ -177,6 +241,84 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     act();
   };
 
+  /** Where the replay stands along the scramble and the solve together: 0 on the solved cube, the scramble's length on the scrambled one, and the whole of both at the end. */
+  const stateNow = () => {
+    if (plan === null || replay === null) return 0;
+    const scramble = plan.scramble.length;
+    const status = replay.status;
+    return status.scrambleAt < scramble ? status.scrambleAt : scramble + (followed() ?? status.position);
+  };
+  /** The move that brought the replay to where it stands, or null on the solved cube. */
+  const moveNow = () => {
+    if (plan === null) return null;
+    const at = stateNow() - 1;
+    if (at < 0) return null;
+    const scramble = plan.scramble.length;
+    return at < scramble ? { step: plan.scramble[at], scramble: true, at: at + 1, total: scramble } : { step: plan.steps[at - scramble], scramble: false, at: at - scramble + 1, total: plan.steps.length };
+  };
+  const whereOf = (one: { scramble: boolean; at: number; total: number }) => say(one.scramble ? "playerScrambleOf" : "playerMoveOf", { at: one.at, total: one.total });
+  /** What a screen reader is told of the move just made: at once when somebody chose it, and only once the cube has been still a moment when it is playing. */
+  const announce = (text: string, playing: boolean) => {
+    if (text === told) return;
+    told = text;
+    if (toldTimer !== null) clearTimeout(toldTimer);
+    toldTimer = null;
+    if (quiet) {
+      quiet = false;
+      return;
+    }
+    if (playing) toldTimer = setTimeout(() => (live.textContent = told), 350);
+    else live.textContent = text;
+  };
+  const paintMoves = () => {
+    if (replay === null || plan === null) return;
+    const one = moveNow();
+    const state = stateNow();
+    if (showList) moves?.setCurrent(state === 0 ? null : state - 1);
+    let heard: string;
+    if (one === null) {
+      codeBox.textContent = "–";
+      saysName.textContent = say("playerBeforeScramble");
+      saysWhere.textContent = "";
+      heard = say("playerBeforeScramble");
+    } else {
+      const name = moveName(one.step.text, language) ?? "";
+      codeBox.textContent = one.step.text;
+      saysName.textContent = name;
+      saysWhere.textContent = one.scramble ? whereOf(one) : "";
+      heard = say("playerHeard", { code: one.step.text, name, where: whereOf(one) });
+    }
+    root.dataset.code = one?.step.text ?? "";
+    if (showReadout) announce(heard, replay.status.playing);
+  };
+
+  const listGroups = (): MoveListGroup[] => {
+    if (plan === null) return [];
+    const item = (step: { text: string }, scramble: boolean, at: number, total: number) => {
+      const name = moveName(step.text, language) ?? "";
+      return { code: step.text, name, label: say("playerToken", { code: step.text, name, where: whereOf({ scramble, at, total }) }) };
+    };
+    const scramble = plan.scramble.length;
+    return [
+      { label: say("playerScrambleLabel"), items: plan.scramble.map((step, at) => item(step, true, at + 1, scramble)) },
+      { label: say("playerSolutionLabel"), main: true, items: plan.steps.map((step, at) => item(step, false, at + 1, plan!.steps.length)) },
+    ];
+  };
+
+  /** A move or a place chosen along the scramble and the solve together, by a press, a key or the slider: counted from the solved cube, so that the scrambled one is the scramble's length. */
+  const goState = (state: number) => {
+    if (replay === null || plan === null) return;
+    const scramble = plan.scramble.length;
+    const total = scramble + plan.steps.length;
+    const to = Math.max(0, Math.min(total, state));
+    const now = stateNow();
+    if (to === now) return;
+    if (to === now + 1) replay.step(1);
+    else if (to === now - 1 && now > scramble) replay.step(-1);
+    else if (to >= scramble) replay.seek(to - scramble, { animate: animateScrub });
+    else replay.seekScramble(to);
+  };
+
   const paint = () => {
     root.dataset.lang = language;
     for (const one of labelled) one.text.textContent = say(one.key);
@@ -200,6 +342,7 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       scrub.setAttribute("aria-label", say("playerScrub"));
       at.textContent = say("playerMoveOf", { at: position, total: status.total });
     }
+    paintMoves();
     if (fault !== null) {
       note.dataset.tone = "bad";
       const where = fault.fault;
@@ -224,6 +367,15 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     }
     replay?.destroy();
     replay = null;
+    moves?.destroy();
+    moves = null;
+    showReadout = false;
+    showList = false;
+    quiet = true;
+    told = "";
+    live.textContent = "";
+    if (toldTimer !== null) clearTimeout(toldTimer);
+    toldTimer = null;
     labelled = [];
     speeds = [];
     playButton = null;
@@ -251,6 +403,8 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       },
       onEnd: options.onEnd,
     });
+    showReadout = options.readout ?? how.controls !== false;
+    showList = options.moveList ?? how.controls !== false;
     if (how.controls !== false) {
       const main = doc.createElement("div");
       main.className = "kyuubu-player-row";
@@ -266,11 +420,12 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       scrub.step = "1";
       scrub.oninput = () => {
         stopFollow();
-        replay!.seek(Number(scrub.value));
+        replay!.seek(Number(scrub.value), { animate: animateScrub });
       };
       const where = doc.createElement("div");
       where.className = "kyuubu-player-row";
       where.append(scrub, at);
+
       const pace = doc.createElement("div");
       pace.className = "kyuubu-player-row";
       pace.setAttribute("role", "group");
@@ -290,8 +445,13 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       followButton = button("playerFollow", () => (follow === null ? startFollow() : stopFollow()), "follow");
       labelled.push(loopButton, followButton);
       pace.append(loopButton.el, followButton.el);
-      root.append(main, where, pace);
+      root.append(main, ...(showReadout ? [readout] : []), where, pace);
+    } else if (showReadout) root.append(readout);
+    if (showList) {
+      root.append(listBox);
+      moves = mountMoveList(listBox, { groups: listGroups(), locale: language, onPick: (index) => played(() => goState(index + 1))() });
     }
+    if (showReadout) root.append(live);
   };
   show(options, options);
 
@@ -310,10 +470,18 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     restart: played(() => replay?.restart()),
     setSpeed: (speed) => replay?.setSpeed(speed),
     setLoop: (loop) => replay?.setLoop(loop),
+    setAnimateScrub: (on) => {
+      animateScrub = on;
+    },
+    get animatingScrub() {
+      return animateScrub;
+    },
     setLocale: (locale) => {
       language = locale;
       view.setLocale(locale);
       follow?.panel.setLocale(locale);
+      moves?.setGroups(listGroups());
+      quiet = true;
       paint();
     },
     follow: (on) => (on ? startFollow() : stopFollow()),
@@ -325,6 +493,8 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
       return replay?.status ?? null;
     },
     destroy: () => {
+      if (toldTimer !== null) clearTimeout(toldTimer);
+      moves?.destroy();
       follow?.panel.destroy();
       replay?.destroy();
       view.destroy();

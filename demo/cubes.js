@@ -2,6 +2,7 @@
 /* global familyLanguage */
 import { CUBE_THEMES, CubeView } from "./dist/index.js";
 import "./dist/element-define.js";
+import { scrambleFrame, scrambleIframe, scrambleTag, scrambleAttributes, SCALE_PX } from "./snippets.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -29,7 +30,15 @@ const WORDS = {
     pickerCube: "{n}×{n}",
     picked: "You picked {n}×{n}.",
     embedTitle: "On your page",
-    embedText: "One tag, or an iframe for a page that allows no scripts. The one below is the iframe.",
+    embedText: "One tag, or an iframe for a page that allows no scripts. Each piece of code is for the size you picked above, the pace you chose and the scale here, and the cube beside it is made by that code.",
+    embedScaleLabel: "How big on the page",
+    scaleChoiceSmall: "Small",
+    scaleChoiceMedium: "Medium",
+    scaleChoiceLarge: "Large",
+    embedTagTitle: "One tag",
+    embedFrameTitle: "An iframe",
+    copy: "Copy",
+    copied: "Copied.",
     foot: "Nothing here is stored. Rubik's Cube is a trademark of its owner; Kyuubu is not affiliated with it.",
   },
   ja: {
@@ -55,17 +64,62 @@ const WORDS = {
     pickerCube: "{n}×{n}",
     picked: "{n}×{n}を選びました。",
     embedTitle: "自分のページに置く",
-    embedText: "タグ1つで置けます。スクリプトが使えないページには iframe を使います。下のものは iframe です。",
+    embedText: "タグ1つで置けます。スクリプトが使えないページには iframe を使います。どのコードも、上で選んだサイズ、回る間隔、ここで選ぶ大きさのためのもので、横のキューブはそのコードで作られています。",
+    embedScaleLabel: "ページでの大きさ",
+    scaleChoiceSmall: "小",
+    scaleChoiceMedium: "中",
+    scaleChoiceLarge: "大",
+    embedTagTitle: "タグ1つ",
+    embedFrameTitle: "iframe",
+    copy: "コピー",
+    copied: "コピーしました。",
     foot: "ここでは何も保存しません。Rubik's Cube は権利者の商標です。Kyuubu は権利者とは関係ありません。",
   },
 };
 
 let widgetOn = true;
 let picked = null;
+let pace = "normal";
+let scale = "small";
+const spec = () => ({ size: picked ?? 3, pace, scale, theme: "paper" });
+
+/** The code on the page, and the cube and the frame beside it, all made from the same size, pace and scale. */
+let tagKey = "";
+let frameKey = "";
+function drawEmbed() {
+  const now = spec();
+  $("embed-tag").textContent = scrambleTag(now);
+  $("embed-frame").textContent = scrambleIframe(now);
+  const side = `${SCALE_PX[scale]}px`;
+  for (const box of [$("embed-tag-preview"), $("embed-frame-preview")]) {
+    box.style.width = side;
+    box.style.height = side;
+  }
+  const key = JSON.stringify(now);
+  if (key !== tagKey) {
+    tagKey = key;
+    const cube = document.createElement("kyuubu-scramble");
+    for (const [name, value] of scrambleAttributes(now)) cube.setAttribute(name, value);
+    $("embed-tag-preview").replaceChildren(cube);
+  }
+  const { path, side: frameSide } = scrambleFrame(now);
+  if (path !== frameKey) {
+    frameKey = path;
+    const frame = document.createElement("iframe");
+    frame.src = path;
+    frame.title = "A cube that keeps turning";
+    frame.width = String(frameSide);
+    frame.height = String(frameSide);
+    frame.style.cssText = "border:0;max-width:100%";
+    frame.dataset.testid = "embedded";
+    $("embed-frame-preview").replaceChildren(frame);
+  }
+}
 const drawWidget = () => {
   $("widget-toggle").textContent = page.word(widgetOn ? "widgetStop" : "widgetStart");
   $("widget-toggle").setAttribute("aria-pressed", String(widgetOn));
   $("picked").textContent = picked === null ? "" : page.word("picked").replaceAll("{n}", String(picked));
+  drawEmbed();
 };
 const page = familyLanguage({ id: "kyuubu", words: WORDS, onChange: drawWidget });
 
@@ -75,6 +129,26 @@ for (const button of paceButtons) {
   button.addEventListener("click", () => {
     for (const other of paceButtons) other.setAttribute("aria-pressed", String(other === button));
     for (const cube of widget) cube.setAttribute("pace", button.dataset.pace);
+    pace = button.dataset.pace;
+    drawEmbed();
+  });
+}
+const scaleButtons = [...document.querySelectorAll("#embed-scales button")];
+for (const button of scaleButtons) {
+  button.addEventListener("click", () => {
+    for (const other of scaleButtons) other.setAttribute("aria-pressed", String(other === button));
+    scale = button.dataset.scale;
+    drawEmbed();
+  });
+}
+for (const button of document.querySelectorAll("[data-copy]")) {
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText($(button.dataset.copy).textContent);
+      $("embed-copied").textContent = page.word("copied");
+    } catch {
+      $("embed-copied").textContent = "";
+    }
   });
 }
 $("widget-toggle").addEventListener("click", () => {

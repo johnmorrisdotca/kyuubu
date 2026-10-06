@@ -44,10 +44,31 @@
       <section class="more" aria-labelledby="embed-title">
         <h2 id="embed-title" data-say="embedTitle"></h2>
         <p data-say="embedText"></p>
-        <pre><code>&lt;script type="module" src="https://unpkg.com/@johnmorrisdotca/kyuubu/dist/element-define.js"&gt;&lt;/script&gt;
-&lt;kyuubu-scramble size="3" pace="slow" scale="small"&gt;&lt;/kyuubu-scramble&gt;</code></pre>
-        <pre><code>&lt;iframe src="https://johnmorrisdotca.github.io/kyuubu/embed-scramble.html#pace=slow&amp;scale=medium" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%"&gt;&lt;/iframe&gt;</code></pre>
-        <iframe src="embed-scramble.html#pace=slow&scale=medium&theme=paper" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%" data-testid="embedded"></iframe>
+        <div class="fam-row">
+          <span class="fam-label cube-wide-label" id="scale-label" data-say="embedScaleLabel"></span>
+          <div class="fam-seg" id="embed-scales" role="group" aria-labelledby="scale-label" data-testid="embed-scales">
+            <button type="button" data-scale="small" aria-pressed="true" data-say="scaleChoiceSmall"></button>
+            <button type="button" data-scale="medium" aria-pressed="false" data-say="scaleChoiceMedium"></button>
+            <button type="button" data-scale="large" aria-pressed="false" data-say="scaleChoiceLarge"></button>
+          </div>
+        </div>
+        <h3 data-say="embedTagTitle"></h3>
+        <div class="cube-example">
+          <div class="cube-example-code">
+            <pre><code id="embed-tag" data-testid="embed-tag"></code></pre>
+            <div class="fam-actions"><button class="fam-button" type="button" data-copy="embed-tag" data-say="copy" data-testid="copy-tag"></button></div>
+          </div>
+          <div class="cube-example-preview" id="embed-tag-preview" data-testid="embed-tag-preview"></div>
+        </div>
+        <h3 data-say="embedFrameTitle"></h3>
+        <div class="cube-example">
+          <div class="cube-example-code">
+            <pre><code id="embed-frame" data-testid="embed-frame"></code></pre>
+            <div class="fam-actions"><button class="fam-button" type="button" data-copy="embed-frame" data-say="copy" data-testid="copy-frame"></button></div>
+          </div>
+          <div class="cube-example-preview" id="embed-frame-preview" data-testid="embed-frame-preview"></div>
+        </div>
+        <p class="fam-fine" id="embed-copied" aria-live="polite" data-testid="embed-copied"></p>
       </section>
       <!-- family:unreviewed -->
       <!-- family:footer -->

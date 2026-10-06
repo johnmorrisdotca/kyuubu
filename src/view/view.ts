@@ -4,7 +4,7 @@ import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
 import { apply, axisVector, cross, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
-import { COMMIT_ANGLE, dragAngle, moveForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, type DragPick } from "./gestures.ts";
+import { COMMIT_ANGLE, dragAngle, movesForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, seamsAt, type DragPick, type Seam } from "./gestures.ts";
 import { dragHint, type DragHint } from "./hint.ts";
 import { readKey } from "./keys.ts";
 
@@ -107,6 +107,8 @@ export type CubeViewOptions = {
   interactive?: boolean;
   /** Where the keys are listened for: the cube itself once it has focus (the default), the whole page, or nowhere. */
   keyboard?: "focus" | "page" | "none";
+  /** Whether `scramble` shows the turns it makes: the last few, quickly, after the rest are made at once. True when left out; a device that asks for reduced motion shows none whatever this says. */
+  animateScramble?: boolean;
   /** How long a quarter turn takes, in milliseconds, when it is made by a key, by notation or from code: 160 when left out. A device that asks for reduced motion gets no animation, whatever this says. `setTurnMs` changes it later. */
   turnMs?: number;
   /**
@@ -130,6 +132,10 @@ export type CubeViewOptions = {
 };
 
 const EDGE = 300;
+/** How many of a scramble's last turns are shown turning; the rest are made at once. */
+const SCRAMBLE_SHOWN = 10;
+/** How long each of those turns takes, in milliseconds. */
+const SCRAMBLE_TURN_MS = 85;
 const WHEEL_STEP = 60;
 /** How far outside the cube's element a drag may wander before it is taken as given up: this share of the element's smaller side, and never less than `DRAG_LEAVE_LEAST` pixels. A half turn on a big cube is a long drag. */
 const DRAG_LEAVE = 0.25;
@@ -201,7 +207,22 @@ export class CubeView {
   private frame = 0;
   private depth = 1;
   private wheelSum = 0;
-  private gesture: { id: number; x: number; y: number; at: number; slot: number | null; done: boolean; yaw: number; pitch: number } | null = null;
+  private gesture: {
+    id: number;
+    x: number;
+    y: number;
+    at: number;
+    slot: number | null;
+    done: boolean;
+    yaw: number;
+    pitch: number;
+    /** Where the pointer is now. */
+    now: [number, number];
+    /** The seams between layers the pointer went down on, nearest first. */
+    seams: Seam[];
+    /** A second finger, down on another sticker: with the first it takes two neighbouring layers. */
+    partner: { id: number; slot: number; x: number; y: number; now: [number, number] } | null;
+  } | null = null;
   /** The layer the pointer is holding, turned as far as it has been dragged. */
   private drag: LiveDrag | null = null;
   /** What ends a layer's snap after it is let go, run early when something cannot wait for it. */
@@ -227,6 +248,7 @@ export class CubeView {
       interactive: options.scale === undefined ? true : CUBE_SCALE_INTERACTIVE[options.scale],
       keyboard: "focus",
       turnMs: 160,
+      animateScramble: true,
       commitAngle: COMMIT_ANGLE,
       yaw: -35,
       pitch: 28,
@@ -476,6 +498,23 @@ export class CubeView {
     if (!this.animating) this.next();
   }
 
+  /**
+   * Scramble the cube with these turns, from the cube as it is. Turned
+   * quickly, the way a hand scrambles it: the last ten are shown, each in
+   * under a tenth of a second, and every one before them is made at once, so a
+   * scramble of a hundred turns on a 7×7 is over in a second and not a blur
+   * that shows nothing. With `animate: false`, or `animateScramble: false` when
+   * the cube was made, nothing is shown turning. Never told to `onTurn`.
+   */
+  scramble(moves: readonly CubeMove[], { animate = this.options.animateScramble }: { animate?: boolean } = {}): void {
+    this.settleDrag();
+    const shown = animate ? Math.min(moves.length, SCRAMBLE_SHOWN) : 0;
+    let state = this.target;
+    for (const move of moves.slice(0, moves.length - shown)) state = turnCube(state, this.n, move);
+    this.setState(state);
+    for (const move of moves.slice(moves.length - shown)) this.turnTogether([move], { ms: SCRAMBLE_TURN_MS });
+  }
+
   /** Whether a turn asked for is still on its way. */
   get busy(): boolean {
     return this.animating || this.queue.length > 0;
@@ -504,9 +543,9 @@ export class CubeView {
   }
 
   /** A turn a person made, told to `onTurn` and to every listener. */
-  private told(move: CubeMove): void {
-    this.options.onTurn?.(move, this.target);
-    for (const listener of [...this.listeners.turn]) listener(move, this.target);
+  private told(move: CubeMove, state: string = this.target): void {
+    this.options.onTurn?.(move, state);
+    for (const listener of [...this.listeners.turn]) listener(move, state);
   }
 
   /**
@@ -816,7 +855,8 @@ export class CubeView {
       const out = apply(m, place.out);
       // Facing the eye, which sits `lens` pixels in front of the cube's centre.
       const facing = -out[0] * at[0] - out[1] * at[1] + out[2] * (lens - at[2]) > 1e-6;
-      const transform = facing ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}` : (place.drawn?.transform ?? "");
+      // An element that has never faced the eye is kept at no size, hidden: left as it is laid out, the plastic across a turning gap would be a 300 pixel box that makes the page scroll sideways.
+      const transform = facing ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}` : (place.drawn?.transform ?? "scale(0)");
       let z = "0";
       if (facing && spin !== null && pieces > 1) {
         const piece = pieceOf[place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n)];
@@ -911,7 +951,8 @@ export class CubeView {
       this.shown = this.target;
       this.paint();
     }
-    this.lift({ axis: pick.axis, layer: pick.layer, turns: 1 });
+    this.lift({ axis: pick.axis, layer: pick.layer, turns: 1 }, pick.also === undefined ? [] : [{ axis: pick.axis, layer: pick.also, turns: 1 }]);
+    if (pick.also !== undefined) this.root.dataset.seam = "held";
     // Where the pointer went down counts as the first place the layer was: a flick is measured from there.
     this.drag = { pick, angle: 0, committed: false, samples: [{ at, angle: 0 }] };
     this.root.dataset.turning = "true";
@@ -946,7 +987,7 @@ export class CubeView {
     const since = drag.samples.find((sample) => at - sample.at <= SPEED_WINDOW);
     const speed = since === undefined ? 0 : (drag.angle - since.angle) / Math.max(at - since.at, 16);
     const quarters = released ? quartersForRelease(drag.angle, speed, this.commitAngle()) : 0;
-    const move = moveForRelease(drag.pick, quarters);
+    const made = movesForRelease(drag.pick, quarters);
     this.markCommitted(false);
     this.root.dataset.dragging = "false";
     const from = drag.angle;
@@ -957,15 +998,20 @@ export class CubeView {
       cancelAnimationFrame(this.frame);
       this.finishSnap = null;
       this.lower();
-      if (move !== null) {
+      const heard: [CubeMove, string][] = [];
+      if (made.length > 0) {
         this.depth = 1;
-        this.target = turnCube(this.target, this.n, move);
+        for (const move of made) {
+          this.target = turnCube(this.target, this.n, move);
+          heard.push([move, this.target]);
+        }
         this.shown = this.target;
         this.paint();
       }
       this.animating = false;
       this.root.dataset.turning = "false";
-      if (move !== null) this.told(move);
+      delete this.root.dataset.seam;
+      for (const [move, state] of heard) this.told(move, state);
     };
     this.finishSnap = finish;
     const started = performance.now();
@@ -1093,6 +1139,47 @@ export class CubeView {
     return made;
   }
 
+  /** The seams between layers a pointer at this place on this sticker is taking hold of, nearest first. */
+  private seamsUnder(slot: number, clientX: number, clientY: number): Seam[] {
+    const box = this.root.getBoundingClientRect();
+    // A cube drawn inside something scaled (a zoomed page) is measured in its own pixels.
+    const zoom = box.width / (this.root.offsetWidth || box.width) || 1;
+    const pointer: [number, number] = [(clientX - (box.left + box.width / 2)) / zoom, (clientY - (box.top + box.height / 2)) / zoom];
+    const scale = (this.side * this.options.fill) / (EDGE * Math.sqrt(3));
+    return seamsAt(cubeSlots(this.n).slots[slot], this.n, this.view(), pointer, (this.unit() / 2) * scale, Math.round(this.side * 3.2));
+  }
+
+  /** The seams two fingers, down on two stickers, take hold of: each axis about which the layers of the two are neighbours. */
+  private pairSeams(a: StickerSlot, b: StickerSlot): Seam[] {
+    return ([0, 1, 2] as CubeAxis[]).flatMap((axis) => {
+      const [la, lb] = [layerOf(a.centre, axis, this.n), layerOf(b.centre, axis, this.n)];
+      return Math.abs(la - lb) === 1 && this.n >= 3 ? [{ axis, beside: lb }] : [];
+    });
+  }
+
+  /** The two layers a touch on a seam would turn, drawn with a ring on each of their stickers before anything moves; or none. */
+  private lightSeam(seam: Seam | null, slot: number | null): void {
+    const slots = cubeSlots(this.n).slots;
+    const layers = seam === null || slot === null ? null : new Set([layerOf(slots[slot].centre, seam.axis, this.n), seam.beside]);
+    const ring = `2px solid var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
+    this.stickers.forEach((sticker, at) => {
+      const face = sticker.firstChild as HTMLDivElement;
+      const lit = layers !== null && seam !== null && layers.has(layerOf(slots[at].centre, seam.axis, this.n));
+      if (lit) {
+        face.style.outline = ring;
+        face.style.outlineOffset = "-2px";
+        sticker.dataset.seamLit = "";
+      } else if (sticker.dataset.seamLit !== undefined) {
+        face.style.outline = "";
+        face.style.outlineOffset = "";
+        delete sticker.dataset.seamLit;
+      }
+    });
+    if (layers === null) {
+      if (this.root.dataset.seam === "near") delete this.root.dataset.seam;
+    } else this.root.dataset.seam = "near";
+  }
+
   private slotAt(target: EventTarget | null): number | null {
     const sticker = (target as HTMLElement | null)?.closest?.("[data-slot]") as HTMLElement | null;
     return sticker === null || sticker === undefined || !this.root.contains(sticker) ? null : Number(sticker.dataset.slot);
@@ -1122,16 +1209,30 @@ export class CubeView {
     this.bind(this.root, "pointerdown", (event) => {
       if (event.button !== 0 && event.pointerType === "mouse") return;
       this.root.setPointerCapture?.(event.pointerId);
-      if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
       const slot = this.options.interactive ? this.slotAt(event.target) : null;
-      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch };
+      const first = this.gesture;
+      // A second finger on another sticker, before the layer is picked: the two together take two neighbouring layers.
+      if (first !== null && first.id !== event.pointerId && !first.done && first.slot !== null && first.partner === null && slot !== null && this.drag === null && event.pointerType === "touch") {
+        first.partner = { id: event.pointerId, slot, x: event.clientX, y: event.clientY, now: [event.clientX, event.clientY] };
+        this.root.dataset.seam = "pair";
+        return;
+      }
+      if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
+      const seams = slot === null ? [] : this.seamsUnder(slot, event.clientX, event.clientY);
+      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch, now: [event.clientX, event.clientY], seams, partner: null };
+      this.lightSeam(slot === null ? null : seams[0] ?? null, slot);
       this.root.style.cursor = "grabbing";
     });
     this.bind(this.root, "pointermove", (event) => {
       const gesture = this.gesture;
-      if (gesture === null || gesture.id !== event.pointerId || gesture.done) return;
-      const dx = event.clientX - gesture.x;
-      const dy = event.clientY - gesture.y;
+      if (gesture === null || gesture.done) return;
+      if (gesture.partner?.id === event.pointerId) gesture.partner.now = [event.clientX, event.clientY];
+      else if (gesture.id === event.pointerId) gesture.now = [event.clientX, event.clientY];
+      else return;
+      // With two fingers down the pair goes the way they go together: the mean of the two.
+      const pair = gesture.partner;
+      const dx = (gesture.now[0] - gesture.x + (pair === null ? 0 : pair.now[0] - pair.x)) / (pair === null ? 1 : 2);
+      const dy = (gesture.now[1] - gesture.y + (pair === null ? 0 : pair.now[1] - pair.y)) / (pair === null ? 1 : 2);
       if (gesture.slot === null) {
         this.setLook(gesture.yaw + dx * 0.45, gesture.pitch + dy * 0.45);
         return;
@@ -1146,16 +1247,23 @@ export class CubeView {
       }
       if (this.drag === null) {
         // The layer is picked once, where the drag can be told, and stays picked: the angle is counted from where the pointer went down.
-        const pick = pickDrag(cubeSlots(this.n).slots[gesture.slot], this.n, this.view(), dx, dy);
+        const slots = cubeSlots(this.n).slots;
+        const seams = pair === null ? gesture.seams : this.pairSeams(slots[gesture.slot], slots[pair.slot]);
+        const pick = pickDrag(slots[gesture.slot], this.n, this.view(), dx, dy, seams);
         if (pick === null) return;
         this.beginDrag(pick, gesture.at);
+        // The ring was a promise of the two layers; what is held is the answer, and shows for itself.
+        if (pick.also === undefined) this.lightSeam(null, null);
       }
       if (this.drag !== null) this.followDrag(dragAngle(this.drag.pick, dx, dy, this.quarterPx()), event.timeStamp);
     });
     const end = (released: boolean) => (event: PointerEvent) => {
-      if (this.gesture?.id !== event.pointerId) return;
+      const gesture = this.gesture;
+      if (gesture === null || (gesture.id !== event.pointerId && gesture.partner?.id !== event.pointerId)) return;
       this.gesture = null;
       this.endDrag(released, event.timeStamp);
+      this.lightSeam(null, null);
+      delete this.root.dataset.seam;
       this.root.style.cursor = this.options.interactive ? "grab" : "default";
     };
     this.bind(this.root, "pointerup", end(true));

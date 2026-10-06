@@ -28,7 +28,7 @@ export async function open(page, query = "?lang=en") {
   page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
   await serve(page);
   await page.goto(`http://kyuubu.test/${query}`);
-  await expect(page.locator("[data-kyuubu]")).toBeVisible();
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu]")).toBeVisible();
   return errors;
 }
 
@@ -44,8 +44,8 @@ export const id = (name) => `[data-testid="${name}"]`;
 
 /** The cube's stickers, once every turn on its way has been made. */
 export async function cube(page) {
-  await expect(page.locator("[data-kyuubu]")).toHaveAttribute("data-turning", "false");
-  return page.locator("[data-kyuubu]").getAttribute("data-state");
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu]")).toHaveAttribute("data-turning", "false");
+  return page.locator(":is(#stage, #player) [data-kyuubu]").getAttribute("data-state");
 }
 
 /** Open one of the five panels by its tab. */
@@ -87,8 +87,10 @@ export async function sound(page, errors) {
  * letting go is no flick.
  */
 export async function hold(page, nth = 5) {
-  const root = page.locator("[data-kyuubu]");
-  const box = await page.locator('[data-kyuubu] [data-face="F"]').nth(nth).boundingBox();
+  const root = page.locator(":is(#stage, #player) [data-kyuubu]");
+  // Wherever the page was scrolled to by whatever came before, the cube is in the window.
+  await root.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  const box = await page.locator(':is(#stage, #player) [data-kyuubu] [data-face="F"]').nth(nth).boundingBox();
   const from = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   let y = from.y;
   await page.mouse.move(from.x, from.y);

@@ -191,7 +191,9 @@ export function mountGuide(host: HTMLElement, view: CubeView, options: GuidePane
       : hint === null || hint.face === null
         ? say("guideLook")
         : next.moves.length > 1
-          ? say("guideDragSlab", { count: next.moves.length })
+          ? hint.seam && next.moves.length === 2
+            ? say("guideDragSeam")
+            : say("guideDragSlab", { count: next.moves.length })
           : next.moves[0].turns === 2
             ? say("guideDragHalf")
             : say("guideDrag");

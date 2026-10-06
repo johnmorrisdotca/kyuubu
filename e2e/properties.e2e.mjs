@@ -32,7 +32,7 @@ test("setting each observed attribute as a property sets the attribute, on both 
     return out;
   });
   // Every one of them, as the text of what was set.
-  expect(seen["kyuubu-cube"].map(([name]) => name)).toEqual(["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "guide"]);
+  expect(seen["kyuubu-cube"].map(([name]) => name)).toEqual(["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "guide", "readout", "movelist", "scrub"]);
   expect(seen["kyuubu-scramble"].map(([name]) => name)).toEqual(["size", "pace", "paused", "scale", "width", "theme", "faces", "interactive", "seed"]);
   for (const rows of Object.values(seen)) for (const [name, value] of rows) expect(value, name).toBe("7");
   expect(errors).toEqual([]);

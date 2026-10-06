@@ -1,7 +1,7 @@
 import { layerOf } from "../cube.ts";
-import type { CubeAxis, CubeMove, CubeTurns, StickerSlot } from "../types.ts";
+import type { CubeAxis, CubeMove, CubeTurns, StickerSlot, Vec3 } from "../types.ts";
 
-import { axisOf, axisVector, cross, onScreen, type Mat3 } from "./geometry.ts";
+import { apply, axisOf, axisVector, cross, onScreen, type Mat3 } from "./geometry.ts";
 
 /**
  * FROM A HAND TO A TURN: which layer a drag, a wheel or a key means, worked
@@ -81,16 +81,71 @@ export const FLICK_SPEED = 0.25;
 /** The least a flick must have turned the layer, in degrees. */
 export const FLICK_ANGLE = 4;
 
-/** The layer a drag has picked: its axis and layer, and the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule. */
-export type DragPick = { axis: CubeAxis; layer: number; along: [number, number] };
+/** How near a seam between two layers a touch lands to take both: this share of a sticker's width on each side of the line between them, so that the middle of a sticker, and a little more than half of its width, is still the one layer. */
+export const SEAM_BAND = 0.18;
+
+/** The layer a drag has picked: its axis and layer, and the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule. `also` is the layer beside it that turns with it, where the drag began on the seam between the two. */
+export type DragPick = { axis: CubeAxis; layer: number; along: [number, number]; also?: number };
+
+/** A seam a hand has taken hold of: a turn about this axis would carry the layer the sticker is in and the one `beside` it, together. */
+export type Seam = { axis: CubeAxis; beside: number };
+
+/** A model point, in the cube's doubled units, as the screen draws it: in pixels from the cube's middle (y down), with the perspective the cube is drawn in. `k` is the pixels in one doubled unit, `lens` the eye's distance in pixels. */
+function projected(view: Mat3, v: Vec3, k: number, lens: number): [number, number] {
+  const [x, y, z] = apply(view, v).map((value) => value * k) as unknown as Vec3;
+  const f = lens / (lens - z);
+  return [x * f, -y * f];
+}
+
+/**
+ * The seams a touch at this place on a sticker is taking hold of, nearest
+ * first: where it lands within `SEAM_BAND` of a sticker's width of the line
+ * that parts the sticker's layer from the one beside it, along either of the
+ * two directions the sticker can be turned across. Each is a turn about an axis that takes
+ * both layers, and is made only if the drag that follows goes that way: a drag
+ * across the line, or begun anywhere else on the sticker, turns the one layer
+ * as ever. `pointer` is in pixels from the cube's middle, y down, as the cube
+ * is drawn; none on a 2×2, where both layers are the whole cube.
+ */
+export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: readonly [number, number], k: number, lens: number, band = SEAM_BAND): Seam[] {
+  if (n < 3) return [];
+  const face = axisOf(slot.normal);
+  const surface = slot.centre.map((value, at) => value + slot.normal[at]) as unknown as Vec3;
+  const plus = (a: Vec3, b: Vec3, sign = 1): Vec3 => [a[0] + sign * b[0], a[1] + sign * b[1], a[2] + sign * b[2]];
+  const middle = projected(view, surface, k, lens);
+  const there = [pointer[0] - middle[0], pointer[1] - middle[1]];
+  const half = (axis: CubeAxis): [number, number] => {
+    const [forward, back] = [projected(view, plus(surface, axisVector(axis)), k, lens), projected(view, plus(surface, axisVector(axis), -1), k, lens)];
+    return [(forward[0] - back[0]) / 2, (forward[1] - back[1]) / 2];
+  };
+  const found: { seam: Seam; near: number }[] = [];
+  for (const axis of [0, 1, 2] as CubeAxis[]) {
+    if (axis === face) continue;
+    const other = ([0, 1, 2] as CubeAxis[]).find((one) => one !== face && one !== axis)!;
+    const [a, b] = [half(axis), half(other)];
+    const det = a[0] * b[1] - a[1] * b[0];
+    if (Math.abs(det) < 1e-6) continue;
+    // Where the touch is on the sticker, in its own units: -1 to 1 across it, along each way.
+    const u = (there[0] * b[1] - there[1] * b[0]) / det;
+    const v = (a[0] * there[1] - a[1] * there[0]) / det;
+    if (Math.abs(v) > 1.3 || Math.abs(u) < 1 - 2 * band || Math.abs(u) > 1.3) continue;
+    const layer = layerOf(slot.centre, axis, n);
+    const beside = layer + (u > 0 ? 1 : -1);
+    if (beside < 0 || beside > n - 1) continue;
+    found.push({ seam: { axis, beside }, near: Math.abs(u) });
+  }
+  return found.sort((x, y) => y.near - x.near).map((one) => one.seam);
+}
 
 /**
  * The layer a drag across a sticker means, once it can be told: null while
  * the pointer has not gone far enough, or while the two layers that carry the
  * sticker are too nearly as likely as each other. Past `DRAG_DECIDE_PX` the
- * likelier is picked whatever the odds.
+ * likelier is picked whatever the odds. A drag that began on a seam
+ * (`seamsAt`) and goes the way that turns about the seam's axis picks the
+ * layer beside as well (`also`).
  */
-export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, dy: number): DragPick | null {
+export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, dy: number, seams: readonly Seam[] = []): DragPick | null {
   const far = Math.hypot(dx, dy);
   if (far < DRAG_START_PX) return null;
   const ranked = candidates(slot, view)
@@ -102,7 +157,8 @@ export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, d
     .sort((a, b) => b.went - a.went);
   const [best, other] = ranked;
   if (far < DRAG_DECIDE_PX && other !== undefined && best.went < other.went * DRAG_CLEAR_RATIO) return null;
-  return { axis: best.candidate.axis, layer: layerOf(slot.centre, best.candidate.axis, n), along: best.along };
+  const seam = seams.find((one) => one.axis === best.candidate.axis);
+  return { axis: best.candidate.axis, layer: layerOf(slot.centre, best.candidate.axis, n), along: best.along, ...(seam === undefined ? {} : { also: seam.beside }) };
 }
 
 /** The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. `quarterPx` is the pixels that make a quarter turn. */
@@ -139,4 +195,11 @@ export function pastCommit(angle: number, commitAngle = COMMIT_ANGLE): boolean {
 export function moveForRelease(pick: DragPick, quarters: number): CubeMove | null {
   if (quarters === 0) return null;
   return { axis: pick.axis, layer: pick.layer, turns: (((quarters % 4) + 4) % 4) as CubeTurns };
+}
+
+/** Every layer a release turns: the picked layer, and the one beside it where the drag took a seam, each by those quarters; none for none. */
+export function movesForRelease(pick: DragPick, quarters: number): CubeMove[] {
+  const move = moveForRelease(pick, quarters);
+  if (move === null) return [];
+  return pick.also === undefined ? [move] : [move, { ...move, layer: pick.also }];
 }

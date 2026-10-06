@@ -7,8 +7,8 @@ import { parseMoves, solvedCube, turnAll } from "../dist/index.js";
 import { cube, hold, id, open, panel, sound } from "./page.mjs";
 
 const after = (notation) => turnAll(solvedCube(3), 3, parseMoves(notation, 3));
-const root = (page) => page.locator("[data-kyuubu]");
-const lit = (page) => page.locator('[data-kyuubu] [data-slot] > div[style*="filter"]');
+const root = (page) => page.locator(":is(#stage, #player) [data-kyuubu]");
+const lit = (page) => page.locator(':is(#stage, #player) [data-kyuubu] [data-slot] > div[style*="filter"]');
 
 /** Nothing was made a move: the cube is as it was, the count is nought and nothing is written down. */
 async function nothingRecorded(page) {
@@ -179,13 +179,13 @@ test("the speed of turns made by keys and notation is chosen under Controls", as
 // tests run does, shows three whole faces.
 test("draws three whole faces with no 3D context to lose", async ({ page }) => {
   await open(page);
-  const nested = await page.locator("[data-kyuubu], [data-kyuubu] *").evaluateAll((all) => all.filter((element) => getComputedStyle(element).transformStyle === "preserve-3d").length);
+  const nested = await page.locator(":is(#stage, #player) [data-kyuubu], :is(#stage, #player) [data-kyuubu] *").evaluateAll((all) => all.filter((element) => getComputedStyle(element).transformStyle === "preserve-3d").length);
   expect(nested).toBe(0);
-  await expect(page.locator("[data-kyuubu] [data-slot]:visible")).toHaveCount(27);
-  const faces = await page.locator("[data-kyuubu] [data-slot]:visible").evaluateAll((all) => [...new Set(all.map((element) => element.dataset.face))].sort().join(""));
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu] [data-slot]:visible")).toHaveCount(27);
+  const faces = await page.locator(":is(#stage, #player) [data-kyuubu] [data-slot]:visible").evaluateAll((all) => [...new Set(all.map((element) => element.dataset.face))].sort().join(""));
   expect(faces).toBe("FRU");
   // Stickers side by side, not piled on one another: 27 of them cover 27 different places.
-  const places = await page.locator("[data-kyuubu] [data-slot]:visible").evaluateAll((all) => new Set(all.map((element) => { const box = element.getBoundingClientRect(); return `${Math.round(box.x / 4)},${Math.round(box.y / 4)}`; })).size);
+  const places = await page.locator(":is(#stage, #player) [data-kyuubu] [data-slot]:visible").evaluateAll((all) => new Set(all.map((element) => { const box = element.getBoundingClientRect(); return `${Math.round(box.x / 4)},${Math.round(box.y / 4)}`; })).size);
   expect(places).toBe(27);
 });
 
@@ -198,7 +198,7 @@ test("keeps a touch that begins on the cube from scrolling or zooming the page",
       target.dispatchEvent(event);
       return event.defaultPrevented;
     };
-    return { cube: touch(document.querySelector("[data-kyuubu] [data-slot]")), page: touch(document.querySelector("h1") ?? document.body) };
+    return { cube: touch(document.querySelector("#stage [data-kyuubu] [data-slot]")), page: touch(document.querySelector("h1") ?? document.body) };
   });
   expect(refused).toEqual({ cube: true, page: false });
 });

@@ -78,3 +78,10 @@
 .cube-pick span { display: block; pointer-events: none; }
 .cube-pick small { font-size: .8rem; }
 .cube-row kyuubu-scramble, .cube-pick { user-select: none; -webkit-user-select: none; }
+
+/* The code a page shows and the cube that code makes, side by side where there is room, one over the other where there is not. */
+.cube-example { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.cube-example-code { min-width: 0; }
+.cube-example-preview { position: relative; width: 160px; height: 160px; max-width: 100%; }
+.cube-example-preview > * { max-width: 100%; }
+@media (min-width: 640px) { .cube-example { grid-template-columns: minmax(0, 1fr) auto; } }

@@ -6,7 +6,7 @@ import { parseMoves, solvedCube, turnAll } from "../dist/index.js";
 import { cube, id, open, panel, serve, sound, tap } from "./page.mjs";
 
 const after = (notation) => turnAll(solvedCube(3), 3, parseMoves(notation, 3));
-const root = (page) => page.locator("[data-kyuubu]");
+const root = (page) => page.locator(":is(#stage, #player) [data-kyuubu]");
 const shown = (page) => page.locator('.kyuubu-guide [data-guide="move"]');
 
 /**
@@ -19,7 +19,7 @@ async function followArrow(page, half = false) {
   // The whole cube in the window, so that the drag has room to go.
   await root(page).evaluate((el) => el.scrollIntoView({ block: "center" }));
   const [dx, dy] = (await page.locator("[data-hint-arrow]").getAttribute("data-drag")).split(",").map(Number);
-  const box = await page.locator("[data-kyuubu] [data-hint-grab]").boundingBox();
+  const box = await page.locator(":is(#stage, #player) [data-kyuubu] [data-hint-grab]").boundingBox();
   const from = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
@@ -46,7 +46,7 @@ test("moves typed in are shown on the cube one at a time, and following the arro
   await expect(shown(page)).toHaveText("R");
   await expect(page.locator('[data-guide="says"]')).toHaveText("Turn the right face away from you.");
   // The layer is lit and the rest dimmed: nine on the face and three on each of four sides.
-  await expect(page.locator("[data-kyuubu] [data-hint-lit]")).toHaveCount(21);
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu] [data-hint-lit]")).toHaveCount(21);
   await followArrow(page);
   expect(await cube(page)).toBe(after("R"));
   await expect(shown(page)).toHaveText("U'");
@@ -58,7 +58,7 @@ test("moves typed in are shown on the cube one at a time, and following the arro
   expect(await cube(page)).toBe(after("R U' F2"));
   await expect(page.locator('[data-guide="says"]')).toHaveText("That was the last move.");
   await expect(root(page)).not.toHaveAttribute("data-hint", /./);
-  await expect(page.locator("[data-kyuubu] [data-hint-lit]")).toHaveCount(0);
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu] [data-hint-lit]")).toHaveCount(0);
   await expect(page.locator(id("count"))).toHaveText("3");
   await sound(page, errors);
 });
@@ -110,9 +110,9 @@ test("the hint is in Japanese too, and the cube's corners are rounded", async ({
   const errors = await open(page, "?lang=ja");
   await showTyped(page, "R'");
   await expect(page.locator('[data-guide="says"]')).toHaveText("右の面を手前に回します。");
-  const corner = await page.locator('[data-kyuubu] [data-slot="0"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
+  const corner = await page.locator(':is(#stage, #player) [data-kyuubu] [data-slot="0"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
   expect(parseFloat(corner)).toBeGreaterThan(0);
-  const inner = await page.locator('[data-kyuubu] [data-slot="4"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
+  const inner = await page.locator(':is(#stage, #player) [data-kyuubu] [data-slot="4"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
   expect(parseFloat(inner)).toBe(0);
   await sound(page, errors);
 });

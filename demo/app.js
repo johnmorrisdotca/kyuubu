@@ -1,5 +1,6 @@
 // The demo page: a cube on the felt, and everything the package does beside it.
 /* global familyLanguage */
+import { viewCode, viewOptions } from "./snippets.js";
 import {
   CUBE_FACE_ORDER,
   CUBE_THEMES,
@@ -116,6 +117,9 @@ const WORDS = {
     k7does: "The second layer in",
     k8: "Arrow keys",
     k8does: "Look round the cube",
+    exampleLook: "This code makes the cube beside it: the size, theme, colours and turn speed chosen above. Copy it and you have it.",
+    exampleCopied: "Copied.",
+    animateScramble: "Show the scramble turning",
     moreTitle: "One on your page",
     moreText: "Install it, give an element a size, and make a cube in it. React, Vue, Svelte and Angular are in the README.",
     foot: "Your solves stay on this device. Turn it with a mouse, a finger, the wheel or the keys.",
@@ -204,6 +208,9 @@ const WORDS = {
     k7does: "外から2番目の層",
     k8: "矢印キー",
     k8does: "見る向きが変わります",
+    exampleLook: "このコードで、横のキューブができます。上で選んだ大きさ、テーマ、色、回す速さが入っています。コピーすれば、そのまま使えます。",
+    exampleCopied: "コピーしました。",
+    animateScramble: "スクランブルを回して見せる",
     moreTitle: "自分のページに置く",
     moreText: "インストールして、大きさを決めた要素の中にキューブを作ります。React、Vue、Svelte、Angular の例は README にあります。",
     foot: "ソルブの記録はこの端末にだけ保存されます。マウス、指、ホイール、キーボードで回せます。",
@@ -218,6 +225,7 @@ let view;
 let theme = { ...CUBE_THEMES.paper, colours: { ...CUBE_THEMES.paper.colours } };
 let themeName = "paper";
 let turnMs = 160;
+let animateScramble = true;
 let scramble = [];
 let moves = [];
 let startedAt = null;
@@ -253,6 +261,7 @@ function draw() {
   if (document.activeElement !== $("text")) $("text").value = scramble.length + moves.length === 0 ? "" : toText(record());
   $("saved").textContent = note === null ? "" : say(note);
 
+  drawExample();
   const can = SOLVABLE_SIZES.includes(n);
   // Always a way back: the method where there is one, and every turn taken back where there is not.
   const stuck = !can && scramble.length + moves.length === 0;
@@ -321,6 +330,18 @@ function draw() {
     wrap.append(table);
     box.replaceChildren(wrap);
   }
+}
+
+/** The code under the page, and the cube beside it, both made from what is chosen above. */
+let example = { key: "", preview: null };
+function drawExample() {
+  const spec = { size: view.size, ...(themeName === "" ? { colours: theme.colours, plastic: theme.plastic } : { theme: themeName }), turnMs, animateScramble };
+  const code = viewCode(spec);
+  $("example-code").textContent = code;
+  const key = JSON.stringify(spec);
+  if (key === example.key) return;
+  example.preview?.destroy();
+  example = { key, preview: new CubeView($("example-preview"), { ...viewOptions(spec, CUBE_THEMES), locale: page.lang }) };
 }
 
 const tick = () => {
@@ -410,7 +431,7 @@ function unguide() {
 function make(n, state) {
   unguide();
   view?.destroy();
-  view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs, onTurn: (move) => { last = null; turned(move); } });
+  view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs, animateScramble, onTurn: (move) => { last = null; turned(move); } });
 }
 
 for (let n = 2; n <= 7; n += 1) {
@@ -476,7 +497,7 @@ $("scramble").addEventListener("click", () => {
   view.setState(solvedCube(n));
   clear();
   scramble = randomScramble(n, FULL_SCRAMBLE_LENGTHS[n] ?? 25);
-  for (const move of scramble) view.turn(move);
+  view.scramble(scramble);
   timed = true;
   draw();
 });
@@ -494,6 +515,20 @@ $("reset").addEventListener("click", () => {
   draw();
 });
 $("look").addEventListener("click", () => view.resetLook());
+$("animate-scramble").addEventListener("click", () => {
+  animateScramble = !animateScramble;
+  $("animate-scramble").setAttribute("aria-pressed", String(animateScramble));
+  make(view.size, view.state);
+  draw();
+});
+$("example-copy").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("example-code").textContent);
+    $("example-copied").textContent = say("exampleCopied");
+  } catch {
+    $("example-copied").textContent = "";
+  }
+});
 
 // The layer-by-layer method, one step at a time: what the step is for, and its turns, made on the cube.
 const stepOnce = () => {

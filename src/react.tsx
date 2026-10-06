@@ -3,6 +3,7 @@ import { useEffect, useImperativeHandle, useRef, type CSSProperties, type Ref } 
 import type { CubeFace } from "./cube.ts";
 import { CUBE_SCALE_INTERACTIVE } from "./scale.ts";
 import type { CubeMove } from "./types.ts";
+import { mountMoveList, type MoveListHandle, type MoveListOptions } from "./move-list.ts";
 import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
 
 /** What a parent can ask of the cube on the screen. */
@@ -17,6 +18,8 @@ export type KyuubuHandle = {
   setTheme: (theme: CubeTheme) => void;
   /** The stickers once every turn asked for is done. */
   state: () => string;
+  /** Scramble the cube with these turns: the last few turn quickly and the rest are made at once, unless `animate` is false or the cube was made with `animateScramble: false`. */
+  scramble: (moves: readonly CubeMove[], options?: { animate?: boolean }) => void;
   /** Show on the cube how to make these moves (the layer lit, an arrow the way to drag), or nothing with null. The `hint` prop does the same. */
   showHint: (moves: CubeMove | readonly CubeMove[] | null) => void;
 };
@@ -58,7 +61,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
   useEffect(() => {
     handlers.current = { onTurn, onLook };
   }, [onTurn, onLook]);
-  const { colours, plastic, theme, locale, keyboard, turnMs, commitAngle, yaw, pitch, fill, label, rounded } = rest;
+  const { colours, plastic, theme, locale, keyboard, turnMs, animateScramble, commitAngle, yaw, pitch, fill, label, rounded } = rest;
   const hinted = useRef(hint);
   const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-")));
 
@@ -76,6 +79,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
       locale,
       keyboard,
       turnMs,
+      animateScramble,
       commitAngle,
       yaw,
       pitch,
@@ -93,7 +97,7 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
     };
     // Made again only for what cannot be changed on a cube already drawn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, keyboard, plastic, yaw, pitch, fill, label, rounded, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
+  }, [size, keyboard, plastic, yaw, pitch, fill, label, rounded, animateScramble, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
 
   // The hint is shown again only when it says something else: a parent that makes a new array of the same moves on every render changes nothing.
   const hintKey = JSON.stringify(hint);
@@ -131,9 +135,65 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
     setTheme: (next) => view.current?.setTheme(next),
     state: () => view.current?.state ?? state ?? "",
     showHint: (moves) => view.current?.showHint(moves),
+    scramble: (moves, options) => view.current?.scramble(moves, options),
   }));
 
   // With no class of its own the box is a square as wide as its container; a class says where it sits and how big it is, and is left to.
   const boxStyle: CSSProperties = className === undefined ? { position: "relative", width: "100%", aspectRatio: "1 / 1", ...style } : { ...style };
   return <div ref={box} className={className} style={boxStyle} {...data} />;
+}
+
+/** The props of `KyuubuMoves`: every option of the list, and the box's `className` and `style`. */
+export type KyuubuMovesProps = MoveListOptions & {
+  className?: string;
+  style?: CSSProperties;
+  ref?: Ref<MoveListHandle>;
+};
+
+/**
+ * THE MOVES AS A REACT COMPONENT: a thin wrapper round `mountMoveList`. Give
+ * it the runs of moves and the one just made, and it marks that one and
+ * scrolls it into view; `onPick` hears a press or a key. The runs are drawn
+ * again only when what they say changes.
+ */
+export function KyuubuMoves({ ref, className, style, groups, current = null, locale, label, onPick }: KyuubuMovesProps) {
+  const box = useRef<HTMLDivElement>(null);
+  const list = useRef<MoveListHandle | null>(null);
+  const handlers = useRef({ onPick });
+  const first = useRef({ groups, current, locale, label });
+  useEffect(() => {
+    handlers.current = { onPick };
+  }, [onPick]);
+  useEffect(() => {
+    if (box.current === null) return;
+    const made = mountMoveList(box.current, { ...first.current, onPick: (index, group, at) => handlers.current.onPick?.(index, group, at) });
+    list.current = made;
+    return () => {
+      made.destroy();
+      list.current = null;
+    };
+  }, [label]);
+  const key = JSON.stringify(groups);
+  useEffect(() => {
+    list.current?.setGroups(groups, current);
+    // The runs, compared by what they say.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  useEffect(() => {
+    list.current?.setCurrent(current);
+  }, [current]);
+  useEffect(() => {
+    if (locale !== undefined) list.current?.setLocale(locale);
+  }, [locale]);
+  useImperativeHandle(ref, () => ({
+    get element() {
+      return list.current!.element;
+    },
+    setCurrent: (index) => list.current?.setCurrent(index),
+    setGroups: (next, now) => list.current?.setGroups(next, now),
+    setLocale: (next) => list.current?.setLocale(next),
+    focus: () => list.current?.focus(),
+    destroy: () => list.current?.destroy(),
+  }));
+  return <div ref={box} className={className} style={style} />;
 }

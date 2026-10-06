@@ -253,6 +253,8 @@ src/
 ├── guide-panel.ts       the panel beside a cube: the next movement in notation and words, and an arrow on the cube
 ├── guide.ts             a solve to follow with your own hands, one movement at a time, with detours taken back
 ├── index.ts             the main entry: the cube, notation, solver, famous solves, and the player to mount
+├── move-list.ts         the moves of a scramble or a solve as buttons, the one just made marked and scrolled into view
+├── move-name.ts         what a move turns, in a few plain words, in English and Japanese
 ├── notation.ts          the standard notation, for reading a move out and for the keys that make one
 ├── player.ts            the "/player" entry: a solve on a page, with play, pause, step and speed controls
 ├── random.ts            a seeded random source
@@ -442,7 +444,7 @@ alg.cubing.net, so a person can paste the address.
 Keys are heard when the cube has focus (`keyboard: "focus"`, the default) or
 anywhere on the page (`"page"`), never while the reader is typing in a field.
 
-### Dragging a layer
+### Dragging a layer, and two layers at once
 
 A drag on a sticker, by mouse or by finger, holds its layer and turns it with
 the pointer. Nothing is a move while the pointer is down.
@@ -464,6 +466,20 @@ the pointer. Nothing is a move while the pointer is down.
 - **A flick still turns.** A short, fast drag, still moving when it is let
   go, makes the quarter turn from short of the point, so quick hands lose
   nothing.
+- **Two neighbouring layers turn together, like a real cube.** A drag that
+  begins on the seam between two layers, within a fifth of a sticker's width
+  of the line (`SEAM_BAND`, 0.18), and goes along that line turns both, as a
+  wide turn (`Rw`, `Lw`, `Uw`, and on a big cube any two neighbours: `3R 4R`
+  are two layers of a 5×5). The two layers are ringed as soon as the finger is
+  down, before it has moved, so you see what will turn; a drag begun anywhere
+  else on the sticker, or across the seam, turns the one layer as ever. A
+  second finger put down on the neighbouring layer before the drag starts does
+  the same: two fingers together take two layers. Both layers are told to
+  `onTurn`, one after the other. The cube's element carries `data-seam`
+  (`"near"` while the layers are ringed, `"held"`, `"pair"`), and each ringed
+  sticker `data-seam-lit`. The guide's arrow for a wide turn begins at the
+  seam, at its dot, and one drag from there makes it. A 2×2 has no seam: both
+  its layers are the whole cube.
 - **Giving up.** Escape, a cancelled pointer, or a drag that wanders well off
   the cube's element puts the layer back, and nothing is recorded.
 - **`onTurn` is called once for a completed turn, after the layer has
@@ -472,9 +488,11 @@ the pointer. Nothing is a move while the pointer is down.
 While a layer is held the element carries `data-dragging="true"` and
 `data-angle` (whole degrees, forwards positive). The rules are exported as
 pure functions for tools and tests of your own: `pickDrag`, `dragAngle`,
-`quartersForRelease`, `pastCommit` and `moveForRelease`, with the constants
-`COMMIT_ANGLE`, `DRAG_START_PX`, `DRAG_DECIDE_PX`, `DRAG_CLEAR_RATIO`,
-`FLICK_SPEED` and `FLICK_ANGLE` (type `DragPick`).
+`quartersForRelease`, `pastCommit`, `moveForRelease`, `movesForRelease` (every
+layer a release turns, two for a seam) and `seamsAt` (the seams a touch at a
+place on a sticker takes hold of), with the constants `COMMIT_ANGLE`,
+`DRAG_START_PX`, `DRAG_DECIDE_PX`, `DRAG_CLEAR_RATIO`, `FLICK_SPEED`,
+`FLICK_ANGLE` and `SEAM_BAND` (types `DragPick` and `Seam`).
 
 ```ts
 quartersForRelease(22);         // 0: short of the point, it goes back
@@ -489,6 +507,14 @@ Turns made by a key, by notation or from code are animated over `turnMs`
 (160 ms a quarter turn; `setTurnMs` changes it, and the demo's Controls tab
 offers a slow setting). On a device that asks for reduced motion they are
 not animated at all, and a layer let go is put straight where it belongs.
+
+**Scrambling.** `view.scramble(moves)` scrambles the cube the way a hand does:
+the last ten turns are shown, each in under a tenth of a second, and the
+turns before them are made at once, so a hundred-turn scramble of a 7×7 is
+over in about a second and is not a blur that shows nothing. It is on unless
+the cube is made with `animateScramble: false` (or `scramble(moves, { animate:
+false })` is asked for one scramble); then nothing is shown turning. It is
+never told to `onTurn`, and a device that asks for reduced motion shows none.
 
 ## The model
 
@@ -633,10 +659,69 @@ cannot turn its layers, until they press "Turn it yourself": then the cube
 is theirs, the solve's next move is shown on it (see *Show me on the cube*),
 and each move they make brings the next. Options: `size`, `scramble`,
 `solution`, `timeMs`, `stepMs`, `autoplay`, `loop`, `controls`, `speed`,
-`theme`, `locale`, `guide` (start with the cube handed over), `onChange`,
-`onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
+`theme`, `locale`, `guide` (start with the cube handed over), `readout` and
+`moveList` (the move just made in large type and in words, and the moves as
+buttons; on unless `controls` is `false`, or unless said otherwise), `animateScrub`
+(on unless said otherwise), `onChange`, `onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
 `seek(n)`, `restart()` (back to the scrambled cube, waiting), `setSpeed()`, `setLoop()`, `setLocale()`,
-`setTheme()`, `follow(on)` and `following`, `status`, `plan`, `fault` and `destroy()`.
+`setTheme()`, `setAnimateScrub(on)` and `animatingScrub`, `follow(on)` and `following`, `status`, `plan`, `fault` and `destroy()`.
+
+### See each move
+
+Beside "Move 12 of 33" the player says which move that is: its code in large
+type (`R'`, `Rw`, `x2`, `3Uw'`, `M`), and what it turns in a few plain words,
+in English or Japanese ("Right face, anticlockwise", "Right two layers,
+clockwise", "Whole cube on x, twice", "Middle slice, same way as Left
+clockwise"). Under the cube the moves are drawn as buttons, the scramble and
+then the solution, the one just made marked and scrolled into view inside the
+list (never the page) as the solve plays; the scramble's are marked the same
+way, since you can go back into it. A press on a move takes the replay there
+(the cube is the cube after that move), a press on the scramble's last move is
+the scrambled cube the solve starts from.
+
+- **Keys.** Tab reaches the list once, at the move just made. Left and right
+  (or up and down) go a move back or on, <kbd>Home</kbd> to the solution's
+  first move and <kbd>End</kbd> to its last, and the focus goes with them. The
+  same keys work from any button of the player. Back past the first move is the
+  scrambled cube, and on into the scramble: a replay stepped back into it plays
+  the rest of the scramble quickly (`REPLAY_SCRAMBLE_STEP_MS`) and then the
+  solve.
+- **A screen reader** hears each move once, in a polite live region: "R':
+  Right face, anticlockwise. Move 5 of 33." While the solve plays it is told
+  once the cube has been still for a moment, not for every move, and nothing
+  is said for what was there when the player was drawn. Each button is named
+  with its code, its words and where it is.
+- **The slider turns the cube the way it goes.** Moving it (or pressing a
+  move) shows the turns between where the cube was and where it goes: each
+  move turned going on, each one undone, last first, going back. A long jump
+  goes straight to six steps short and turns those (`REPLAY_SCRUB_TURNS`, each
+  `REPLAY_SCRUB_MS` long), and a new drag cancels the catch-up before it. It is
+  on unless `animateScrub: false`; `seek(n, { animate: true })` is the same
+  for code, and `scrubPath` works out the turns with no page at all.
+- **The words** are `moveName(code, language)`, which names any move in
+  standard form (`Rw'`, `2R`, `M2`, `y`), and `null` for anything else.
+
+```ts
+import { mountPlayer, moveName } from "@johnmorrisdotca/kyuubu";
+
+moveName("R'");  // "Right face, anticlockwise"
+moveName("Rw");  // "Right two layers, clockwise"
+moveName("x2");  // "Whole cube on x, twice"
+moveName("2R'", "ja"); // "右から2層目、反時計回り"
+
+mountPlayer(document.getElementById("solve"), {
+  scramble: "R U R' U'",
+  solution: "U R U' R'",
+  timeMs: 2000,
+  animateScrub: true,
+});
+```
+
+The list can be drawn alone, for a cube and a scrubber of your own:
+`mountMoveList(element, { groups, current, onPick })` (colours
+`--kyuubu-moves-ink`, `paper`, `rule`, `focus` and `height`, falling back to the
+player's; `MOVE_LIST_CSS`; the handle has `setCurrent(index)`, `setGroups()`,
+`setLocale()`, `focus()` and `destroy()`).
 
 **About the pace.** A reconstruction says how long the whole solve took and
 almost never when each move was made. So the moves are spread evenly over the
@@ -671,6 +756,8 @@ One tag, where the page may run a script. It needs no build step:
 | `theme` | `standard`, `paper` or `stickerless` |
 | `lang` | `en` or `ja`; the page's language when left out |
 | `guide` | Start with the cube handed to the viewer, to follow the solve by hand |
+| `readout`, `movelist` | The move just made in large type and in words, and the moves as buttons: shown unless `"false"` (and, with `controls="false"`, only if asked for) |
+| `scrub` | Moving the slider turns the cube between where it was and where it goes: on unless `scrub="false"` |
 
 The element has `play()`, `pause()`, `step()`, `seek()`, `restart()` and
 `status`, and sends `kyuubu-step` after every step and `kyuubu-end` at the
@@ -697,7 +784,7 @@ An iframe, where the page allows no scripts (a forum, a blog):
 ```
 
 The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`,
-`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`, `guide=1`. The page stores
+`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`, `guide=1`, `readout=0`, `movelist=0`, `scrub=0`. The page stores
 nothing, tracks nothing and loads nothing from anywhere else. A browser takes
 an address of a few thousand characters, which is room for any solve of a
 3×3. The [famous solves page](https://johnmorrisdotca.github.io/kyuubu/famous.html)
@@ -1062,12 +1149,17 @@ Types: `SolveRecord` (`{ size, scramble, moves, ms?, at?, seed? }`),
 | `solveText`, `countSolveMoves` | `(steps) => string`, `(steps) => number` | The steps in standard form; how many count as moves |
 | `readSolveLink` | `(text) => SolveLink \| null` | The scramble and solve in a link to alg.cubing.net |
 | `planReplay` | `(source) => { ok, plan } \| { ok, fault }` | A solve read, checked and timed |
-| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `seek`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
+| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `seek(n, { animate? })`, `seekScramble(n)`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
+| `scrubPath` | `(steps, from, to, shown?) => ScrubPath` | The turns that take the cube from one position to another: each step going on, each undone going back, a long jump catching up at once |
 | `REPLAY_SPEEDS`, `REPLAY_STEP_MS`, `REPLAY_LOOP_REST_MS`, `MAX_REPLAY_STEPS` | | The speeds offered, the steady pace, the rest before a repeat, the longest solve |
+| `REPLAY_SCRUB_TURNS`, `REPLAY_SCRUB_MS`, `REPLAY_SCRAMBLE_STEP_MS` | `6`, `70`, `200` | How many turns a slider shows, how long each takes, how long each step of the scramble takes when a replay walks through it |
+| `moveName` | `(code, language?) => string \| null` | What a move turns, in a few plain words: "Right face, anticlockwise" |
+| `mountMoveList` | `(element, options) => MoveListHandle` | The moves as buttons: the one just made marked, each taking the replay there. Options: `groups`, `current`, `locale`, `onPick`, `label` |
+| `MOVE_LIST_CSS` | | The list's stylesheet, put in the page once |
 
 Types: `SolveMove`, `SolveReading`, `NotationFault`, `SolveLink`,
 `ReplaySource`, `ReplayPlan`, `ReplayFault`, `ReplayStatus`, `ReplayOptions`,
-`ReplayCube`, `ReplayClock`.
+`ReplayCube`, `ReplayClock`, `ScrubPath`, `MoveListGroup`, `MoveListItem`, `MoveListOptions`, `MoveListHandle`.
 
 From `@johnmorrisdotca/kyuubu/player`: `mountPlayer(element, options)`,
 `PLAYER_CSS`, and the types `PlayerOptions` and `PlayerHandle`. From
@@ -1133,6 +1225,7 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `interactive` | `true` | Whether a person can turn it. `turn()` always works. `false` at `small` |
 | `keyboard` | `"focus"` | `"focus"`, `"page"` or `"none"` |
 | `turnMs` | `160` | How long a quarter turn made by a key, notation or code takes. Turns waiting in line go faster, and reduced motion gets none |
+| `animateScramble` | `true` | Whether `scramble(moves)` shows the turns it makes: the last ten, quickly. Reduced motion shows none |
 | `commitAngle` | `30` | The point of no return of a dragged layer, in degrees, from 5 to 85 |
 | `yaw`, `pitch` | `-35`, `28` | The first view, in degrees |
 | `fill` | `0.9` | How much of its box the cube fills |
@@ -1154,6 +1247,7 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 | `setInteractive(on)` | Lets a person turn it, or stops them |
 | `setScale(scale?, width?)` | Draws it at a scale or a width, or with neither, back to filling its box |
 | `turnTogether(moves, { animate?, ms? })` | Turns several layers about one axis as one movement (a wide turn), in `ms` when given |
+| `scramble(moves, { animate? })` | Scrambles the cube from where it is: the last ten turns shown quickly, the rest made at once; never told to `onTurn` |
 | `busy` | Whether a turn asked for is still on its way |
 | `redraw()` | Takes the cube out of the page and puts it straight back. Kept for pages that call it; since 1.3.2 the cube asks for no 3D context, so there are no layers for a browser to lose |
 | `setTurnMs(ms)` | Changes how long a quarter turn takes |
@@ -1166,7 +1260,7 @@ Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
 
 The root element carries `data-kyuubu`, `data-state`,
 `data-turning="true" | "false"`, and while a layer is dragged `data-dragging`,
-`data-committed` and `data-angle`, and while a hint is shown `data-hint`
+`data-committed` and `data-angle`, while a drag has taken a seam `data-seam`, and while a hint is shown `data-hint`
 (`"drag"`, `"look"` or `"whole"`); each sticker carries `data-slot` and
 `data-face`, and under a hint `data-hint-lit` and, on the one to take hold
 of, `data-hint-grab`. The arrow is `[data-hint-arrow]`, with the way to drag
@@ -1182,8 +1276,8 @@ means; type `KeyReading`), `viewMatrix` (the way the cube is looked at; type
 
 This component takes every `CubeView` option as a prop, plus `className`,
 `style` and any `data-*` (type `KyuubuProps`). Its `ref` (type
-`KyuubuHandle`) gives `turn`, `setState`, `resetLook`, `setTheme`, `state`
-and `showHint`. When the `state` prop changes to something the cube is not
+`KyuubuHandle`) gives `turn`, `setState`, `resetLook`, `setTheme`, `state`,
+`showHint` and `scramble`. When the `state` prop changes to something the cube is not
 already showing, the cube shows it, so a parent can keep the state and hand it
 back without the cube jumping.
 
@@ -1192,6 +1286,22 @@ layer lit, an arrow the way to drag it); null shows nothing:
 
 ```tsx
 <Kyuubu size={3} state={state} hint={nextStep.moves.slice(0, 1)} onTurn={(move, now) => setState(now)} />
+```
+
+`<KyuubuMoves />`, from the same entry, is the list of moves of a scramble or
+a solve as buttons (see *See each move*), for a page that draws its own cube
+and its own scrubber: give it `groups` and the move just made as `current`,
+and it marks that one and scrolls it into view; `onPick(index, group, at)`
+hears a press or a key (type `KyuubuMovesProps`).
+
+```tsx
+import { KyuubuMoves } from "@johnmorrisdotca/kyuubu/react";
+
+<KyuubuMoves
+  groups={[{ label: "Solution", main: true, items: ["R", "U", "R'", "U'"] }]}
+  current={at - 1}
+  onPick={(index) => setAt(index + 1)}
+/>;
 ```
 
 ## Theming
@@ -1288,6 +1398,10 @@ engine, at phone size with touch.
   towards you.") as well as notation; a turn it did not ask for is announced
   as an alert. The player's controls are real buttons with names, the speeds,
   Loop and Follow report whether they are pressed, and the scrubber has a name.
+  The move just made is also said once, in a polite live region, and not for
+  every move of a solve playing; the moves are buttons named with their code,
+  their words and where they are, reached by one Tab stop and the arrow keys,
+  Home and End, the one just made marked with `aria-current`.
 - **Motion is optional.** A device that asks for reduced motion gets turns
   made at once, a cube that keeps turning stays still, and the guide's arrow
   does not move.

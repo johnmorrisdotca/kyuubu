@@ -298,7 +298,7 @@ describe("the README's reference", () => {
   it("names every export, in code", () => {
     const names = [...Object.keys(kyuubu), ...types, ...react];
     expect(names.length).toBeGreaterThan(80);
-    expect(react).toEqual(["KyuubuHandle", "KyuubuProps", "Kyuubu"]);
+    expect(react).toEqual(["KyuubuHandle", "KyuubuProps", "Kyuubu", "KyuubuMovesProps", "KyuubuMoves"]);
     for (const name of names) expect(readme, name).toMatch(new RegExp("`[^`\\n]*\\b" + name + "\\b[^`\\n]*`"));
   });
 

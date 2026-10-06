@@ -43,6 +43,8 @@ export type DragHint = {
   layers: number[];
   /** How far, by the right-hand rule. */
   turns: CubeTurns;
+  /** Whether the turn is of two neighbouring layers on a cube of 3 or more: one drag that begins on the seam between them, at the tail of the arrow, or two fingers at once, turns both together. */
+  seam: boolean;
   /** Every sticker those layers carry, as indexes into the state: the stickers to light. */
   slots: number[];
   /** The face the arrow lies on, or null where no side of the layer can be seen well enough from here: look round the cube first. */
@@ -89,6 +91,7 @@ export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view:
   const { slots } = cubeSlots(n);
   const lit = slots.flatMap((slot, at) => (layers.includes(layerOf(slot.centre, axis, n)) ? [at] : []));
   const quarters = turns === 2 ? 2 : turns === 1 ? 1 : -1;
+  const seam = n >= 3 && layers.length === 2 && layers[1] === layers[0] + 1;
   const across = axisVector(axis);
   const middle = layers.reduce((sum, layer) => sum + 2 * layer - n + 1, 0) / layers.length;
   let best: { score: number; hint: DragHint } | null = null;
@@ -152,6 +155,7 @@ export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view:
           axis,
           layers,
           turns,
+          seam,
           slots: lit,
           face: faceOfNormal(normal),
           grab: at,
@@ -163,5 +167,5 @@ export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view:
       };
     }
   }
-  return best?.hint ?? { axis, layers, turns, slots: lit, face: null, grab: null, drag: null, quarters, atOnce: false, arrow: null };
+  return best?.hint ?? { axis, layers, turns, seam, slots: lit, face: null, grab: null, drag: null, quarters, atOnce: false, arrow: null };
 }

@@ -123,7 +123,7 @@ test("the custom element draws a solve from its attributes and tells the page as
 test("on the cube's own page a pasted solve with comments is turned, and a big cube can always be taken back", async ({ page }) => {
   await serve(page);
   await page.goto("http://kyuubu.test/?lang=en");
-  await expect(page.locator("[data-kyuubu]")).toBeVisible();
+  await expect(page.locator("#stage [data-kyuubu]")).toBeVisible();
   await page.locator("#tab-moves").click();
   await page.getByTestId("moves").fill("x' // inspection\nr' U F // cross");
   await page.getByTestId("turn").click();
@@ -138,5 +138,5 @@ test("on the cube's own page a pasted solve with comments is turned, and a big c
   await page.getByTestId("scramble").click();
   await expect(page.getByTestId("all")).toBeEnabled();
   await page.getByTestId("all").click();
-  await expect(page.locator("[data-kyuubu]")).toHaveAttribute("data-state", /^U{16}R{16}F{16}D{16}L{16}B{16}$/, { timeout: 30000 });
+  await expect(page.locator("#stage [data-kyuubu]")).toHaveAttribute("data-state", /^U{16}R{16}F{16}D{16}L{16}B{16}$/, { timeout: 30000 });
 });

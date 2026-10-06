@@ -13,7 +13,7 @@ export default tseslint.config(
   },
   {
     files: ["scripts/**/*.mjs", "bin/**/*.mjs", "e2e/**/*.mjs", "playwright.config.mjs"],
-    languageOptions: { globals: { console: "readonly", URL: "readonly", document: "readonly", window: "readonly", getComputedStyle: "readonly" } },
+    languageOptions: { globals: { console: "readonly", URL: "readonly", Blob: "readonly", DOMParser: "readonly", MutationObserver: "readonly", document: "readonly", navigator: "readonly", window: "readonly", getComputedStyle: "readonly" } },
   },
   {
     files: ["demo/**/*.js"],

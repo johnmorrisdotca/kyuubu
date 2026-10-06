@@ -4,14 +4,26 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- **The player says which move it is.** Beside "Move 12 of 33" the move just made is shown in large type (`R'`, `Rw`, `x2`, `3Uw'`, `M`) with what it turns in a few plain words, in English and Japanese: "Right face, anticlockwise", "Right two layers, clockwise", "Whole cube on x, twice", "Middle slice, same way as Left clockwise". `moveName(code, language?)` is the words alone, for any move in standard form: faces, wide turns, inner layers of a big cube, the slices M, E and S, the rotations x, y and z, primes and doubles; null for anything else.
+- **The moves as buttons.** Under the cube the scramble and then the solution are drawn as buttons, the move just made marked (`aria-current="step"`) and scrolled into view inside the list, never the page, as the solve plays. A press on a move takes the replay there. Tab reaches the list once, the arrow keys go a move back or on (from any button of the player too), Home and End to the solution's first and last move, and the focus goes with them. Back past the first move is the scrambled cube, and on into the scramble, which then plays the rest of itself quickly before the solve (`Replay.seekScramble`, `REPLAY_SCRAMBLE_STEP_MS`, `ReplayStatus.scrambleAt` and `scrambleTotal`, `ReplayPlan.scrambleStates`). `mountMoveList` draws the list alone (`MOVE_LIST_CSS`, the `--kyuubu-moves-…` custom properties), `<KyuubuMoves />` is it for React.
+- **A screen reader hears each move once**, in a polite live region ("R': Right face, anticlockwise. Move 5 of 33."), once the cube has been still a moment while a solve plays, and not for what was there when the player was drawn.
+- **The slider turns the cube the way it goes.** Moving it, or pressing a move, shows the turns between where the cube was and where it goes: forwards going on, each undone, last first, going back; a long jump goes straight to six steps short of the end and turns those, and a new drag cancels the catch-up before it. It is the player's `animateScrub` option (on unless `false`), `setAnimateScrub(on)` and `animatingScrub`, `seek(n, { animate: true })` on a `Replay`, and `scrubPath` with no page at all (`REPLAY_SCRUB_TURNS`, `REPLAY_SCRUB_MS`).
+- **`<kyuubu-cube>` attributes `readout`, `movelist` and `scrub`**, each on unless `"false"` (with `controls="false"` the first two are off unless asked for), and `readout=0`, `movelist=0`, `scrub=0` in the embed page's address. The options of the player are `readout`, `moveList` and `animateScrub`.
+- **Two layers with one drag, like a real cube.** A drag that begins on the seam between two neighbouring layers, within a fifth of a sticker's width of the line between them (`SEAM_BAND`), and goes along it turns both together, as a wide turn (`Rw`, `Uw`, and on a big cube any two neighbours). The two layers are ringed the moment the finger is down, before it moves; a drag begun anywhere else on the sticker, or across the seam, turns the one layer as before. Two fingers put down on two neighbouring layers do the same. Both layers are told to `onTurn`, one after the other. The guide's arrow for a wide turn begins at the seam, and its line says so. `seamsAt`, `movesForRelease`, `DragPick.also`, the type `Seam` and `DragHint.seam` are the rules, for tools of your own; measured with real touches on a 390 pixel screen, a touch is one layer up to 0.3 of the way from the middle of a sticker to the seam and two from 0.34.
+- **`CubeView.scramble(moves)`**, and the option `animateScramble` (on unless `false`): the last ten turns are shown, each in under a tenth of a second, and the turns before are made at once, so the demo's Scramble button on a 7×7 turns where it can be seen and is not a blur. The demo has a button for it, and its code shows `animateScramble: false` when it is off.
+- The demo's "One on your page" and "On your page" code are written from what is chosen on the page (size, theme, colours, turn speed, scramble; size, pace and scale), the cube and frame beside each is made by that code, and Copy gives the code that is shown.
+
 ### Changed
 
-- Repository only: the package and everything it exports are unchanged. `CONTRIBUTING.md` is the family's one text with a section of its own for Kyuubu, held to the master in johnmorrisdotca/.github by `test/family.test.js`; `ci.yml` and `pages.yml` are the family's one text (`pnpm check`, the demo, and the package on Linux, macOS and Windows), and any jobs of the package's own after them.
+- Of the repository, and nothing that is exported: `CONTRIBUTING.md` is the family's one text with a section of its own for Kyuubu, held to the master in johnmorrisdotca/.github by `test/family.test.js`; `ci.yml` and `pages.yml` are the family's one text (`pnpm check`, the demo, and the package on Linux, macOS and Windows), and any jobs of the package's own after them.
 - The demo's own stylesheet is `demo/kyuubu.css`, named for the package like the family's.
 - The demo is built into `site/`, where the Pages workflow and every other package look for it.
 
 ### Fixed
 
+- The plastic across a turning gap was a 300 pixel box laid out wherever it was made, and a small cube near the right edge of a page made the page scroll sideways for as long as it turned. It is kept at no size until it is drawn.
 - The API reference page wraps a long entry path instead of running about 2 px wider than a 360 px screen. Nothing the package exports has changed.
 
 ## [1.8.1] - 2026-10-05

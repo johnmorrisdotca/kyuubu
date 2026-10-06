@@ -18,7 +18,7 @@ import { languageOf } from "./words.ts";
  */
 
 /** The attributes the element reads. Changing any draws the player afresh. */
-export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "guide"] as const;
+export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "guide", "readout", "movelist", "scrub"] as const;
 
 /** The name the element is registered under. */
 export const CUBE_ELEMENT_NAME = "kyuubu-cube";
@@ -26,7 +26,7 @@ export const CUBE_ELEMENT_NAME = "kyuubu-cube";
 /**
  * What the element adds to an ordinary one. Every attribute is also a property
  * that writes it, as React, Vue and Svelte set them: reading gives the text of the
- * attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `guide`) reads as a boolean.
+ * attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `guide`, `readout`, `movelist`, `scrub`) reads as a boolean.
  */
 export type KyuubuCubeElement = HTMLElement & {
   get size(): string | null;
@@ -49,6 +49,12 @@ export type KyuubuCubeElement = HTMLElement & {
   set theme(value: string | number | boolean | null | undefined);
   get guide(): boolean;
   set guide(value: boolean | string | null | undefined);
+  get readout(): boolean;
+  set readout(value: boolean | string | null | undefined);
+  get movelist(): boolean;
+  set movelist(value: boolean | string | null | undefined);
+  get scrub(): boolean;
+  set scrub(value: boolean | string | null | undefined);
   play(): void;
   pause(): void;
   step(by: 1 | -1): void;
@@ -92,6 +98,9 @@ function build(): CustomElementConstructor {
         autoplay: has("autoplay"),
         guide: has("guide"),
         controls: !this.hasAttribute("controls") || has("controls"),
+        readout: this.hasAttribute("readout") ? has("readout") : undefined,
+        moveList: this.hasAttribute("movelist") ? has("movelist") : undefined,
+        animateScrub: this.hasAttribute("scrub") ? has("scrub") : undefined,
         loop: has("loop"),
         speed: speed > 0 ? speed : undefined,
         theme: theme !== null && theme in CUBE_THEMES ? CUBE_THEMES[theme as keyof typeof CUBE_THEMES] : undefined,
@@ -120,7 +129,7 @@ function build(): CustomElementConstructor {
       return this.player?.status ?? null;
     }
   };
-  reflectAttributes(element, CUBE_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop", "guide"], onByDefault: ["controls"] });
+  reflectAttributes(element, CUBE_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop", "guide"], onByDefault: ["controls", "readout", "movelist", "scrub"] });
   return element;
 }
 

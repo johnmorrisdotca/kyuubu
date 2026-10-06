@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- A solve and nothing else, for another site's iframe. Everything it shows comes from its own address:
-     embed.html#scramble=R+U&moves=U'+R'&time=3.13&size=3&theme=paper&lang=ja&autoplay=1&loop=1&controls=0
+     embed.html#scramble=R+U&moves=U'+R'&time=3.13&size=3&theme=paper&lang=ja&autoplay=1&loop=1&controls=0&readout=0&movelist=0&scrub=0
      (the same after a ? works too). It stores nothing, tracks nothing and loads nothing from anywhere else. -->
 <html lang="en">
   <head>
@@ -42,6 +42,9 @@
           guide: on("guide", false),
           loop: on("loop", false),
           controls: on("controls", true),
+          readout: q.has("readout") ? on("readout", true) : undefined,
+          moveList: q.has("movelist") ? on("movelist", true) : undefined,
+          animateScrub: on("scrub", true),
           speed: speed > 0 ? speed : undefined,
           theme: q.get("theme") in CUBE_THEMES ? CUBE_THEMES[q.get("theme")] : undefined,
           locale: lang,

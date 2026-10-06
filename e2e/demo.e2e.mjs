@@ -15,7 +15,7 @@ test("opens with a solved 3×3 on the felt, in the family's look", async ({ page
   await expect(page.locator("h1")).toHaveText("Kyuubuキューブ");
   await expect(page.locator("footer .family a[aria-current='page']")).toHaveText("Kyuubu");
   await expect(page.locator("footer code")).toHaveText("npm install @johnmorrisdotca/kyuubu");
-  await expect(page.locator("[data-kyuubu]")).toHaveAttribute("aria-label", "A 3×3 cube");
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu]")).toHaveAttribute("aria-label", "A 3×3 cube");
   // The paper of the family's stylesheet, in light and in dark.
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(244, 239, 228)");
   await sound(page, errors);
@@ -27,7 +27,7 @@ test("every size from 2×2 to 7×7 is a tap away", async ({ page }) => {
     await tap(page, `${id("sizes")} button[data-n="${n}"]`);
     expect(await cube(page)).toBe(solvedCube(n));
     await expect(page.locator(`${id("sizes")} button[data-n="${n}"]`)).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator("[data-kyuubu] [data-slot]")).toHaveCount(6 * n * n);
+    await expect(page.locator(":is(#stage, #player) [data-kyuubu] [data-slot]")).toHaveCount(6 * n * n);
   }
   await sound(page, errors);
 });
@@ -164,7 +164,7 @@ test("the look changes by theme and by colour, without losing the cube", async (
   await page.locator(id("moves")).fill("R");
   await tap(page, id("turn"));
   const before = await cube(page);
-  const up = page.locator('[data-kyuubu] [data-face="U"] > div').first();
+  const up = page.locator(':is(#stage, #player) [data-kyuubu] [data-face="U"] > div').first();
   const rgb = (hex) => `rgb(${[1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16)).join(", ")})`;
   await expect(up).toHaveCSS("background-color", rgb(CUBE_THEMES.paper.colours.U));
   await panel(page, "look");
@@ -184,7 +184,7 @@ test("the language is chosen by a tap, remembered, and overruled by the address"
   await tap(page, '[data-lang="ja"]');
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator(id("scramble"))).toHaveText("スクランブル");
-  await expect(page.locator("[data-kyuubu]")).toHaveAttribute("aria-label", "3×3のキューブ");
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu]")).toHaveAttribute("aria-label", "3×3のキューブ");
   await expect(page.locator("#unreviewed")).toBeVisible();
   await tap(page, id("scramble"));
   await tap(page, id("next"));

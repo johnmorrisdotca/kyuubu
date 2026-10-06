@@ -83,6 +83,7 @@ open a *Fix a translation* issue with the string's name. `{n}` and the other bra
 | `guideDrag` | Take hold of the sticker with the dot, and drag it along the arrow. | 点のあるステッカーを持って、矢印に沿ってドラッグします。 |
 | `guideDragHalf` | A half turn: drag twice as far, or make two quarter turns the same way. | 半回転です。2倍の距離をドラッグするか、同じ向きに2回回します。 |
 | `guideDragSlab` | {count} layers turn together: drag each of them along the arrow. | {count}つの層を一緒に回します。それぞれを矢印に沿ってドラッグします。 |
+| `guideDragSeam` | Two layers turn together: put a finger on the line between them, at the dot, and drag along the arrow. Or drag each of them in turn. | 2つの層を一緒に回します。2つの層の間の線の上の点に指を置いて、矢印に沿ってドラッグします。1つずつドラッグしても回せます。 |
 | `guideLook` | Drag beside the cube to look round it, until you can see a side of the lit layer. | キューブの外側をドラッグして、光っている層の側面が見えるまで見る向きを変えます。 |
 | `guideWholeHow` | No drag on a sticker does this: press {key}, or choose “{button}”. | ステッカーのドラッグではできません。{key}を押すか、「{button}」を選びます。 |
 | `guideOff` | You turned {made}, not {wanted}. | {wanted}ではなく{made}を回しました。 |
@@ -92,6 +93,30 @@ open a *Fix a translation* issue with the string's name. `{n}` and the other bra
 | `guideDone` | That was the last move. | これが最後の手でした。 |
 | `guideLabel` | What to turn next | 次に回す手 |
 | `playerFollow` | Turn it yourself | 自分で回す |
+| `playerMovesLabel` | The moves | 手順 |
+| `playerScrambleLabel` | Scramble | スクランブル |
+| `playerSolutionLabel` | Solution | ソルブ |
+| `playerScrambleOf` | Scramble move {at} of {total} | スクランブル{total}手中{at}手目 |
+| `playerBeforeScramble` | The solved cube, before the scramble | スクランブル前のそろったキューブ |
+| `playerHeard` | {code}: {name}. {where}. | {code}：{name}。{where}。 |
+| `playerToken` | {code}: {name}. {where} | {code}：{name}。{where} |
+| `moveFace` | {side} face | {side}の面 |
+| `moveLayers` | {side} {count} layers | {side}の{count}層 |
+| `moveLayer` | {side} layer {depth} | {side}から{depth}層目 |
+| `moveSliceM` | Middle slice | 中の層（左右の間） |
+| `moveSliceE` | Equator slice | 中の層（上下の間） |
+| `moveSliceS` | Standing slice | 中の層（前後の間） |
+| `moveSliceWay` | {slice}, same way as {side} {amount} | {slice}、{side}の{amount}と同じ向き |
+| `moveWhole` | Whole cube on {axis} | キューブ全体を{axis}軸で |
+| `moveSays` | {what}, {amount} | {what}、{amount} |
+| `moveCw` | clockwise | 時計回り |
+| `moveCcw` | anticlockwise | 反時計回り |
+| `moveTwice` | twice | 2回 |
+| `moveCount2` | two | 2 |
+| `moveCount3` | three | 3 |
+| `moveCount4` | four | 4 |
+| `moveCount5` | five | 5 |
+| `moveCount6` | six | 6 |
 | `cliUsage` | Usage: kyuubu [options] [turns]<br><br>A turning cube from the command line: scrambles, turns, a check and a solve.<br>Turns are written in cubers' notation. Quote them, since a shell reads the ' itself.<br><br>  kyuubu                                   a scramble for the 3×3<br>  kyuubu -n 4 -c 5                         five scrambles for the 4×4<br>  kyuubu --seed "club night"               the same scramble for everyone with the seed<br>  kyuubu --apply "R U R' U'"               the cube after those turns<br>  kyuubu --verify --from "R U" "U' R'"     whether the turns solve the scramble<br>  kyuubu --solve "R U2 F' L"               the layer-by-layer solve of that scramble<br><br>What to do:<br>      --scramble        Print a scramble. This is what happens when nothing else is asked<br>      --apply           Make the turns and show the cube<br>      --verify          Say whether the turns solve the cube: exit code 0 if they do, 1 if not<br>      --solve           Show the layer-by-layer solve, step by step (2×2 and 3×3)<br><br>Options:<br>  -n, --size <n>        The cube's side, 2 to 7. 3 when left out<br>  -l, --length <n>      How many turns a scramble has. The usual length for the size when left out<br>  -c, --count <n>       How many scrambles, 1 to 100<br>  -s, --seed <seed>     The same seed gives the same scrambles, everywhere<br>      --faces           Scramble with the outer faces only: no inner layers<br>  -f, --from <turns>    The scramble the cube starts from<br>      --state <state>   The cube to start from, as its 6 × n × n letters<br>      --stdin           Read the turns from standard input<br>  -j, --json            Print JSON<br>      --lang <en\|ja>    English or Japanese<br>      --no-color        No colour<br>  -h, --help            This help<br>  -v, --version         The version<br> | 使い方: kyuubu [オプション] [回転記号]<br><br>コマンドラインで回すキューブです。スクランブル、回転、確認、解き方を扱います。<br>回転は回転記号で書きます。シェルが ' を読んでしまうので、引用符で囲んでください。<br><br>  kyuubu                                   3×3のスクランブル<br>  kyuubu -n 4 -c 5                         4×4のスクランブルを5個<br>  kyuubu --seed "club night"               同じシードなら、だれでも同じスクランブル<br>  kyuubu --apply "R U R' U'"               その回転のあとのキューブ<br>  kyuubu --verify --from "R U" "U' R'"     その回転でスクランブルがそろうかどうか<br>  kyuubu --solve "R U2 F' L"               そのスクランブルを一段ずつそろえる手順<br><br>すること:<br>      --scramble        スクランブルを表示します（何も指定しないときの動作）<br>      --apply           回転を行い、キューブを表示します<br>      --verify          回転でキューブがそろうかを答えます。そろえば終了コード0、そろわなければ1<br>      --solve           一段ずつそろえる手順を表示します（2×2と3×3）<br><br>オプション:<br>  -n, --size <n>        キューブの大きさ（2〜7）。省略時は3<br>  -l, --length <n>      スクランブルの手数。省略時はその大きさの標準の手数<br>  -c, --count <n>       スクランブルの個数（1〜100）<br>  -s, --seed <seed>     同じシードなら、どこでも同じスクランブル<br>      --faces           外側の面だけでスクランブルします（内側の層は回しません）<br>  -f, --from <回転>     はじめのスクランブル<br>      --state <状態>    はじめのキューブの状態（6 × n × n 文字）<br>      --stdin           回転を標準入力から読みます<br>  -j, --json            JSONで表示します<br>      --lang <en\|ja>    英語または日本語<br>      --no-color        色を付けません<br>  -h, --help            このヘルプ<br>  -v, --version         バージョン<br> |
 | `cliBadOption` | unknown option {option} | 不明なオプションです: {option} |
 | `cliNeedsValue` | {option} needs a value | {option} には値が必要です |

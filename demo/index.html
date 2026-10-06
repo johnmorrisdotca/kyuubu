@@ -29,6 +29,7 @@
             <button class="fam-button" id="reset" type="button" data-say="reset" data-testid="reset"></button>
             <button class="fam-button" id="look" type="button" data-say="frontOn" data-testid="front-on"></button>
           </div>
+          <button class="fam-button" id="animate-scramble" type="button" aria-pressed="true" data-say="animateScramble" data-testid="animate-scramble"></button>
         </div>
 
         <div class="fam-panels cube-panels">
@@ -127,9 +128,15 @@
         <h2 id="more-title" data-say="moreTitle"></h2>
         <p data-say="moreText"></p>
         <pre><code>npm install @johnmorrisdotca/kyuubu</code></pre>
-        <pre><code>import { CubeView } from "@johnmorrisdotca/kyuubu";
-
-new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });</code></pre>
+        <div class="cube-example">
+          <div class="cube-example-code">
+            <pre><code id="example-code" data-testid="example-code"></code></pre>
+            <div class="fam-actions"><button class="fam-button" id="example-copy" type="button" data-say="copy" data-testid="example-copy"></button></div>
+            <p class="fam-fine" id="example-copied" aria-live="polite" data-testid="example-copied"></p>
+          </div>
+          <div class="cube-example-preview" id="example-preview" data-testid="example-preview"></div>
+        </div>
+        <p class="fam-fine" data-say="exampleLook"></p>
       </section>
       <!-- family:footer -->
     </main>
