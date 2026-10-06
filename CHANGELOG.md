@@ -23,6 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- **Back turns the move the other way.** A step back (the Back button, the left arrow) showed the previous cube at once, where Forward turned the move. It turns the move undone now, as long and as eased as Forward, and the move code and the list follow. `Replay.step(-1)` does it, and `Replay.walk(-1)` goes on into the scramble from the scrambled cube.
 - The plastic across a turning gap was a 300 pixel box laid out wherever it was made, and a small cube near the right edge of a page made the page scroll sideways for as long as it turned. It is kept at no size until it is drawn.
 - The API reference page wraps a long entry path instead of running about 2 px wider than a 360 px screen. Nothing the package exports has changed.
 

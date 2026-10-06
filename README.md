@@ -683,7 +683,7 @@ the scrambled cube the solve starts from.
   (or up and down) go a move back or on, <kbd>Home</kbd> to the solution's
   first move and <kbd>End</kbd> to its last, and the focus goes with them. The
   same keys work from any button of the player. Back past the first move is the
-  scrambled cube, and on into the scramble: a replay stepped back into it plays
+  scrambled cube, and on into the scramble (`walk(-1)`; each step back is the move turned the other way, as long and as eased as a step on): a replay stepped back into it plays
   the rest of the scramble quickly (`REPLAY_SCRAMBLE_STEP_MS`) and then the
   solve.
 - **A screen reader** hears each move once, in a polite live region: "R':
@@ -702,7 +702,8 @@ the scrambled cube the solve starts from.
   standard form (`Rw'`, `2R`, `M2`, `y`), and `null` for anything else.
 
 ```ts
-import { mountPlayer, moveName } from "@johnmorrisdotca/kyuubu";
+import { moveName } from "@johnmorrisdotca/kyuubu";
+import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
 
 moveName("R'");  // "Right face, anticlockwise"
 moveName("Rw");  // "Right two layers, clockwise"
@@ -1149,7 +1150,7 @@ Types: `SolveRecord` (`{ size, scramble, moves, ms?, at?, seed? }`),
 | `solveText`, `countSolveMoves` | `(steps) => string`, `(steps) => number` | The steps in standard form; how many count as moves |
 | `readSolveLink` | `(text) => SolveLink \| null` | The scramble and solve in a link to alg.cubing.net |
 | `planReplay` | `(source) => { ok, plan } \| { ok, fault }` | A solve read, checked and timed |
-| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `seek(n, { animate? })`, `seekScramble(n)`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
+| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `walk`, `seek(n, { animate? })`, `seekScramble(n)`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
 | `scrubPath` | `(steps, from, to, shown?) => ScrubPath` | The turns that take the cube from one position to another: each step going on, each undone going back, a long jump catching up at once |
 | `REPLAY_SPEEDS`, `REPLAY_STEP_MS`, `REPLAY_LOOP_REST_MS`, `MAX_REPLAY_STEPS` | | The speeds offered, the steady pace, the rest before a repeat, the longest solve |
 | `REPLAY_SCRUB_TURNS`, `REPLAY_SCRUB_MS`, `REPLAY_SCRAMBLE_STEP_MS` | `6`, `70`, `200` | How many turns a slider shows, how long each takes, how long each step of the scramble takes when a replay walks through it |

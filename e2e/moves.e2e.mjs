@@ -299,3 +299,113 @@ test("the element and the embed can leave the readout, the list and the scrub ou
   });
   expect(result).toEqual({ plain: [true, true], bare: [false, false], off: [false, false], asked: [true, false], defaults: [true, true, true, false, false] });
 });
+
+test.describe("Back turns the move the other way, as Forward turns it", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  /**
+   * Watch the layer that turns for the next 700 ms, frame by frame: the distinct places the page drew it in (as many as
+   * the machine had frames for, never fewer than the start and the end of a turn), and how long the cube said it was turning. The press is made inside the same task, so no frame is missed.
+   */
+  const press = (page, selector, key) =>
+    page.evaluate(
+      ([target, keyName]) =>
+        new Promise((resolve) => {
+          const cube = document.querySelector("[data-kyuubu-player] [data-kyuubu]");
+          const turning = cube.firstElementChild.children[1];
+          const seen = new Set();
+          let lifted = 0;
+          let began = null;
+          let ended = null;
+          new MutationObserver(() => {
+            if (cube.dataset.turning === "true" && began === null) began = performance.now();
+            if (cube.dataset.turning === "false" && began !== null && ended === null) ended = performance.now();
+          }).observe(cube, { attributes: true, attributeFilter: ["data-turning"] });
+          const started = performance.now();
+          const tick = () => {
+            // Every sticker of the turning layer that faces the eye, as drawn this frame: one that faces away is left as it was.
+            const faces = [...turning.querySelectorAll("[data-slot]")].filter((one) => one.style.visibility !== "hidden");
+            lifted = Math.max(lifted, turning.querySelectorAll("[data-slot]").length);
+            if (faces.length > 0) seen.add(faces.map((one) => one.style.transform).join("|"));
+            if (performance.now() - started < 700) requestAnimationFrame(tick);
+            else resolve({ lifted, transforms: seen.size, ms: began === null || ended === null ? null : ended - began, began: began !== null });
+          };
+          if (keyName === null) document.querySelector(target).click();
+          else {
+            const element = document.querySelector(target);
+            element.focus();
+            element.dispatchEvent(new KeyboardEvent("keydown", { key: keyName, bubbles: true, cancelable: true }));
+          }
+          requestAnimationFrame(tick);
+        }),
+      [selector, key],
+    );
+
+  /** A layer was lifted off the cube and turned, as for any turn: a jump never lifts one. Where frames come fast it was drawn in many places. */
+  const expectTurned = (seen) => {
+    expect(seen.began).toBe(true);
+    expect(seen.lifted).toBeGreaterThanOrEqual(9);
+    expect(seen.transforms).toBeGreaterThanOrEqual(1);
+    if (test.info().project.name.startsWith("chromium")) expect(seen.transforms).toBeGreaterThan(3);
+  };
+
+  test("pressing Back turns the move undone, layer by layer, and ends on the cube before it", async ({ page }) => {
+    await open(page);
+    await token(page, S + 5).click();
+    await still(page);
+    expect(await stateOf(page)).toBe(plan.states[6]);
+    const back = await press(page, '[data-act="back"]', null);
+    // Seen turning, in many drawn positions, and over when it is: not a jump.
+    expect(back.began).toBe(true);
+    expectTurned(back);
+    await still(page);
+    await expect(player(page)).toHaveAttribute("data-position", "5");
+    expect(await stateOf(page)).toBe(plan.states[5]);
+    // The move code and the list follow.
+    await expect(code(page)).toHaveText(plan.steps[4].text);
+    await expect(current(page)).toHaveAttribute("data-index", String(S + 4));
+    await expect(page.locator(".kyuubu-player-at")).toHaveText(`Move 5 of ${T}`);
+  });
+
+  test("pressing Forward still turns it, and takes as long as Back does", async ({ page }) => {
+    await open(page);
+    await token(page, S + 5).click();
+    await still(page);
+    const back = await press(page, '[data-act="back"]', null);
+    await still(page);
+    const forward = await press(page, '[data-act="on"]', null);
+    expect(forward.began).toBe(true);
+    expectTurned(forward);
+    await still(page);
+    expect(await stateOf(page)).toBe(plan.states[6]);
+    await expect(code(page)).toHaveText(plan.steps[5].text);
+    // The same speed: the same length, give or take the frames a busy machine drops (the unit test holds them to the same call).
+    expect(Math.abs(back.ms - forward.ms)).toBeLessThan(250);
+  });
+
+  test("the left arrow does what Back does, from a move of the list", async ({ page }) => {
+    await open(page);
+    await token(page, S + 7).click();
+    await still(page);
+    const left = await press(page, `[data-kyuubu-moves] button[data-index="${S + 7}"]`, "ArrowLeft");
+    expect(left.began).toBe(true);
+    expectTurned(left);
+    await still(page);
+    await expect(player(page)).toHaveAttribute("data-position", "7");
+    expect(await stateOf(page)).toBe(plan.states[7]);
+    await expect(token(page, S + 6)).toBeFocused();
+  });
+
+  test("back into the scramble turns its moves undone too", async ({ page }) => {
+    await open(page);
+    const back = await press(page, '[data-act="back"]', null);
+    // At the scrambled cube the button stays where it is, as ever.
+    expect(back.began).toBe(false);
+    await token(page, S - 2).click();
+    await still(page);
+    const left = await press(page, `[data-kyuubu-moves] button[data-index="${S - 2}"]`, "ArrowLeft");
+    expect(left.began).toBe(true);
+    await still(page);
+    expect(await stateOf(page)).toBe(plan.scrambleStates[S - 2]);
+  });
+});

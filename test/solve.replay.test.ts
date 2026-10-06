@@ -233,7 +233,8 @@ describe("a replay", () => {
     expect(asked.at(-1)).toBe("turn:1:own");
     replay.step(-1);
     expect(replay.status.position).toBe(2);
-    expect(asked.at(-1)).toBe(`set:${plan.states[2].slice(0, 9)}`);
+    // A step back is turned the other way, as a step on is turned: the cube is shown where it was, and the move undone.
+    expect(asked.slice(-2)).toEqual([`set:${plan.states[3].slice(0, 9)}`, "turn:1:own"]);
     replay.seek(99);
     expect(replay.status).toMatchObject({ position: 4, ended: true });
     replay.seek(-3);
@@ -427,7 +428,7 @@ describe("going back into the scramble", () => {
     replay.step(-1);
     replay.step(-1);
     expect(replay.status.scrambleAt).toBe(1);
-    expect(asked.at(-1)).toBe(`set:${plan.scrambleStates[1].slice(0, 9)}`);
+    expect(asked.slice(-2)).toEqual([`set:${plan.scrambleStates[2].slice(0, 9)}`, "turn:1:own"]);
     replay.seekScramble(4);
     expect(replay.status).toMatchObject({ scrambleAt: 4, position: 0 });
     // At the scrambled cube a step back stays there, as ever.
@@ -462,5 +463,99 @@ describe("going back into the scramble", () => {
     expect(asked.at(-1)).toBe(`set:${plan.scrambleStates[2].slice(0, 9)}`);
     wind(5000);
     expect(replay.status.scrambleAt).toBe(2);
+  });
+});
+
+describe("a step back is the move turned the other way", () => {
+  /** A cube that does what it is told, on the model, so that what it shows can be read. */
+  const model = (n: number) => {
+    let state = solvedCube(n);
+    const turned: CubeMove[][] = [];
+    const cube: ReplayCube = {
+      setState: (next) => void (state = next),
+      turnTogether: (moves) => {
+        turned.push([...moves]);
+        state = turnAll(state, n, moves);
+      },
+    };
+    return { cube, turned, get state() { return state; } };
+  };
+  const planned = planReplay({ scramble: "F R U R' U' F' x", solution: "x' Rw U Rw' U' F R U R' U' F'", timeMs: 3000 });
+  if (!planned.ok) throw new Error("the plan should read");
+  const plan = planned.plan;
+
+  it("turns the inverse of the step it takes back, and ends on the cube before it, from every position", () => {
+    for (let at = 1; at <= plan.steps.length; at += 1) {
+      const shown = model(3);
+      const replay = new Replay(shown.cube, plan, { clock: rig().clock });
+      replay.seek(at);
+      shown.cube.setState(plan.states[at]);
+      shown.turned.length = 0;
+      replay.step(-1);
+      expect(replay.status.position, `from ${at}`).toBe(at - 1);
+      expect(shown.turned, `from ${at}`).toHaveLength(1);
+      // Exactly what turning the step does, the other way: the same layers, each turned as far the other way.
+      expect(shown.turned[0].map((move) => ({ ...move, turns: 4 - move.turns })), `from ${at}`).toEqual(plan.steps[at - 1].moves);
+      expect(shown.state, `from ${at}`).toBe(plan.states[at - 1]);
+    }
+  });
+
+  it("is the same move and the same length of turn as stepping on, so it looks as Forward does", () => {
+    const shown = model(3);
+    const replay = new Replay(shown.cube, plan, { clock: rig().clock });
+    replay.step(1);
+    replay.step(1);
+    expect(shown.state).toBe(plan.states[2]);
+    replay.step(-1);
+    replay.step(-1);
+    expect(shown.state).toBe(plan.states[0]);
+    expect(shown.turned).toHaveLength(4);
+    // Back at the first step stays there, and shows it.
+    replay.step(-1);
+    expect(shown.turned).toHaveLength(4);
+    expect(shown.state).toBe(plan.states[0]);
+  });
+
+  it("does the same in the scramble, a step at a time", () => {
+    const shown = model(3);
+    const replay = new Replay(shown.cube, plan, { clock: rig().clock });
+    replay.seekScramble(4);
+    shown.turned.length = 0;
+    replay.step(-1);
+    expect(shown.turned).toHaveLength(1);
+    expect(shown.state).toBe(plan.scrambleStates[3]);
+    replay.step(1);
+    expect(shown.state).toBe(plan.scrambleStates[4]);
+  });
+});
+
+describe("walking the scramble and the solve as one", () => {
+  const planned = planReplay({ scramble: "R U R' U'", solution: "U R U' R'", timeMs: 2000 });
+  if (!planned.ok) throw new Error("the plan should read");
+  const plan = planned.plan;
+
+  it("turns a step back from the scrambled cube into the scramble, and on, and back again", () => {
+    const { asked, cube, clock } = rig();
+    const replay = new Replay(cube, plan, { clock });
+    asked.length = 0;
+    replay.walk(-1);
+    expect(replay.status).toMatchObject({ scrambleAt: 3, position: 0 });
+    expect(asked).toEqual([`set:${plan.scrambleStates[4].slice(0, 9)}`, "turn:1:own"]);
+    replay.walk(-1);
+    expect(replay.status.scrambleAt).toBe(2);
+    replay.walk(1);
+    replay.walk(1);
+    expect(replay.status).toMatchObject({ scrambleAt: 4, position: 0 });
+    replay.walk(1);
+    expect(replay.status.position).toBe(1);
+    replay.walk(-1);
+    expect(replay.status).toMatchObject({ scrambleAt: 4, position: 0 });
+  });
+
+  it("goes no further back than the solved cube", () => {
+    const { cube, clock } = rig();
+    const replay = new Replay(cube, plan, { clock });
+    for (let at = 0; at < 9; at += 1) replay.walk(-1);
+    expect(replay.status).toMatchObject({ scrambleAt: 0, position: 0 });
   });
 });

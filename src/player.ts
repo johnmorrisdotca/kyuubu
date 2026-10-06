@@ -313,8 +313,8 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     const to = Math.max(0, Math.min(total, state));
     const now = stateNow();
     if (to === now) return;
-    if (to === now + 1) replay.step(1);
-    else if (to === now - 1 && now > scramble) replay.step(-1);
+    if (to === now + 1) replay.walk(1);
+    else if (to === now - 1) replay.walk(-1);
     else if (to >= scramble) replay.seek(to - scramble, { animate: animateScrub });
     else replay.seekScramble(to);
   };

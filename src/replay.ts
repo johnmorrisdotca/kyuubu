@@ -319,9 +319,11 @@ export class Replay {
   }
 
   /**
-   * One step on, or one back, and stop there. A step on is turned; a step back
-   * is shown at once. At the scrambled cube a step back stays there (`seekScramble`
-   * goes into the scramble); once gone back into the scramble, steps walk it.
+   * One step on, or one back, and stop there. A step on is turned, and a step
+   * back is turned the other way, each as long as the other: the cube shows
+   * the move being made and taken back, never a jump. At the scrambled cube a
+   * step back stays there (`seekScramble` goes into the scramble); once gone
+   * back into the scramble, steps walk it.
    */
   step(by: 1 | -1): void {
     this.running = false;
@@ -330,23 +332,44 @@ export class Replay {
     const scramble = this.plan.scramble.length;
     if (this.scrambleAt < scramble) {
       const to = Math.max(0, Math.min(scramble, this.scrambleAt + by));
-      if (by === 1 && to !== this.scrambleAt) {
+      if (to !== this.scrambleAt) {
+        const made = by === 1 ? this.plan.scramble[this.scrambleAt] : this.plan.scramble[to];
         this.cube.setState(this.plan.scrambleStates[this.scrambleAt], this.plan.size);
-        this.cube.turnTogether(this.plan.scramble[this.scrambleAt].moves);
+        this.cube.turnTogether(by === 1 ? made.moves : made.moves.map(undoOf));
       } else this.cube.setState(this.plan.scrambleStates[to], this.plan.size);
       this.scrambleAt = to;
       this.tell();
       return;
     }
     const to = Math.max(0, Math.min(this.plan.steps.length, this.at + by));
-    if (by === 1 && to !== this.at) {
+    if (to !== this.at) {
+      const made = by === 1 ? this.plan.steps[this.at] : this.plan.steps[to];
       this.cube.setState(this.plan.states[this.at], this.plan.size);
-      this.cube.turnTogether(this.plan.steps[this.at].moves);
+      this.cube.turnTogether(by === 1 ? made.moves : made.moves.map(undoOf));
     } else {
       this.cube.setState(this.plan.states[to], this.plan.size);
     }
     this.at = to;
     this.tell();
+  }
+
+  /**
+   * One move on or back along the scramble and the solve together, turned: `step`, except that a step back from
+   * the scrambled cube turns the scramble's last move undone, so that Back can go on into the scramble.
+   */
+  walk(by: 1 | -1): void {
+    const scramble = this.plan.scramble.length;
+    if (by === -1 && scramble > 0 && this.scrambleAt >= scramble && this.at === 0) {
+      this.running = false;
+      this.stop();
+      this.scrubbed = 0;
+      this.scrambleAt = scramble - 1;
+      this.cube.setState(this.plan.scrambleStates[scramble], this.plan.size);
+      this.cube.turnTogether(this.plan.scramble[scramble - 1].moves.map(undoOf));
+      this.tell();
+      return;
+    }
+    this.step(by);
   }
 
   /**
