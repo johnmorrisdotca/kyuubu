@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "Turning cube for the browser: a 3D twisty-puzzle cube from 2×2 to 7×7 in plain CSS 3D. Drag, touch, keys or notation; replay world record solves; scrambles, a solve guide, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "cube",

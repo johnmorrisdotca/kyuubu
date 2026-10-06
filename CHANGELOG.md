@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-06
+
+The player says which move it is and lists them, the slider and Back turn the cube the way they go, a drag on the seam turns two layers, and a scramble is shown turning. A minor release: nothing that was exported has changed or gone; every addition is on unless said otherwise, and each can be turned off.
+
 ### Added
 
 - **The player says which move it is.** Beside "Move 12 of 33" the move just made is shown in large type (`R'`, `Rw`, `x2`, `3Uw'`, `M`) with what it turns in a few plain words, in English and Japanese: "Right face, anticlockwise", "Right two layers, clockwise", "Whole cube on x, twice", "Middle slice, same way as Left clockwise". `moveName(code, language?)` is the words alone, for any move in standard form: faces, wide turns, inner layers of a big cube, the slices M, E and S, the rotations x, y and z, primes and doubles; null for anything else.
