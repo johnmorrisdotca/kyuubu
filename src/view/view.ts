@@ -209,6 +209,16 @@ export class CubeView {
   private sized = { width: "", height: "", maxWidth: "", aspectRatio: "" };
   private sizedByScale = false;
   private readonly resize: ResizeObserver | null;
+  /**
+   * The side of the box the cube is drawn in, measured when the box changes size and not in every frame of a turn: reading
+   * it asks the page to work out its styles and layout there and then, in the middle of the frame, which on a big cube
+   * on a phone is the longest thing a frame does.
+   */
+  private side = 0;
+  /** Whether a sticker is marked as the one a hint says to take hold of, so a draw with no hint has nothing to take the mark off. */
+  private grabbed = false;
+  /** Whether every sticker has been given its colour once, after which `paint` writes only the ones that changed (a new theme resets it). */
+  private coloured = false;
   private readonly cleanups: (() => void)[] = [];
 
   constructor(host: HTMLElement, options: CubeViewOptions) {
@@ -254,10 +264,17 @@ export class CubeView {
     Object.assign(this.pivot.style, { left: "50%", top: "50%" });
     host.append(this.root);
     this.setScale(options.scale, options.width);
+    this.measureSide();
 
     this.build();
     this.look();
-    this.resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => this.look());
+    this.resize =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(() => {
+            this.measureSide();
+            this.look();
+          });
     this.resize?.observe(host);
     // Safari on a phone can let go of the 3D layers of a cube that is out of sight, and then draws it flat when
     // it comes back: one face of it, and nothing behind. Taking the cube out of the page and putting it straight
@@ -293,6 +310,8 @@ export class CubeView {
     const colours = Object.fromEntries(Object.entries(theme.colours ?? {}).filter(([, value]) => value !== undefined));
     this.theme = { ...this.theme, ...defined, colours: { ...this.theme.colours, ...colours } };
     this.dress();
+    // `dress` put the plastic on every sticker, so every one is coloured again.
+    this.coloured = false;
     this.paint();
   }
 
@@ -381,7 +400,14 @@ export class CubeView {
       if (this.host.ownerDocument.defaultView?.getComputedStyle(this.host).position === "static") box.position = "relative";
     }
     this.root.style.cursor = this.options.interactive ? "grab" : "default";
+    this.measureSide();
     if (this.stickers.length > 0) this.look();
+  }
+
+  /** The box's smaller side as it is now, or a size to draw at where it has none yet (a box that is hidden). */
+  private measureSide(): void {
+    const fallback = EDGE * 1.8;
+    this.side = Math.min(this.host.clientWidth || fallback, this.host.clientHeight || this.host.clientWidth || fallback);
   }
 
   /** Whether a person can turn it now. */
@@ -609,10 +635,14 @@ export class CubeView {
     this.hintNow = hint;
     if (moves === null) delete this.root.dataset.hint;
     else this.root.dataset.hint = whole ? "whole" : hint?.face === null || hint === null ? "look" : "drag";
-    for (const sticker of this.stickers) {
-      const grab = hint?.grab === Number(sticker.dataset.slot);
-      if (grab && sticker.dataset.hintGrab === undefined) sticker.dataset.hintGrab = "";
-      else if (!grab && sticker.dataset.hintGrab !== undefined) delete sticker.dataset.hintGrab;
+    // With no hint and no mark left to take off there is nothing to do: not a pass over every sticker of a 7×7 in every frame.
+    if (hint !== null || this.grabbed) {
+      for (const sticker of this.stickers) {
+        const grab = hint?.grab === Number(sticker.dataset.slot);
+        if (grab && sticker.dataset.hintGrab === undefined) sticker.dataset.hintGrab = "";
+        else if (!grab && sticker.dataset.hintGrab !== undefined) delete sticker.dataset.hintGrab;
+      }
+      this.grabbed = hint?.grab !== undefined && hint.grab !== null;
     }
     const arrow = hint?.arrow ?? null;
     if (arrow === null || hint === null || this.spin !== null) {
@@ -731,9 +761,12 @@ export class CubeView {
   private paint(): void {
     this.stickers.forEach((sticker, at) => {
       const letter = this.shown[at];
+      // Only a sticker that changed colour is written: a quarter turn of a 7×7 moves 77 of its 294.
+      if (sticker.dataset.face === letter && this.coloured) return;
       (sticker.firstChild as HTMLDivElement).style.background = this.colourOf(letter);
       sticker.dataset.face = letter;
     });
+    this.coloured = true;
     this.root.dataset.state = this.shown;
   }
 
@@ -756,7 +789,7 @@ export class CubeView {
    * is redrawn when `turningOnly`, as each frame of a turn is.
    */
   private draw(turningOnly = false): void {
-    const side = Math.min(this.host.clientWidth || EDGE * 1.8, this.host.clientHeight || this.host.clientWidth || EDGE * 1.8);
+    const side = this.side;
     const scale = (side * this.options.fill) / (EDGE * Math.sqrt(3));
     const lens = Math.round(side * 3.2);
     const view = this.view();
@@ -852,8 +885,7 @@ export class CubeView {
 
   /** The pixels a pointer goes to drag a layer a quarter turn: seven tenths of the cube's edge as it is drawn. */
   private quarterPx(): number {
-    const side = Math.min(this.host.clientWidth || EDGE * 1.8, this.host.clientHeight || this.host.clientWidth || EDGE * 1.8);
-    return ((side * this.options.fill) / Math.sqrt(3)) * 0.7;
+    return ((this.side * this.options.fill) / Math.sqrt(3)) * 0.7;
   }
 
   private commitAngle(): number {

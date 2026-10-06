@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-05
+
+The 6×6 and 7×7 are held and drawn faster. No turn, notation, scramble, state or saved solve changes (the same moves make the same cube),
+and nothing that was exported changes.
+
+### Added
+
+- **`test/big-cubes.test.ts`** holds the 6×6 and 7×7: every turn they have is written and read back layer by layer, the layers are named
+  by depth (`3R`, a 7×7's middle layer `M`, a 6×6 with none), a digit and a face letter reach every layer at the keyboard, a competition's
+  scramble (80 and 100 turns, from a seed, never solved, inner layers in it) is taken back to solved, a cube turned whole in the hand
+  after it is still solved, and a wide turn (`Rw`, `3Uw'`, `4Fw2`) is the layers it names, turned together.
+- **`e2e/big.e2e.mjs`**: with Chromium's processor slowed fourfold, six animated turns of a 3×3, a 6×6 and a 7×7 and the longest task the
+  page runs, which has to stay under a hitch a person would see (120 ms, where a 7×7 measures 21).
+
+### Changed
+
+- **A big cube costs less in every frame.** The size of the box the cube is drawn in is measured when the box changes size, not in every
+  frame of a turn (reading it made the page work out its styles and layout in the middle of the frame); a draw with no hint walks no
+  stickers; and the colours are written to the stickers that changed colour, not to all 294 after every turn. Six turns of a 7×7 took
+  145 ms of script in the page and 84 ms of style work with the processor slowed fourfold, and take 117 and 67 now.
+- README's Limits says what the 7×7 costs on a phone's processor, and where it is held.
+
 ## [1.7.0] - 2026-10-01
 
 ### Added

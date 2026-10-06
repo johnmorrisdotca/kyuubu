@@ -915,7 +915,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.7.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.8.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -941,7 +941,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.7.0",
+  "generator": "kyuubu 1.8.0",
   "solves": [
     {
       "size": 3,
@@ -1261,6 +1261,12 @@ property colours which face) are exported.
 
 The model turns a cube of any size from 2 up, and the view draws one; past
 7×7 nothing is tested, and a saved solve is refused.
+
+**The biggest cubes on a phone's processor.** A 7×7 is 294 stickers, each given its place on the screen in every frame of a turn.
+Measured in Chromium with the processor slowed fourfold (about a phone), the longest single task over six turns of a 7×7 is 21
+milliseconds (the 3×3, 9), and the longest of a dragged layer 19. The longest are at the start and the end of a turn, where the
+layer's stickers are lifted out of the cube and put back; the frames between are a few milliseconds each. `e2e/big.e2e.mjs`
+fails a change that makes a turn cost several times that.
 
 ## Browser support
 
