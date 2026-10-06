@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Turning cube for the browser: a 3D twisty-puzzle cube from 2×2 to 7×7 in plain CSS 3D. Drag, touch, keys or notation; replay world record solves; scrambles, a solve guide, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "cube",
@@ -181,7 +181,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "site": "pnpm build && node scripts/site.mjs",
-    "pictures": "pnpm site && node scripts/readme-pictures.mjs",
     "demo": "pnpm site",
     "test:site": "pnpm site && playwright test",
     "test:cli": "pnpm build && node scripts/check-cli.mjs",
@@ -190,7 +189,9 @@
     "test:frameworks": "pnpm build && node scripts/check-frameworks.mjs",
     "docs:make": "node scripts/docs.mjs",
     "prepublishOnly": "pnpm check",
-    "solve:check": "pnpm build && node scripts/solve-check.mjs"
+    "solve:check": "pnpm build && node scripts/solve-check.mjs",
+    "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",
+    "test:readme": "pnpm build && node scripts/check-readme-examples.mjs"
   },
   "peerDependencies": {
     "react": ">=18"

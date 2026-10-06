@@ -11,12 +11,26 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a> · <a href="https://johnmorrisdotca.github.io/kyuubu/builder.html">Build a cube</a></p>
 
-<p align="center">
-  <img src="docs/desktop.jpg" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links, five cloth patches and the Help switch: the Solve tab names the White cross step with its turn and lists the steps already taken" width="720">
-  <img src="docs/phone.jpg" alt="The same cube on a phone in dark mode, in Japanese: the timer and move count above it, the 2×2 to 7×7 sizes and the scramble and undo buttons under it" width="220">
-</p>
+<table align="center">
+<tr>
+<td align="center" valign="top">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-desk-light.webp" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links, cloth swatches and Help switch: the Solve tab naming the White cross step with its reason, the timer and the move count above the cube, and the 2×2 to 7×7 sizes and the scramble and undo buttons under it." width="720">
+</picture>
+<br><em>A scrambled 3×3, three steps into its solve, on a desk.</em>
+</td>
+<td align="center" valign="top">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-phone-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-phone-light.webp" alt="The same cube on a phone, in Japanese: the timer and move count above it, the 2×2 to 7×7 sizes under it, the scramble, undo, reset and face-front buttons, and the tabs for the solve, the notation and the colours." width="220">
+</picture>
+<br><em>The cube on a phone, in Japanese, in the device's light or dark.</em>
+</td>
+</tr>
+</table>
 
 A 3D cube simulator, a cube model, a scramble generator and a beginner's
 solver for the twisty puzzle everybody knows, from the 2×2 to the 7×7.
@@ -45,7 +59,7 @@ cubeSolved(turnAll(cube, 3, steps.flatMap((step) => step.moves)), 3);   // true
 
 On a page, one line draws a cube a person can turn:
 
-```ts
+```ts no-check
 import { CubeView } from "@johnmorrisdotca/kyuubu";
 
 new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });
@@ -76,7 +90,129 @@ Or with nothing to install, [turn a cube in the demo](https://johnmorrisdotca.gi
 "Rubik's Cube" is a trademark of its owner. Kyuubu is not affiliated with or
 endorsed by them; it is a turning cube of its own, worked out from geometry.
 
+## Features
+
+- **Any size, one model.** The 2×2 up to the 7×7 run on the same few lines of
+  geometry. There are no hand-written tables of face cycles.
+- **Real 3D in plain CSS.** Every sticker is an element given its whole
+  place on the screen in one `matrix3d`, worked out by the cube itself, with
+  nothing nested in 3D, so no browser can draw it flat. While a layer turns,
+  the inside of the cube shows as plastic, never as a hole.
+- **Every way of turning it.** Drag a sticker; roll the wheel over one; use a
+  finger; press the keys cubers write with; or hand it notation from code.
+- **The layer follows your hand.** A dragged layer turns with the pointer,
+  forwards and back, and is a move only once it is let go past a point of no
+  return. Start a turn, think better of it, and take it back.
+- **A plain model under the view.** A cube is a string of `6 × n × n` letters
+  and a turn is a pure function, so a cube is easy to store, send, snapshot
+  in a test, or check again on a server.
+- **Notation in and out.** It reads and writes `R U R' U'`, `2R2`, `M'`, `x`
+  and the rest.
+- **Scrambles from a seed.** The same seed gives the same scramble in every
+  browser and on every server, so a club can race one scramble.
+- **A solve you can follow.** The beginner's layer-by-layer method for any
+  2×2 or 3×3: each step with its name, what it is for, its turns and the
+  algorithms it uses.
+- **Shown on the cube.** The next move of a solve, or of any moves, marked on
+  the cube itself: the layer lit, an arrow the way to drag it, the move in
+  notation and in plain words. It waits for your hand, moves on when you
+  make the move, and says so, with a way back, when you make another.
+- **Replay a record.** A scramble and its solve played on the cube at the
+  pace it was made, with play, pause, step, speed and repeat; famous record
+  solves included, each checked to end solved; and any solve pasted in, as
+  it is written or as a link.
+- **Embed it anywhere.** One `<kyuubu-cube>` tag, or an iframe for a site
+  that allows no scripts.
+- **Export and import.** A solve, scramble and moves together, as JSON that
+  reads back in, as a few lines of plain text, or as CSV for a spreadsheet.
+- **Themes.** Every colour is an option and a CSS custom property, with
+  three looks included and a call to change them on a cube already drawn.
+- **A command line.** `kyuubu --seed table` in a terminal on Linux, macOS or
+  Windows: scrambles, turns, a check and a solve, as text or JSON.
+- **Cuboids.** The Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3 and any
+  `a × b × c` from 1 to 7: turned by drag with the rule that a layer turns a
+  quarter only where its slice is square, written in the same notation, and
+  scrambled to a state chosen fairly. [Its own section](#cuboids).
+- **English and Japanese**, for everything the package says to a person.
+- **Accessible.** The cube is a labelled `application`, takes the keyboard,
+  and every turn can be made without a pointer.
+
+### What's in it
+
+Each picture is a page of [the demo](https://johnmorrisdotca.github.io/kyuubu/), taken with `pnpm screenshots:readme`, in light and dark. `Math.random` is a seeded generator in the page, so every scramble is the same and the same pictures come again.
+
+<table>
+<tr>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/the-cube-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/the-cube-desk-light.webp" alt="A scrambled 3×3 cube drawn in CSS 3D on green felt, seen at a corner with the top, front and right faces showing, each sticker a rounded square of red, orange, yellow, green, blue or white." width="300">
+</picture>
+<br><em><strong>The cube</strong>: drawn in plain CSS 3D, no canvas and no WebGL.</em>
+</td>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cubes-of-every-size-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cubes-of-every-size-desk-light.webp" alt="The page of cubes of every size: a 2×2 to a 7×7 drawn one after another, and the same cube drawn large, medium and small for a list, with the tag that puts it on a page." width="400">
+</picture>
+<br><em><strong>Every size</strong>, from the 2×2 to the 7×7, large, medium or small.</em>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/builder-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/builder-desk-light.webp" alt="The builder page: a live cube on the left and on the right a form with every option, such as size, scale, theme, turn speed and keys, above the code in ES module, React, Vue, Svelte and Angular that makes exactly that cube." width="300">
+</picture>
+<br><em><strong>The builder</strong>: every option, the cube and the code that makes it.</em>
+</td>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/famous-solves-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/famous-solves-desk-light.webp" alt="The famous solves page: a player that turns a cube through a record solve with its scramble and moves listed, scrub bar, speed buttons and a list of the moves as buttons, and the form to paste a solve of your own." width="400">
+</picture>
+<br><em><strong>Famous solves</strong>: replay a record, or paste a solve of your own.</em>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cuboid-domino-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cuboid-domino-desk-light.webp" alt="The cuboids page: a scrambled 2×3×3 Domino drawn like the cube, a row of shapes to choose from and the scramble, undo and reset buttons." width="400">
+</picture>
+<br><em><strong>Cuboids</strong>: a Domino, and shapes from 1×1×2 to 7×7×7.</em>
+</td>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cuboid-pillar-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/cuboid-pillar-desk-light.webp" alt="The cuboids page with a scrambled 3×4×3 pillar, taller than it is wide, on the green felt with the same buttons and the shapes to choose from." width="400">
+</picture>
+<br><em><strong>A pillar</strong>: any box, scrambled and turned by hand.</em>
+</td>
+</tr>
+</table>
+
 ## Use it in your project
+
+### Install
+
+```sh
+npm install @johnmorrisdotca/kyuubu
+```
+
+```sh
+pnpm add @johnmorrisdotca/kyuubu
+```
+
+```sh
+yarn add @johnmorrisdotca/kyuubu
+```
+
+A page with no bundler loads the cube as a tag from a CDN, naming the major version so that a release that changes what you use is one you choose:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
+```
 
 Kyuubu is three things, each usable without the others: **an API** of plain
 functions (turn, read notation, scramble, solve, save), **a view** you put in
@@ -191,7 +327,7 @@ out:
 <p id="turned">{turned}</p>
 ```
 
-```ts
+```ts no-check
 // Angular: a standalone component
 @Component({
   selector: "check-root",
@@ -263,178 +399,139 @@ list.
   Events. The model, the solver and the command line run in Node 22 and
   later.
 
-## Architecture
+The cookbook, with the output of each example, is under [Examples](#examples).
 
-The cube, its notation, the solver and the famous solves are plain functions
-over a string, with no DOM: the state is one letter a sticker, and every turn
-returns a new string. Drawing is its own layer under `view/`, in plain DOM and
-CSS with no canvas, and the player, the custom elements and the React
-component are thin wrappers over it, each its own entry point, so a page loads
-only what it uses.
+## Examples
 
-```text
-src/
-├── cli.ts               the command line as a pure function: arguments in, text and an exit code out
-├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
-├── cuboid/               the cuboid: a box-shaped turning puzzle, a × b × c from 1 to 7 on a side
-│   ├── draw.ts           the "/cuboid/draw" entry: the cuboid drawn in CSS 3D, turned by drag, key and code
-│   ├── element-define.ts the "/cuboid/element/define" entry: registers <kyuubu-cuboid> by being imported
-│   ├── element.ts        the "/cuboid/element" entry: a solve on a cuboid as a <kyuubu-cuboid> custom element
-│   ├── gestures.ts       from a hand to a turn on a cuboid: which layer a drag means, and the half-turn rule
-│   ├── index.ts          the "/cuboid" entry: model, notation, scramble, shapes, words, gestures, replay plan
-│   ├── model.ts          the cuboid as pure functions over a string: slots, legal turns, turns, solved
-│   ├── notation.ts       the notation read and written for a cuboid, with the reason a move is refused
-│   ├── play.ts           the "/cuboid/play" entry: a solve on a cuboid with play, step, speed and repeat
-│   ├── presets.ts        the named shapes, each with its name and what is special about it
-│   ├── replay.ts         a solve on a cuboid read, checked and timed for the replay the cube uses
-│   ├── scramble.ts       a state drawn uniformly where the puzzle is small, a random walk where it is not
-│   └── words.ts          the cuboid's own words, in English and Japanese
-├── element-define.ts    the "/element/define" entry: registers the custom elements by being imported
-├── element.ts           the "/element" entry: the player as a <kyuubu-cube> custom element
-├── famous.data.ts       the record solves, each with its published source, newest first
-├── famous.ts            the "/famous" entry: record solves of the 3×3, played back move for move
-├── guide-panel.ts       the panel beside a cube: the next movement in notation and words, and an arrow on the cube
-├── guide.ts             a solve to follow with your own hands, one movement at a time, with detours taken back
-├── index.ts             the main entry: the cube, notation, solver, famous solves, and the player to mount
-├── options.ts           every choice the package offers, as a list a builder page is drawn from
-├── move-list.ts         the moves of a scramble or a solve as buttons, the one just made marked and scrolled into view
-├── move-name.ts         what a move turns, in a few plain words, in English and Japanese
-├── notation.ts          the standard notation, for reading a move out and for the keys that make one
-├── player.ts            the "/player" entry: a solve on a page, with play, pause, step and speed controls
-├── random.ts            a seeded random source
-├── react.tsx            the "/react" entry: the cube as a React component
-├── reconstruction.ts    a solve as competitors write it down, with wide turns and rotations
-├── reflect.ts           makes each attribute of a custom element a property too, as React, Vue and Svelte set them
-├── record.ts            a solve kept as versioned JSON, plain text or CSV, and read back
-├── replay.ts            a solve played back at the pace it was made
-├── scale.ts             how big a cube is drawn, as a setting: small, medium or large
-├── scramble-element.ts  <kyuubu-scramble>: a cube that keeps turning by itself, as a custom element
-├── scramble.ts          how long a full scramble is for each size, and making one from a seed
-├── scrambler.ts         a cube that turns one random layer, waits, and turns another, at a pace you choose
-├── solve.ts             a layer-by-layer solve a person can follow, step by step, for any size
-├── strings.ts           every word the package says to a person, in English and Japanese
-├── types.ts             the vocabulary of a turning cube of any size
-├── version.ts           the package's version, as in package.json
-├── words.ts             the words the cube itself says, in English and Japanese
-└── view/  the cube drawn on the screen in plain DOM and CSS
-    ├── geometry.ts  the screen's geometry: from the cube's model to CSS
-    ├── gestures.ts  from a hand to a turn: which layer a drag or a wheel means
-    ├── hint.ts      where to drag: the sticker and the direction that make a given turn
-    ├── keys.ts      the keyboard, in the notation cubers write
-    └── view.ts      the cube on the screen: every sticker placed by one matrix3d, with no canvas or framework
+Every TypeScript and JavaScript block that can run is type-checked against the built package and run by `pnpm test:readme`, so the output after `// →` is what the code prints. The model has no DOM in it, so most of these run under Node.
+
+### A page with nothing else
+
+Save this as a file and open it: one script and one element, and a cube a person can turn by drag, touch, wheel or keys:
+
+```html
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A cube</title>
+<div id="cube" style="width: 300px; height: 300px; position: relative"></div>
+<script type="module">
+  import { CubeView } from "https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/index.js";
+
+  new CubeView(document.getElementById("cube"), { size: 3, keyboard: "page" });
+</script>
 ```
 
-Tests live in `test/`, apart from the code, and `test/docs.test.js` runs the
-README's examples. `bin/` is the few lines that hand the command line the real
-process, `scripts/` builds the demo and its API reference page and checks the
-package as npm packs it, `demo/` is the site published on GitHub Pages, and
-`e2e/` taps it in real browsers.
+### A scramble from a seed
 
-## The name
+The same words give the same scramble for everyone, on every machine, so a club can share one by sharing a phrase. A cube is a string of 54 letters, and a turn is a pure function:
 
-*Kyuubu* (キューブ) is the English word "cube" as Japanese writes it: a
-borrowed word, spelled in katakana, the script Japanese uses for words taken
-from other languages. It is said in three beats, kyu-u-bu, the middle one
-only the vowel held longer, which is what the mark ー shows. Written more
-formally in the Latin alphabet it is *kyūbu*; the package spells the long
-vowel out, so that the name needs no accent to type.
+```ts
+import { movesNotation, randomScramble, seededRandom, solvedCube, turnAll } from "@johnmorrisdotca/kyuubu";
 
-## Where it comes from, and where it is used
+const scramble = randomScramble(3, 25, seededRandom("club night"));
+console.log(movesNotation(scramble, 3).split(" ").slice(0, 6).join(" "));   // → B L' S' U' F' R2
+const cube = turnAll(solvedCube(3), 3, scramble);
+console.log(cube.length);                                                    // → 54
+```
 
-Kyuubu was built for [Itsutsu](https://itsutsu.com), a site for board games,
-puzzles, card games and dice games played at your own pace. *Itsutsu* (五つ) is
-Japanese for "five", after five in a row, the game the site began with. The
-site wanted a cube that worked on a phone without a canvas, that it could
-check on the server move by move, and that could show a beginner what to do
-next. Once that existed it seemed worth sharing.
+### Read and write notation
 
-### Used by
+`parseMoves` reads cubers' notation, and gives back `null` where any of it is not a turn. A turn undone is the turn the other way, in the opposite order:
 
-- [Itsutsu](https://itsutsu.com), for its cube.
+```ts
+import { cubeSolved, movesNotation, parseMoves, solvedCube, turnAll, undoAll } from "@johnmorrisdotca/kyuubu";
 
-That is the whole list so far. Using Kyuubu in something? Open an *Add my
-project* issue and we will add you.
+const moves = parseMoves("R U R' U'", 3)!;
+console.log(movesNotation(undoAll(moves), 3));                               // → U R U' R'
+console.log(cubeSolved(turnAll(solvedCube(3), 3, moves), 3));                // → false
+console.log(parseMoves("R Q", 3));                                           // → null
+```
 
-### The family
+### Watch it solve, one named step at a time
 
-<!-- family:start (made by scripts/family-readme.mjs from scripts/family-template.mjs; change those, not this) -->
-Kyuubu is one of twenty-four packages, each made for the same site, each at
-[github.com/johnmorrisdotca](https://github.com/johnmorrisdotca). The code of every one is MIT.
+`solveSteps` is the beginner's layer-by-layer method as steps with names and reasons, in English and Japanese, and the moves of every step solve the cube:
 
-- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ): dice, with notation, exact odds, real sounds and the dice of many games. [Demo](https://johnmorrisdotca.github.io/korokoro/).
-- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ): a turning cube for the browser, 2×2 to 7×7, with record solves to replay. [Demo](https://johnmorrisdotca.github.io/kyuubu/).
-- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ): a colour-card shedding game for two to eight, with the house rules people play. [Demo](https://johnmorrisdotca.github.io/hitotsu/).
-- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ): a deck of playing cards, card games with computer players, and solitaires. [Demo](https://johnmorrisdotca.github.io/toranpu/).
-- [Tane](https://github.com/johnmorrisdotca/tane) (種): seeded random numbers and daily seeds, the same in every browser and on every server. [Demo](https://johnmorrisdotca.github.io/tane/).
-- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ): one rules engine for abstract board games, from gomoku and Reversi to Go and checkers. [Demo](https://johnmorrisdotca.github.io/narabe/).
-- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下): world conquest for two to six, on a map of the real world. [Demo](https://johnmorrisdotca.github.io/tenka/).
-- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字): a crossword tile race, in English and Japanese kana. [Demo](https://johnmorrisdotca.github.io/kumimoji/).
-- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ): a line-joining logic puzzle whose every level has exactly one answer. [Demo](https://johnmorrisdotca.github.io/tsunagi/).
-- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ): mahjong tiles drawn as SVG, stacked layouts, and the matching solitaire Awase. [Demo](https://johnmorrisdotca.github.io/jarajara/).
-- [Suido](https://github.com/johnmorrisdotca/suido) (水道): a pipe puzzle: turn the pieces until the water reaches every drain. [Demo](https://johnmorrisdotca.github.io/suido/).
-- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ): dominoes and Mexican Train. [Demo](https://johnmorrisdotca.github.io/domino/).
-- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉): word lists and word-game rules in English, French, German and Japanese. [Demo](https://johnmorrisdotca.github.io/kotoba/).
-- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六): backgammon and its variants, with the doubling cube and match play. [Demo](https://johnmorrisdotca.github.io/sugoroku/).
-- [Kazu](https://github.com/johnmorrisdotca/kazu) (数): grid number puzzles: Sudoku and its variants, Futoshiki and Skyscrapers. [Demo](https://johnmorrisdotca.github.io/kazu/).
-- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮): mazes on squares, hexagons, triangles and circles, made from a seed and drawn through with a finger or the mouse. [Demo](https://johnmorrisdotca.github.io/meikyuu/).
-- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty. [Demo](https://johnmorrisdotca.github.io/hikidashi/).
-- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
-- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首): find a kanji by the parts it is made of. [Demo](https://johnmorrisdotca.github.io/bushu/).
-- [Tobiishi](https://github.com/johnmorrisdotca/tobiishi) (飛び石): peg solitaire with nine boards and seeded solvable challenges. [Demo](https://johnmorrisdotca.github.io/tobiishi/).
-- [Jirai](https://github.com/johnmorrisdotca/jirai) (地雷): minesweeper on shaped grids with verified no-guess boards. [Demo](https://johnmorrisdotca.github.io/jirai/).
-- [Gunjin](https://github.com/johnmorrisdotca/gunjin) (軍人): five hidden-rank strategy games with pass-the-device play. [Demo](https://johnmorrisdotca.github.io/gunjin/).
-- [Karakuri](https://github.com/johnmorrisdotca/karakuri) (からくり): eight hyper-casual puzzle games, some of them physics: draw a shield, pull pins, cut ropes, slide blocks, pour tubes. [Demo](https://johnmorrisdotca.github.io/karakuri/).
-- [Houseki](https://github.com/johnmorrisdotca/houseki) (宝石): gem and stone matching puzzles: falling triplets, stone collapse, colour chains and gem swap. [Demo](https://johnmorrisdotca.github.io/houseki/).
+```ts
+import { cubeSolved, randomScramble, seededRandom, solveSteps, solvedCube, stageName, turnAll } from "@johnmorrisdotca/kyuubu";
 
-**This package is Kyuubu.** The demos of all twenty-four share one header and footer, so each links the rest.
-<!-- family:end -->
+const cube = turnAll(solvedCube(3), 3, randomScramble(3, 25, seededRandom("club night")));
+const steps = solveSteps(cube, 3)!;
+console.log(steps.length, stageName(steps[1].stage), stageName(steps[1].stage, "ja"));   // → 17 White cross 白のクロス
+console.log(cubeSolved(turnAll(cube, 3, steps.flatMap((step) => step.moves)), 3));      // → true
+```
 
-## Features
+### Check a solve on a server
 
-- **Any size, one model.** The 2×2 up to the 7×7 run on the same few lines of
-  geometry. There are no hand-written tables of face cycles.
-- **Real 3D in plain CSS.** Every sticker is an element given its whole
-  place on the screen in one `matrix3d`, worked out by the cube itself, with
-  nothing nested in 3D, so no browser can draw it flat. While a layer turns,
-  the inside of the cube shows as plastic, never as a hole.
-- **Every way of turning it.** Drag a sticker; roll the wheel over one; use a
-  finger; press the keys cubers write with; or hand it notation from code.
-- **The layer follows your hand.** A dragged layer turns with the pointer,
-  forwards and back, and is a move only once it is let go past a point of no
-  return. Start a turn, think better of it, and take it back.
-- **A plain model under the view.** A cube is a string of `6 × n × n` letters
-  and a turn is a pure function, so a cube is easy to store, send, snapshot
-  in a test, or check again on a server.
-- **Notation in and out.** It reads and writes `R U R' U'`, `2R2`, `M'`, `x`
-  and the rest.
-- **Scrambles from a seed.** The same seed gives the same scramble in every
-  browser and on every server, so a club can race one scramble.
-- **A solve you can follow.** The beginner's layer-by-layer method for any
-  2×2 or 3×3: each step with its name, what it is for, its turns and the
-  algorithms it uses.
-- **Shown on the cube.** The next move of a solve, or of any moves, marked on
-  the cube itself: the layer lit, an arrow the way to drag it, the move in
-  notation and in plain words. It waits for your hand, moves on when you
-  make the move, and says so, with a way back, when you make another.
-- **Replay a record.** A scramble and its solve played on the cube at the
-  pace it was made, with play, pause, step, speed and repeat; famous record
-  solves included, each checked to end solved; and any solve pasted in, as
-  it is written or as a link.
-- **Embed it anywhere.** One `<kyuubu-cube>` tag, or an iframe for a site
-  that allows no scripts.
-- **Export and import.** A solve, scramble and moves together, as JSON that
-  reads back in, as a few lines of plain text, or as CSV for a spreadsheet.
-- **Themes.** Every colour is an option and a CSS custom property, with
-  three looks included and a call to change them on a cube already drawn.
-- **A command line.** `kyuubu --seed table` in a terminal on Linux, macOS or
-  Windows: scrambles, turns, a check and a solve, as text or JSON.
-- **Cuboids.** The Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3 and any
-  `a × b × c` from 1 to 7: turned by drag with the rule that a layer turns a
-  quarter only where its slice is square, written in the same notation, and
-  scrambled to a state chosen fairly. [Its own section](#cuboids).
-- **English and Japanese**, for everything the package says to a person.
-- **Accessible.** The cube is a labelled `application`, takes the keyboard,
-  and every turn can be made without a pointer.
+The model has no DOM, so a server can scramble, send the scramble, and check the moves a player sends back. `summarize` says whether they solved it and how many turns it took:
+
+```ts
+import { parseMoves, summarize, toCSV, toText } from "@johnmorrisdotca/kyuubu";
+
+const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
+console.log(summarize(solve).solved, summarize(solve).count);                // → true 3
+console.log(toCSV([solve]).split("\n")[1]);                                  // → ,3,R U2 F',F U2 R',3,true,12.34,club night
+```
+
+### Keep a solve, and read it back
+
+A solve is its size, the scramble and the turns made after it. It is written out three ways, each a pure function that returns a string, and read back without trust:
+
+```ts
+import { fromText, parseMoves, toText } from "@johnmorrisdotca/kyuubu";
+
+const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
+const text = toText(solve);
+console.log(text.split("\n").slice(0, 3));                                   // → [ '3x3', "scramble: R U2 F'", "solve: F U2 R'" ]
+console.log(fromText(text)?.size, fromText("not a solve"));                  // → 3 null
+```
+
+### A tag in any framework
+
+`<kyuubu-cube>` is the cube as a tag, for a page with a framework or none: a solve, shown on a cube at the pace it was made, with controls (see [Use it in your project](#use-it-in-your-project) for React, Vue, Svelte and Angular):
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
+<kyuubu-cube size="4" scramble="R U R' U'" moves="U R U' R'" controls></kyuubu-cube>
+```
+
+### A solve played back
+
+The same tag replays a solve with its scramble, a scrubber, speeds and a list of the moves as buttons, starting at once and beginning again at the end (see [Replay a solve](#replay-a-solve) for every attribute):
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
+<kyuubu-cube scramble="R U R' U'" moves="U R U' R'" time="2.5" controls autoplay loop></kyuubu-cube>
+```
+
+### A cuboid
+
+Boxes from 1×1×2 to 7×7×7 are turned the same way, with their own entry points; one tag plays a solve on any of them:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/cuboid/element-define.js"></script>
+<kyuubu-cuboid dims="3x3x1" scramble="U2 R2 M2" moves="M2 R2 U2" controls></kyuubu-cuboid>
+```
+
+### From a terminal
+
+```sh
+npx @johnmorrisdotca/kyuubu --seed table
+```
+
+```text
+D' R2 U' F2 L' S L F' R E' B' R2 D S' R' E' B2 L' B' D2 F' E S U' M'
+```
+
+The scramble is the same for the same seed on every machine. `--solve`, `--verify` and `--json` do the rest of the job from a terminal: see [The command line](#the-command-line).
+
+### A look of your own
+
+Every colour and the shape of a sticker is a CSS custom property, an option, or a later `setTheme` (the table is under [Theming](#theming)):
+
+```css
+.cube { --kyuubu-up: #fff7d6; --kyuubu-front: #1b9e77; }
+```
 
 ## Notation
 
@@ -474,95 +571,9 @@ alg.cubing.net, so a person can paste the address.
 
 ## Controls
 
-| Input | On a sticker | Beside the cube |
-| --- | --- | --- |
-| Drag or swipe | The layer carrying that sticker turns with the pointer; let go to make the turn, or to let it go back | Looks at the cube from anywhere |
-| Wheel | Turns the sticker's row | Turns the view sideways |
-| <kbd>Ctrl</kbd> + wheel | Turns the sticker's column | Tips the view up or down |
-| <kbd>Shift</kbd> + wheel | Turns the sticker's face | |
+A person turns the cube with the keys (a letter turns its face, with Shift the other way), by dragging a sticker so that its layer turns with it, by the wheel, or by touch; a layer let go before its point of no return springs back, and a drag on the seam between two layers turns both.
 
-| Key | Turn |
-| --- | --- |
-| <kbd>R</kbd> <kbd>L</kbd> <kbd>U</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>B</kbd> | Face clockwise; with <kbd>Shift</kbd>, counter-clockwise |
-| <kbd>M</kbd> <kbd>E</kbd> <kbd>S</kbd> | Middle layer (odd cubes) |
-| <kbd>X</kbd> <kbd>Y</kbd> <kbd>Z</kbd> | Whole cube |
-| <kbd>2</kbd> to <kbd>9</kbd>, then a face | That many layers in: <kbd>2</kbd> <kbd>R</kbd> is `2R` on a 4×4 |
-| Arrow keys | Look around |
-
-Keys are heard when the cube has focus (`keyboard: "focus"`, the default) or
-anywhere on the page (`"page"`), never while the reader is typing in a field.
-
-### Dragging a layer, and two layers at once
-
-A drag on a sticker, by mouse or by finger, holds its layer and turns it with
-the pointer. Nothing is a move while the pointer is down.
-
-- **The layer is picked once.** After a few pixels the drag says which of the
-  sticker's two layers it means. A drag that could be either waits a little
-  longer before it picks, and the layer picked stays picked for that drag.
-- **It turns both ways.** Drag back and the layer comes back; drag past
-  where it began and it turns the other way.
-- **There is a point of no return**, 30 degrees unless `commitAngle` says
-  otherwise. Let go short of it and the layer goes back: no move is made and
-  `onTurn` is not called. Let go at it or past it and the layer snaps on to
-  the quarter turn, and that is one move. Dragged the same distance past a
-  quarter turn, it is a half turn, recorded as one move (`R2`).
-- **You can see and feel the point.** Past it the held layer brightens, and
-  the cube's element carries `data-committed="true"`. The brightening is the
-  CSS filter in `--kyuubu-commit-filter` (`brightness(1.14)` unless you set
-  it; `none` turns it off).
-- **A flick still turns.** A short, fast drag, still moving when it is let
-  go, makes the quarter turn from short of the point, so quick hands lose
-  nothing.
-- **Two neighbouring layers turn together, like a real cube.** A drag that
-  begins on the seam between two layers, within a fifth of a sticker's width
-  of the line (`SEAM_BAND`, 0.18), and goes along that line turns both, as a
-  wide turn (`Rw`, `Lw`, `Uw`, and on a big cube any two neighbours: `3R 4R`
-  are two layers of a 5×5). The two layers are ringed as soon as the finger is
-  down, before it has moved, so you see what will turn; a drag begun anywhere
-  else on the sticker, or across the seam, turns the one layer as ever. A
-  second finger put down on the neighbouring layer before the drag starts does
-  the same: two fingers together take two layers. Both layers are told to
-  `onTurn`, one after the other. The cube's element carries `data-seam`
-  (`"near"` while the layers are ringed, `"held"`, `"pair"`), and each ringed
-  sticker `data-seam-lit`. The guide's arrow for a wide turn begins at the
-  seam, at its dot, and one drag from there makes it. A 2×2 has no seam: both
-  its layers are the whole cube.
-- **Giving up.** Escape, a cancelled pointer, or a drag that wanders well off
-  the cube's element puts the layer back, and nothing is recorded.
-- **`onTurn` is called once for a completed turn, after the layer has
-  snapped home**, and never for one that went back.
-
-While a layer is held the element carries `data-dragging="true"` and
-`data-angle` (whole degrees, forwards positive). The rules are exported as
-pure functions for tools and tests of your own: `pickDrag`, `dragAngle`,
-`quartersForRelease`, `pastCommit`, `moveForRelease`, `movesForRelease` (every
-layer a release turns, two for a seam) and `seamsAt` (the seams a touch at a
-place on a sticker takes hold of), with the constants `COMMIT_ANGLE`,
-`DRAG_START_PX`, `DRAG_DECIDE_PX`, `DRAG_CLEAR_RATIO`, `FLICK_SPEED`,
-`FLICK_ANGLE` and `SEAM_BAND` (types `DragPick` and `Seam`).
-
-```ts
-quartersForRelease(22);         // 0: short of the point, it goes back
-quartersForRelease(38);         // 1: past it, a quarter turn
-quartersForRelease(-38);        // -1: the other way
-quartersForRelease(130);        // 2: a half turn
-quartersForRelease(12, 0.4);    // 1: a flick, 0.4 degrees a millisecond
-quartersForRelease(40, 0, 45);  // 0: with commitAngle 45
-```
-
-Turns made by a key, by notation or from code are animated over `turnMs`
-(160 ms a quarter turn; `setTurnMs` changes it, and the demo's Controls tab
-offers a slow setting). On a device that asks for reduced motion they are
-not animated at all, and a layer let go is put straight where it belongs.
-
-**Scrambling.** `view.scramble(moves)` scrambles the cube the way a hand does:
-the last ten turns are shown, each in under a tenth of a second, and the
-turns before them are made at once, so a hundred-turn scramble of a 7×7 is
-over in about a second and is not a blur that shows nothing. It is on unless
-the cube is made with `animateScramble: false` (or `scramble(moves, { animate:
-false })` is asked for one scramble); then nothing is shown turning. It is
-never told to `onTurn`, and a device that asks for reduced motion shows none.
+The options, the examples and the tables are in [docs/CONTROLS.md](docs/CONTROLS.md#controls).
 
 ## The model
 
@@ -578,7 +589,7 @@ A **move** is `{ axis, layer, turns }`:
   for the whole cube.
 - `turns`: `1`, `2` or `3` quarter turns by the right-hand rule.
 
-```ts
+```ts no-check
 parseMove("R", 3);      // { axis: 0, layer: 2, turns: 3 }
 parseMove("2R'", 4);    // { axis: 0, layer: 2, turns: 1 }
 parseMove("x", 3);      // { axis: 0, layer: "all", turns: 3 }
@@ -591,463 +602,43 @@ whole in the hand is still solved.
 
 ## A solve a person can follow
 
-`solveSteps(state, n)` works out the layer-by-layer solve most people learn
-first, for a 2×2 or 3×3 in any state. It returns `null` for other sizes.
+`solveSteps` is the beginner's layer-by-layer method for any 2×2 or 3×3 as steps with names, reasons and the algorithm each one uses, in English and Japanese; the cube's guide tells a person what to turn next and shows it.
 
-```ts
-import { movesNotation, parseMoves, solveSteps, solvedCube, stageName, stageSays, turnAll } from "@johnmorrisdotca/kyuubu";
-
-const cube = turnAll(solvedCube(2), 2, parseMoves("R U2 F'", 2)!);
-for (const step of solveSteps(cube, 2)!) {
-  console.log(stageName(step.stage), movesNotation(step.moves, 2));
-}
-// Hold it      x'
-// White layer  F'
-// White layer  F U F'
-// White layer  F R2 F'
-
-stageSays("whiteLayer");          // "Put a white corner in its place on the bottom."
-stageName("whiteLayer", "ja");    // "白の面"
-```
-
-- The cube is held with white on the bottom. The `hold` step, if one is
-  needed, is the whole-cube turn that puts it there.
-- The 3×3 goes white cross, white corners, middle layer, yellow cross, yellow
-  face, yellow corners, yellow edges. The 2×2 goes white layer, yellow face,
-  yellow corners. A stage that places its pieces one at a time is a step for
-  each piece.
-- Each step's `parts` split it into lining-up turns and whole algorithms, so
-  a page can say which algorithm to use and when. `SOLVE_ALGORITHMS` gives
-  each one in notation, and `algorithmName` names it in either language.
-- Every step is a short search over the moves a beginner is taught, so it
-  reads like the method, not like a computer's shortest solve: a scrambled
-  3×3 comes to something over a hundred moves, and takes a millisecond or two
-  to work out.
-- "White" and "yellow" are the up and down faces' letters, `U` and `D`,
-  whatever colours your theme gives them.
-- A state no cube can reach (a corner twisted, two stickers swapped) has no
-  solve: `solveSteps` throws, and the command line says so.
-
-| Algorithm | Notation | Used for |
-| --- | --- | --- |
-| `cornerIn` | `R U R' U'` | A white corner into the bottom |
-| `edgeRight` | `U R U' R' U' F' U F` | A top edge into the middle layer, to the right |
-| `edgeLeft` | `U' L' U L U F U' F'` | A top edge into the middle layer, to the left |
-| `yellowCross` | `F R U R' U' F'` | The yellow cross |
-| `sune` | `R U R' U R U2 R'` | The yellow face |
-| `cornerCycle` | `R' F R' B2 R F' R' B2 R2` | Three top corners moved round |
-| `edgeCycle` | `R U' R U R U R U' R' U' R2` | Three top edges moved round |
+The options, the examples and the tables are in [docs/REPLAY.md](docs/REPLAY.md#a-solve-a-person-can-follow).
 
 ## Show me on the cube
 
-The next move of a solve drawn on the cube: the layer that turns is lit and
-the rest dimmed, an arrow lies across its stickers the way to drag them, and
-beside the cube the move is given in notation and in plain words. The
-person makes the move with their own hand, and the guide moves on.
+A move written in notation can be shown on the cube itself: an arrow on the face to turn, in the direction to turn it, in sentences as well as letters, so that a person follows a solve by hand.
 
-```ts
-import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
-
-const view = new CubeView(cubeElement, { size: 3, state });
-mountGuide(guideElement, view, { method: true });            // the layer-by-layer method, step by step
-mountGuide(guideElement, view, { moves: "R U R' U' Rw x" }); // or any moves, as written
-```
-
-- **The arrow is the drag.** It is worked out with the drag's own rules
-  (`pickDrag` and `moveForRelease`, above), run backwards: a sticker is
-  chosen only if a drag along the arrow from it is read as exactly that
-  move. A test proves it for every face, slice, wide turn and direction on
-  every size from 2×2 to 5×5, from seven sides.
-- **It follows your eye.** Look round the cube and the arrow is drawn again
-  from where you are, on a side you can see. Where no side of the layer can
-  be seen, it says to look round.
-- **Half turns, wide turns and the whole cube.** A half turn is one long
-  drag or two quarter turns the same way. A wide turn (`Rw`) is lit as one
-  slab under one arrow, and each of its layers is dragged in turn. A turn of
-  the whole cube (`x`) cannot be dragged: the guide names its key and has a
-  button that makes it.
-- **A turn it did not ask for** is said to be one ("You turned U, not R."),
-  with a button to take it back, and an arrow on the cube for turning it
-  back by hand.
-- **Words**, in English and Japanese: "Turn the right face towards you."
-  (`R'`), 「右の面を手前に回します。」. The line is announced to a screen reader
-  once for each move, and on a device that asks for reduced motion nothing on
-  the arrow moves.
-
-Underneath, each part can be used alone. `view.showHint(moves)` lights a
-layer and draws its arrow on any `CubeView`, and `view.hint` says which
-sticker to take hold of and which way to drag it; `dragHint(moves, n, view)`
-works that out with no page at all. `new Guide(state, n, source)` walks a
-list or the method as a pure state machine (`next`, `heard(move)`,
-`takeBack()`, `makeNext()`), and `movementSays` puts a move in words.
-The player has it too: `mountPlayer(element, { …, guide: true })`, or its
-"Turn it yourself" button, hands the viewer the cube to follow a solve by
-hand.
+The options, the examples and the tables are in [docs/REPLAY.md](docs/REPLAY.md#show-me-on-the-cube).
 
 ## Replay a solve
 
-A scramble and the moves that solved it, shown on a cube at the pace they
-were made: what a record looked like, a move at a time.
+A scramble and the moves that solved it, shown on a cube at the pace they were made: what a record looked like, a move at a time. Seen move by move in a list of buttons, embedded on any site as one tag or an iframe, with the famous record solves one click away.
 
-```js
-import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
-
-mountPlayer(document.getElementById("solve"), {
-  scramble: "D R' U2 F2 D U' B2 R2 L' F U' B2 U2 F L F' D'",
-  solution: "x2 R' D2 R' D L' U L D R' U' R D L U' L' U' R U R' y' U R' U' R Rw' U' R U' R' U2 Rw U",
-  timeMs: 3130,
-  autoplay: true,
-});
-```
-
-That draws the cube with its controls: play and pause, a step back and
-forward, restart, where in the solve, the speed (the solve's own, a half, a
-quarter, a tenth) and repeat. The viewer can drag to look round the cube and
-cannot turn its layers, until they press "Turn it yourself": then the cube
-is theirs, the solve's next move is shown on it (see *Show me on the cube*),
-and each move they make brings the next. Options: `size`, `scramble`,
-`solution`, `timeMs`, `stepMs`, `autoplay`, `loop`, `controls`, `speed`,
-`theme`, `locale`, `guide` (start with the cube handed over), `readout` and
-`moveList` (the move just made in large type and in words, and the moves as
-buttons; on unless `controls` is `false`, or unless said otherwise), `animateScrub`
-(on unless said otherwise), `onChange`, `onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
-`seek(n)`, `restart()` (back to the scrambled cube, waiting), `setSpeed()`, `setLoop()`, `setLocale()`,
-`setTheme()`, `setAnimateScrub(on)` and `animatingScrub`, `follow(on)` and `following`, `status`, `plan`, `fault` and `destroy()`.
-
-### See each move
-
-Beside "Move 12 of 33" the player says which move that is: its code in large
-type (`R'`, `Rw`, `x2`, `3Uw'`, `M`), and what it turns in a few plain words,
-in English or Japanese ("Right face, anticlockwise", "Right two layers,
-clockwise", "Whole cube on x, twice", "Middle slice, same way as Left
-clockwise"). Under the cube the moves are drawn as buttons, the scramble and
-then the solution, the one just made marked and scrolled into view inside the
-list (never the page) as the solve plays; the scramble's are marked the same
-way, since you can go back into it. A press on a move takes the replay there
-(the cube is the cube after that move), a press on the scramble's last move is
-the scrambled cube the solve starts from.
-
-- **Keys.** Tab reaches the list once, at the move just made. Left and right
-  (or up and down) go a move back or on, <kbd>Home</kbd> to the solution's
-  first move and <kbd>End</kbd> to its last, and the focus goes with them. The
-  same keys work from any button of the player. Back past the first move is the
-  scrambled cube, and on into the scramble (`walk(-1)`; each step back is the move turned the other way, as long and as eased as a step on): a replay stepped back into it plays
-  the rest of the scramble quickly (`REPLAY_SCRAMBLE_STEP_MS`) and then the
-  solve.
-- **A screen reader** hears each move once, in a polite live region: "R':
-  Right face, anticlockwise. Move 5 of 33." While the solve plays it is told
-  once the cube has been still for a moment, not for every move, and nothing
-  is said for what was there when the player was drawn. Each button is named
-  with its code, its words and where it is.
-- **The slider turns the cube the way it goes.** Moving it (or pressing a
-  move) shows the turns between where the cube was and where it goes: each
-  move turned going on, each one undone, last first, going back. A long jump
-  goes straight to six steps short and turns those (`REPLAY_SCRUB_TURNS`, each
-  `REPLAY_SCRUB_MS` long), and a new drag cancels the catch-up before it. It is
-  on unless `animateScrub: false`; `seek(n, { animate: true })` is the same
-  for code, and `scrubPath` works out the turns with no page at all.
-- **The words** are `moveName(code, language)`, which names any move in
-  standard form (`Rw'`, `2R`, `M2`, `y`), and `null` for anything else.
-
-```ts
-import { moveName } from "@johnmorrisdotca/kyuubu";
-import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
-
-moveName("R'");  // "Right face, anticlockwise"
-moveName("Rw");  // "Right two layers, clockwise"
-moveName("x2");  // "Whole cube on x, twice"
-moveName("2R'", "ja"); // "右から2層目、反時計回り"
-
-mountPlayer(document.getElementById("solve"), {
-  scramble: "R U R' U'",
-  solution: "U R U' R'",
-  timeMs: 2000,
-  animateScrub: true,
-});
-```
-
-The list can be drawn alone, for a cube and a scrubber of your own:
-`mountMoveList(element, { groups, current, onPick })` (colours
-`--kyuubu-moves-ink`, `paper`, `rule`, `focus` and `height`, falling back to the
-player's; `MOVE_LIST_CSS`; the handle has `setCurrent(index)`, `setGroups()`,
-`setLocale()`, `focus()` and `destroy()`).
-
-**About the pace.** A reconstruction says how long the whole solve took and
-almost never when each move was made. So the moves are spread evenly over the
-recorded time: a 3.13 second solve takes 3.13 seconds, and the player says
-that the real one was not this even. Give `stepMs`, a time for every step,
-where you know them.
-
-**A solve that does not end solved** is played anyway, and the player says
-so. Only text that cannot be read is refused, with the piece it stopped at.
-
-Without a page, `planReplay(source)` reads, checks and times a solve, and
-`new Replay(cube, plan, options)` plays a plan on anything with `setState`
-and `turnTogether`, which `CubeView` has.
-
-### Embed a solve on any site
-
-One tag, where the page may run a script. It needs no build step:
-
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
-<kyuubu-cube scramble="R U R' U'" moves="U R U' R'" time="2.5" controls autoplay></kyuubu-cube>
-```
-
-| Attribute | Means |
-| --- | --- |
-| `scramble`, `moves` | The scramble and the solve, as written |
-| `size` | The cube's side, 2 to 7: 3 when left out |
-| `time` | The solve's time in seconds; left out, a steady pace |
-| `autoplay`, `loop` | Start at once; begin again at the end |
-| `controls` | Shown unless `controls="false"` |
-| `speed` | The speed to start at: `1`, `0.5`, `0.25`, `0.1` |
-| `theme` | `standard`, `paper` or `stickerless` |
-| `lang` | `en` or `ja`; the page's language when left out |
-| `guide` | Start with the cube handed to the viewer, to follow the solve by hand |
-| `readout`, `movelist` | The move just made in large type and in words, and the moves as buttons: shown unless `"false"` (and, with `controls="false"`, only if asked for) |
-| `scrub` | Moving the slider turns the cube between where it was and where it goes: on unless `scrub="false"` |
-
-The element has `play()`, `pause()`, `step()`, `seek()`, `restart()` and
-`status`, and sends `kyuubu-step` after every step and `kyuubu-end` at the
-end. In a bundle, `import { defineCube } from "@johnmorrisdotca/kyuubu/element"`
-and call it, or import `@johnmorrisdotca/kyuubu/element/define`, which does.
-It is drawn in the page's own document, so the page's font, colour and the
-`--kyuubu-player-…` custom properties (`felt`, `radius`, `rule`, `button`,
-`ink`, `paper`, `focus`) dress it.
-
-**In a framework, an attribute is also a property.** React 19, Vue 3 and
-Svelte 5 set a property rather than an attribute on a custom element that has
-one of the name, so `<kyuubu-cube size={4}>` is `cube.size = 4`. Every attribute
-in the table above, and every one of `<kyuubu-scramble>` below, is a property
-that writes the attribute: a number is its text, `true` turns a flag on and
-`false` or `null` turns it off (`controls`, which is on unless it says
-otherwise, is written `"false"`), and reading gives the attribute's text, or a
-boolean for a flag. The methods are untouched, and `lang` is the browser's own.
-`e2e/properties.e2e.mjs` sets every one in Chromium and WebKit.
-
-An iframe, where the page allows no scripts (a forum, a blog):
-
-```html
-<iframe src="https://johnmorrisdotca.github.io/kyuubu/embed.html#scramble=R+U+R'+U'&moves=U+R+U'+R'&time=2.5" title="Kyuubu" width="360" height="600" style="border:0;max-width:100%" loading="lazy"></iframe>
-```
-
-The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`,
-`lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`, `guide=1`, `readout=0`, `movelist=0`, `scrub=0`. The page stores
-nothing, tracks nothing and loads nothing from anywhere else. A browser takes
-an address of a few thousand characters, which is room for any solve of a
-3×3. The [famous solves page](https://johnmorrisdotca.github.io/kyuubu/famous.html)
-writes both snippets for whatever it is showing.
-
-### Famous solves
-
-`@johnmorrisdotca/kyuubu/famous` is a list of record-setting solves of the
-3×3, each with its time, solver, country, competition, the competition's
-dates, the scramble, the moves, who reconstructed it where the source says,
-and where it was published. It is its own entry, so a page that does not show
-it does not carry it.
-
-```js
-import { FAMOUS_SOLVES, famousSolve } from "@johnmorrisdotca/kyuubu/famous";
-
-const solve = famousSolve("park-3.13");
-mountPlayer(element, { scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs });
-```
-
-Every solve in it is played by a test from its scramble, and is in the list
-only because the cube ends solved. The list is short and has gaps: a record
-with no published reconstruction, or one that does not play out, is left out.
-
-**Where the records are.** The whole history of the 3×3 record, with a link
-to each reconstruction, is kept on the
-[Speedsolving wiki](https://www.speedsolving.com/wiki/index.php?title=History_of_World_Records/3x3x3),
-and the official results, for every event, are the
-[World Cube Association's records](https://www.worldcubeassociation.org/results/records).
-The times, names, competitions and dates here are the WCA's public results;
-the scrambles and moves are from the sources each entry names. Kyuubu is not
-affiliated with the WCA.
-
-**Add a solve.** Open an
-[Add a solve](https://github.com/johnmorrisdotca/kyuubu/issues/new?template=add-a-solve.md)
-issue with the scramble, the moves and where they were published, or send a
-pull request: `pnpm solve:check "<scramble>" "<moves>"` plays it and prints
-whether it ends solved and how many moves it is.
+The options, the examples and the tables are in [docs/REPLAY.md](docs/REPLAY.md#replay-a-solve).
 
 ## A cube drawn small, medium or large
 
-`scale` is the same three names Toranpu's cards take (a cube's `size` is its
-side, so the setting is `scale` here). Small is for a list or a picker: every
-side from 2×2 to 7×7 is drawn in 72 pixels, look-only, and the box is one
-steady square, never wider than its container.
+A cube for a list or a row of cards is drawn at a named scale (`small`, `medium`, `large`) and fills the width it is given.
 
-```ts
-new CubeView(box, { size: 4, scale: "small" });    // 72 pixels wide, and square
-new CubeView(box, { size: 3, scale: "large", interactive: false });
-new CubeView(box, { size: 3, width: 100 });        // any width
-```
-
-The React component takes `scale` and `width` as props, and the elements below
-take them as attributes.
+The options, the examples and the tables are in [docs/DISPLAY.md](docs/DISPLAY.md#a-cube-drawn-small-medium-or-large).
 
 ## A cube that keeps turning
 
-For a background or a widget, `keepScrambling` turns a random layer, waits,
-and turns another, at a pace you choose. It never turns about the axis it just
-used, and it never queues a turn behind one that is still moving.
+A cube that turns by itself, slowly, for a hero or a loading screen: it stays still for anybody who asks for less motion.
 
-```ts
-import { CubeView, keepScrambling } from "@johnmorrisdotca/kyuubu";
-
-const view = new CubeView(box, { size: 3, scale: "medium", interactive: false });
-const loop = keepScrambling(view, { pace: "slow" });   // every 4 seconds
-loop.setPace(0.5);                                     // every half second
-loop.stop();                                           // the cube stays as it is
-loop.start();
-loop.destroy();                                        // lets go of the page
-```
-
-| Option | Default | Meaning |
-| --- | --- | --- |
-| `pace` | `1` | Seconds between turns, never under `0.2`, or `"fast"` (0.5), `"normal"` (1), `"slow"` (4) |
-| `faces` | `false` | Turn only the six outer faces |
-| `random` | `Math.random` | A `() => number` in [0, 1); seeded, the same cube turns the same way |
-| `autoplay` | `true` | Start by itself |
-
-It costs nothing nobody can see. A hidden tab is left alone and the cube carries
-on when the tab comes back (it listens for `visibilitychange`). A device that
-asks for reduced motion gets a cube that stays still: `running` is `false` and
-no timer is set.
-
-As a tag, with nothing to build:
-
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></script>
-<kyuubu-scramble size="3" pace="slow" scale="small"></kyuubu-scramble>
-```
-
-| Attribute | Means |
-| --- | --- |
-| `size` | The cube's side, 2 to 7: 3 when left out |
-| `pace` | Seconds between turns, or `fast`, `normal`, `slow` |
-| `paused` | Does not turn until `play()` |
-| `scale`, `width` | `small`, `medium` or `large`, or a width in pixels |
-| `theme` | `standard`, `paper` or `stickerless` |
-| `faces` | Outer faces only |
-| `seed` | The same turns every time |
-| `interactive` | Lets a person turn it; off for a small one |
-| `lang` | `en` or `ja` |
-
-It has `play()`, `pause()`, `running` and `cube` (the `CubeView`). In a bundle,
-`defineScramble` from `@johnmorrisdotca/kyuubu/element` registers it. An iframe
-for a page that allows no scripts:
-
-```html
-<iframe src="https://johnmorrisdotca.github.io/kyuubu/embed-scramble.html#pace=slow&scale=medium" title="A cube that keeps turning" width="160" height="160" style="border:0;max-width:100%"></iframe>
-```
-
-The address carries `size`, `pace`, `scale`, `width`, `theme`, `faces`, `seed`
-and `paused`. The [turning cubes page](https://johnmorrisdotca.github.io/kyuubu/cubes.html)
-shows it at all three scales.
+The options, the examples and the tables are in [docs/DISPLAY.md](docs/DISPLAY.md#a-cube-that-keeps-turning).
 
 ## Cuboids
 
-<p align="center">
-  <img src="docs/cuboids.jpg" alt="The cuboids page on green felt: a scrambled 2×3×3 Domino drawn like the cube, a row of the seven named shapes (Brick, Floppy, Tower, Domino, Block, Pillar, Tall pillar) each drawn small, and the chooser for any width, height and depth from 1 to 7" width="720">
-  <img src="docs/cuboids-phone.jpg" alt="The same page on a phone in dark mode, in Japanese: a scrambled 3×4×3 pillar on the felt under its shape and move count" width="220">
-</p>
+Box-shaped turning puzzles from 1×1×2 to 7×7×7, in their own entry points (`@johnmorrisdotca/kyuubu/cuboid` and its `/draw`, `/play`, `/element`), drawn like the cube, turned the same way, with one tag that plays a solve on any of them.
 
-A cuboid is a turning puzzle shaped like a box, `a × b × c` cubies with each
-side from 1 to 7: the Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3, a
-3×3×4 pillar, and the 1×2×3 brick, or any other. It has its own entry points
-and leaves the cube's untouched. It is drawn, turned, scrambled, written down
-and played back the way the cube is.
-
-The rule that makes it different is one line. **A layer may turn a quarter only
-where its slice is square, and may always turn a half.** A quarter turn of a
-slice that is not square would push its corners out of the box and change the
-puzzle's shape; a half turn puts every cubie of it where another one was. So the
-Domino's two 3×3 slices turn like a cube's face, and its six 2×3 slices only
-half way round. A side one cubie deep (the 1 of a 1×3×3) is the whole puzzle,
-and turning it moves nothing: it is not a layer. `1×1×1` has nothing to turn
-and is not a cuboid.
-
-```ts
-import {
-  cuboidSolved, legalTurns, parseCuboidMoves, randomCuboidScramble, readCuboidMove,
-  seededRandom, solvedCuboid, turnAllCuboid,
-} from "@johnmorrisdotca/kyuubu/cuboid";
-
-const dims = [2, 3, 3] as const;                  // width, height, depth, as the puzzle first sits
-legalTurns(dims, 0, 0);                           // [1, 2, 3]: the right and left slices are 3×3, square
-legalTurns(dims, 1, 0);                           // [2]: a 2×3 slice, so a half turn only
-
-const scramble = randomCuboidScramble(dims, undefined, seededRandom("club night"));
-const mixed = turnAllCuboid(solvedCuboid(dims), dims, scramble);
-cuboidSolved(mixed, dims);                        // false: a scramble never leaves it solved
-```
-
-On a page, one line draws a puzzle a person can turn:
-
-```ts
-import { CuboidView } from "@johnmorrisdotca/kyuubu/cuboid/draw";
-
-const view = new CuboidView(document.getElementById("puzzle"), { dims: [3, 3, 1], keyboard: "page" });
-view.turn({ axis: 1, layer: 2, turns: 2 });       // a half turn of the top row of a floppy
-```
-
-### The shapes
-
-Each shape is listed once, with its sides in order: `3×3×2` is a Domino turned
-on its side. `CUBOID_PRESETS` holds them, with their names and a line in each
-language on what is special.
-
-| Shape | Name | What it is |
-| --- | --- | --- |
-| 1×2×3 | Brick | The smallest with a name: five turns, all half turns, and 192 states |
-| 1×3×3 | Floppy | A flat 3×3 one cubie thick: half turns only, 768 states (192 if only the outer slices turn) |
-| 2×2×3 | Tower | A 2×2 with a layer added: three layers turn a quarter, the sides only a half |
-| 2×3×3 | Domino | A 3×3 cut in half: the two 3×3 slices turn a quarter, the sides only a half |
-| 2×3×4 | Block | No slice is square, so every turn is a half turn |
-| 3×3×4 | Pillar | A 3×3 with a fourth layer: the four layers turn a quarter, the long sides a half |
-| 3×3×5 | Tall pillar | The pillar with a fifth layer, and the biggest named shape |
-
-### The entry points
-
-| Import | Holds |
-| --- | --- |
-| `@johnmorrisdotca/kyuubu/cuboid` | The model, notation, scramble, named shapes, words, gestures and `planCuboidReplay`: no DOM |
-| `@johnmorrisdotca/kyuubu/cuboid/draw` | `CuboidView`: the puzzle drawn in CSS 3D |
-| `@johnmorrisdotca/kyuubu/cuboid/play` | `mountCuboidPlayer`: a solve with its controls |
-| `@johnmorrisdotca/kyuubu/cuboid/element` | `defineCuboid`: registers `<kyuubu-cuboid>` |
-| `@johnmorrisdotca/kyuubu/cuboid/element/define` | Importing it registers `<kyuubu-cuboid>` |
-
-The model's calls are the cube's with `Cuboid` in the name and `dims` for `n`:
-`solvedCuboid`, `turnCuboid`, `turnAllCuboid`, `cuboidSolved`, `isCuboidState`,
-`legalTurns`, `legalCuboidMoves`, `undoCuboidMove`, `cuboidMovesNotation`,
-`parseCuboidMove`, `randomCuboidScramble`. `turnCuboid` throws a `RangeError`
-for a turn the puzzle cannot make. `CuboidView` has the cube view's options
-(`dims` for `size`) and members, less hints, scale and the wheel's turns, and
-its root is marked `data-kyuubu-cuboid` with `data-state`, `data-dims`,
-`data-turning`, `data-dragging`, `data-committed` and `data-angle`.
-
-One tag plays a solve on any cuboid:
-
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/cuboid/element-define.js"></script>
-<kyuubu-cuboid dims="3x3x1" scramble="U2 R2 M2" moves="M2 R2 U2" controls></kyuubu-cuboid>
-```
-
-### More on cuboids
-
-The notation (`R2` for a half turn, and why `R` is refused where only half
-turns are), how a scramble is drawn, how a drag and a key turn a layer that
-only half turns, and the tag's attributes are in [docs/cuboids.md](docs/cuboids.md), which is on GitHub and
-not in the package. The [cuboids page](https://johnmorrisdotca.github.io/kyuubu/cuboids.html)
-has them all to try.
+The options, the examples and the tables are in [docs/CUBOIDS-USE.md](docs/CUBOIDS-USE.md#cuboids).
 
 ## Scrambles and seeds
 
-```ts
+```ts no-check
 randomScramble(3, 25);                                  // 25 turns, from Math.random
 randomScramble(3, 25, seededRandom("club night"));      // the same 25 turns everywhere
 randomScramble(3, 25, seededRandom("club night"), { faces: true });   // outer faces only: no M, E or S
@@ -1071,7 +662,7 @@ and nothing else, and runs the same on Linux, macOS and Windows.
 npm install -g @johnmorrisdotca/kyuubu    # or use npx, as above
 ```
 
-```console
+```text
 $ kyuubu --seed table
 D' R2 U' F2 L' S L F' R E' B' R2 D S' R' E' B2 L' B' D2 F' E S U' M'
 
@@ -1146,10 +737,10 @@ A solve is its size, the scramble and the turns made after it. It is written
 out three ways, each a pure function that returns a string; what is done with
 it is yours.
 
-```ts
+```ts no-check
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.11.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.11.1", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -1157,7 +748,7 @@ toCSV([solve]);       // for a spreadsheet
 summarize(solve);     // { scramble: "R U2 F'", moves: "F U2 R'", solved: true, count: 3, start, state, size }
 ```
 
-```
+```text
 3x3
 scramble: R U2 F'
 solve: F U2 R'
@@ -1165,7 +756,7 @@ time: 12.34
 seed: club night
 ```
 
-```csv
+```text
 time,size,scramble,moves,count,solved,seconds,seed
 ,3,R U2 F',F U2 R',3,true,12.34,club night
 ```
@@ -1175,7 +766,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.11.0",
+  "generator": "kyuubu 1.11.1",
   "solves": [
     {
       "size": 3,
@@ -1217,238 +808,32 @@ Everything is exported from `@johnmorrisdotca/kyuubu`; the React component
 from `@johnmorrisdotca/kyuubu/react`. Every export has a doc comment, which
 an editor shows on hover.
 
-### The model
+### Entry points
 
-| Export | Signature | Does |
-| --- | --- | --- |
-| `solvedCube` | `(n) => string` | A solved `n × n` cube |
-| `turnCube` | `(state, n, move) => string` | One turn. The state passed in is never changed |
-| `turnAll` | `(state, n, moves) => string` | Many turns, in order |
-| `cubeSolved` | `(state, n) => boolean` | Every face one colour |
-| `undoOf`, `undoAll` | `(move) => move`, `(moves) => moves` | The turn or turns that take it back |
-| `countsAsMove` | `(move) => boolean` | `false` for a whole-cube turn, which is only a look |
-| `isCubeState` | `(state, n) => boolean` | The right length, and `n²` stickers of each face. It does not say the cube can be solved |
-| `moveFits` | `(n, move) => boolean` | Whether a move exists on this size |
-| `encodeCubeMoves`, `decodeCubeMoves` | `(moves) => string`, `(code) => moves \| null` | Three characters a move, such as `x23y22z21`, for compact storage. Layers 0 to 9 |
-| `joinTurns` | `(moves) => moves` | Turns of one layer in a row written as one: `U' U2` is `U` |
-| `CUBE_FACE_ORDER` | `["U", "R", "F", "D", "L", "B"]` | The order a state is written in |
-| `FACE_FRAMES` | | Each face's normal, and its rows and columns as seen from outside |
-| `cubeSlots` | `(n) => { slots, index }` | Every sticker slot, in the order of the state |
-| `faceOfSlot`, `faceOfNormal`, `layerOf` | | The face a slot is on; the face a normal points out of; the layer a piece sits in |
-| `permutationOf` | `(n, move) => Int32Array` | Where every sticker goes under a turn |
-| `quarterTurn` | `(vector, axis) => vector` | A vector turned a quarter about an axis |
-
-Types: `CubeMove`, `CubeAxis`, `CubeTurns`, `CubeFace`, `StickerSlot`, `Vec3`.
-
-### Notation, scrambles and randomness
-
-| Export | Signature | Does |
-| --- | --- | --- |
-| `parseMove`, `parseMoves` | `(text, n) => CubeMove \| null`, `CubeMove[] \| null` | Notation read |
-| `moveNotation`, `movesNotation` | `(move, n) => string`, `(moves, n) => string` | Notation written |
-| `faceMove` | `(face, depth, amount, n) => CubeMove \| null` | A face or the layer `depth` in from it, turned `"cw"`, `"half"` or `"ccw"` |
-| `middleMove` | `(letter, amount, n) => CubeMove \| null` | `M`, `E` or `S`; `null` on an even cube |
-| `wholeMove` | `(letter, amount) => CubeMove` | `x`, `y` or `z` |
-| `randomScramble` | `(n, length, random?, options?) => CubeMove[]` | A scramble. `options.faces` keeps to the outer faces |
-| `FULL_SCRAMBLE_LENGTHS` | `{ 2: 11, 3: 25, 4: 40, 5: 60, 6: 80, 7: 100 }` | The usual length by size |
-| `seededRandom` | `(seed) => () => number` | A random source fixed by a seed |
-
-Types: `CubeFaceLetter`, `ScrambleOptions`.
-
-### The solve
-
-| Export | Signature | Does |
-| --- | --- | --- |
-| `solveSteps` | `(state, n) => SolveStep[] \| null` | The layer-by-layer solve; `null` for a size without a method |
-| `SOLVABLE_SIZES` | `[2, 3]` | The sizes it is written for |
-| `SOLVE_ALGORITHMS` | | The method's seven algorithms, in notation |
-| `stageName`, `stageSays` | `(stage, language?) => string` | A step's name, and what it is for |
-| `algorithmName` | `(algorithm, language?) => string` | An algorithm's name |
-
-Types: `SolveStep` (`{ stage, moves, parts, algorithms }`), `SolvePart`
-(`{ moves, algorithm? }`), `SolveStage`, `SolveAlgorithm`.
-
-### Export, import and the command line
-
-| Export | Signature | Does |
-| --- | --- | --- |
-| `toJSON`, `fromJSON` | `(solves) => string`, `(text) => SolveRecord[] \| null` | Versioned JSON, out and back |
-| `toText`, `fromText` | `(solve) => string`, `(text) => SolveRecord \| null` | Plain lines, out and back |
-| `toCSV` | `(solves) => string` | A row a solve |
-| `summarize` | `(solve) => SolveSummary` | What a solve comes to |
-| `RECORD_FORMAT` | `1` | The version of the JSON's shape |
-| `runCli` | `(args, surroundings?) => { code, out, err }` | The command line as a pure function |
-| `cubeNet` | `(state, n, colour?) => string` | A cube unfolded, as lines of text |
-| `VERSION` | | The package's version |
-
-Types: `SolveRecord` (`{ size, scramble, moves, ms?, at?, seed? }`),
-`SolveSummary`, `CliSurroundings`, `CliResult`.
-
-### Replay, the player and famous solves
-
-| Export | Signature | Does |
-| --- | --- | --- |
-| `parseSolve` | `(text, n) => SolveReading` | A solve as written, read into steps, or the first fault |
-| `parseSolveMove` | `(token, n) => step \| "unknown" \| "no-such-layer"` | One written step |
-| `solveMoves`, `applySolve` | `(steps) => CubeMove[]`, `(state, n, steps) => string` | The layers the steps turn; a cube after them |
-| `solveText`, `countSolveMoves` | `(steps) => string`, `(steps) => number` | The steps in standard form; how many count as moves |
-| `readSolveLink` | `(text) => SolveLink \| null` | The scramble and solve in a link to alg.cubing.net |
-| `planReplay` | `(source) => { ok, plan } \| { ok, fault }` | A solve read, checked and timed |
-| `Replay` | `new Replay(cube, plan, options?)` | A plan played: `play`, `pause`, `step`, `walk`, `seek(n, { animate? })`, `seekScramble(n)`, `restart`, `setSpeed`, `setLoop`, `status`, `destroy` |
-| `scrubPath` | `(steps, from, to, shown?) => ScrubPath` | The turns that take the cube from one position to another: each step going on, each undone going back, a long jump catching up at once |
-| `REPLAY_SPEEDS`, `REPLAY_STEP_MS`, `REPLAY_LOOP_REST_MS`, `MAX_REPLAY_STEPS` | | The speeds offered, the steady pace, the rest before a repeat, the longest solve |
-| `REPLAY_SCRUB_TURNS`, `REPLAY_SCRUB_MS`, `REPLAY_SCRAMBLE_STEP_MS` | `6`, `70`, `200` | How many turns a slider shows, how long each takes, how long each step of the scramble takes when a replay walks through it |
-| `CUBE_OPTIONS` | | Every choice the package offers, as rows a page can be built from (see *Build one with every option*); `CUBE_OPTION_GROUPS` names the groups and `CUBE_OPTIONS_LEFT_OUT` says why a few options are not choices |
-| `moveName` | `(code, language?) => string \| null` | What a move turns, in a few plain words: "Right face, anticlockwise" |
-| `mountMoveList` | `(element, options) => MoveListHandle` | The moves as buttons: the one just made marked, each taking the replay there. Options: `groups`, `current`, `locale`, `onPick`, `label` |
-| `MOVE_LIST_CSS` | | The list's stylesheet, put in the page once |
-
-Types: `SolveMove`, `SolveReading`, `NotationFault`, `SolveLink`,
-`ReplaySource`, `ReplayPlan`, `ReplayFault`, `ReplayStatus`, `ReplayOptions`,
-`ReplayCube`, `ReplayClock`, `ScrubPath`, `MoveListGroup`, `MoveListItem`, `MoveListOptions`, `MoveListHandle`.
-
-From `@johnmorrisdotca/kyuubu/player`: `mountPlayer(element, options)`,
-`PLAYER_CSS`, and the types `PlayerOptions` and `PlayerHandle`. From
-`@johnmorrisdotca/kyuubu/element`: `defineCube(name?)`,
-`CUBE_ELEMENT_NAME`, `CUBE_ELEMENT_ATTRIBUTES` and the type
-`KyuubuCubeElement`. From `@johnmorrisdotca/kyuubu/famous`: `FAMOUS_SOLVES`,
-`famousSolve(id)` and the type `FamousSolve`.
-
-### Scale and the cube that keeps turning
-
-| Export | Is |
+| Import | What it holds |
 | --- | --- |
-| `CUBE_SCALES` | `["small", "medium", "large"]`; the type is `CubeScale` |
-| `CUBE_SCALE_PX` | `{ small: 72, medium: 160, large: 300 }` |
-| `CUBE_SCALE_INTERACTIVE` | Whether a cube of each scale is turned by a hand unless told: `small` is not |
-| `cubeWidthPx` | `(scale?, width?) => number \| null`: the width a cube is drawn at |
-| `isCubeScale` | `(value) => boolean` |
-| `keepScrambling` | `(cube, options?) => KeepScramblingHandle`: `start`, `stop`, `setPace`, `running`, `destroy` |
-| `SCRAMBLE_PACES` | `{ fast: 0.5, normal: 1, slow: 4 }`, in seconds; the type is `ScramblePace` |
-| `SCRAMBLE_DEFAULT_PACE`, `SCRAMBLE_SHORTEST` | `1` and `0.2` seconds |
-| `paceSeconds` | `(pace?) => number`: a pace as seconds |
-| `nextTurn` | `(n, last, random, faces) => CubeMove`: one random layer, never about the last axis |
-| `prefersReducedMotion` | `() => boolean` |
+| `@johnmorrisdotca/kyuubu` | The model, notation, scrambles, the solver, export and import, `CubeView`, the guide, the replay and the words |
+| `@johnmorrisdotca/kyuubu/react` | `Kyuubu`, a component wrapping `CubeView` |
+| `@johnmorrisdotca/kyuubu/famous` | The record solves |
+| `@johnmorrisdotca/kyuubu/player` | `mountPlayer`: a solve with its controls |
+| `@johnmorrisdotca/kyuubu/element`, `/element/define` | `<kyuubu-cube>` and `<kyuubu-scramble>` |
+| `@johnmorrisdotca/kyuubu/cuboid`, `/cuboid/draw`, `/cuboid/play`, `/cuboid/element`, `/cuboid/element/define` | The cuboids: model, view, player and tag |
 
-Types: `KeepScramblingOptions`, `Scrambled` (what the loop turns: a `CubeView` is one), `ScramblePage`.
+### The calls to learn first
 
-### Show me on the cube
-
-| Export | Signature | Does |
-| --- | --- | --- |
-| `mountGuide` | `(element, view, options) => GuideHandle` | The guide beside a cube: the next move on the cube and in words. Options: `moves` or `method`, `locale`, `onChange`, `onEnd`. The handle has `guide`, `takeBack()`, `makeNext()`, `load(source)`, `setLocale()`, `destroy()` |
-| `GUIDE_CSS` | | The guide's stylesheet, put in the page once; it colours through `--kyuubu-guide-ink`, `alert`, `button`, `rule` and `focus` |
-| `Guide` | `new Guide(state, n, source)` | The walk itself, with no page: `next`, `heard(move)` (`"done"`, `"part"`, `"off"` or `"back"`), `detours`, `takeBack()`, `makeNext()`, `done`, `finished`, `state` |
-| `dragHint` | `(moves, n, view) => DragHint \| null` | The sticker to take hold of and the way to drag it that makes these turns, from this view; `null` for a turn of the whole cube |
-| `HINT_MIN_FACING`, `HINT_MIN_FOLLOW` | `0.2`, `0.5` | How squarely a face must face the viewer to carry an arrow; how closely the arrow must go the layer's way |
-| `movementSays` | `(moves, n, language?) => string \| null` | A movement in plain words: "Turn the right face towards you." |
-| `movementText` | `(moves, n) => string` | A movement in notation, wide turns as `Rw` |
-| `rotationKeys` | `(move) => string` | The keys for a turn of the whole cube: `X`, `Shift+X`, `X X` |
-
-Types: `GuideSource` (`{ moves }` or `{ method: true }`), `GuideStep`,
-`GuideHeard`, `GuidePanelOptions`, `GuideHandle`, `DragHint`, `HintArrow`,
-`CubeViewEvents`.
-
-### Words
-
-| Export | Does |
+| Call | What it does |
 | --- | --- |
-| `WORDS` | The cube's own words in English and Japanese: its label, the steps, the algorithms |
-| `STRINGS` | `WORDS` and the command line's words together: every word the package says |
-| `fill` | `fill("A {n}×{n} cube", { n: 3 })` is `"A 3×3 cube"` |
-| `languageOf` | The language a tag such as `ja-JP` names: `"ja"` or `"en"` |
+| `solvedCube(n)`, `turnAll(cube, n, moves)`, `cubeSolved(cube, n)` | A cube is a string; a turn is a pure function |
+| `parseMoves(text, n)`, `movesNotation(moves, n)`, `undoAll(moves)` | Notation in and out |
+| `randomScramble(n, length, random)`, `seededRandom(seed)` | A scramble from a seed |
+| `solveSteps(cube, n)`, `stageName(stage, language?)` | The beginner's method as named steps |
+| `toJSON`, `toText`, `toCSV`, `fromJSON`, `fromText`, `summarize` | A solve kept and read back |
+| `new CubeView(element, options)` and `<kyuubu-cube>` | The cube on a page |
+| `new Replay(cube, plan, options)`, `planReplay` | A solve played back |
 
-Types: `CubeWords`, `CliWords`, `KyuubuStrings`, `KyuubuLanguage`.
+### Every export
 
-### `new CubeView(element, options)`
-
-| Option | Default | Meaning |
-| --- | --- | --- |
-| `size` | required | The cube's side, 2 or more |
-| `state` | solved | The stickers to start with |
-| `scale` | | `"small"` (72 pixels), `"medium"` (160) or `"large"` (300): the box is given that width and kept square. Left out, the cube fills its box. A `small` cube is look-only unless `interactive` says otherwise |
-| `width` | | How wide it is drawn, in pixels, in place of `scale`'s |
-| `interactive` | `true` | Whether a person can turn it. `turn()` always works. `false` at `small` |
-| `keyboard` | `"focus"` | `"focus"`, `"page"` or `"none"` |
-| `turnMs` | `160` | How long a quarter turn made by a key, notation or code takes. Turns waiting in line go faster, and reduced motion gets none |
-| `animateScramble` | `true` | Whether `scramble(moves)` shows the turns it makes: the last ten, quickly. Reduced motion shows none |
-| `commitAngle` | `30` | The point of no return of a dragged layer, in degrees, from 5 to 85 |
-| `yaw`, `pitch` | `-35`, `28` | The first view, in degrees |
-| `fill` | `0.9` | How much of its box the cube fills |
-| `rounded` | `true` | Rounds the cube's corners like a real cube's plastic; `false` for square |
-| `colours` | standard | Face colours by letter: `{ U, R, F, D, L, B }` |
-| `plastic` | `"#111"` | The colour between stickers |
-| `theme` | | A whole look at once: `{ colours, plastic, stickerInset, stickerRadius, cornerRadius }` |
-| `locale` | the page's `lang` | `"en"` or `"ja"`, for the accessible name |
-| `label` | `"A 3×3 cube"` | Its accessible name |
-| `onTurn` | | `(move, state)` for every turn a person makes |
-| `onLook` | | `(yaw, pitch)` whenever the view turns |
-
-| Member | Does |
-| --- | --- |
-| `turn(move, { report?, animate? })` | Turns a layer, animated after any turns already on their way |
-| `setState(state, size?)` | Shows a state at once |
-| `state`, `size`, `host` | The state once every turn in line has finished; the side; the element |
-| `setLook(yaw, pitch)`, `resetLook()`, `looking` | The view |
-| `setInteractive(on)` | Lets a person turn it, or stops them |
-| `setScale(scale?, width?)` | Draws it at a scale or a width, or with neither, back to filling its box |
-| `turnTogether(moves, { animate?, ms? })` | Turns several layers about one axis as one movement (a wide turn), in `ms` when given |
-| `scramble(moves, { animate? })` | Scrambles the cube from where it is: the last ten turns shown quickly, the rest made at once; never told to `onTurn` |
-| `busy` | Whether a turn asked for is still on its way |
-| `redraw()` | Takes the cube out of the page and puts it straight back. Kept for pages that call it; since 1.3.2 the cube asks for no 3D context, so there are no layers for a browser to lose |
-| `setTurnMs(ms)` | Changes how long a quarter turn takes |
-| `setTheme(theme)` | Changes colours, plastic or sticker shape on the cube as drawn |
-| `setLocale(locale)` | Changes the language of its accessible name |
-| `showHint(moves)` | Lights the layer the turns are of, dims the rest, and draws the arrow to drag; `null` takes it away (see *Show me on the cube*) |
-| `hint` | What the hint shows from where the cube is looked at now: the sticker to take hold of, the way to drag, or `face: null` to look round first |
-| `on(type, listener)` | Listens for `"turn"` or `"look"`, as `onTurn` and `onLook` are told, as many listeners as wanted; returns what stops it |
-| `destroy()` | Removes the cube and every listener |
-
-The root element carries `data-kyuubu`, `data-state`,
-`data-turning="true" | "false"`, and while a layer is dragged `data-dragging`,
-`data-committed` and `data-angle`, while a drag has taken a seam `data-seam`, and while a hint is shown `data-hint`
-(`"drag"`, `"look"` or `"whole"`); each sticker carries `data-slot` and
-`data-face`, and under a hint `data-hint-lit` and, on the one to take hold
-of, `data-hint-grab`. The arrow is `[data-hint-arrow]`, with the way to drag
-on the screen in `data-drag`. Tests can wait on these.
-
-Also exported, for tools of your own: `moveForWheel` and `moveForDrag` (the
-turn the wheel means over a sticker, and the turn a whole drag means at
-once), `readKey` (the turn a key
-means; type `KeyReading`), `viewMatrix` (the way the cube is looked at; type
-`Mat3`), and the types `CubeViewOptions` and `CubeTheme`.
-
-### `<Kyuubu />`, from `@johnmorrisdotca/kyuubu/react`
-
-This component takes every `CubeView` option as a prop, plus `className`,
-`style` and any `data-*` (type `KyuubuProps`). Its `ref` (type
-`KyuubuHandle`) gives `turn`, `setState`, `resetLook`, `setTheme`, `state`,
-`showHint` and `scramble`. When the `state` prop changes to something the cube is not
-already showing, the cube shows it, so a parent can keep the state and hand it
-back without the cube jumping.
-
-The `hint` prop shows moves on the cube the way the visual guide does (the
-layer lit, an arrow the way to drag it); null shows nothing:
-
-```tsx
-<Kyuubu size={3} state={state} hint={nextStep.moves.slice(0, 1)} onTurn={(move, now) => setState(now)} />
-```
-
-`<KyuubuMoves />`, from the same entry, is the list of moves of a scramble or
-a solve as buttons (see *See each move*), for a page that draws its own cube
-and its own scrubber: give it `groups` and the move just made as `current`,
-and it marks that one and scrolls it into view; `onPick(index, group, at)`
-hears a press or a key (type `KyuubuMovesProps`).
-
-```tsx
-import { KyuubuMoves } from "@johnmorrisdotca/kyuubu/react";
-
-<KyuubuMoves
-  groups={[{ label: "Solution", main: true, items: ["R", "U", "R'", "U'"] }]}
-  current={at - 1}
-  onPick={(index) => setAt(index + 1)}
-/>;
-```
+The tables of every export (the model, notation, scrambles, the solve, export and import, the replay, the player and famous solves, scale, show me, words, `CubeView` and `<Kyuubu />`) are in [docs/API.md](docs/API.md), and each one, with its signature and doc comment, is in the [API reference](https://johnmorrisdotca.github.io/kyuubu/api.html).
 
 ## Theming
 
@@ -1484,7 +869,7 @@ the same on both:
 `CUBE_THEMES` holds three looks: `standard`, `stickerless` (colour to the
 edge of every piece) and `paper`, which is the one the demo site wears:
 
-```ts
+```ts no-check
 import { CUBE_THEMES, CubeView } from "@johnmorrisdotca/kyuubu";
 
 const view = new CubeView(element, { size: 3, theme: CUBE_THEMES.paper });
@@ -1528,13 +913,6 @@ milliseconds (the 3×3, 9), and the longest of a dragged layer 19. The longest a
 layer's stickers are lifted out of the cube and put back; the frames between are a few milliseconds each. `e2e/big.e2e.mjs`
 fails a change that makes a turn cost several times that.
 
-## Browser support
-
-Every current browser with CSS 3D transforms and Pointer Events: Chrome,
-Edge, Firefox and Safari 15 or later, on desktop and mobile. There is
-nothing to polyfill. It is tested in Chromium and in WebKit, Safari's
-engine, at phone size with touch.
-
 ## Accessibility
 
 - **The cube is one control.** Its box is a `role="application"` named "A 3×3
@@ -1558,6 +936,13 @@ engine, at phone size with touch.
   the faces.
 
 `test/docs.test.js` checks each of these against the source.
+
+## Browser support
+
+Every current browser with CSS 3D transforms and Pointer Events: Chrome,
+Edge, Firefox and Safari 15 or later, on desktop and mobile. There is
+nothing to polyfill. It is tested in Chromium and in WebKit, Safari's
+engine, at phone size with touch.
 
 ## Languages
 
@@ -1601,15 +986,98 @@ from a static page and costs nothing to host.
 
 Ideas and pull requests are welcome.
 
-## Contributing
+## Architecture
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). In short:
+The cube, its notation, the solver and the famous solves are plain functions
+over a string, with no DOM: the state is one letter a sticker, and every turn
+returns a new string. Drawing is its own layer under `view/`, in plain DOM and
+CSS with no canvas, and the player, the custom elements and the React
+component are thin wrappers over it, each its own entry point, so a page loads
+only what it uses.
+
+The file-by-file tree, with a line on each source file, is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the model and the notation, the scrambler and the solver, the view, the player and the elements, the cuboids (`cuboid/`), and the command line. Tests live in `test/`, apart from the code, and `test/docs.test.js` runs the
+README's examples. `bin/` is the few lines that hand the command line the real
+process, `scripts/` builds the demo and its API reference page and checks the
+package as npm packs it, `demo/` is the site published on GitHub Pages, and
+`e2e/` taps it in real browsers.
+
+## The name
+
+*Kyuubu* (キューブ) is the English word "cube" as Japanese writes it: a
+borrowed word, spelled in katakana, the script Japanese uses for words taken
+from other languages. It is said in three beats, kyu-u-bu, the middle one
+only the vowel held longer, which is what the mark ー shows. Written more
+formally in the Latin alphabet it is *kyūbu*; the package spells the long
+vowel out, so that the name needs no accent to type.
+
+## Where it comes from, and where it is used
+
+Kyuubu was built for [Itsutsu](https://itsutsu.com), a site for board games,
+puzzles, card games and dice games played at your own pace. *Itsutsu* (五つ) is
+Japanese for "five", after five in a row, the game the site began with. The
+site wanted a cube that worked on a phone without a canvas, that it could
+check on the server move by move, and that could show a beginner what to do
+next. Once that existed it seemed worth sharing.
+
+### Used by
+
+- [Itsutsu](https://itsutsu.com), for its cube.
+
+That is the whole list so far. Using Kyuubu in something? Open an *Add my
+project* issue and we will add you.
+
+### The family
+
+<!-- family:start (made by scripts/family-readme.mjs from scripts/family-template.mjs; change those, not this) -->
+Kyuubu is one of twenty-four packages, each made for the same site, each at
+[github.com/johnmorrisdotca](https://github.com/johnmorrisdotca). The code of every one is MIT.
+
+- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ): dice, with notation, exact odds, real sounds and the dice of many games. [Demo](https://johnmorrisdotca.github.io/korokoro/).
+- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ): a turning cube for the browser, 2×2 to 7×7, with record solves to replay. [Demo](https://johnmorrisdotca.github.io/kyuubu/).
+- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ): a colour-card shedding game for two to eight, with the house rules people play. [Demo](https://johnmorrisdotca.github.io/hitotsu/).
+- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ): a deck of playing cards, card games with computer players, and solitaires. [Demo](https://johnmorrisdotca.github.io/toranpu/).
+- [Tane](https://github.com/johnmorrisdotca/tane) (種): seeded random numbers and daily seeds, the same in every browser and on every server. [Demo](https://johnmorrisdotca.github.io/tane/).
+- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ): one rules engine for abstract board games, from gomoku and Reversi to Go and checkers. [Demo](https://johnmorrisdotca.github.io/narabe/).
+- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下): world conquest for two to six, on a map of the real world. [Demo](https://johnmorrisdotca.github.io/tenka/).
+- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字): a crossword tile race, in English and Japanese kana. [Demo](https://johnmorrisdotca.github.io/kumimoji/).
+- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ): a line-joining logic puzzle whose every level has exactly one answer. [Demo](https://johnmorrisdotca.github.io/tsunagi/).
+- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ): mahjong tiles drawn as SVG, stacked layouts, and the matching solitaire Awase. [Demo](https://johnmorrisdotca.github.io/jarajara/).
+- [Suido](https://github.com/johnmorrisdotca/suido) (水道): a pipe puzzle: turn the pieces until the water reaches every drain. [Demo](https://johnmorrisdotca.github.io/suido/).
+- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ): dominoes and Mexican Train. [Demo](https://johnmorrisdotca.github.io/domino/).
+- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉): word lists and word-game rules in English, French, German and Japanese. [Demo](https://johnmorrisdotca.github.io/kotoba/).
+- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六): backgammon and its variants, with the doubling cube and match play. [Demo](https://johnmorrisdotca.github.io/sugoroku/).
+- [Kazu](https://github.com/johnmorrisdotca/kazu) (数): grid number puzzles: Sudoku and its variants, Futoshiki and Skyscrapers. [Demo](https://johnmorrisdotca.github.io/kazu/).
+- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮): mazes on squares, hexagons, triangles and circles, made from a seed and drawn through with a finger or the mouse. [Demo](https://johnmorrisdotca.github.io/meikyuu/).
+- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty. [Demo](https://johnmorrisdotca.github.io/hikidashi/).
+- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
+- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首): find a kanji by the parts it is made of. [Demo](https://johnmorrisdotca.github.io/bushu/).
+- [Tobiishi](https://github.com/johnmorrisdotca/tobiishi) (飛び石): peg solitaire with nine boards and seeded solvable challenges. [Demo](https://johnmorrisdotca.github.io/tobiishi/).
+- [Jirai](https://github.com/johnmorrisdotca/jirai) (地雷): minesweeper on shaped grids with verified no-guess boards. [Demo](https://johnmorrisdotca.github.io/jirai/).
+- [Gunjin](https://github.com/johnmorrisdotca/gunjin) (軍人): five hidden-rank strategy games with pass-the-device play. [Demo](https://johnmorrisdotca.github.io/gunjin/).
+- [Karakuri](https://github.com/johnmorrisdotca/karakuri) (からくり): eight hyper-casual puzzle games, some of them physics: draw a shield, pull pins, cut ropes, slide blocks, pour tubes. [Demo](https://johnmorrisdotca.github.io/karakuri/).
+- [Houseki](https://github.com/johnmorrisdotca/houseki) (宝石): gem and stone matching puzzles: falling triplets, stone collapse, colour chains and gem swap. [Demo](https://johnmorrisdotca.github.io/houseki/).
+
+**This package is Kyuubu.** The demos of all twenty-four share one header and footer, so each links the rest.
+<!-- family:end -->
+
+## Development
 
 ```sh
-pnpm install
-pnpm check   # lint, types, tests and a build
-pnpm site    # build the demo into ./site, then serve it
+pnpm install --frozen-lockfile
+pnpm check             # lint, types, tests and the build
+pnpm test:site         # the demo in real browsers
+pnpm test:cli          # the command line, as a child process
+pnpm test:package      # pack it as npm does, install it and import every entry
+pnpm test:frameworks   # the framework examples, built from the packed tarball and played
+pnpm test:readme       # every TypeScript and JavaScript example in this README, type-checked and run
+pnpm screenshots:readme  # retake the README's pictures into docs/images (builds the demo first)
 ```
+
+The pictures are taken on the maintainer's Mac and are retaken only when the look changes; they are in `docs/images` and are not in the package that npm installs.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). In short: run `pnpm check` before you push (see [Development](#development)).
 
 Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make the
 solver or a parser run for very long, or text that gets out of the cube into
@@ -1619,6 +1087,8 @@ the page, is for the [security policy](./SECURITY.md), not a public issue.
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
+The latest release is 1.11.1: the README takes the family's full layout, with pictures of the cube, its pages and the cuboids and examples that are run.
+
 ## Licence
 
-[MIT](./LICENSE) © John Morris
+[MIT](./LICENSE) © John Morris The cube is drawn in code: no picture, font or sound of anyone else's ships.

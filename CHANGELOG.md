@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-10-06
+
+Nothing that was exported has changed.
+
+### Changed
+
+- The README takes the family's one layout, fully: a hero picture of the demo on a desk and on a phone in light and dark, a picture of the cube, of the page of every size, of the builder, of the famous solves and of two cuboids, an Install section, an Examples section of eleven examples whose output is what they print, and a short list of the calls to learn first. Its pictures are in `docs/images` (WebP, light and dark) and are retaken with `pnpm screenshots:readme` (it replaces `pnpm pictures`, `docs/desktop.jpg`, `docs/phone.jpg`, `docs/cuboids.jpg` and `docs/cuboids-phone.jpg`); they are not in the tarball, and `pnpm test:package` fails if one is.
+- To keep the README under the 64,000 characters npm can show, the long sections moved to pages under `docs/`, each with its heading and a summary left in the README: the controls and the drag to `docs/CONTROLS.md`; the solve a person can follow, showing a move on the cube and replaying a solve to `docs/REPLAY.md`; the cube drawn small and the cube that keeps turning to `docs/DISPLAY.md`; the cuboids to `docs/CUBOIDS-USE.md`; the tables of every export to `docs/API.md`; the source tree to `docs/ARCHITECTURE.md`. Nothing was removed, and the tests that hold these to the code read the README and these pages together.
+- The export's text and CSV samples name their language (`text`), and the README's Accessibility section sits before Browser support, where the standard puts it.
+- `pnpm test:readme` type-checks and runs every TypeScript and JavaScript example in the README against the built package, as a CI job of its own, and `pnpm check` holds the README to the family's lint.
+
 ## [1.11.0] - 2026-10-06
 
 Cuboids: turning puzzles shaped like a box. Five entry points are new, and nothing the cube exports has changed, except that `CubeOption.names` has three more optional keys and `CUBE_OPTIONS` has a row for `dims`.

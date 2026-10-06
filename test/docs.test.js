@@ -49,7 +49,8 @@ const {
 } = kyuubu;
 
 const read = (path) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
-const readme = read("README.md");
+// The pages the README's long sections moved to, then the README: what the package says about itself is held to the code across all of them. The pages come first, so that a heading is found where its section is written in full.
+const readme = ["docs/CONTROLS.md", "docs/REPLAY.md", "docs/DISPLAY.md", "docs/CUBOIDS-USE.md", "docs/API.md", "README.md"].map(read).join("\n");
 const pkg = JSON.parse(read("package.json"));
 const cell = (text) => text.replace(/\\\|/g, "|").trim();
 
@@ -77,7 +78,7 @@ function blocks(heading, language) {
   const depth = heading.match(/^#+/)[0].length;
   const rest = readme.slice(from + heading.length);
   const end = rest.search(new RegExp(`\\n#{1,${depth}} `));
-  return [...(end < 0 ? rest : rest.slice(0, end)).matchAll(new RegExp("```" + language + "\\n([\\s\\S]*?)```", "g"))].map((found) => found[1]);
+  return [...(end < 0 ? rest : rest.slice(0, end)).matchAll(new RegExp("```" + language + "(?: no-[a-z]+)?\\n([\\s\\S]*?)```", "g"))].map((found) => found[1]);
 }
 
 const codes = (text) => [...text.matchAll(/`([^`]+)`/g)].map((found) => found[1]);
@@ -114,7 +115,7 @@ describe("the README's first examples", () => {
 
   it("who it is for names notation the cube turns", () => {
     const from = readme.indexOf("## Who it is for");
-    const found = codes(readme.slice(from, readme.indexOf("## Use it in your project")));
+    const found = codes(readme.slice(from, readme.indexOf("## Features")));
     expect(found).toEqual(['--seed "club night"', "R U R' U'"]);
     expect(parseMoves(found[1], 3)).not.toBeNull();
   });
@@ -149,7 +150,7 @@ describe("the README's framework examples", () => {
 
 describe("the README's notation", () => {
   it("every piece of notation in its table is read on some cube, and written back the same", () => {
-    const rows = table("## Notation");
+    const rows = table("## Notation\n");
     expect(rows).toHaveLength(6);
     for (const [written] of rows) {
       for (const text of codes(written)) {
@@ -274,8 +275,8 @@ describe("the README on export and import", () => {
   it("prints what the three of them write", () => {
     const [shape] = blocks("## Export and import", "json");
     expect(shape).toBe(toJSON(solve));
-    expect(readme).toContain("```\n" + toText(solve) + "```");
-    const [csv] = blocks("## Export and import", "csv");
+    expect(readme).toContain("```text\n" + toText(solve) + "```");
+    const [, csv] = blocks("## Export and import", "text");   // the text sample, then the CSV
     expect(csv).toBe(toCSV([solve]).replace(/\r\n/g, "\n"));
     const summary = summarize(solve);
     expect(readme).toContain(`// { scramble: "${summary.scramble}", moves: "${summary.moves}", solved: ${summary.solved}, count: ${summary.count}, start, state, size }`);
@@ -305,10 +306,10 @@ describe("the README's reference", () => {
   it("names every option and member of the view", () => {
     const view = read("src/view/view.ts");
     const options = [...view.slice(view.indexOf("export type CubeViewOptions = {"), view.indexOf("const EDGE")).matchAll(/^ {2}(\w+)\??:/gm)].map((found) => found[1]);
-    const told = new Set(table("### `new CubeView(element, options)`").flatMap(([option]) => codes(option)));
+    const told = new Set(table("## `new CubeView(element, options)`").flatMap(([option]) => codes(option)));
     expect(new Set(options)).toEqual(told);
     const members = [...view.slice(view.indexOf("export class CubeView")).matchAll(/^ {2}(?:get |readonly )?(\w+)(?:\(|:)/gm)].map((found) => found[1]).filter((name) => name !== "constructor");
-    const shown = table("### `new CubeView(element, options)`", 1).flatMap(([member]) => codes(member)).map((text) => text.replace(/\(.*/, ""));
+    const shown = table("## `new CubeView(element, options)`", 1).flatMap(([member]) => codes(member)).map((text) => text.replace(/\(.*/, ""));
     expect(new Set(members)).toEqual(new Set(shown));
   });
 
@@ -401,7 +402,7 @@ describe("the release notes", () => {
 
 describe("the README's accessibility", () => {
   it("says what the source does: a labelled application that takes focus, a live guide, an alert, buttons that report pressed, reduced motion", () => {
-    const section = readme.slice(readme.indexOf("## Accessibility"), readme.indexOf("## Languages"));
+    const section = readme.slice(readme.indexOf("## Accessibility"), readme.indexOf("## Browser support"));
     expect(section.length).toBeGreaterThan(500);
     const view = read("src/view/view.ts");
     expect(view).toContain('this.root.setAttribute("role", "application")');

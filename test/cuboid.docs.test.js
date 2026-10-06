@@ -7,7 +7,7 @@ import { seededRandom } from "../src/index.ts";
 import { CUBOID_MAX_SIDE, CUBOID_PRESETS, CUBOID_RANDOM_STATE_MAX, cuboidSolved, legalTurns, parseCuboidMoves, randomCuboidScramble, readCuboidMove, solvedCuboid, turnAllCuboid } from "../src/cuboid/index.ts";
 
 describe("the README on cuboids", () => {
-  const readme = readFileSync("README.md", "utf8");
+  const readme = `${readFileSync("docs/CUBOIDS-USE.md", "utf8")}\n${readFileSync("README.md", "utf8")}`;
   const section = readme.slice(readme.indexOf("\n## Cuboids"), readme.indexOf("\n## Scrambles and seeds"));
   const rows = (heading) => {
     const lines = section.slice(section.indexOf(heading)).split("\n").slice(1);

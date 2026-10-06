@@ -64,3 +64,15 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium webkit
       - name: React, Vue, Svelte, Angular and a plain page, each built from the packed tarball and opened
         run: pnpm test:frameworks
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: The README's TypeScript and JavaScript examples, type-checked and run against the built package
+        run: pnpm test:readme
