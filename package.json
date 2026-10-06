@@ -1,7 +1,7 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
-  "version": "1.8.0",
-  "description": "Turning cube for the browser: a 3D twisty-puzzle cube simulator in the manner of the Rubik's Cube, 2×2 to 7×7, in plain CSS 3D. Drag, touch, keys or notation. Replay world record solves move for move; embed one with a tag or an iframe. Scrambles, a step-by-step solve, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
+  "version": "1.8.1",
+  "description": "Turning cube for the browser: a 3D twisty-puzzle cube from 2×2 to 7×7 in plain CSS 3D. Drag, touch, keys or notation; replay world record solves; scrambles, a solve guide, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "cube",
     "rubiks-cube",
@@ -89,11 +89,8 @@
     "url": "git+https://github.com/johnmorrisdotca/kyuubu.git"
   },
   "license": "MIT",
-  "author": {
-    "name": "John Morris",
-    "email": "john@johnmorris.ca",
-    "url": "https://johnmorris.ca"
-  },
+  "type": "module",
+  "author": "John Morris",
   "sideEffects": [
     "./dist/element-define.js"
   ],
@@ -103,26 +100,32 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./react": {
       "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
       "default": "./dist/react.js"
     },
     "./famous": {
       "types": "./dist/famous.d.ts",
+      "import": "./dist/famous.js",
       "default": "./dist/famous.js"
     },
     "./player": {
       "types": "./dist/player.d.ts",
+      "import": "./dist/player.js",
       "default": "./dist/player.js"
     },
     "./element": {
       "types": "./dist/element.d.ts",
+      "import": "./dist/element.js",
       "default": "./dist/element.js"
     },
     "./element/define": {
       "types": "./dist/element-define.d.ts",
+      "import": "./dist/element-define.js",
       "default": "./dist/element-define.js"
     }
   },

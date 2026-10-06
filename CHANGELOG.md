@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-10-05
+
+Nothing that was exported has changed.
+
+### Added
+
+- A test holds every `@johnmorrisdotca/kyuubu@N` version pin in the README to this package's major version.
+
+### Changed
+
+- The family's list, in the README and in the demo's footer, names all twenty-four packages, Karakuri and Houseki included.
+- The npm description is one sentence of 250 characters or fewer, so npm and its search show it whole; it is also the repository's About text. `homepage` is the demo site and `author` is `"John Morris"`, the same in every package.
+- The GitHub Actions workflows use the current versions of the actions (checkout 7, setup-node 7, pnpm/action-setup 6; configure-pages 6, upload-pages-artifact 5 and deploy-pages 5 for Pages), which clears GitHub's Node 20 deprecation warning.
+- `package.json` says `"type": "module"`, like the rest of the family, and every entry has an `import` condition.
+
 ## [1.8.0] - 2026-10-05
 
 The 6×6 and 7×7 are held and drawn faster. No turn, notation, scramble, state or saved solve changes (the same moves make the same cube),
@@ -333,7 +348,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.0...v1.8.1
 [1.7.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.4.0...v1.5.0
