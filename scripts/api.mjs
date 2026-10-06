@@ -119,7 +119,7 @@ export const API_CSS = `/* The API reference page: made by scripts/api.mjs. */
 .api-entry article > * { min-width: 0; max-width: 100%; }
 .api-entry h3 { margin: 0; font-size: 1rem; font-family: var(--mono); overflow-wrap: anywhere; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .api-entry h3 .fam-badge { font-family: var(--font); font-weight: 600; }
-.api-entry p { margin: 0; line-height: 1.5; max-width: 72ch; }
+.api-entry p { margin: 0; line-height: 1.5; max-width: 72ch; overflow-wrap: anywhere; }
 .api-entry p.api-names { max-width: none; }
 .api-entry pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 `;
