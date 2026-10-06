@@ -77,8 +77,10 @@ mountGuide(guideElement, view, { moves: "R U R' U' Rw x" }); // or any moves, as
 - **Half turns, wide turns and the whole cube.** A half turn is one long
   drag or two quarter turns the same way. A wide turn (`Rw`) is lit as one
   slab under one arrow, and each of its layers is dragged in turn. A turn of
-  the whole cube (`x`) cannot be dragged: the guide names its key and has a
-  button that makes it.
+  the whole cube (`x`) cannot be dragged, so the guide names its key and has a
+  button that makes it, and the cube shows which way it goes: an arrow across
+  the middle of the side round its axis that is seen best, running the way the
+  stickers there travel (`rotationHint`), with two heads for a half turn.
 - **A turn it did not ask for** is said to be one ("You turned U, not R."),
   with a button to take it back, and an arrow on the cube for turning it
   back by hand.
@@ -90,7 +92,8 @@ mountGuide(guideElement, view, { moves: "R U R' U' Rw x" }); // or any moves, as
 Underneath, each part can be used alone. `view.showHint(moves)` lights a
 layer and draws its arrow on any `CubeView`, and `view.hint` says which
 sticker to take hold of and which way to drag it; `dragHint(moves, n, view)`
-works that out with no page at all. `new Guide(state, n, source)` walks a
+works that out with no page at all, and `rotationHint(moves, n, view)` the arrow
+for a turn of the whole cube. `new Guide(state, n, source)` walks a
 list or the method as a pure state machine (`next`, `heard(move)`,
 `takeBack()`, `makeNext()`), and `movementSays` puts a move in words.
 The player has it too: `mountPlayer(element, { …, guide: true })`, or its

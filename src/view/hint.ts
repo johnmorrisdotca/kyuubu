@@ -49,7 +49,7 @@ export type DragHint = {
   slots: number[];
   /** The face the arrow lies on, or null where no side of the layer can be seen well enough from here: look round the cube first. */
   face: CubeFace | null;
-  /** The sticker to take hold of, at the arrow's tail, in the first of the layers; null with `face`. */
+  /** The sticker to take hold of, at the arrow's tail, in the first of the layers; null with `face`, and for a turn of the whole cube, which no sticker is taken hold of for. */
   grab: number | null;
   /** The way to drag across the screen (x right, y down), as a unit vector; null with `face`. */
   drag: [number, number] | null;
@@ -169,3 +169,71 @@ export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view:
   }
   return best?.hint ?? { axis, layers, turns, seam, slots: lit, face: null, grab: null, drag: null, quarters, atOnce: false, arrow: null };
 }
+
+/**
+ * The turn of the whole cube, if the moves are one: every one a turn of the
+ * whole cube, about one axis and as far. Null for anything else.
+ */
+function oneRotation(moves: readonly CubeMove[]): { axis: CubeAxis; turns: CubeTurns } | null {
+  if (moves.length === 0) return null;
+  const [first] = moves;
+  if (moves.some((move) => move.layer !== "all" || move.axis !== first.axis || move.turns !== first.turns)) return null;
+  return { axis: first.axis, turns: first.turns };
+}
+
+/**
+ * WHICH WAY TO TURN THE WHOLE CUBE: no drag on a sticker makes it (a key or a
+ * button does: `x`, `y`, `z`), so there is no sticker to take hold of, but the
+ * way it goes can still be drawn. The arrow lies across the middle of the side
+ * the axis goes through that is seen best, as long as the side allows, and runs
+ * the way every sticker on it travels; two heads for a half turn. The sides
+ * the axis comes out of never cross the screen, so none is drawn on.
+ *
+ * Null for moves that are not one turn of the whole cube; `face` and `arrow`
+ * are null where none of the four sides can be seen well enough (look round
+ * first).
+ */
+export function rotationHint(moves: CubeMove | readonly CubeMove[], n: number, view: Mat3): DragHint | null {
+  const rotation = oneRotation(Array.isArray(moves) ? (moves as readonly CubeMove[]) : [moves as CubeMove]);
+  if (rotation === null) return null;
+  const { axis, turns } = rotation;
+  const { slots } = cubeSlots(n);
+  const layers = Array.from({ length: n }, (_, layer) => layer);
+  const quarters = turns === 2 ? 2 : turns === 1 ? 1 : -1;
+  const way = quarters === -1 ? -1 : 1;
+  const across = axisVector(axis);
+  const base = { axis, layers, turns, seam: false, slots: slots.map((_, at) => at), quarters: quarters as 1 | -1 | 2, atOnce: false };
+  let best: { score: number; hint: DragHint } | null = null;
+  for (const normal of FACE_NORMALS) {
+    if (normal[axis] !== 0) continue;
+    const facing = apply(view, normal)[2];
+    if (facing < HINT_MIN_FACING) continue;
+    // Every sticker of the side goes this way, as every layer's turn is read: the axis crossed with the side's own direction.
+    const along = times(cross(across, normal), way) as unknown as Vec3;
+    const screen = onScreen(view, along);
+    const shown = Math.hypot(...screen);
+    // An arrow seen end-on says nothing: it must run across the screen.
+    if (shown < 0.3) continue;
+    const score = facing * shown;
+    if (best !== null && best.score >= score) continue;
+    // Across the whole side, a little short of its edges, and the arrow's tail at its near end.
+    const length = 2 * n - 0.8;
+    const centre = times(normal, n);
+    const from = centre.map((value, k) => value - (along[k] * length) / 2) as unknown as Vec3;
+    best = {
+      score,
+      hint: { ...base, face: faceOfNormal(normal), grab: null, drag: [screen[0] / shown, screen[1] / shown], arrow: { from, along, length, width: 2 * n, normal } },
+    };
+  }
+  return best?.hint ?? { ...base, face: null, grab: null, drag: null, arrow: null };
+}
+
+/** The six outward normals of a cube's sides. */
+const FACE_NORMALS: readonly Vec3[] = [
+  [1, 0, 0],
+  [-1, 0, 0],
+  [0, 1, 0],
+  [0, -1, 0],
+  [0, 0, 1],
+  [0, 0, -1],
+];

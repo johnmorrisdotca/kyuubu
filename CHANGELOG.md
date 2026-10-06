@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-10-06
+
+The guide draws an arrow for a turn of the whole cube. Nothing that was exported has changed; `rotationHint` is new.
+
+### Added
+
+- **An arrow for `x`, `y` and `z`.** The guide's arrow was drawn for every layer turn and for none of the three turns of the whole cube, which no drag on a sticker makes: it named the key and had a button, and the cube showed nothing. The cube now shows which way it goes: an arrow lies across the middle of the side round the axis that is seen best, running the way the stickers there travel (`x` takes the front up, `y'` the front to the right), as long as the side lets it be, thick and as wide across the head as the cube, with no dot at its tail (there is no sticker to take hold of), so it is not taken for the arrow of one layer, and with two heads for a half turn. It is drawn again from wherever the cube is looked at, and where none of the four sides can be seen it is left off. `view.showHint(x)`, the guide panel and the player's "Turn it yourself" all show it, `data-hint` stays `"whole"` and `view.hint` stays `null` for it (no sticker to take hold of), and `rotationHint(moves, n, view)` works the arrow out with no page at all.
+
 ## [1.11.1] - 2026-10-06
 
 Nothing that was exported has changed.

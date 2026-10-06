@@ -740,7 +740,7 @@ it is yours.
 ```ts no-check
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.11.1", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.12.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -766,7 +766,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.11.1",
+  "generator": "kyuubu 1.12.0",
   "solves": [
     {
       "size": 3,
@@ -1087,7 +1087,7 @@ the page, is for the [security policy](./SECURITY.md), not a public issue.
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release is 1.11.1: the README takes the family's full layout, with pictures of the cube, its pages and the cuboids and examples that are run.
+The latest release is 1.12.0: the guide draws an arrow on the cube for a turn of the whole cube (`x`, `y`, `z`), as it already did for every layer.
 
 ## Licence
 

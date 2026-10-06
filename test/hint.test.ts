@@ -8,6 +8,7 @@ import {
   cubeSlots,
   dragAngle,
   dragHint,
+  rotationHint,
   layerOf,
   moveForRelease,
   moveNotation,
@@ -143,7 +144,7 @@ describe("the arrow for a turn", () => {
     expect(follow([parseMove("R'", 3)!], 3, viewMatrix(0, 0)).face).toBe("F");
   });
 
-  it("draws no arrow for the whole cube, or for turns that are not one movement", () => {
+  it("is not a drag for the whole cube, which has its own arrow; nor for turns that are not one movement", () => {
     expect(dragHint(parseMove("x", 3)!, 3, viewMatrix(-35, 28))).toBeNull();
     expect(dragHint([parseMove("R", 3)!, parseMove("U", 3)!], 3, viewMatrix(-35, 28))).toBeNull();
     expect(dragHint([parseMove("R", 3)!, parseMove("L", 3)!], 3, viewMatrix(-35, 28))).toBeNull();
@@ -160,5 +161,84 @@ describe("the arrow for a turn", () => {
         expect(length).toBeGreaterThanOrEqual(1);
       }
     }
+  });
+});
+
+/**
+ * The arrow for a turn of the whole cube is not a drag, so there is nothing to
+ * follow with a pointer. What it must do is lie on a side the viewer sees,
+ * across the screen, and point the way the stickers there really travel.
+ */
+describe("the arrow for a turn of the whole cube", () => {
+  const ROTATIONS = ["x", "x'", "x2", "y", "y'", "y2", "z", "z'", "z2"];
+
+  it("lies on a side the viewer sees, along the axis's own sides, from every side the cube is looked at", () => {
+    for (const n of [2, 3, 5]) {
+      for (const view of VIEWS) {
+        for (const code of ROTATIONS) {
+          const move = parseMove(code, n)!;
+          const hint = rotationHint(move, n, viewMatrix(...view))!;
+          expect(hint).not.toBeNull();
+          if (hint.face === null) {
+            expect(hint.arrow).toBeNull();
+            continue;
+          }
+          const { normal, along, from, length, width } = hint.arrow!;
+          // On a side the viewer sees, and not one of the two the axis comes out of.
+          expect(apply(viewMatrix(...view), normal)[2]).toBeGreaterThanOrEqual(HINT_MIN_FACING);
+          expect(normal[move.axis]).toBe(0);
+          // Along the side, never off it, and as long as the side lets it be.
+          expect(along[move.axis] * along[move.axis] + normal[0] * along[0] + normal[1] * along[1] + normal[2] * along[2]).toBeCloseTo(0, 9);
+          expect(Math.hypot(...along)).toBeCloseTo(1, 9);
+          const tip = from.map((value, k) => value + along[k] * length);
+          for (const k of [0, 1, 2]) expect(Math.abs(tip[k])).toBeLessThanOrEqual(n + 1e-9);
+          expect(length).toBeGreaterThan(n);
+          expect(width).toBe(2 * n);
+          expect(hint.grab).toBeNull();
+          expect(hint.slots).toHaveLength(6 * n * n);
+          // Seen across the screen, so that it can be read.
+          expect(Math.hypot(...onScreen(viewMatrix(...view), along))).toBeGreaterThanOrEqual(0.3);
+        }
+      }
+    }
+  });
+
+  it("points the way the stickers on its side travel, a quarter turn of each kind and a half", () => {
+    for (const n of [2, 3, 4]) {
+      for (const view of VIEWS) {
+        for (const code of ROTATIONS) {
+          const move = parseMove(code, n)!;
+          const hint = rotationHint(move, n, viewMatrix(...view))!;
+          if (hint.arrow === null) continue;
+          const { normal, along, from, length } = hint.arrow;
+          const middle = from.map((value, k) => value + (along[k] * length) / 2);
+          // Right-hand rule: one quarter takes a point p towards axis × p, three quarters the other way; two go either way, drawn with two heads.
+          const axis = [0, 0, 0];
+          axis[move.axis] = 1;
+          const velocity = [axis[1] * normal[2] - axis[2] * normal[1], axis[2] * normal[0] - axis[0] * normal[2], axis[0] * normal[1] - axis[1] * normal[0]];
+          const sign = move.turns === 3 ? -1 : 1;
+          const heading = velocity[0] * along[0] * sign + velocity[1] * along[1] * sign + velocity[2] * along[2] * sign;
+          expect(heading).toBeCloseTo(1, 9);
+          // And it is the middle of the side.
+          middle.forEach((value, k) => expect(value).toBeCloseTo(normal[k] * n, 9));
+          expect(hint.quarters).toBe(move.turns === 2 ? 2 : move.turns === 1 ? 1 : -1);
+        }
+      }
+    }
+  });
+
+  it("is none for a layer, for turns that are not one movement, or for nothing", () => {
+    const view = viewMatrix(-35, 28);
+    expect(rotationHint(parseMove("R", 3)!, 3, view)).toBeNull();
+    expect(rotationHint([parseMove("x", 3)!, parseMove("y", 3)!], 3, view)).toBeNull();
+    expect(rotationHint([parseMove("x", 3)!, parseMove("x2", 3)!], 3, view)).toBeNull();
+    expect(rotationHint([], 3, view)).toBeNull();
+  });
+
+  it("says to look round when no side the axis goes through can be seen", () => {
+    // Looking straight along x, the four sides round it are all edge-on.
+    const hint = rotationHint(parseMove("x", 3)!, 3, viewMatrix(-90, 0))!;
+    expect(hint.face).toBeNull();
+    expect(hint.arrow).toBeNull();
   });
 });

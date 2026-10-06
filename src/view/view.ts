@@ -5,7 +5,7 @@ import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
 import { apply, axisVector, cross, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
 import { COMMIT_ANGLE, dragAngle, movesForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, seamsAt, type DragPick, type Seam } from "./gestures.ts";
-import { dragHint, type DragHint } from "./hint.ts";
+import { dragHint, rotationHint, type DragHint } from "./hint.ts";
 import { readKey } from "./keys.ts";
 
 /**
@@ -666,12 +666,13 @@ export class CubeView {
     }
   }
 
-  /** Where the hint's arrow is drawn from here, or nowhere: the layer's side cannot be seen, it is a turn of the whole cube, or a layer is turning. */
+  /** Where the hint's arrow is drawn from here, or nowhere: no side of the layer (or, for the whole cube, of the sides it turns) can be seen, or a layer is turning. */
   private drawHint(view: Mat3, scale: number, lens: number): void {
     const moves = this.hintMoves;
     const whole = moves !== null && moves.some((move) => move.layer === "all");
-    const hint = moves === null || whole ? null : dragHint(moves, this.n, view);
-    this.hintNow = hint;
+    const hint = moves === null ? null : whole ? rotationHint(moves, this.n, view) : dragHint(moves, this.n, view);
+    // A turn of the whole cube is drawn an arrow, but is not a drag: `hint` stays null for it, as it always has.
+    this.hintNow = whole ? null : hint;
     if (moves === null) delete this.root.dataset.hint;
     else this.root.dataset.hint = whole ? "whole" : hint?.face === null || hint === null ? "look" : "drag";
     // With no hint and no mark left to take off there is nothing to do: not a pass over every sticker of a 7×7 in every frame.
@@ -692,10 +693,10 @@ export class CubeView {
     const length = arrow.length * half;
     const width = arrow.width * half;
     const element = this.arrowElement();
-    const key = `${length.toFixed(1)}|${width.toFixed(1)}|${hint.quarters}|${this.n}`;
+    const key = `${length.toFixed(1)}|${width.toFixed(1)}|${hint.quarters}|${this.n}|${whole}`;
     if (key !== this.arrowKey) {
       this.arrowKey = key;
-      this.drawArrow(element, length, width, hint.quarters === 2);
+      this.drawArrow(element, length, width, hint.quarters === 2, whole);
     }
     const scaled = (v: Vec3) => apply(view, v).map((value) => value * scale) as unknown as Vec3;
     // Its middle, half its length on from the sticker it starts at, lifted a hair off the face.
@@ -720,15 +721,18 @@ export class CubeView {
   /**
    * The arrow itself, `length` by `width` pixels on a cube 300 across: a dot
    * at its tail where the sticker is taken hold of, a shaft, and a head; two
-   * heads for a half turn. Drawn in its colour with an edge round it, so it
-   * shows on every sticker; where motion is welcome, a mark runs along it.
+   * heads for a half turn. For the whole cube, which no sticker is taken hold
+   * of for, there is no dot, and the shaft is as thick as half a sticker and the
+   * head as wide as the cube, so it is not taken for the arrow of one layer.
+   * Drawn in its colour with an edge round it, so it shows on every sticker;
+   * where motion is welcome, a mark runs along it.
    */
-  private drawArrow(element: HTMLDivElement, length: number, width: number, half: boolean): void {
+  private drawArrow(element: HTMLDivElement, length: number, width: number, half: boolean, whole: boolean): void {
     for (const running of element.getAnimations?.({ subtree: true }) ?? []) running.cancel();
     const unit = this.unit();
-    const shaft = Math.min(width * 0.6, unit * (width > unit * 1.01 ? 0.3 : 0.2));
-    const headWide = Math.min(width * 0.92, shaft * 3.2);
-    const headLong = headWide * 0.72;
+    const shaft = whole ? Math.min(width * 0.5, unit * 0.55) : Math.min(width * 0.6, unit * (width > unit * 1.01 ? 0.3 : 0.2));
+    const headWide = whole ? width * 0.9 : Math.min(width * 0.92, shaft * 3.2);
+    const headLong = headWide * (whole ? 0.5 : 0.72);
     const mid = width / 2;
     const edge = Math.max(1, unit * 0.035);
     Object.assign(element.style, { width: `${length}px`, height: `${width}px`, left: `${-length / 2}px`, top: `${-width / 2}px` });
@@ -742,11 +746,13 @@ export class CubeView {
     const heads = half ? [length, length - headLong * 0.78] : [length];
     const shapes = (): SVGElement[] => {
       const made: SVGElement[] = [];
-      const dot = document.createElementNS(SVG, "circle");
-      dot.setAttribute("cx", "0");
-      dot.setAttribute("cy", String(mid));
-      dot.setAttribute("r", String(shaft * 0.95));
-      made.push(dot);
+      if (!whole) {
+        const dot = document.createElementNS(SVG, "circle");
+        dot.setAttribute("cx", "0");
+        dot.setAttribute("cy", String(mid));
+        dot.setAttribute("r", String(shaft * 0.95));
+        made.push(dot);
+      }
       const bar = document.createElementNS(SVG, "rect");
       bar.setAttribute("x", "0");
       bar.setAttribute("y", String(mid - shaft / 2));

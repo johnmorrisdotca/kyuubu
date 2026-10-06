@@ -125,6 +125,7 @@ Types: `KeepScramblingOptions`, `Scrambled` (what the loop turns: a `CubeView` i
 | `GUIDE_CSS` | | The guide's stylesheet, put in the page once; it colours through `--kyuubu-guide-ink`, `alert`, `button`, `rule` and `focus` |
 | `Guide` | `new Guide(state, n, source)` | The walk itself, with no page: `next`, `heard(move)` (`"done"`, `"part"`, `"off"` or `"back"`), `detours`, `takeBack()`, `makeNext()`, `done`, `finished`, `state` |
 | `dragHint` | `(moves, n, view) => DragHint \| null` | The sticker to take hold of and the way to drag it that makes these turns, from this view; `null` for a turn of the whole cube |
+| `rotationHint` | `(moves, n, view) => DragHint \| null` | The arrow for a turn of the whole cube, which no drag makes: across the middle of the side round its axis seen best, the way the stickers there go; `null` for anything but one turn of the whole cube |
 | `HINT_MIN_FACING`, `HINT_MIN_FOLLOW` | `0.2`, `0.5` | How squarely a face must face the viewer to carry an arrow; how closely the arrow must go the layer's way |
 | `movementSays` | `(moves, n, language?) => string \| null` | A movement in plain words: "Turn the right face towards you." |
 | `movementText` | `(moves, n) => string` | A movement in notation, wide turns as `Rw` |

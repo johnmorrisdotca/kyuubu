@@ -92,6 +92,9 @@ test("the method is shown on the cube, a turn of the whole cube made for you", a
     const before = Number(await guide.getAttribute("data-done"));
     if ((await root(page).getAttribute("data-hint")) === "whole") {
       await expect(page.locator('[data-guide="how"]')).toContainText("No drag on a sticker does this");
+      // The way the cube turns is drawn on it, across a side that can be seen.
+      await expect(page.locator("[data-hint-arrow]")).toBeVisible();
+      expect((await page.locator("[data-hint-arrow]").boundingBox()).width).toBeGreaterThan(20);
       await tap(page, '[data-act="do-it"]');
     } else {
       await followArrow(page, (await shown(page).textContent()).endsWith("2"));
@@ -103,6 +106,27 @@ test("the method is shown on the cube, a turn of the whole cube made for you", a
   await tap(page, id("show"));
   await expect(page.locator(id("guide"))).toBeHidden();
   await expect(root(page)).not.toHaveAttribute("data-hint", /./);
+  await sound(page, errors);
+});
+
+test("a turn of the whole cube is drawn on the cube with an arrow, and the next one is drawn when it is made", async ({ page }) => {
+  const errors = await open(page);
+  await showTyped(page, "x' z2 R");
+  await expect(root(page)).toHaveAttribute("data-hint", "whole");
+  const arrow = page.locator("[data-hint-arrow]");
+  await expect(arrow).toBeVisible();
+  // Nothing is lit or dimmed: the whole cube turns. Two heads for a half turn come later.
+  await expect(page.locator(":is(#stage, #player) [data-kyuubu] [data-hint-lit]")).toHaveCount(0);
+  const first = await arrow.getAttribute("style");
+  await tap(page, '[data-act="do-it"]');
+  await expect(shown(page)).toHaveText("z2");
+  await expect(root(page)).toHaveAttribute("data-hint", "whole");
+  await expect(arrow).toBeVisible();
+  // A different turn is a different arrow, somewhere else.
+  expect(await arrow.getAttribute("style")).not.toBe(first);
+  await tap(page, '[data-act="do-it"]');
+  await expect(shown(page)).toHaveText("R");
+  await expect(root(page)).toHaveAttribute("data-hint", "drag");
   await sound(page, errors);
 });
 
