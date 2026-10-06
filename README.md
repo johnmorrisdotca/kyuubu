@@ -216,6 +216,36 @@ Each of the five is built from the packed tarball, opened in Chromium and
 WebKit, and turned with a key by `scripts/check-frameworks.mjs` before a
 release names it. The examples above are the ones it builds.
 
+### Build one with every option
+
+The [builder](https://johnmorrisdotca.github.io/kyuubu/builder.html) is a
+page with every choice the package offers (size, scale, theme, a colour for
+each face, turn speed, keys, the pace of a cube that keeps turning, the
+replay's settings, the guide, the language), a live cube that changes as each
+is chosen, and the exact code for that cube as a custom element, an ES module,
+an iframe, React, Vue, Svelte and Angular, each with a Copy button. The
+choices are in the address, so a link shares the cube. It writes nothing for a
+choice that is what the package does when it is left out.
+
+The page has no row of its own for any option. It is drawn from `CUBE_OPTIONS`,
+the package's own list of its choices: each has a kebab-case `id`, a `group`, a
+`kind` (`number`, `boolean`, `choice`, `colour`, `text` or `moves`), its default,
+its choices or range, what each way of making a cube calls it (`names.view` for
+`CubeView`, `names.player` for `mountPlayer`, `names.cube` for the attributes of
+`<kyuubu-cube>` and the embed's address, `names.turning` for those of
+`<kyuubu-scramble>`), and one plain line in English and Japanese. `CUBE_OPTION_GROUPS`
+names the groups, and `CUBE_OPTIONS_LEFT_OUT` says why each option that is
+not a choice (a function the page gives, a list only a program has) is not in it.
+A test reads the options of the view, the player and both elements out of the
+source and fails until each is a row or is left out with its reason, so a new
+option cannot be added to the package and missed by the builder (types
+`CubeOption`, `OptionKind`, `OptionGroup`, `CubeMaker`).
+
+The code is written by `demo/builder-code.js`, pure functions from that list and
+the choices made; the page is `demo/builder.html` and `demo/builder.js`. The three
+files do not name an option, so they can be copied to another package with its own
+list.
+
 ### What a developer gets
 
 - **Typed results.** TypeScript types for everything, with a doc comment on
@@ -253,6 +283,7 @@ src/
 ├── guide-panel.ts       the panel beside a cube: the next movement in notation and words, and an arrow on the cube
 ├── guide.ts             a solve to follow with your own hands, one movement at a time, with detours taken back
 ├── index.ts             the main entry: the cube, notation, solver, famous solves, and the player to mount
+├── options.ts           every choice the package offers, as a list a builder page is drawn from
 ├── move-list.ts         the moves of a scramble or a solve as buttons, the one just made marked and scrolled into view
 ├── move-name.ts         what a move turns, in a few plain words, in English and Japanese
 ├── notation.ts          the standard notation, for reading a move out and for the keys that make one
@@ -1005,7 +1036,7 @@ it is yours.
 ```ts
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.9.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.10.0", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -1031,7 +1062,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.9.0",
+  "generator": "kyuubu 1.10.0",
   "solves": [
     {
       "size": 3,
@@ -1154,6 +1185,7 @@ Types: `SolveRecord` (`{ size, scramble, moves, ms?, at?, seed? }`),
 | `scrubPath` | `(steps, from, to, shown?) => ScrubPath` | The turns that take the cube from one position to another: each step going on, each undone going back, a long jump catching up at once |
 | `REPLAY_SPEEDS`, `REPLAY_STEP_MS`, `REPLAY_LOOP_REST_MS`, `MAX_REPLAY_STEPS` | | The speeds offered, the steady pace, the rest before a repeat, the longest solve |
 | `REPLAY_SCRUB_TURNS`, `REPLAY_SCRUB_MS`, `REPLAY_SCRAMBLE_STEP_MS` | `6`, `70`, `200` | How many turns a slider shows, how long each takes, how long each step of the scramble takes when a replay walks through it |
+| `CUBE_OPTIONS` | | Every choice the package offers, as rows a page can be built from (see *Build one with every option*); `CUBE_OPTION_GROUPS` names the groups and `CUBE_OPTIONS_LEFT_OUT` says why a few options are not choices |
 | `moveName` | `(code, language?) => string \| null` | What a move turns, in a few plain words: "Right face, anticlockwise" |
 | `mountMoveList` | `(element, options) => MoveListHandle` | The moves as buttons: the one just made marked, each taking the replay there. Options: `groups`, `current`, `locale`, `onPick`, `label` |
 | `MOVE_LIST_CSS` | | The list's stylesheet, put in the page once |

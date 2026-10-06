@@ -29,6 +29,7 @@ export { HINT_MIN_FACING, HINT_MIN_FOLLOW, dragHint, type DragHint, type HintArr
 export { Guide, movementSays, movementText, rotationKeys, type GuideHeard, type GuideSource, type GuideStep } from "./guide.ts";
 export { GUIDE_CSS, mountGuide, type GuideHandle, type GuidePanelOptions } from "./guide-panel.ts";
 export { moveName } from "./move-name.ts";
+export { CUBE_OPTIONS, CUBE_OPTIONS_LEFT_OUT, CUBE_OPTION_GROUPS, type CubeMaker, type CubeOption, type OptionGroup, type OptionKind } from "./options.ts";
 export { MOVE_LIST_CSS, mountMoveList, type MoveListGroup, type MoveListHandle, type MoveListItem, type MoveListOptions } from "./move-list.ts";
 export {
   COMMIT_ANGLE,

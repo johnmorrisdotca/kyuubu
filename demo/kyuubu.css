@@ -85,3 +85,28 @@
 .cube-example-preview { position: relative; width: 160px; height: 160px; max-width: 100%; }
 .cube-example-preview > * { max-width: 100%; }
 @media (min-width: 640px) { .cube-example { grid-template-columns: minmax(0, 1fr) auto; } }
+
+/* The builder: the cube stays in view beside the choices on a desk, and comes first above them on a phone. */
+.cube-bld-layout { align-items: start; }
+.cube-bld-controls { display: grid; gap: 14px; min-width: 0; }
+@media (min-width: 900px) { .cube-bld-preview { position: sticky; top: 12px; } }
+.cube-bld-stage { position: relative; width: 100%; max-width: min(520px, 62vh); aspect-ratio: 1; margin: 0 auto; }
+.cube-bld-stage[data-maker="player"] { aspect-ratio: auto; max-width: min(560px, 100%); min-height: 280px; }
+.cube-bld-stage .kyuubu-player { --kyuubu-player-paper: var(--felt, #1f4d3a); }
+.cube-bld-stage kyuubu-scramble { margin: 0 auto; }
+.cube-bld-group { padding: 0; display: block; }
+.cube-bld-group > summary { cursor: pointer; padding: 12px 14px; min-height: 44px; font-weight: 700; display: flex; align-items: center; }
+.cube-bld-group[open] > summary { border-bottom: 1px solid var(--rule); }
+.cube-bld-options { padding: 14px; display: grid; gap: 16px; }
+.cube-bld-option { display: grid; gap: 6px; min-width: 0; }
+.cube-bld-option > label, .cube-bld-option > .fam-label { font-weight: 600; font-size: .9rem; }
+.cube-bld-option .fam-fine { margin: 0; }
+.cube-bld-colours { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.cube-bld-colour { display: flex; gap: 8px; align-items: center; }
+.cube-bld-colour input[type="color"] { width: 64px; height: 44px; padding: 3px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); cursor: pointer; }
+.cube-bld-number { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cube-bld-number input[type="range"] { flex: 1 1 8rem; min-height: 44px; accent-color: var(--ink); }
+.cube-bld-number input[type="number"] { width: 6.5rem; }
+.cube-bld-code pre { max-width: 100%; overflow-x: auto; }
+.cube-bld-code .fam-tabs { flex-wrap: wrap; }
+.cube-bld-code .fam-tabs button { flex: 1 1 auto; min-width: 44px; padding: 0 12px; white-space: nowrap; }

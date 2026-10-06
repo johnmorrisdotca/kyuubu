@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-06
+
+A builder page, and the list of the package's choices it is drawn from. Nothing that was exported has changed; `CUBE_OPTIONS`, `CUBE_OPTION_GROUPS`, `CUBE_OPTIONS_LEFT_OUT` and their types are new.
+
+### Added
+
+- **`CUBE_OPTIONS`: every choice the package offers, as a list.** Each row has an id, a group, a kind (number, boolean, choice, colour, text, moves), its default, its choices or range, what each way of making a cube calls it (`CubeView`, `mountPlayer`, the attributes of `<kyuubu-cube>` and of `<kyuubu-scramble>`) and one plain line in English and Japanese. `CUBE_OPTION_GROUPS` names the groups and `CUBE_OPTIONS_LEFT_OUT` says why an option that is not a choice (a function, a list only a program has) is not in it. `test/options.test.ts` reads the options of the view, the player and both elements from the source and fails until each is a row or is left out with its reason, so a new option cannot be missed by the builder.
+- **The builder, `builder.html`, linked from every page's header.** Every choice in the list, grouped with a line each; a live cube (a cube to turn, a solve to watch, or a cube that keeps turning) that changes as each is chosen; and the exact code for it as a custom element, an ES module, an iframe, React, Vue, Svelte and Angular, each with Copy. The choices are in the address, so a link shares the cube. `demo/builder-code.js` writes the code from the list and the choices, and names no option, so the page and the file can be copied to another package.
+
 ## [1.9.0] - 2026-10-06
 
 The player says which move it is and lists them, the slider and Back turn the cube the way they go, a drag on the seam turns two layers, and a scramble is shown turning. A minor release: nothing that was exported has changed or gone; every addition is on unless said otherwise, and each can be turned off.

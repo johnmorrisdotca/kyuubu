@@ -15,7 +15,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ",
     ogDescription: "A turning cube for the browser, in CSS 3D. 2×2 to 7×7, with a solve you can follow.",
   }),
-  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
+  header: familyHeader({ id, links: [{ href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "builder.html", say: "toBuilder" }, { href: "api.html", say: "toApi" }] }),
   famousHead: familyHead({
     id,
     title: "Kyuubu · famous solves, played move for move",
@@ -23,7 +23,7 @@ const parts = {
     ogTitle: "Kyuubu キューブ · famous solves",
     ogDescription: "Record solves of the 3×3, move for move, at the speed they were made.",
   }),
-  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
+  famousHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "cubes.html", say: "toCubes" }, { href: "builder.html", say: "toBuilder" }, { href: "api.html", say: "toApi" }] }),
   cubesHead: familyHead({
     id,
     title: "Kyuubu · a cube that keeps turning, big or small",
@@ -31,7 +31,15 @@ const parts = {
     ogTitle: "Kyuubu キューブ · a cube that keeps turning",
     ogDescription: "A cube that keeps turning by itself, at a pace you choose, small, medium or large.",
   }),
-  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "api.html", say: "toApi" }] }),
+  cubesHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "builder.html", say: "toBuilder" }, { href: "api.html", say: "toApi" }] }),
+  builderHead: familyHead({
+    id,
+    title: "Kyuubu · build a cube with every option, and copy the code",
+    description: "Choose every option Kyuubu offers, watch the cube change as you do, and copy the code that makes exactly that cube: a custom element, an ES module, an iframe, React, Vue, Svelte or Angular. The choices are in the address, so a link shares the cube.",
+    ogTitle: "Kyuubu キューブ · builder",
+    ogDescription: "Every option of a turning cube in one page, with the code for the cube you build.",
+  }),
+  builderHeader: familyHeader({ id, links: [{ href: "./", say: "toCube" }, { href: "famous.html", say: "toFamous" }, { href: "cubes.html", say: "toCubes" }, { href: "api.html", say: "toApi" }] }),
   unreviewed: familyUnreviewed({ id }),
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
@@ -49,7 +57,8 @@ mkdirSync("site", { recursive: true });
 writeFileSync("site/index.html", page);
 writeFileSync("site/famous.html", fillPage("famous.html"));
 writeFileSync("site/cubes.html", fillPage("cubes.html"));
-for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "snippets.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
+writeFileSync("site/builder.html", fillPage("builder.html"));
+for (const file of ["family.css", "kyuubu.css", "app.js", "famous.js", "cubes.js", "snippets.js", "builder.js", "builder-code.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
 cpSync("docs/cube.png", "site/cube.png");
 cpSync("dist", "site/dist", { recursive: true });
 // The API reference, made from the source: every export of every entry point.

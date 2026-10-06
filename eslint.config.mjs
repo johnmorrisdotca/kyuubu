@@ -13,12 +13,12 @@ export default tseslint.config(
   },
   {
     files: ["scripts/**/*.mjs", "bin/**/*.mjs", "e2e/**/*.mjs", "playwright.config.mjs"],
-    languageOptions: { globals: { console: "readonly", URL: "readonly", Blob: "readonly", DOMParser: "readonly", MutationObserver: "readonly", KeyboardEvent: "readonly", performance: "readonly", requestAnimationFrame: "readonly", document: "readonly", navigator: "readonly", window: "readonly", getComputedStyle: "readonly" } },
+    languageOptions: { globals: { console: "readonly", URL: "readonly", Blob: "readonly", DOMParser: "readonly", MutationObserver: "readonly", KeyboardEvent: "readonly", location: "readonly", setTimeout: "readonly", performance: "readonly", requestAnimationFrame: "readonly", document: "readonly", navigator: "readonly", window: "readonly", getComputedStyle: "readonly" } },
   },
   {
     files: ["demo/**/*.js"],
     languageOptions: {
-      globals: { console: "readonly", URL: "readonly", Blob: "readonly", document: "readonly", localStorage: "readonly", matchMedia: "readonly", navigator: "readonly", performance: "readonly", requestAnimationFrame: "readonly", cancelAnimationFrame: "readonly", setTimeout: "readonly", URLSearchParams: "readonly", location: "readonly", history: "readonly" },
+      globals: { console: "readonly", URL: "readonly", Blob: "readonly", document: "readonly", localStorage: "readonly", matchMedia: "readonly", navigator: "readonly", performance: "readonly", requestAnimationFrame: "readonly", cancelAnimationFrame: "readonly", setTimeout: "readonly", clearTimeout: "readonly", URLSearchParams: "readonly", location: "readonly", history: "readonly" },
     },
   },
 );
