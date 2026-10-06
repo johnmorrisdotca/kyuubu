@@ -69,7 +69,7 @@ export async function sound(page, errors) {
       .map((el) => ({ what: el.id || el.dataset.testid || el.textContent.trim().slice(0, 20), box: el.getBoundingClientRect() }))
       .filter(({ box }) => box.width < 43.5 || box.height < 43.5)
       .map(({ what, box }) => `${what} ${Math.round(box.width)}×${Math.round(box.height)}`);
-    const wide = [...document.querySelectorAll("main *")].filter((el) => seen(el) && el.closest("[data-kyuubu], .fam-table-box, pre") === null && el.getBoundingClientRect().right > window.innerWidth + 0.5).map((el) => el.tagName + "." + el.className);
+    const wide = [...document.querySelectorAll("main *")].filter((el) => seen(el) && el.closest("[data-kyuubu], [data-kyuubu-cuboid], .fam-table-box, pre") === null && el.getBoundingClientRect().right > window.innerWidth + 0.5).map((el) => el.tagName + "." + el.className);
     return { over: document.documentElement.scrollWidth - window.innerWidth, small, wide };
   });
   expect(found.over, "the page scrolls sideways").toBeLessThanOrEqual(0);

@@ -1,0 +1,94 @@
+<!doctype html>
+<!-- The cuboids page's source. `pnpm site` fills each "family:" line from scripts/family-template.mjs and writes site/cuboids.html. -->
+<html lang="en">
+  <head>
+    <!-- family:cuboidsHead -->
+    <meta property="og:image" content="https://johnmorrisdotca.github.io/kyuubu/cuboids.jpg" />
+    <link rel="stylesheet" href="family.css" />
+    <link rel="stylesheet" href="kyuubu.css" />
+    <link rel="stylesheet" href="cuboids.css" />
+  </head>
+  <body>
+    <main class="cube-page">
+      <!-- family:cuboidsHeader -->
+      <div class="cube-layout">
+        <div class="cube-side">
+          <section class="fam-felt cube-felt" aria-labelledby="hint">
+            <div class="cube-hud">
+              <div><small data-say="shape"></small><b id="name" data-testid="name">3×3×1</b></div>
+              <div><small data-say="moves"></small><b id="count" data-testid="count">0</b></div>
+            </div>
+            <div class="cube-stage" id="stage" data-testid="stage"></div>
+            <p class="fam-hint" id="hint" data-testid="hint" aria-live="polite"></p>
+          </section>
+          <div class="cube-actions">
+            <button class="fam-button" data-primary="true" id="scramble" type="button" data-say="scramble" data-testid="scramble"></button>
+            <button class="fam-button" id="undo" type="button" data-say="undo" data-testid="undo"></button>
+            <button class="fam-button" id="reset" type="button" data-say="reset" data-testid="reset"></button>
+            <button class="fam-button" id="look" type="button" data-say="frontOn" data-testid="front-on"></button>
+          </div>
+        </div>
+
+        <div class="cube-side">
+          <section class="fam-panel cube-panel" aria-labelledby="picker-title">
+            <h2 id="picker-title" data-say="pickerTitle"></h2>
+            <div class="cuboid-picker" id="picker" role="group" aria-labelledby="picker-title" data-testid="picker" data-help-en="Tap a named shape to put it on the felt. Choosing one starts a new, solved puzzle." data-help-ja="名前のある形をタップすると、そろった新しいパズルがフェルトに置かれます。"></div>
+            <div class="cuboid-says" aria-live="polite">
+              <b id="says-name" data-testid="says-name"></b>
+              <p id="says" data-testid="says"></p>
+            </div>
+          </section>
+
+          <section class="fam-panel cube-panel" aria-labelledby="custom-title">
+            <h2 id="custom-title" data-say="customTitle"></h2>
+            <div class="cuboid-custom" data-help-en="Make any shape from 1 to 7 cubies on a side. Width, height and depth are the sides as the puzzle first sits. 1×1×1 has nothing to turn, so it is not offered." data-help-ja="各辺1〜7個の好きな形を作れます。横・高さ・奥行きは、最初に置かれた向きの辺です。1×1×1は回せるところがないので選べません。">
+              <label class="cuboid-side"><span data-say="sideX"></span><select class="fam-field" id="side-0" data-testid="side-0"></select></label>
+              <label class="cuboid-side"><span data-say="sideY"></span><select class="fam-field" id="side-1" data-testid="side-1"></select></label>
+              <label class="cuboid-side"><span data-say="sideZ"></span><select class="fam-field" id="side-2" data-testid="side-2"></select></label>
+            </div>
+            <p class="fam-error" id="custom-error" data-testid="custom-error" aria-live="polite"></p>
+          </section>
+
+          <section class="fam-panel cube-panel" aria-labelledby="layers-title">
+            <h2 id="layers-title" data-say="layersTitle"></h2>
+            <p class="fam-muted" data-say="layersText"></p>
+            <ul class="cuboid-axes" id="axes" data-testid="axes"></ul>
+          </section>
+
+          <section class="fam-panel cube-panel" aria-labelledby="type-title">
+            <h2 id="type-title" data-say="typeTitle"></h2>
+            <form class="cube-form" id="type">
+              <textarea class="fam-field cube-moves" data-mono="true" id="moves" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="U2 R2" data-say-label="typeLabel" data-testid="moves"></textarea>
+              <button class="fam-button" data-primary="true" type="submit" data-say="turn" data-testid="turn"></button>
+            </form>
+            <p class="fam-error" id="error" data-testid="error" aria-live="polite"></p>
+            <h3 data-say="scrambleWas"></h3>
+            <p class="fam-notation cube-log" id="scrambled" data-testid="scrambled"></p>
+            <h3 data-say="yourMoves"></h3>
+            <p class="fam-notation cube-log" id="log" data-testid="log"></p>
+            <p class="fam-fine" data-say="notationHelp"></p>
+          </section>
+        </div>
+      </div>
+
+      <section class="more" aria-labelledby="embed-title">
+        <h2 id="embed-title" data-say="embedTitle"></h2>
+        <p data-say="embedText"></p>
+        <pre><code>&lt;script type="module" src="https://unpkg.com/@johnmorrisdotca/kyuubu/dist/cuboid/element-define.js"&gt;&lt;/script&gt;
+&lt;kyuubu-cuboid dims="3x3x1" scramble="U2 R2 M2" moves="M2 R2 U2" controls&gt;&lt;/kyuubu-cuboid&gt;</code></pre>
+        <pre><code>import { randomCuboidScramble } from "@johnmorrisdotca/kyuubu/cuboid";
+import { CuboidView } from "@johnmorrisdotca/kyuubu/cuboid/draw";
+
+const view = new CuboidView(document.getElementById("puzzle"), { dims: [2, 3, 3] });
+for (const move of randomCuboidScramble([2, 3, 3])) view.turn(move);</code></pre>
+        <div class="cuboid-embed" data-testid="embedded">
+          <kyuubu-cuboid id="embedded" dims="3x3x1" scramble="U2 R2 M2" moves="M2 R2 U2" theme="paper"></kyuubu-cuboid>
+        </div>
+      </section>
+      <!-- family:unreviewed -->
+      <!-- family:footer -->
+    </main>
+    <!-- family:script -->
+    <script type="module" src="cuboids.js"></script>
+  </body>
+</html>

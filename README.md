@@ -276,6 +276,19 @@ only what it uses.
 src/
 ├── cli.ts               the command line as a pure function: arguments in, text and an exit code out
 ├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
+├── cuboid/               the cuboid: a box-shaped turning puzzle, a × b × c from 1 to 7 on a side
+│   ├── draw.ts           the "/cuboid/draw" entry: the cuboid drawn in CSS 3D, turned by drag, key and code
+│   ├── element-define.ts the "/cuboid/element/define" entry: registers <kyuubu-cuboid> by being imported
+│   ├── element.ts        the "/cuboid/element" entry: a solve on a cuboid as a <kyuubu-cuboid> custom element
+│   ├── gestures.ts       from a hand to a turn on a cuboid: which layer a drag means, and the half-turn rule
+│   ├── index.ts          the "/cuboid" entry: model, notation, scramble, shapes, words, gestures, replay plan
+│   ├── model.ts          the cuboid as pure functions over a string: slots, legal turns, turns, solved
+│   ├── notation.ts       the notation read and written for a cuboid, with the reason a move is refused
+│   ├── play.ts           the "/cuboid/play" entry: a solve on a cuboid with play, step, speed and repeat
+│   ├── presets.ts        the named shapes, each with its name and what is special about it
+│   ├── replay.ts         a solve on a cuboid read, checked and timed for the replay the cube uses
+│   ├── scramble.ts       a state drawn uniformly where the puzzle is small, a random walk where it is not
+│   └── words.ts          the cuboid's own words, in English and Japanese
 ├── element-define.ts    the "/element/define" entry: registers the custom elements by being imported
 ├── element.ts           the "/element" entry: the player as a <kyuubu-cube> custom element
 ├── famous.data.ts       the record solves, each with its published source, newest first
@@ -415,6 +428,10 @@ Kyuubu is one of twenty-four packages, each made for the same site, each at
   three looks included and a call to change them on a cube already drawn.
 - **A command line.** `kyuubu --seed table` in a terminal on Linux, macOS or
   Windows: scrambles, turns, a check and a solve, as text or JSON.
+- **Cuboids.** The Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3 and any
+  `a × b × c` from 1 to 7: turned by drag with the rule that a layer turns a
+  quarter only where its slice is square, written in the same notation, and
+  scrambled to a state chosen fairly. [Its own section](#cuboids).
 - **English and Japanese**, for everything the package says to a person.
 - **Accessible.** The cube is a labelled `application`, takes the keyboard,
   and every turn can be made without a pointer.
@@ -932,6 +949,102 @@ The address carries `size`, `pace`, `scale`, `width`, `theme`, `faces`, `seed`
 and `paused`. The [turning cubes page](https://johnmorrisdotca.github.io/kyuubu/cubes.html)
 shows it at all three scales.
 
+## Cuboids
+
+<p align="center">
+  <img src="docs/cuboids.jpg" alt="The cuboids page on green felt: a scrambled 2×3×3 Domino drawn like the cube, a row of the seven named shapes (Brick, Floppy, Tower, Domino, Block, Pillar, Tall pillar) each drawn small, and the chooser for any width, height and depth from 1 to 7" width="720">
+  <img src="docs/cuboids-phone.jpg" alt="The same page on a phone in dark mode, in Japanese: a scrambled 3×4×3 pillar on the felt under its shape and move count" width="220">
+</p>
+
+A cuboid is a turning puzzle shaped like a box, `a × b × c` cubies with each
+side from 1 to 7: the Floppy 1×3×3, the Tower 2×2×3, the Domino 2×3×3, a
+3×3×4 pillar, and the 1×2×3 brick, or any other. It has its own entry points
+and leaves the cube's untouched. It is drawn, turned, scrambled, written down
+and played back the way the cube is.
+
+The rule that makes it different is one line. **A layer may turn a quarter only
+where its slice is square, and may always turn a half.** A quarter turn of a
+slice that is not square would push its corners out of the box and change the
+puzzle's shape; a half turn puts every cubie of it where another one was. So the
+Domino's two 3×3 slices turn like a cube's face, and its six 2×3 slices only
+half way round. A side one cubie deep (the 1 of a 1×3×3) is the whole puzzle,
+and turning it moves nothing: it is not a layer. `1×1×1` has nothing to turn
+and is not a cuboid.
+
+```ts
+import {
+  cuboidSolved, legalTurns, parseCuboidMoves, randomCuboidScramble, readCuboidMove,
+  seededRandom, solvedCuboid, turnAllCuboid,
+} from "@johnmorrisdotca/kyuubu/cuboid";
+
+const dims = [2, 3, 3] as const;                  // width, height, depth, as the puzzle first sits
+legalTurns(dims, 0, 0);                           // [1, 2, 3]: the right and left slices are 3×3, square
+legalTurns(dims, 1, 0);                           // [2]: a 2×3 slice, so a half turn only
+
+const scramble = randomCuboidScramble(dims, undefined, seededRandom("club night"));
+const mixed = turnAllCuboid(solvedCuboid(dims), dims, scramble);
+cuboidSolved(mixed, dims);                        // false: a scramble never leaves it solved
+```
+
+On a page, one line draws a puzzle a person can turn:
+
+```ts
+import { CuboidView } from "@johnmorrisdotca/kyuubu/cuboid/draw";
+
+const view = new CuboidView(document.getElementById("puzzle"), { dims: [3, 3, 1], keyboard: "page" });
+view.turn({ axis: 1, layer: 2, turns: 2 });       // a half turn of the top row of a floppy
+```
+
+### The shapes
+
+Each shape is listed once, with its sides in order: `3×3×2` is a Domino turned
+on its side. `CUBOID_PRESETS` holds them, with their names and a line in each
+language on what is special.
+
+| Shape | Name | What it is |
+| --- | --- | --- |
+| 1×2×3 | Brick | The smallest with a name: five turns, all half turns, and 192 states |
+| 1×3×3 | Floppy | A flat 3×3 one cubie thick: half turns only, 768 states (192 if only the outer slices turn) |
+| 2×2×3 | Tower | A 2×2 with a layer added: three layers turn a quarter, the sides only a half |
+| 2×3×3 | Domino | A 3×3 cut in half: the two 3×3 slices turn a quarter, the sides only a half |
+| 2×3×4 | Block | No slice is square, so every turn is a half turn |
+| 3×3×4 | Pillar | A 3×3 with a fourth layer: the four layers turn a quarter, the long sides a half |
+| 3×3×5 | Tall pillar | The pillar with a fifth layer, and the biggest named shape |
+
+### The entry points
+
+| Import | Holds |
+| --- | --- |
+| `@johnmorrisdotca/kyuubu/cuboid` | The model, notation, scramble, named shapes, words, gestures and `planCuboidReplay`: no DOM |
+| `@johnmorrisdotca/kyuubu/cuboid/draw` | `CuboidView`: the puzzle drawn in CSS 3D |
+| `@johnmorrisdotca/kyuubu/cuboid/play` | `mountCuboidPlayer`: a solve with its controls |
+| `@johnmorrisdotca/kyuubu/cuboid/element` | `defineCuboid`: registers `<kyuubu-cuboid>` |
+| `@johnmorrisdotca/kyuubu/cuboid/element/define` | Importing it registers `<kyuubu-cuboid>` |
+
+The model's calls are the cube's with `Cuboid` in the name and `dims` for `n`:
+`solvedCuboid`, `turnCuboid`, `turnAllCuboid`, `cuboidSolved`, `isCuboidState`,
+`legalTurns`, `legalCuboidMoves`, `undoCuboidMove`, `cuboidMovesNotation`,
+`parseCuboidMove`, `randomCuboidScramble`. `turnCuboid` throws a `RangeError`
+for a turn the puzzle cannot make. `CuboidView` has the cube view's options
+(`dims` for `size`) and members, less hints, scale and the wheel's turns, and
+its root is marked `data-kyuubu-cuboid` with `data-state`, `data-dims`,
+`data-turning`, `data-dragging`, `data-committed` and `data-angle`.
+
+One tag plays a solve on any cuboid:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/cuboid/element-define.js"></script>
+<kyuubu-cuboid dims="3x3x1" scramble="U2 R2 M2" moves="M2 R2 U2" controls></kyuubu-cuboid>
+```
+
+### More on cuboids
+
+The notation (`R2` for a half turn, and why `R` is refused where only half
+turns are), how a scramble is drawn, how a drag and a key turn a layer that
+only half turns, and the tag's attributes are in [docs/cuboids.md](docs/cuboids.md), which is on GitHub and
+not in the package. The [cuboids page](https://johnmorrisdotca.github.io/kyuubu/cuboids.html)
+has them all to try.
+
 ## Scrambles and seeds
 
 ```ts
@@ -1397,6 +1510,8 @@ property colours which face) are exported.
 | --- | --- | --- |
 | Sizes the package is made and tested for | 2×2 to 7×7 | `MIN_RECORD_SIZE`, `MAX_RECORD_SIZE` |
 | Sizes with a step-by-step solve | 2×2 and 3×3 | `SOLVABLE_SIZES` |
+| Cuboid sides | 1 to 7 each, and not 1×1×1 | `CUBOID_MIN_SIDE`, `CUBOID_MAX_SIDE` |
+| Cuboid states a scramble is drawn uniformly from | 20,000 | `CUBOID_RANDOM_STATE_MAX` |
 | Layers notation reaches from a face | 9 | |
 | Turns in one saved solve, scramble and moves each | 10,000 | `MAX_RECORD_MOVES` |
 | Solves read from one file | 1,000 | `MAX_RECORDS` |
@@ -1469,13 +1584,13 @@ for fixing one.
 - Measured times for each move of the famous solves (the player takes a time
   per move already, as `stepMs`; the records give only the whole time)
 - A drag that follows a real touch in the tests, not only a mouse
-- Other shapes: 2×2×3, 3×3×2
 
 Done since the first release, and no longer on this list: Vue, Svelte and
 Angular (above, each proved from the packed tarball), the `<kyuubu-cube>`
 element for any page or framework, replaying and embedding a solve, famous
-record solves, pasting a solve as it is written or as a link, and each move
-shown on the cube with an arrow to follow.
+record solves, pasting a solve as it is written or as a link, each move
+shown on the cube with an arrow to follow, and the other shapes (cuboids:
+2×2×3, 3×3×2 and the rest).
 
 Left out on purpose: a wrapper component for every framework (React has one;
 everywhere else the element or one `new CubeView` does the same job, with

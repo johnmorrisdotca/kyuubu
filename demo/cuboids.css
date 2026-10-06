@@ -1,0 +1,21 @@
+/* The cuboids page's own: the picker's little puzzles, the side chooser and the list of layers. Everything else is family.css and kyuubu.css. */
+.cuboid-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.cuboid-picker .cube-pick { min-width: 96px; }
+.cuboid-picker .cube-pick[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.cuboid-mark { position: relative; width: 72px; height: 72px; }
+.cuboid-pick-name { font-weight: 600; }
+.cuboid-says { display: grid; gap: 4px; min-height: 6.5em; align-content: start; }
+.cuboid-says p { margin: 0; font-size: .9rem; color: var(--muted); }
+.cuboid-custom { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cuboid-side { display: grid; gap: 4px; font-size: .75rem; color: var(--muted); }
+.cuboid-side select { width: 100%; height: 44px; box-sizing: border-box; font-size: 1rem; color: var(--ink); }
+.cuboid-axes { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.cuboid-axes li { display: grid; grid-template-columns: 4.5rem 5rem minmax(0, 1fr); gap: 4px 12px; align-items: baseline; padding: 8px 2px; border-bottom: 1px solid var(--rule); font-size: .9rem; }
+.cuboid-axes li:last-child { border-bottom: 0; }
+.cuboid-axes b { font-family: var(--mono); }
+.cuboid-axes span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.cuboid-embed { max-width: min(360px, 100%); }
+.cuboid-embed kyuubu-cuboid { --kyuubu-player-felt: var(--felt, #1f4d3a); --kyuubu-player-paper: var(--surface); }
+@media (max-width: 480px) {
+  .cuboid-axes li { grid-template-columns: 3.5rem 4rem minmax(0, 1fr); }
+}
