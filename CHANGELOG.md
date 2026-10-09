@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+
+### Changed
+
+- Group the package family by kind, alphabetize each group, and include the geography packages and REST in Pieces in the shared footer and README.
+
 ## [1.12.0] - 2026-10-06
 
 The guide draws an arrow for a turn of the whole cube. Nothing that was exported has changed; `rotationHint` is new.
