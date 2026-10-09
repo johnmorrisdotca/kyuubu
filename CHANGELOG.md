@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Move the builder controls, code tabs and shareable links into the shared family embed builder, keeping the live cube preview and adding plain-HTML and iframe-URL output.
+
 
 ### Changed
 

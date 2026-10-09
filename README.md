@@ -359,7 +359,9 @@ page with every choice the package offers (size, scale, theme, a colour for
 each face, turn speed, keys, the pace of a cube that keeps turning, the
 replay's settings, the guide, the language), a live cube that changes as each
 is chosen, and the exact code for that cube as a custom element, an ES module,
-an iframe, React, Vue, Svelte and Angular, each with a Copy button. The
+an iframe, React 19, Vue, Svelte and Angular, each with a Copy button. The
+custom elements also have plain HTML for a website code block and the iframe
+URL on its own for hosts such as Notion and OBS. The
 choices are in the address, so a link shares the cube. It writes nothing for a
 choice that is what the package does when it is left out.
 
@@ -377,10 +379,12 @@ source and fails until each is a row or is left out with its reason, so a new
 option cannot be added to the package and missed by the builder (types
 `CubeOption`, `OptionKind`, `OptionGroup`, `CubeMaker`).
 
-The code is written by `demo/builder-code.js`, pure functions from that list and
-the choices made; the page is `demo/builder.html` and `demo/builder.js`. The three
-files do not name an option, so they can be copied to another package with its own
-list.
+The controls, code tabs, copy buttons and shared links come from
+`familyEmbedBuilder` in `scripts/family-template.mjs`, which every package shares.
+Kyuubu supplies its option list, groups, makers, current npm major and words.
+`demo/builder-code.js` keeps the cube-specific view and player calls, and
+`demo/builder.js` renders the live cube. A package can supply its own preview
+without rewriting the shared controls. See [the builder contract](./docs/embed-builder.md).
 
 ### What a developer gets
 

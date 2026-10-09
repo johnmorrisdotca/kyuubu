@@ -46,7 +46,7 @@ describe("the code the builder writes", () => {
         // And its value, as the format spells it.
         const pairs = byAttribute ? attributesFor(CUBE_OPTIONS, settings, maker).filter(([, value]) => value !== "" && value !== "false") : entriesFor(CUBE_OPTIONS, settings, maker).map((entry) => [entry.name, String(entry.value)]);
         for (const [name, value] of pairs) {
-          const spelled = format === "iframe" ? encodeURIComponent(value).replaceAll("%20", "+").replaceAll("%27", "'").replaceAll("&", "&amp;") : value;
+          const spelled = (format === "iframe" || format === "url") ? encodeURIComponent(value).replaceAll("%20", "+").replaceAll("%27", "'").replaceAll("&", "&amp;") : value;
           expect(text, `${maker} ${format}: ${name} = ${value}`).toContain(spelled);
         }
       }
