@@ -3,15 +3,15 @@
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
 ### Added
 
 - Move the builder controls, code tabs and shareable links into the shared family embed builder, keeping the live cube preview and adding plain-HTML and iframe-URL output.
 
-
 ### Changed
 
 - Group the package family by kind, alphabetize each group, and include the geography packages and REST in Pieces in the shared footer and README.
+
+- Update the shared family description for addresses in all seven supported countries, including France and Germany.
 
 ## [1.12.0] - 2026-10-06
 

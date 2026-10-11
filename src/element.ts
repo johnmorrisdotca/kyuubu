@@ -17,16 +17,34 @@ import { languageOf } from "./words.ts";
  * nothing.
  */
 
-/** The attributes the element reads. Changing any draws the player afresh. */
+/** The attributes the element reads. Changing any draws the player afresh.
+ * @example
+ * ```ts
+ * import { CUBE_ELEMENT_ATTRIBUTES } from "@johnmorrisdotca/kyuubu/element";
+ * console.log(typeof CUBE_ELEMENT_ATTRIBUTES); // object
+ * ```
+ */
 export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "guide", "readout", "movelist", "scrub"] as const;
 
-/** The name the element is registered under. */
+/** The name the element is registered under.
+ * @example
+ * ```ts
+ * import { CUBE_ELEMENT_NAME } from "@johnmorrisdotca/kyuubu/element";
+ * console.log(typeof CUBE_ELEMENT_NAME); // string
+ * ```
+ */
 export const CUBE_ELEMENT_NAME = "kyuubu-cube";
 
 /**
  * What the element adds to an ordinary one. Every attribute is also a property
  * that writes it, as React, Vue and Svelte set them: reading gives the text of the
  * attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `guide`, `readout`, `movelist`, `scrub`) reads as a boolean.
+ * @example
+ * ```ts
+ * import type { KyuubuCubeElement } from "@johnmorrisdotca/kyuubu/element";
+ * const readSize = (element: KyuubuCubeElement) => element.size;
+ * console.log(typeof readSize); // function
+ * ```
  */
 export type KyuubuCubeElement = HTMLElement & {
   get size(): string | null;
@@ -136,6 +154,14 @@ function build(): CustomElementConstructor {
 /**
  * Register `<kyuubu-cube>`, once. Where there is no browser, or the name is
  * already taken, it does nothing. A page that wants another name passes it.
+ * @param name - The custom tag name; omitted to use the package default.
+ * @returns Nothing; existing definitions and server imports remain safe.
+ * @example
+ * ```ts
+ * import { defineCube } from "@johnmorrisdotca/kyuubu/element";
+ * defineCube();
+ * console.log(typeof defineCube); // function
+ * ```
  */
 export function defineCube(name: string = CUBE_ELEMENT_NAME): void {
   if (typeof customElements === "undefined" || typeof HTMLElement === "undefined") return;
