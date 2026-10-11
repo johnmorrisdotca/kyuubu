@@ -1,5 +1,6 @@
 // The demo page: a cube on the felt, and everything the package does beside it.
 /* global familyLanguage */
+import { toMarkdown, toSql } from "./downloads.js";
 import { viewCode, viewOptions } from "./snippets.js";
 import {
   CUBE_FACE_ORDER,
@@ -82,6 +83,9 @@ const WORDS = {
     loaded: "Loaded.",
     json: "Save as JSON",
     csv: "Save as CSV",
+    md: "Save as Markdown",
+    sql: "Save as SQL",
+    listDownloadHelp: "Markdown makes a table for a note; SQL creates the solves table for a database. MySQL imports need ANSI_QUOTES and NO_BACKSLASH_ESCAPES.",
     solvesTitle: "Solves on this device",
     solvesNone: "Scramble the cube and solve it, and it is listed here.",
     solveSize: "Cube",
@@ -175,6 +179,9 @@ const WORDS = {
     loaded: "読み込みました。",
     json: "JSONで保存",
     csv: "CSVで保存",
+    md: "Markdownで保存",
+    sql: "SQLで保存",
+    listDownloadHelp: "Markdownはメモ用の表、SQLはデータベース用のsolvesテーブルを作ります。MySQLに読み込む場合は、ANSI_QUOTESとNO_BACKSLASH_ESCAPESが必要です。",
     solvesTitle: "この端末のソルブ",
     solvesNone: "スクランブルしてそろえると、ここに記録されます。",
     solveSize: "キューブ",
@@ -649,6 +656,15 @@ const download = (name, type, text) => {
 const current = () => (solves.length > 0 ? solves : scramble.length + moves.length > 0 ? [record()] : []);
 $("json").addEventListener("click", () => download("kyuubu-solves.json", "application/json", toJSON(current())));
 $("csv").addEventListener("click", () => download("kyuubu-solves.csv", "text/csv", toCSV(current())));
+const solveColumns = ["time", "size", "scramble", "moves", "count", "solved", "seconds", "seed"];
+const solveRows = () => current().map((record) => {
+  const summary = summarize(record);
+  return { time: record.at === undefined ? null : new Date(record.at).toISOString(), size: record.size,
+    scramble: summary.scramble, moves: summary.moves, count: summary.count, solved: summary.solved,
+    seconds: record.ms === undefined ? null : Number((record.ms / 1000).toFixed(2)), seed: record.seed ?? null };
+});
+$("md").addEventListener("click", () => download("kyuubu-solves.md", "text/markdown", toMarkdown(solveColumns, solveRows())));
+$("sql").addEventListener("click", () => download("kyuubu-solves.sql", "application/sql", toSql("solves", solveColumns, solveRows())));
 $("clear").addEventListener("click", () => {
   solves = [];
   keep();
