@@ -29,6 +29,13 @@ describe("a package-independent embed builder", () => {
     expect(builder.fromAddress("#make=__proto__&width=Infinity&border=0", options)).toEqual({ maker: "flag", settings: { border: false } });
     expect(builder.fromAddress("#width=10000", options).settings.width).toBe(600);
   });
+  it("restores omitted defaults without resurrecting starter choices", () => {
+    const initial = { flag: { code: "JP", border: true } };
+    expect(builder.restoreState("", initial, options).settings).toEqual(initial.flag);
+    const address = builder.toAddress("flag", options, { border: false });
+    expect(builder.restoreState(`#${address}`, initial, options).settings).toEqual({});
+    expect(builder.restoreState("#make=flag&width=88", initial, options).settings).toEqual({ width: 88 });
+  });
   it("escapes hostile attribute text and template-string delimiters", () => {
     const label = 'a" onload="bad <script> `${attack}';
     const html = builder.codeFor("flag", "html", options, { label });
