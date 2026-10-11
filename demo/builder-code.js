@@ -22,7 +22,7 @@ function objectLines(entries, { themes = true } = {}) {
 
 
 export const builder = familyEmbedBuilder({ id: "kyuubu", packageName: PACKAGE, major: VERSION.split(".")[0], site: SITE,
-  title: "Kyuubu", component: "Cube", selector: "app-cube", defaultMaker: "view", makers: MAKERS,
+  title: "Kyuubu", titleJa: "キューブの埋め込み", component: "Cube", selector: "app-cube", defaultMaker: "view", makers: MAKERS,
   options: CUBE_OPTIONS, groups: CUBE_OPTION_GROUPS, leftOut: CUBE_OPTIONS_LEFT_OUT,
   unit: (option) => option.id === "time" ? "s" : option.id.endsWith("ms") ? "ms" : "",
   code: ({ maker, format, call, literal }) => {

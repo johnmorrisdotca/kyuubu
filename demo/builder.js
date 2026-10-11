@@ -1,3 +1,4 @@
+import { FAMILY_EMBED_BUILDER_WORDS } from "./family-embed-builder.js";
 // The package supplies its words and preview; the shared builder draws the controls and code.
 import { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC } from "./dist/index.js";
 import { mountPlayer } from "./dist/player.js";
@@ -5,6 +6,7 @@ import "./dist/element-define.js";
 import { builder } from "./builder-code.js";
 const WORDS = {
   en: {
+    ...FAMILY_EMBED_BUILDER_WORDS.en,
     pitch: "Build a cube with every choice the package offers. Watch it change as you choose, and copy the code that makes exactly that cube.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
@@ -15,30 +17,17 @@ const WORDS = {
     toApi: "API reference",
     toBuilder: "Builder",
     foot: "Nothing here is stored. The choices are in the address, so a link shares the cube. Rubik's Cube is a trademark of its owner; Kyuubu is not affiliated with it.",
-    previewTitle: "Your cube",
-    makerLabel: "What to build",
     makerView: "A cube to turn",
     makerPlayer: "A solve to watch",
     makerTurning: "A cube that keeps turning",
     makerViewSays: "A cube a person turns by hand: drag a layer, use the keys or notation. Made with CubeView, or <Kyuubu /> in React.",
     makerPlayerSays: "A solve played back at the pace it was made, with each move shown and listed, a slider, and a way to turn it yourself. Made with mountPlayer, or the <kyuubu-cube> tag.",
     makerTurningSays: "A cube that keeps turning by itself, for a background, a widget or a list. Made with the <kyuubu-scramble> tag.",
-    notSet: "Not set",
-    on: "On",
-    off: "Off",
-    reset: "Reset",
-    startAgain: "Start again",
-    copy: "Copy",
-    copied: "Copied.",
     copyLink: "Copy a link to this cube",
-    linkCopied: "The link is copied: it opens this cube.",
-    codeTitle: "The code",
-    codeText: "This is the code for the cube above, and nothing else. Choose how your page will have it, and copy it.",
-    onlyDifferent: "Only the choices that are not what the package does when they are left out are written.",
-    noteMoves: "The moves could not be read: {what}",
-    defaultIs: "Default: {value}",
+    noteMoves: "The moves could not be read: {what}"
   },
   ja: {
+    ...FAMILY_EMBED_BUILDER_WORDS.ja,
     pitch: "パッケージのすべての選択肢でキューブを作ります。選ぶと見た目がすぐに変わり、そのキューブを作るコードをコピーできます。",
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
@@ -49,28 +38,14 @@ const WORDS = {
     toApi: "API（英語）",
     toBuilder: "ビルダー",
     foot: "ここでは何も保存しません。選択はアドレスに入るので、リンクでキューブを共有できます。Rubik's Cube は権利者の商標です。Kyuubu は権利者とは関係ありません。",
-    previewTitle: "あなたのキューブ",
-    makerLabel: "作るもの",
     makerView: "手で回すキューブ",
     makerPlayer: "見るソルブ",
     makerTurning: "回り続けるキューブ",
     makerViewSays: "手で回すキューブです。層をドラッグしたり、キーや回転記号で回します。CubeView、または React の <Kyuubu /> で作ります。",
     makerPlayerSays: "ソルブを実際の速さで再生します。各手の表示と一覧、スライダー、自分で回す機能があります。mountPlayer、または <kyuubu-cube> タグで作ります。",
     makerTurningSays: "ひとりでに回り続けるキューブです。背景やウィジェット、リストに使えます。<kyuubu-scramble> タグで作ります。",
-    notSet: "指定なし",
-    on: "オン",
-    off: "オフ",
-    reset: "元に戻す",
-    startAgain: "最初からやり直す",
-    copy: "コピー",
-    copied: "コピーしました。",
     copyLink: "このキューブへのリンクをコピー",
-    linkCopied: "リンクをコピーしました。開くとこのキューブになります。",
-    codeTitle: "コード",
-    codeText: "上のキューブを作るコードです。ほかのものは入っていません。ページでの使い方を選んで、コピーしてください。",
-    onlyDifferent: "何も指定しないときの動作と違う選択だけが書かれます。",
-    noteMoves: "手順を読めませんでした: {what}",
-    defaultIs: "初期値: {value}",
+    noteMoves: "手順を読めませんでした： {what}"
   },
 };
 
