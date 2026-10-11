@@ -67,7 +67,7 @@ writeFileSync("site/famous.html", fillPage("famous.html"));
 writeFileSync("site/cubes.html", fillPage("cubes.html"));
 writeFileSync("site/builder.html", fillPage("builder.html"));
 writeFileSync("site/cuboids.html", fillPage("cuboids.html"));
-for (const file of ["family.css", "kyuubu.css", "cuboids.css", "app.js", "famous.js", "cubes.js", "cuboids.js", "snippets.js", "builder.js", "builder-code.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
+for (const file of ["downloads.js", "family.css", "kyuubu.css", "cuboids.css", "app.js", "famous.js", "cubes.js", "cuboids.js", "snippets.js", "builder.js", "builder-code.js", "embed.html", "embed-scramble.html"]) cpSync(`demo/${file}`, `site/${file}`);
 cpSync("docs/cube.png", "site/cube.png");
 cpSync("docs/cuboids.jpg", "site/cuboids.jpg");
 cpSync("dist", "site/dist", { recursive: true });

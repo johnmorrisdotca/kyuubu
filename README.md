@@ -405,6 +405,10 @@ without rewriting the shared controls. See [the builder contract](./docs/embed-b
 
 The cookbook, with the output of each example, is under [Examples](#examples).
 
+### Record-list downloads
+
+The demo saves solve histories as Markdown tables or executable SQL beside CSV and JSON. See [formats and database import](docs/list-downloads.md), including the MySQL settings.
+
 ## Examples
 
 Every TypeScript and JavaScript block that can run is type-checked against the built package and run by `pnpm test:readme`, so the output after `// →` is what the code prints. The model has no DOM in it, so most of these run under Node.

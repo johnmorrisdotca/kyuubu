@@ -179,7 +179,7 @@
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "site": "pnpm build && node scripts/site.mjs",
     "demo": "pnpm site",
     "test:site": "pnpm site && playwright test",
