@@ -1,4 +1,4 @@
-<h1 align="center">Kyuubu <sub>キューブ</sub></h1>
+<h1 align="center">Kyuubu <sub>キューブ</sub> — Twisty cube puzzle for the browser</h1>
 
 <p align="center"><strong>A turning cube for the browser, with a solve you can follow.</strong><br>
 2×2 to 7×7, drawn in plain CSS 3D. Turn it by drag, touch, wheel, keys or cubers' notation; scramble it from a seed; and watch the layer-by-layer method solve it one named step at a time.</p>
@@ -9,16 +9,18 @@
   <a href="./LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-2f5d4a"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
+  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="38.0 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-38.0%20kB-2f5d4a"></a>
+  <a href="https://www.npmjs.com/package/@johnmorrisdotca/kyuubu#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a> · <a href="https://johnmorrisdotca.github.io/kyuubu/builder.html">Build a cube</a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><strong>Turn a cube →</strong></a> · <a href="https://johnmorrisdotca.github.io/kyuubu/docs/">Documentation</a> · <a href="https://johnmorrisdotca.github.io/kyuubu/docs/guides/getting-started.html">Getting started</a> · <a href="https://johnmorrisdotca.github.io/kyuubu/api.html">API reference</a> · <a href="https://johnmorrisdotca.github.io/kyuubu/builder.html">Build a cube</a></p>
 
 <table align="center">
 <tr>
 <td align="center" valign="top">
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-desk-dark.webp">
-<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-desk-light.webp" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links, cloth swatches and Help switch: the Solve tab naming the White cross step with its reason, the timer and the move count above the cube, and the 2×2 to 7×7 sizes and the scramble and undo buttons under it." width="720">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/hero-desk-light.webp" alt="A scrambled 3×3 on green felt, three steps into its solve, under the demo's header with its language chooser, page links including Docs and API reference, cloth swatches and Help switch: the Solve tab naming the White cross step with its reason, the timer and the move count above the cube, and the 2×2 to 7×7 sizes and the scramble and undo buttons under it." width="720">
 </picture>
 <br><em>A scrambled 3×3, three steps into its solve, on a desk.</em>
 </td>
@@ -220,6 +222,18 @@ any element, and **a React component** that wraps the view.
 
 The view fills the element it is given, so that element needs a size and a
 position (`relative` or `absolute`).
+
+### Install under another name
+
+The alias uses the same package under a name in your own project.
+
+```sh
+npm install cube@npm:@johnmorrisdotca/kyuubu
+```
+
+```ts no-check
+import { solvedCube } from "cube";
+```
 
 ### 1. The API alone
 
@@ -810,7 +824,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 
 ## API
 
-The [API reference](https://johnmorrisdotca.github.io/kyuubu/api.html) lists every export of every entry point with its signature and its doc comment. It is made from the source by `pnpm site`, so it cannot fall behind the code.
+The [documentation](https://johnmorrisdotca.github.io/kyuubu/docs/) includes bilingual guides, local search and a page for every public export, with its signature, parameters, return values and checked examples. `pnpm docs:site` builds it from the source. The [API index](https://johnmorrisdotca.github.io/kyuubu/api.html) retains the existing export anchors.
 
 Everything is exported from `@johnmorrisdotca/kyuubu`; the React component
 from `@johnmorrisdotca/kyuubu/react`. Every export has a doc comment, which
@@ -1005,7 +1019,7 @@ only what it uses.
 
 The file-by-file tree, with a line on each source file, is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the model and the notation, the scrambler and the solver, the view, the player and the elements, the cuboids (`cuboid/`), and the command line. Tests live in `test/`, apart from the code, and `test/docs.test.js` runs the
 README's examples. `bin/` is the few lines that hand the command line the real
-process, `scripts/` builds the demo and its API reference page and checks the
+process, `scripts/` builds the demo, bilingual documentation and API index, and checks the
 package as npm packs it, `demo/` is the site published on GitHub Pages, and
 `e2e/` taps it in real browsers.
 

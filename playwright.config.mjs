@@ -7,7 +7,7 @@ const phone = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile:
 
 export default defineConfig({
   testDir: "e2e",
-  testMatch: "*.e2e.mjs",
+  testMatch: ["*.e2e.mjs", "*.demo.mjs"],
   fullyParallel: true,
   forbidOnly: true,
   // A flick is a matter of milliseconds, and a loaded runner can be slow to let go: one more try there.

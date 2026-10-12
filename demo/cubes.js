@@ -12,6 +12,7 @@ const WORDS = {
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toCube: "The cube",
+    pageDocs: "Docs",
     toApi: "API reference",
     toBuilder: "Builder",
     toFamous: "Famous solves",
@@ -48,6 +49,7 @@ const WORDS = {
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
     toCube: "キューブ",
+    pageDocs: "ドキュメント",
     toApi: "API（英語）",
     toBuilder: "ビルダー",
     toFamous: "有名なソルブ",
@@ -120,6 +122,7 @@ function drawEmbed() {
   }
 }
 const drawWidget = () => {
+  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   $("widget-toggle").textContent = page.word(widgetOn ? "widgetStop" : "widgetStart");
   $("widget-toggle").setAttribute("aria-pressed", String(widgetOn));
   $("picked").textContent = picked === null ? "" : page.word("picked").replaceAll("{n}", String(picked));

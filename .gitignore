@@ -5,3 +5,5 @@ site/
 test-results
 playwright-report
 .readme-examples/
+
+.docs-examples/

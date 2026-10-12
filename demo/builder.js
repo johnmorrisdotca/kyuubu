@@ -14,6 +14,7 @@ const WORDS = {
     toFamous: "Famous solves",
     toCubes: "Turning cubes",
     toCuboids: "Cuboids",
+    pageDocs: "Docs",
     toApi: "API reference",
     toBuilder: "Builder",
     foot: "Nothing here is stored. The choices are in the address, so a link shares the cube. Rubik's Cube is a trademark of its owner; Kyuubu is not affiliated with it.",
@@ -35,6 +36,7 @@ const WORDS = {
     toFamous: "有名なソルブ",
     toCubes: "回り続けるキューブ",
     toCuboids: "直方体",
+    pageDocs: "ドキュメント",
     toApi: "API（英語）",
     toBuilder: "ビルダー",
     foot: "ここでは何も保存しません。選択はアドレスに入るので、リンクでキューブを共有できます。Rubik's Cube は権利者の商標です。Kyuubu は権利者とは関係ありません。",
@@ -72,7 +74,14 @@ function renderPreview({ stage, maker, call, attrs: attributes, note, say }) {
   return { destroy: () => cube.remove() };
 }
 
-builder.mount({ words: WORDS, initial: { view: {}, player: {}, turning: { scale: "medium" } },
+function docsLanguage(options) {
+  const updateDocs = (lang) => document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
+  const page = globalThis.familyLanguage({ ...options, onChange: (lang) => { updateDocs(lang); options.onChange?.(lang); } });
+  updateDocs(page.lang);
+  return page;
+}
+
+builder.mount({ language: docsLanguage, words: WORDS, initial: { view: {}, player: {}, turning: { scale: "medium" } },
   classPrefix: "cube-bld", renderPreview,
   colourDefault: (option) => option.id === "plastic" ? option.default ?? DEFAULT_PLASTIC : DEFAULT_COLOURS[option.names.view.slice(8)],
 });

@@ -153,7 +153,7 @@ function readTurns(text: string, n: number): { moves: CubeMove[] } | { bad: stri
  * ```ts
  * import { runCli } from "@johnmorrisdotca/kyuubu";
  * 
- * console.log(runCli(["--size", "2", "--scramble", "R", "--verify", "R'"], { colour: false }));
+ * console.log(runCli(["--size", "2", "--verify", "--from", "R", "R'"], { colour: false }));
  * ```
  */
 export function runCli(args: readonly string[], surroundings: CliSurroundings = {}): CliResult {

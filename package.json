@@ -1,7 +1,7 @@
 {
   "name": "@johnmorrisdotca/kyuubu",
   "version": "1.12.0",
-  "description": "Turning cube for the browser: a 3D twisty-puzzle cube from 2×2 to 7×7 in plain CSS 3D. Drag, touch, keys or notation; replay world record solves; scrambles, a solve guide, a command line, React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
+  "description": "Kyuubu キューブ — Twisty cube puzzle for the browser: CSS 3D cubes, seeded scrambles and step-by-step solves in React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "cube",
     "rubiks-cube",
@@ -182,7 +182,7 @@
     "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "site": "pnpm build && node scripts/site.mjs",
     "demo": "pnpm site",
-    "test:site": "pnpm site && playwright test",
+    "test:site": "pnpm test:demo",
     "test:cli": "pnpm build && node scripts/check-cli.mjs",
     "test:package": "pnpm build && node scripts/check-package.mjs",
     "family:readme": "node scripts/family-readme.mjs",
@@ -191,7 +191,11 @@
     "prepublishOnly": "pnpm check",
     "solve:check": "pnpm build && node scripts/solve-check.mjs",
     "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",
-    "test:readme": "pnpm build && node scripts/check-readme-examples.mjs"
+    "test:readme": "pnpm build && node scripts/check-readme-examples.mjs",
+    "docs:site": "pnpm build && node scripts/docs-site.mjs build",
+    "docs:check": "pnpm build && node scripts/docs-site.mjs check",
+    "size": "node scripts/docs-site.mjs size",
+    "test:demo": "pnpm site && node scripts/docs-site.mjs build && playwright test"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -210,7 +214,10 @@
     "react": "^19",
     "typescript": "^5",
     "typescript-eslint": "^8.71.0",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "pagefind": "^1.5.2",
+    "marked": "^18.0.0",
+    "esbuild": "^0.28.0"
   },
   "publishConfig": {
     "access": "public"

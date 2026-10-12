@@ -31,6 +31,7 @@ const WORDS = {
     toCubes: "Turning cubes",
     toCuboids: "Cuboids",
     toBuilder: "Builder",
+    pageDocs: "Docs",
     toApi: "API reference",
     shape: "Shape",
     moves: "Moves",
@@ -77,6 +78,7 @@ const WORDS = {
     toCubes: "回り続けるキューブ",
     toCuboids: "直方体",
     toBuilder: "ビルダー",
+    pageDocs: "ドキュメント",
     toApi: "API（英語）",
     shape: "形",
     moves: "手数",
@@ -136,6 +138,7 @@ const preset = () => CUBOID_PRESETS.find((one) => sameCuboid(one.dims, dims));
 
 /** Everything on the page that is made of the puzzle's state and the language, drawn again. */
 function draw() {
+  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   const solved = cuboidSolved(view.state, dims);
   $("name").textContent = cuboidName(dims);
   $("count").textContent = String(moves.length);
