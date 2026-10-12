@@ -8,6 +8,15 @@ import type { CuboidFault } from "./notation.ts";
  * it and what is said when a move cannot be made. The player's controls say
  * what the cube's do (`WORDS` in `words.ts`). `{braces}` are filled in when a
  * line is shown; a table in another language keeps them.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidWords } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { CUBOID_WORDS } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidWords = CUBOID_WORDS.en;
+ * console.log(value.cuboidLabel);
+ * ```
  */
 export type CuboidWords = {
   /** What a screen reader calls a cuboid: `{dims}` is `2×3×3`. */
@@ -26,7 +35,15 @@ export type CuboidWords = {
   faultLength: string;
 };
 
-/** The cuboid's words in both languages. */
+/** The cuboid's words in both languages.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_WORDS } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(Object.keys(CUBOID_WORDS.en).slice(0, 5));
+ * ```
+ */
 export const CUBOID_WORDS: Readonly<Record<KyuubuLanguage, CuboidWords>> = {
   en: {
     cuboidLabel: "A {dims} cuboid",
@@ -48,7 +65,20 @@ export const CUBOID_WORDS: Readonly<Record<KyuubuLanguage, CuboidWords>> = {
   },
 };
 
-/** The line that says why a piece of notation is not a move on a cuboid. */
+/** The line that says why a piece of notation is not a move on a cuboid.
+ *
+ * @param fault - The reason the cuboid notation was refused.
+ * @param token - The notation token being read or described.
+ * @param language - English or Japanese for the displayed words.
+ * @returns The line that says why a piece of notation is not a move on a cuboid.
+ *
+ * @example
+ * ```ts
+ * import { faultSays } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(faultSays("half-turn-only", "U", "en"));
+ * ```
+ */
 export function faultSays(fault: CuboidFault, token: string, language: KyuubuLanguage = "en"): string {
   const words = CUBOID_WORDS[language];
   const text = { unknown: words.faultUnknown, "no-such-layer": words.faultNoSuchLayer, "half-turn-only": words.faultHalfTurnOnly, "whole-puzzle": words.faultWholePuzzle }[fault];
@@ -62,8 +92,16 @@ export function faultSays(fault: CuboidFault, token: string, language: KyuubuLan
  * face, M, E or S, then nothing, `'` or `2`); null for anything else, and for
  * the cube's wide turns and rotations, which a cuboid has none of.
  *
+ * @param code - The encoded moves or standard notation to read.
+ * @param language - English or Japanese for the displayed words.
+ * @returns What a move of a cuboid turns, in a few plain words, in English or Japanese: `R2` is "Right face, twice", `2U2` "Up layer 2, twice", `M2` "Middle slice, twice". It reads what `cuboidMoveNotation` writes (a face, a digit and a face, M, E or S, then nothing, `'` or `2`); null for anything else, and for the cube's wide turns and rotations, which a cuboid has none of.
+ *
  * @example
- * cuboidMoveName("R2"); // "Right face, twice"
+ * ```ts
+ * import { cuboidMoveName } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(cuboidMoveName("R2", "en"));
+ * ```
  */
 export function cuboidMoveName(code: string, language: KyuubuLanguage = "en"): string | null {
   return /^([2-7]?[RLUDFB]|[MES])(2|')?$/.test(code) ? moveName(code, language) : null;

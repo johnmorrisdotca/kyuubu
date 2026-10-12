@@ -11,6 +11,15 @@ import type { CuboidDims } from "./model.ts";
  * `dims` is as the puzzle is first drawn (flat shapes face the reader, tall
  * ones stand); `label` is its sides in order, so `3×3×2` and `2×3×3` are one
  * shape and are listed once.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidPreset } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { CUBOID_PRESETS } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidPreset = CUBOID_PRESETS[0]!;
+ * console.log(value.dims);
+ * ```
  */
 export type CuboidPreset = {
   /** A kebab-case key: `floppy`, `tall-pillar`. */
@@ -24,7 +33,15 @@ export type CuboidPreset = {
   says: Readonly<Record<KyuubuLanguage, string>>;
 };
 
-/** The named cuboids, smallest first. */
+/** The named cuboids, smallest first.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_PRESETS } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(CUBOID_PRESETS.map((preset) => preset.key));
+ * ```
+ */
 export const CUBOID_PRESETS: readonly CuboidPreset[] = [
   {
     key: "brick",
@@ -77,7 +94,19 @@ export const CUBOID_PRESETS: readonly CuboidPreset[] = [
   },
 ];
 
-/** The named cuboid with this key, or undefined. */
+/** The named cuboid with this key, or undefined.
+ *
+ * @param key - The pressed key, or the cuboid preset key for a lookup.
+ * @returns The matching preset, or undefined when the key is unknown.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_PRESETS, cuboidPreset } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidPreset(CUBOID_PRESETS[0]!.key)?.dims);
+ * ```
+ */
 export function cuboidPreset(key: string): CuboidPreset | undefined {
   return CUBOID_PRESETS.find((preset) => preset.key === key);
 }

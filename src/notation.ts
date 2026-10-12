@@ -13,7 +13,17 @@ import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
  * those, one on the negative side is one.
  */
 
-/** A face as the notation names it. */
+/** A face as the notation names it.
+ *
+ * @example
+ * ```ts
+ * import type { CubeFaceLetter } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeFaceLetter = "R";
+ * console.log(value);
+ * ```
+ */
 export type CubeFaceLetter = "R" | "L" | "U" | "D" | "F" | "B";
 
 const FACE_AXES: Record<CubeFaceLetter, { axis: CubeAxis; positive: boolean }> = {
@@ -47,7 +57,20 @@ function suffixOf(turns: CubeTurns, positive: boolean): string {
   return turns === turnsFor("cw", positive) ? "" : "'";
 }
 
-/** A move as a person writes it, for a cube of this size. */
+/** A move as a person writes it, for a cube of this size.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @param n - The cube’s side length.
+ * @returns A move as a person writes it, for a cube of this size.
+ *
+ * @example
+ * ```ts
+ * import { moveNotation, parseMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(moveNotation(move, 3));
+ * ```
+ */
 export function moveNotation(move: CubeMove, n: number): string {
   if (move.layer === "all") return `${WHOLE[move.axis]}${suffixOf(move.turns, true)}`;
   const layer = move.layer;
@@ -61,26 +84,78 @@ export function moveNotation(move: CubeMove, n: number): string {
   return `${depth > 1 ? depth : ""}${face}${suffixOf(move.turns, positive)}`;
 }
 
-/** Moves as a person writes them, a space between each. */
+/** Moves as a person writes them, a space between each.
+ *
+ * @param moves - The turns, in their execution order.
+ * @param n - The cube’s side length.
+ * @returns Moves as a person writes them, a space between each.
+ *
+ * @example
+ * ```ts
+ * import { movesNotation, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(movesNotation(moves, 3));
+ * ```
+ */
 export function movesNotation(moves: readonly CubeMove[], n: number): string {
   return moves.map((move) => moveNotation(move, n)).join(" ");
 }
 
-/** A face turned, `depth` layers in from it (1 is the face itself), on a cube of this size; null where the cube has no such layer. */
+/** A face turned, `depth` layers in from it (1 is the face itself), on a cube of this size; null where the cube has no such layer.
+ *
+ * @param face - The face letter: U, R, F, D, L or B.
+ * @param depth - The layer depth counted from the named face, starting at 1.
+ * @param amount - The turn direction: cw, half or ccw.
+ * @param n - The cube’s side length.
+ * @returns A face turned, `depth` layers in from it (1 is the face itself), on a cube of this size; null where the cube has no such layer.
+ *
+ * @example
+ * ```ts
+ * import { faceMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(faceMove("R", 1, "cw", 3));
+ * ```
+ */
 export function faceMove(face: CubeFaceLetter, depth: number, amount: "cw" | "half" | "ccw", n: number): CubeMove | null {
   if (!Number.isInteger(depth) || depth < 1 || depth > n) return null;
   const { axis, positive } = FACE_AXES[face];
   return { axis, layer: positive ? n - depth : depth - 1, turns: turnsFor(amount, positive) };
 }
 
-/** The middle layer of an odd cube, turned as M, E or S; null on an even cube, which has none. */
+/** The middle layer of an odd cube, turned as M, E or S; null on an even cube, which has none.
+ *
+ * @param letter - The slice letter M, E or S; whole-cube turns use x, y or z.
+ * @param amount - The turn direction: cw, half or ccw.
+ * @param n - The cube’s side length.
+ * @returns The middle layer of an odd cube, turned as M, E or S; null on an even cube, which has none.
+ *
+ * @example
+ * ```ts
+ * import { middleMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(middleMove("M", "half", 3));
+ * ```
+ */
 export function middleMove(letter: "M" | "E" | "S", amount: "cw" | "half" | "ccw", n: number): CubeMove | null {
   if (n % 2 === 0) return null;
   const axis = (letter === "M" ? 0 : letter === "E" ? 1 : 2) as CubeAxis;
   return { axis, layer: (n - 1) / 2, turns: turnsFor(amount, MIDDLE[axis].followsPositive) };
 }
 
-/** The whole cube turned in the hand, as x, y or z. */
+/** The whole cube turned in the hand, as x, y or z.
+ *
+ * @param letter - The slice letter M, E or S; whole-cube turns use x, y or z.
+ * @param amount - The turn direction: cw, half or ccw.
+ * @returns The whole cube turned in the hand, as x, y or z.
+ *
+ * @example
+ * ```ts
+ * import { wholeMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(wholeMove("x", "cw"));
+ * ```
+ */
 export function wholeMove(letter: "x" | "y" | "z", amount: "cw" | "half" | "ccw"): CubeMove {
   const axis = (letter === "x" ? 0 : letter === "y" ? 1 : 2) as CubeAxis;
   return { axis, layer: "all", turns: turnsFor(amount, true) };
@@ -89,6 +164,17 @@ export function wholeMove(letter: "x" | "y" | "z", amount: "cw" | "half" | "ccw"
 /**
  * One move read back from the notation, for a cube of this size, or null
  * where it is not one: `R`, `R'`, `R2`, `2R'`, `M2`, `x'`.
+ *
+ * @param text - The text to parse or format.
+ * @param n - The cube’s side length.
+ * @returns One move read back from the notation, for a cube of this size, or null where it is not one: `R`, `R'`, `R2`, `2R'`, `M2`, `x'`.
+ *
+ * @example
+ * ```ts
+ * import { parseMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(parseMove("R'", 3));
+ * ```
  */
 export function parseMove(text: string, n: number): CubeMove | null {
   const found = /^([2-9]?)([RLUDFBMESxyz])(2|'|)$/.exec(text.trim());
@@ -100,7 +186,19 @@ export function parseMove(text: string, n: number): CubeMove | null {
   return faceMove(letter as CubeFaceLetter, found[1] === "" ? 1 : Number(found[1]), amount, n);
 }
 
-/** A line of notation read back, or null where any of it is not a move on this cube. */
+/** A line of notation read back, or null where any of it is not a move on this cube.
+ *
+ * @param text - The text to parse or format.
+ * @param n - The cube’s side length.
+ * @returns A line of notation read back, or null where any of it is not a move on this cube.
+ *
+ * @example
+ * ```ts
+ * import { parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(parseMoves("R U2", 3));
+ * ```
+ */
 export function parseMoves(text: string, n: number): CubeMove[] | null {
   const parts = text.trim().split(/\s+/).filter((part) => part.length > 0);
   const moves = parts.map((part) => parseMove(part, n));

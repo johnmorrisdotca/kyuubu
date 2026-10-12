@@ -9,6 +9,15 @@ import type { SolveAlgorithm, SolveStage } from "./solve.ts";
  *
  * `{n}` and the other braces are filled in when a line is shown; a table in
  * another language must keep them.
+ *
+ * @example
+ * ```ts
+ * import type { CubeWords } from "@johnmorrisdotca/kyuubu";
+ * import { WORDS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CubeWords = WORDS.en;
+ * console.log(value.solved);
+ * ```
  */
 export type CubeWords = {
   cubeLabel: string;
@@ -123,10 +132,28 @@ export type CubeWords = {
   moveCount6: string;
 };
 
-/** The two languages the package speaks. */
+/** The two languages the package speaks.
+ *
+ * @example
+ * ```ts
+ * import type { KyuubuLanguage } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: KyuubuLanguage = "ja";
+ * console.log(value);
+ * ```
+ */
 export type KyuubuLanguage = "en" | "ja";
 
-/** The cube's words in both languages. `STRINGS` in `strings.ts` is these and the command line's together. */
+/** The cube's words in both languages. `STRINGS` in `strings.ts` is these and the command line's together.
+ *
+ * @example
+ * ```ts
+ * import { WORDS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(WORDS.en).slice(0, 5));
+ * ```
+ */
 export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
   en: {
     cubeLabel: "A {n}×{n} cube",
@@ -354,29 +381,88 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
   },
 };
 
-/** A line of a table with its braces filled in: `fill("A {n}×{n} cube", { n: 3 })` is "A 3×3 cube". A brace with nothing to fill it is left as it is. */
+/** A line of a table with its braces filled in: `fill("A {n}×{n} cube", { n: 3 })` is "A 3×3 cube". A brace with nothing to fill it is left as it is.
+ *
+ * @param text - The text to parse or format.
+ * @param values - Replacement values keyed by the braces in the text.
+ * @returns A line of a table with its braces filled in: `fill("A {n}×{n} cube", { n: 3 })` is "A 3×3 cube". A brace with nothing to fill it is left as it is.
+ *
+ * @example
+ * ```ts
+ * import { fill } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(fill("A {n}×{n} cube", { n: 3 }));
+ * ```
+ */
 export function fill(text: string, values: Readonly<Record<string, string | number>> = {}): string {
   return text.replace(/\{(\w+)\}/g, (whole, key: string) => (key in values ? String(values[key]) : whole));
 }
 
 const upper = (text: string) => text[0].toUpperCase() + text.slice(1);
 
-/** The name of a step of the solve, as a person would say it: "White cross", 「白のクロス」. */
+/** The name of a step of the solve, as a person would say it: "White cross", 「白のクロス」.
+ *
+ * @param stage - The stage of the layer-by-layer solving method.
+ * @param language - English or Japanese for the displayed words.
+ * @returns The name of a step of the solve, as a person would say it: "White cross", 「白のクロス」.
+ *
+ * @example
+ * ```ts
+ * import { stageName } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(stageName("whiteCross", "en"));
+ * ```
+ */
 export function stageName(stage: SolveStage, language: KyuubuLanguage = "en"): string {
   return WORDS[language][`stage${upper(stage)}` as keyof CubeWords];
 }
 
-/** What a step of the solve is for, in a sentence: "Make a yellow cross on the top." */
+/** What a step of the solve is for, in a sentence: "Make a yellow cross on the top."
+ *
+ * @param stage - The stage of the layer-by-layer solving method.
+ * @param language - English or Japanese for the displayed words.
+ * @returns What a step of the solve is for, in a sentence: "Make a yellow cross on the top."
+ *
+ * @example
+ * ```ts
+ * import { stageSays } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(stageSays("whiteCross", "en"));
+ * ```
+ */
 export function stageSays(stage: SolveStage, language: KyuubuLanguage = "en"): string {
   return WORDS[language][`says${upper(stage)}` as keyof CubeWords];
 }
 
-/** The name of one of the method's algorithms, as a person would say it: "Sune", 「コーナーの三点交換」. */
+/** The name of one of the method's algorithms, as a person would say it: "Sune", 「コーナーの三点交換」.
+ *
+ * @param algorithm - The named solving algorithm.
+ * @param language - English or Japanese for the displayed words.
+ * @returns The name of one of the method's algorithms, as a person would say it: "Sune", 「コーナーの三点交換」.
+ *
+ * @example
+ * ```ts
+ * import { algorithmName } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(algorithmName("sune", "en"));
+ * ```
+ */
 export function algorithmName(algorithm: SolveAlgorithm, language: KyuubuLanguage = "en"): string {
   return WORDS[language][`alg${upper(algorithm)}` as keyof CubeWords];
 }
 
-/** The language a tag names, as far as the package speaks it: anything beginning "ja" is Japanese, and the rest is English. */
+/** The language a tag names, as far as the package speaks it: anything beginning "ja" is Japanese, and the rest is English.
+ *
+ * @param tag - The language tag to read.
+ * @returns The language a tag names, as far as the package speaks it: anything beginning "ja" is Japanese, and the rest is English.
+ *
+ * @example
+ * ```ts
+ * import { languageOf } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(languageOf("ja-JP"));
+ * ```
+ */
 export function languageOf(tag: string | null | undefined): KyuubuLanguage {
   return String(tag ?? "").toLowerCase().startsWith("ja") ? "ja" : "en";
 }

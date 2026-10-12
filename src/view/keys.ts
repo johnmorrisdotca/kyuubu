@@ -8,14 +8,38 @@ import type { CubeMove } from "../types.ts";
  * reaches that many layers in from the face the next letter names, so on a
  * 4×4 "2" then "R" turns the layer next to R.
  */
-/** What a key means: a turn, a depth for the next face letter, or nothing. */
+/** What a key means: a turn, a depth for the next face letter, or nothing.
+ *
+ * @example
+ * ```ts
+ * import type { KeyReading } from "@johnmorrisdotca/kyuubu";
+ * import { readKey } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: KeyReading = readKey("r", false, 3, 1);
+ * console.log(value);
+ * ```
+ */
 export type KeyReading = { move: CubeMove } | { depth: number } | null;
 
 const FACES = new Set(["R", "L", "U", "D", "F", "B"]);
 const MIDDLES = new Set(["M", "E", "S"]);
 const WHOLE = new Set(["X", "Y", "Z"]);
 
-/** What a key means on a cube of side `n`, given the depth a digit before it set (1 where none did). */
+/** What a key means on a cube of side `n`, given the depth a digit before it set (1 where none did).
+ *
+ * @param key - The pressed key, or the cuboid preset key for a lookup.
+ * @param shift - Whether Shift reverses the key’s turn.
+ * @param n - The cube’s side length.
+ * @param depth - The layer depth counted from the named face, starting at 1.
+ * @returns What a key means on a cube of side `n`, given the depth a digit before it set (1 where none did).
+ *
+ * @example
+ * ```ts
+ * import { readKey } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(readKey("r", false, 3, 1));
+ * ```
+ */
 export function readKey(key: string, shift: boolean, n: number, depth: number): KeyReading {
   if (/^[1-9]$/.test(key)) return { depth: Number(key) };
   // A shifted digit or letter arrives as its capital (or a symbol), so the letter is read by its capital and Shift says the way.

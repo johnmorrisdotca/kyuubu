@@ -16,7 +16,17 @@ import { cuboidLayerOf, halfTurnOnly, legalTurns, type CuboidDims, type CuboidMo
  * short of that, or a flick too gentle to count, it goes back.
  */
 
-/** The layer a drag has picked: its axis and layer, the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule, and whether it can only be turned by a half turn. */
+/** The layer a drag has picked: its axis and layer, the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule, and whether it can only be turned by a half turn.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidDragPick } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * 
+ * const value: CuboidDragPick = { axis: 1, layer: 0, along: [1, 0], halfOnly: true };
+ * console.log(value.halfOnly);
+ * ```
+ */
 export type CuboidDragPick = { axis: CubeAxis; layer: number; along: [number, number]; halfOnly: boolean };
 
 const length = ([x, y]: [number, number]) => Math.hypot(x, y) || 1;
@@ -26,6 +36,23 @@ const length = ([x, y]: [number, number]) => Math.hypot(x, y) || 1;
  * pointer has not gone far enough, while the two layers that carry the sticker
  * are too nearly as likely as each other, or where neither can turn. Past
  * `DRAG_DECIDE_PX` the likelier is picked whatever the odds.
+ *
+ * @param slot - The sticker’s centre and outward normal.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param dx - The horizontal pointer displacement in pixels.
+ * @param dy - The vertical pointer displacement in pixels.
+ * @returns The layer a drag across a sticker means, once it can be told: null while the pointer has not gone far enough, while the two layers that carry the sticker are too nearly as likely as each other, or where neither can turn. Past `DRAG_DECIDE_PX` the likelier is picked whatever the odds.
+ *
+ * @example
+ * ```ts
+ * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * import { cuboidSlots, pickCuboidDrag } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const dims = [2, 3, 3] as const;
+ * console.log(pickCuboidDrag(cuboidSlots(dims).slots[0]!, dims, view, 40, 0));
+ * ```
  */
 export function pickCuboidDrag(slot: StickerSlot, dims: CuboidDims, view: Mat3, dx: number, dy: number): CuboidDragPick | null {
   const far = Math.hypot(dx, dy);
@@ -52,13 +79,35 @@ export function pickCuboidDrag(slot: StickerSlot, dims: CuboidDims, view: Mat3, 
  * positive, and it stops at a half turn either way. A layer that only half
  * turns follows twice as fast, so that the whole half turn is as far a drag
  * as a quarter of any other. `quarterPx` is the pixels that make a quarter turn.
+ *
+ * @param pick - The layer and screen direction selected by a drag.
+ * @param dx - The horizontal pointer displacement in pixels.
+ * @param dy - The vertical pointer displacement in pixels.
+ * @param quarterPx - The pointer distance in pixels that makes a quarter turn.
+ * @returns The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. A layer that only half turns follows twice as fast, so that the whole half turn is as far a drag as a quarter of any other. `quarterPx` is the pixels that make a quarter turn.
+ *
+ * @example
+ * ```ts
+ * import { cuboidDragAngle } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const cpick = { axis: 1 as const, layer: 0, along: [1, 0] as [number, number], halfOnly: true };
+ * console.log(cuboidDragAngle(cpick, 40, 0, 100));
+ * ```
  */
 export function cuboidDragAngle(pick: CuboidDragPick, dx: number, dy: number, quarterPx: number): number {
   const angle = ((pick.along[0] * dx + pick.along[1] * dy) / Math.max(pick.halfOnly ? quarterPx / 2 : quarterPx, 1)) * 90;
   return Math.max(-180, Math.min(180, angle));
 }
 
-/** The point of no return of a half turn, in degrees: the middle of the way round. */
+/** The point of no return of a half turn, in degrees: the middle of the way round.
+ *
+ * @example
+ * ```ts
+ * import { HALF_TURN_COMMIT } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(HALF_TURN_COMMIT);
+ * ```
+ */
 export const HALF_TURN_COMMIT = 90;
 
 /**
@@ -68,6 +117,19 @@ export const HALF_TURN_COMMIT = 90;
  * from `HALF_TURN_COMMIT` on, or from a flick (`speed`, in degrees a
  * millisecond, signed like the angle) that has gone at least four times
  * `FLICK_ANGLE` degrees the same way, and otherwise goes back.
+ *
+ * @param angle - The signed drag angle in degrees.
+ * @param speed - The signed drag speed in degrees per millisecond.
+ * @param halfOnly - Whether the layer can only make a half turn.
+ * @param commitAngle - The drag angle in degrees at which a resting release commits a turn.
+ * @returns What letting go makes of a dragged layer, as quarter turns from −2 to 2, where 0 is back where it was. A layer that turns by quarters is read as the cube's is (`quartersForRelease`). One that only half turns is a half turn from `HALF_TURN_COMMIT` on, or from a flick (`speed`, in degrees a millisecond, signed like the angle) that has gone at least four times `FLICK_ANGLE` degrees the same way, and otherwise goes back.
+ *
+ * @example
+ * ```ts
+ * import { cuboidQuartersForRelease } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(cuboidQuartersForRelease(100, 0, true));
+ * ```
  */
 export function cuboidQuartersForRelease(angle: number, speed: number, halfOnly: boolean, commitAngle = COMMIT_ANGLE): -2 | -1 | 0 | 1 | 2 {
   const size = Math.abs(angle);
@@ -83,18 +145,54 @@ export function cuboidQuartersForRelease(angle: number, speed: number, halfOnly:
   return 0;
 }
 
-/** Whether a held layer is past its point of no return: letting go now, at rest, makes a move. */
+/** Whether a held layer is past its point of no return: letting go now, at rest, makes a move.
+ *
+ * @param angle - The signed drag angle in degrees.
+ * @param halfOnly - Whether the layer can only make a half turn.
+ * @param commitAngle - The drag angle in degrees at which a resting release commits a turn.
+ * @returns Whether a held layer is past its point of no return: letting go now, at rest, makes a move.
+ *
+ * @example
+ * ```ts
+ * import { cuboidPastCommit } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(cuboidPastCommit(100, true));
+ * ```
+ */
 export function cuboidPastCommit(angle: number, halfOnly: boolean, commitAngle = COMMIT_ANGLE): boolean {
   return cuboidQuartersForRelease(angle, 0, halfOnly, commitAngle) !== 0;
 }
 
-/** The move a release makes: the picked layer turned by those quarters, or null for none. */
+/** The move a release makes: the picked layer turned by those quarters, or null for none.
+ *
+ * @param pick - The layer and screen direction selected by a drag.
+ * @param quarters - The signed number of quarter turns on release; 0 cancels the move.
+ * @returns The move a release makes: the picked layer turned by those quarters, or null for none.
+ *
+ * @example
+ * ```ts
+ * import { cuboidMoveForRelease } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const cpick = { axis: 1 as const, layer: 0, along: [1, 0] as [number, number], halfOnly: true };
+ * console.log(cuboidMoveForRelease(cpick, 2));
+ * ```
+ */
 export function cuboidMoveForRelease(pick: CuboidDragPick, quarters: number): CuboidMove | null {
   if (quarters === 0) return null;
   return { axis: pick.axis, layer: pick.layer, turns: (((quarters % 4) + 4) % 4) as CubeTurns };
 }
 
-/** What a key means on a cuboid: a turn, a depth for the next face letter, or nothing. */
+/** What a key means on a cuboid: a turn, a depth for the next face letter, or nothing.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidKeyReading } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { readCuboidKey } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidKeyReading = readCuboidKey("u", false, [2, 3, 3], 1);
+ * console.log(value);
+ * ```
+ */
 export type CuboidKeyReading = { move: CuboidMove } | { depth: number } | null;
 
 const FACES = new Set(["R", "L", "U", "D", "F", "B"]);
@@ -105,6 +203,20 @@ const MIDDLES = new Set(["M", "E", "S"]);
  * none did): the cube's keys (`readKey`) without the turns of the whole cube.
  * On a layer that only half turns, the key turns it a half, whichever way
  * Shift says, because that is the only turn it has.
+ *
+ * @param key - The pressed key, or the cuboid preset key for a lookup.
+ * @param shift - Whether Shift reverses the key’s turn.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param depth - The layer depth counted from the named face, starting at 1.
+ * @returns What a key means on a cuboid, given the depth a digit before it set (1 where none did): the cube's keys (`readKey`) without the turns of the whole cube. On a layer that only half turns, the key turns it a half, whichever way Shift says, because that is the only turn it has.
+ *
+ * @example
+ * ```ts
+ * import { readCuboidKey } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(readCuboidKey("u", false, dims, 1));
+ * ```
  */
 export function readCuboidKey(key: string, shift: boolean, dims: CuboidDims, depth: number): CuboidKeyReading {
   if (/^[1-7]$/.test(key)) return { depth: Number(key) };

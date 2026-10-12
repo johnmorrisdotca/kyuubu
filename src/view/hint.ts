@@ -15,13 +15,39 @@ import { DRAG_DECIDE_PX, DRAG_START_PX, moveForRelease, pickDrag } from "./gestu
  * every size and from every side the cube can be seen from.
  */
 
-/** How squarely a face must face the viewer for an arrow to be drawn on it: the cosine of its angle to the eye. */
+/** How squarely a face must face the viewer for an arrow to be drawn on it: the cosine of its angle to the eye.
+ *
+ * @example
+ * ```ts
+ * import { HINT_MIN_FACING } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(HINT_MIN_FACING);
+ * ```
+ */
 export const HINT_MIN_FACING = 0.2;
 
-/** How closely a drag along the arrow must go the way the layer turns: the cosine between them. The layer turns at least this fast for the pointer's pace. */
+/** How closely a drag along the arrow must go the way the layer turns: the cosine between them. The layer turns at least this fast for the pointer's pace.
+ *
+ * @example
+ * ```ts
+ * import { HINT_MIN_FOLLOW } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(HINT_MIN_FOLLOW);
+ * ```
+ */
 export const HINT_MIN_FOLLOW = 0.5;
 
-/** The arrow a hint draws, in the cube's doubled units (a sticker is 2 across), lying on a face. */
+/** The arrow a hint draws, in the cube's doubled units (a sticker is 2 across), lying on a face.
+ *
+ * @example
+ * ```ts
+ * import type { HintArrow } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: HintArrow = { from: [0, 0, 0], along: [0, 1, 0], length: 2, width: 0.25, normal: [0, 0, 1] };
+ * console.log(value.length);
+ * ```
+ */
 export type HintArrow = {
   /** Where it begins: the middle of the sticker to take hold of, on the face (on the slab's middle line, for several layers). */
   from: Vec3;
@@ -35,7 +61,17 @@ export type HintArrow = {
   normal: Vec3;
 };
 
-/** What to drag to make a turn of one layer, or of several about one axis as one (a wide turn). */
+/** What to drag to make a turn of one layer, or of several about one axis as one (a wide turn).
+ *
+ * @example
+ * ```ts
+ * import type { DragHint } from "@johnmorrisdotca/kyuubu";
+ * import { dragHint, parseMove, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: DragHint = dragHint(parseMove("R", 3)!, 3, viewMatrix(-30, -20))!;
+ * console.log(value.layers);
+ * ```
+ */
 export type DragHint = {
   /** The turn's axis. */
   axis: CubeAxis;
@@ -83,6 +119,20 @@ function oneMovement(moves: readonly CubeMove[]): { axis: CubeAxis; layers: numb
  * as far, are one slab and get one arrow across it; each layer is still
  * turned by a drag of its own. Null for a turn of the whole cube, which no
  * drag on a sticker makes, and for turns that are not one movement.
+ *
+ * @param moves - The turns, in their execution order.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @returns The drag that makes this turn, from the way the cube is looked at now (`view`, as `viewMatrix` makes it). Several layers about one axis, turned as far, are one slab and get one arrow across it; each layer is still turned by a drag of its own. null for a turn of the whole cube, which no drag on a sticker makes, and for turns that are not one movement.
+ *
+ * @example
+ * ```ts
+ * import { dragHint, parseMove, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const move = parseMove("R", 3)!;
+ * console.log(dragHint(move, 3, view));
+ * ```
  */
 export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view: Mat3): DragHint | null {
   const movement = oneMovement(Array.isArray(moves) ? moves : [moves as CubeMove]);
@@ -192,6 +242,19 @@ function oneRotation(moves: readonly CubeMove[]): { axis: CubeAxis; turns: CubeT
  * Null for moves that are not one turn of the whole cube; `face` and `arrow`
  * are null where none of the four sides can be seen well enough (look round
  * first).
+ *
+ * @param moves - The turns, in their execution order.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @returns WHICH WAY TO TURN THE WHOLE CUBE: no drag on a sticker makes it (a key or a button does: `x`, `y`, `z`), so there is no sticker to take hold of, but the way it goes can still be drawn. The arrow lies across the middle of the side the axis goes through that is seen best, as long as the side allows, and runs the way every sticker on it travels; two heads for a half turn. The sides the axis comes out of never cross the screen, so none is drawn on. null for moves that are not one turn of the whole cube; `face` and `arrow` are null where none of the four sides can be seen well enough (look round first).
+ *
+ * @example
+ * ```ts
+ * import { rotationHint, viewMatrix, wholeMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * console.log(rotationHint(wholeMove("x", "cw"), 3, view));
+ * ```
  */
 export function rotationHint(moves: CubeMove | readonly CubeMove[], n: number, view: Mat3): DragHint | null {
   const rotation = oneRotation(Array.isArray(moves) ? (moves as readonly CubeMove[]) : [moves as CubeMove]);

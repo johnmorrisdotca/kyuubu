@@ -32,7 +32,15 @@ import { readKey } from "./keys.ts";
  * - keys in cubers' notation (`keys.ts`), and the arrows to look around.
  */
 
-/** The standard colours, by the letter a solved face carries: white up, red right, green front, yellow down, orange left, blue back. */
+/** The standard colours, by the letter a solved face carries: white up, red right, green front, yellow down, orange left, blue back.
+ *
+ * @example
+ * ```ts
+ * import { DEFAULT_COLOURS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(DEFAULT_COLOURS);
+ * ```
+ */
 export const DEFAULT_COLOURS: Readonly<Record<CubeFace, string>> = {
   U: "#f7f7f2",
   R: "#c8102e",
@@ -42,12 +50,29 @@ export const DEFAULT_COLOURS: Readonly<Record<CubeFace, string>> = {
   B: "#0046ad",
 };
 
-/** The colour of the plastic between the stickers, where none is given. */
+/** The colour of the plastic between the stickers, where none is given.
+ *
+ * @example
+ * ```ts
+ * import { DEFAULT_PLASTIC } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(DEFAULT_PLASTIC);
+ * ```
+ */
 export const DEFAULT_PLASTIC = "#111";
 
 /**
  * How a cube looks: its six colours, its plastic, and the shape of a sticker.
  * Everything may be left out, and what is left out stays as it was.
+ *
+ * @example
+ * ```ts
+ * import type { CubeTheme } from "@johnmorrisdotca/kyuubu";
+ * import { CUBE_THEMES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CubeTheme = CUBE_THEMES.paper;
+ * console.log(value.plastic);
+ * ```
  */
 export type CubeTheme = {
   /** Colours for the six faces, by the letter a solved face carries. Any CSS colour. */
@@ -66,6 +91,13 @@ export type CubeTheme = {
  * Looks that come with the package. `standard` is the cube as it is sold;
  * `paper` is the quieter one the demo site wears, made to sit on warm paper
  * and green felt; `stickerless` has colour to the edge of every piece.
+ *
+ * @example
+ * ```ts
+ * import { CUBE_THEMES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(CUBE_THEMES).slice(0, 8));
+ * ```
  */
 export const CUBE_THEMES = {
   standard: { colours: { ...DEFAULT_COLOURS }, plastic: DEFAULT_PLASTIC, stickerInset: "6%", stickerRadius: "14%" },
@@ -73,7 +105,15 @@ export const CUBE_THEMES = {
   stickerless: { colours: { ...DEFAULT_COLOURS }, plastic: "#2a2a2a", stickerInset: "1.5%", stickerRadius: "10%" },
 } as const satisfies Record<string, CubeTheme>;
 
-/** The CSS custom property that colours each face, where no colour is given in code: set it on the cube's element or any ancestor. */
+/** The CSS custom property that colours each face, where no colour is given in code: set it on the cube's element or any ancestor.
+ *
+ * @example
+ * ```ts
+ * import { FACE_PROPERTIES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(FACE_PROPERTIES);
+ * ```
+ */
 export const FACE_PROPERTIES: Readonly<Record<CubeFace, string>> = {
   U: "--kyuubu-up",
   R: "--kyuubu-right",
@@ -83,7 +123,17 @@ export const FACE_PROPERTIES: Readonly<Record<CubeFace, string>> = {
   B: "--kyuubu-back",
 };
 
-/** Everything a cube on the screen can be told when it is made. Only `size` is needed. */
+/** Everything a cube on the screen can be told when it is made. Only `size` is needed.
+ *
+ * @example
+ * ```ts
+ * import type { CubeViewOptions } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeViewOptions = { size: 3, interactive: true, keyboard: "focus" };
+ * console.log(value.size);
+ * ```
+ */
 export type CubeViewOptions = {
   /** The cube's side: 2 for a 2×2, 3 for the classic. */
   size: number;
@@ -152,7 +202,17 @@ const HINT_EDGE = "rgba(17, 17, 17, 0.85)";
 const HINT_DIM = "brightness(0.62) saturate(0.7)";
 const SVG = "http://www.w3.org/2000/svg";
 
-/** What a cube tells the listeners `on` adds: a turn a person made, with the stickers after it; and the view turned, in degrees. */
+/** What a cube tells the listeners `on` adds: a turn a person made, with the stickers after it; and the view turned, in degrees.
+ *
+ * @example
+ * ```ts
+ * import type { CubeViewEvents } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeViewEvents = { turn: (move, state) => console.log(move, state), look: (yaw, pitch) => console.log(yaw, pitch) };
+ * console.log(Object.keys(value));
+ * ```
+ */
 export type CubeViewEvents = {
   turn: (move: CubeMove, state: string) => void;
   look: (yaw: number, pitch: number) => void;
@@ -174,9 +234,20 @@ type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all
  * element, which it fills, so the element needs a size; `destroy()` takes it
  * away again with every listener.
  *
+ *
  * @example
- * const view = new CubeView(document.getElementById("cube"), { size: 3, onTurn: (move, state) => save(state) });
- * view.turn(parseMove("R", 3));
+ * ```ts no-run
+ * import { CubeView } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const host = document.createElement("div");
+ * host.style.cssText = "width:300px;height:300px;position:relative";
+ * document.body.append(host);
+ * const cube = new CubeView(host, { size: 3, interactive: true });
+ * console.log(cube.state);
+ * // Call cube.destroy() when the host is removed.
+ * ```
+ * @param host - The DOM host with a size and position.
+ * @param options - View or replay options.
  */
 export class CubeView {
   /** The element the cube was made in. */

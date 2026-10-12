@@ -22,7 +22,17 @@ import { CUBOID_WORDS, cuboidMoveName, faultSays } from "./words.ts";
  * and there is no x, y or z, because a cuboid turned whole is another puzzle.
  */
 
-/** How a cuboid player is set up: the solve, and how it is shown. */
+/** How a cuboid player is set up: the solve, and how it is shown.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidPlayerOptions } from "@johnmorrisdotca/kyuubu/cuboid/play";
+ * 
+ * 
+ * const value: CuboidPlayerOptions = { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false };
+ * console.log(value.dims);
+ * ```
+ */
 export type CuboidPlayerOptions = CuboidReplaySource & {
   /** Start playing as soon as it is drawn. */
   autoplay?: boolean;
@@ -48,7 +58,17 @@ export type CuboidPlayerOptions = CuboidReplaySource & {
   onEnd?: () => void;
 };
 
-/** A cuboid player on the page. */
+/** A cuboid player on the page.
+ *
+ * @example
+ * ```ts no-run
+ * import type { CuboidPlayerHandle } from "@johnmorrisdotca/kyuubu/cuboid/play";
+ * import { mountCuboidPlayer } from "@johnmorrisdotca/kyuubu/cuboid/play";
+ * 
+ * const value: CuboidPlayerHandle = mountCuboidPlayer(document.createElement("div"), { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false });
+ * console.log(value.plan?.solved);
+ * ```
+ */
 export type CuboidPlayerHandle = {
   /** The solve as it was read, or why it could not be. */
   readonly plan: CuboidReplayPlan | null;
@@ -78,7 +98,15 @@ export type CuboidPlayerHandle = {
 };
 
 const STYLE_ID = "kyuubu-cuboid-player-style";
-/** The player's stylesheet, put in the page once: the cube player's, under the same class names and custom properties. */
+/** The player's stylesheet, put in the page once: the cube player's, under the same class names and custom properties.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_PLAYER_CSS } from "@johnmorrisdotca/kyuubu/cuboid/play";
+ * 
+ * console.log(CUBOID_PLAYER_CSS.includes("."));
+ * ```
+ */
 export const CUBOID_PLAYER_CSS = `
 .kyuubu-cuboid-player{display:grid;gap:.5rem;font:inherit;color:inherit;max-width:100%}
 .kyuubu-cuboid-player-stage{aspect-ratio:1;width:100%;position:relative;background:var(--kyuubu-player-felt,transparent);border-radius:var(--kyuubu-player-radius,12px);touch-action:none}
@@ -111,8 +139,20 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
 /**
  * A solve on a cuboid drawn in an element, with its controls.
  *
+ * @param host - The DOM element that receives the view and controls.
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A solve on a cuboid drawn in an element, with its controls.
+ *
  * @example
- * mountCuboidPlayer(document.getElementById("solve"), { dims: [3, 3, 1], scramble: "U2 R2", solution: "R2 U2", timeMs: 2000, autoplay: true });
+ * ```ts no-run
+ * import { mountCuboidPlayer } from "@johnmorrisdotca/kyuubu/cuboid/play";
+ * 
+ * const host = document.createElement("div");
+ * document.body.append(host);
+ * const player = mountCuboidPlayer(host, { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false });
+ * console.log(player.plan?.solved);
+ * // Call player.destroy() when removing the player.
+ * ```
  */
 export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOptions): CuboidPlayerHandle {
   const doc = host.ownerDocument;

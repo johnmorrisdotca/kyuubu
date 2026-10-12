@@ -21,7 +21,17 @@ import type { CubeMove } from "./types.ts";
  * flattened: a replay turns those layers together, as the hand does.
  */
 
-/** One thing a solver did: a turn, a wide turn or a turn of the whole cube. */
+/** One thing a solver did: a turn, a wide turn or a turn of the whole cube.
+ *
+ * @example
+ * ```ts
+ * import type { SolveMove } from "@johnmorrisdotca/kyuubu";
+ * import { parseSolve } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolveMove = parseSolve("R", 3).steps[0]!;
+ * console.log(value.text);
+ * ```
+ */
 export type SolveMove = {
   /** The step as it is written in standard form: `R`, `Rw'`, `3Uw2`, `x`. */
   text: string;
@@ -33,7 +43,17 @@ export type SolveMove = {
   at: number;
 };
 
-/** Why a line of notation could not be read, and where. */
+/** Why a line of notation could not be read, and where.
+ *
+ * @example
+ * ```ts
+ * import type { NotationFault } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: NotationFault = { token: "oops", at: 0, line: 1, column: 1, reason: "unknown" };
+ * console.log(value.reason);
+ * ```
+ */
 export type NotationFault = {
   /** The piece of text that is not a move on this cube. */
   token: string;
@@ -47,7 +67,17 @@ export type NotationFault = {
   reason: "unknown" | "no-such-layer";
 };
 
-/** What reading a solve gives: its steps, or the first thing that could not be read. */
+/** What reading a solve gives: its steps, or the first thing that could not be read.
+ *
+ * @example
+ * ```ts
+ * import type { SolveReading } from "@johnmorrisdotca/kyuubu";
+ * import { parseSolve } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolveReading = parseSolve("R U", 3);
+ * console.log(value.ok);
+ * ```
+ */
 export type SolveReading = { ok: true; steps: SolveMove[] } | { ok: false; steps: SolveMove[]; fault: NotationFault };
 
 const BRACKETED: Record<string, "x" | "y" | "z"> = { r: "x", l: "x", u: "y", d: "y", f: "z", b: "z" };
@@ -64,7 +94,19 @@ function amountOf(suffix: string): "cw" | "half" | "ccw" {
 const suffixText = (amount: "cw" | "half" | "ccw") => (amount === "half" ? "2" : amount === "ccw" ? "'" : "");
 const other = (amount: "cw" | "half" | "ccw") => (amount === "cw" ? "ccw" : amount === "ccw" ? "cw" : "half");
 
-/** One written step read for a cube of this size, or why it is not one. */
+/** One written step read for a cube of this size, or why it is not one.
+ *
+ * @param token - The notation token being read or described.
+ * @param n - The cube’s side length.
+ * @returns One written step read for a cube of this size, or why it is not one.
+ *
+ * @example
+ * ```ts
+ * import { parseSolveMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(parseSolveMove("Rw", 3));
+ * ```
+ */
 export function parseSolveMove(token: string, n: number): Omit<SolveMove, "at"> | "unknown" | "no-such-layer" {
   const clean = token.replace(/[’‘`´′]/g, "'");
   const found = TOKEN.exec(clean);
@@ -104,9 +146,16 @@ export function parseSolveMove(token: string, n: number): Omit<SolveMove, "at"> 
  * this size. Everything it could read comes back even when it stops at a
  * fault, so a page can show how far it got.
  *
+ * @param text - The text to parse or format.
+ * @param n - The cube’s side length.
+ * @returns A solve, or a scramble, read from the way it is written, for a cube of this size. Everything it could read comes back even when it stops at a fault, so a page can show how far it got.
+ *
  * @example
- * parseSolve("x' // inspection\n(R U R' U') Rw2", 3);
- * // → { ok: true, steps: [x', R, U, R', U', Rw2] }
+ * ```ts
+ * import { parseSolve } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(parseSolve("R U2", 3));
+ * ```
  */
 export function parseSolve(text: string, n: number): SolveReading {
   const steps: SolveMove[] = [];
@@ -178,29 +227,94 @@ export function parseSolve(text: string, n: number): SolveReading {
   return { ok: true, steps };
 }
 
-/** Every layer a list of steps turns, in order: what `turnAll` takes. */
+/** Every layer a list of steps turns, in order: what `turnAll` takes.
+ *
+ * @param steps - The ordered steps of the solve.
+ * @returns Every layer a list of steps turns, in order: what `turnAll` takes.
+ *
+ * @example
+ * ```ts
+ * import { parseSolve, solveMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const reading = parseSolve("R U", 3);
+ * const steps = reading.steps;
+ * console.log(solveMoves(steps));
+ * ```
+ */
 export function solveMoves(steps: readonly SolveMove[]): CubeMove[] {
   return steps.flatMap((step) => step.moves);
 }
 
-/** A cube after these steps. */
+/** A cube after these steps.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @param steps - The ordered steps of the solve.
+ * @returns A cube after these steps.
+ *
+ * @example
+ * ```ts
+ * import { applySolve, parseSolve, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const reading = parseSolve("R U", 3);
+ * const steps = reading.steps;
+ * const state = solvedCube(3);
+ * console.log(applySolve(state, 3, steps));
+ * ```
+ */
 export function applySolve(state: string, n: number, steps: readonly SolveMove[]): string {
   let now = state;
   for (const move of solveMoves(steps)) now = turnCube(now, n, move);
   return now;
 }
 
-/** The steps written out in standard form, a space between each. */
+/** The steps written out in standard form, a space between each.
+ *
+ * @param steps - The ordered steps of the solve.
+ * @returns The steps written out in standard form, a space between each.
+ *
+ * @example
+ * ```ts
+ * import { parseSolve, solveText } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const reading = parseSolve("R U", 3);
+ * const steps = reading.steps;
+ * console.log(solveText(steps));
+ * ```
+ */
 export function solveText(steps: readonly SolveMove[]): string {
   return steps.map((step) => step.text).join(" ");
 }
 
-/** How many of the steps count as moves: every turn, and no turn of the whole cube. */
+/** How many of the steps count as moves: every turn, and no turn of the whole cube.
+ *
+ * @param steps - The ordered steps of the solve.
+ * @returns How many of the steps count as moves: every turn, and no turn of the whole cube.
+ *
+ * @example
+ * ```ts
+ * import { countSolveMoves, parseSolve } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const reading = parseSolve("R U", 3);
+ * const steps = reading.steps;
+ * console.log(countSolveMoves(steps));
+ * ```
+ */
 export function countSolveMoves(steps: readonly SolveMove[]): number {
   return steps.filter((step) => step.counts).length;
 }
 
-/** A solve as a link carries it: its scramble, its moves, and its title where it has one. */
+/** A solve as a link carries it: its scramble, its moves, and its title where it has one.
+ *
+ * @example
+ * ```ts
+ * import type { SolveLink } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: SolveLink = { scramble: "R U", solution: "U' R'", title: "Two turns" };
+ * console.log(value.title);
+ * ```
+ */
 export type SolveLink = { scramble: string; solution: string; title?: string };
 
 /**
@@ -210,9 +324,15 @@ export type SolveLink = { scramble: string; solution: string; title?: string };
  * and a new line `%0A`; the scramble is its `setup` and the solve its `alg`.
  * Null for anything that is not such a link.
  *
+ * @param text - The text to parse or format.
+ * @returns A solve read out of a link to alg.cubing.net, the page most reconstructions are shared by, so that a person can paste the address and not copy two boxes by hand. In such a link a space is written `_`, a `'` is written `-` and a new line `%0A`; the scramble is its `setup` and the solve its `alg`. null for anything that is not such a link.
+ *
  * @example
- * readSolveLink("https://alg.cubing.net/?setup=R_U&alg=U-_R-_%2F%2F_done");
- * // → { scramble: "R U", solution: "U' R' // done" }
+ * ```ts
+ * import { readSolveLink } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(readSolveLink("https://alg.cubing.net/?setup=R_U&alg=U-_R-"));
+ * ```
  */
 export function readSolveLink(text: string): SolveLink | null {
   const found = /https?:\/\/alg\.cubing\.net\/?\?[^\s"'<>]+/.exec(text);

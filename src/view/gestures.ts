@@ -30,7 +30,24 @@ function turnFor(slot: StickerSlot, n: number, axis: CubeAxis, forward: boolean)
   return { axis, layer: layerOf(slot.centre, axis, n), turns: (forward ? 1 : 3) as CubeTurns };
 }
 
-/** The turn a drag across a sticker means: the layer that carries it most nearly the way the pointer went, that way. */
+/** The turn a drag across a sticker means: the layer that carries it most nearly the way the pointer went, that way.
+ *
+ * @param slot - The sticker’s centre and outward normal.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param dx - The horizontal pointer displacement in pixels.
+ * @param dy - The vertical pointer displacement in pixels.
+ * @returns The turn a drag across a sticker means: the layer that carries it most nearly the way the pointer went, that way.
+ *
+ * @example
+ * ```ts
+ * import { cubeSlots, moveForDrag, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const slot = cubeSlots(3).slots[0]!;
+ * console.log(moveForDrag(slot, 3, view, 40, 0));
+ * ```
+ */
 export function moveForDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, dy: number): CubeMove {
   let best: { candidate: Candidate; along: number } | null = null;
   for (const candidate of candidates(slot, view)) {
@@ -46,6 +63,22 @@ export function moveForDrag(slot: StickerSlot, n: number, view: Mat3, dx: number
  * carries it most nearly sideways, rolling the wheel down carrying it right;
  * `upDown` the layer that carries it most nearly up and down, down carrying it
  * down; `face` turns the face it is on, down turning it clockwise.
+ *
+ * @param slot - The sticker’s centre and outward normal.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param way - The wheel gesture: across, upDown or face.
+ * @param down - Whether the wheel rolls down.
+ * @returns The turn the wheel means over a sticker. `across` turns the layer that carries it most nearly sideways, rolling the wheel down carrying it right; `upDown` the layer that carries it most nearly up and down, down carrying it down; `face` turns the face it is on, down turning it clockwise.
+ *
+ * @example
+ * ```ts
+ * import { cubeSlots, moveForWheel, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const slot = cubeSlots(3).slots[0]!;
+ * console.log(moveForWheel(slot, 3, view, "face", true));
+ * ```
  */
 export function moveForWheel(slot: StickerSlot, n: number, view: Mat3, way: "across" | "upDown" | "face", down: boolean): CubeMove {
   if (way === "face") {
@@ -68,26 +101,102 @@ export function moveForWheel(slot: StickerSlot, n: number, view: Mat3, way: "acr
  * pointer lets go. These are the rules, as pure functions.
  */
 
-/** How far the pointer goes, in pixels, before a drag picks a layer at all. */
+/** How far the pointer goes, in pixels, before a drag picks a layer at all.
+ *
+ * @example
+ * ```ts
+ * import { DRAG_START_PX } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(DRAG_START_PX);
+ * ```
+ */
 export const DRAG_START_PX = 9;
-/** How far it goes before a drag that could be either of two layers picks the likelier anyway. */
+/** How far it goes before a drag that could be either of two layers picks the likelier anyway.
+ *
+ * @example
+ * ```ts
+ * import { DRAG_DECIDE_PX } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(DRAG_DECIDE_PX);
+ * ```
+ */
 export const DRAG_DECIDE_PX = 27;
-/** How much more one layer must go the pointer's way than the other to be picked before that. */
+/** How much more one layer must go the pointer's way than the other to be picked before that.
+ *
+ * @example
+ * ```ts
+ * import { DRAG_CLEAR_RATIO } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(DRAG_CLEAR_RATIO);
+ * ```
+ */
 export const DRAG_CLEAR_RATIO = 1.4;
-/** The point of no return, in degrees, where none is given: let go short of it and the layer goes back. */
+/** The point of no return, in degrees, where none is given: let go short of it and the layer goes back.
+ *
+ * @example
+ * ```ts
+ * import { COMMIT_ANGLE } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(COMMIT_ANGLE);
+ * ```
+ */
 export const COMMIT_ANGLE = 30;
-/** A flick: the layer still turning this fast the drag's own way, in degrees a millisecond, when the pointer lets go. */
+/** A flick: the layer still turning this fast the drag's own way, in degrees a millisecond, when the pointer lets go.
+ *
+ * @example
+ * ```ts
+ * import { FLICK_SPEED } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(FLICK_SPEED);
+ * ```
+ */
 export const FLICK_SPEED = 0.25;
-/** The least a flick must have turned the layer, in degrees. */
+/** The least a flick must have turned the layer, in degrees.
+ *
+ * @example
+ * ```ts
+ * import { FLICK_ANGLE } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(FLICK_ANGLE);
+ * ```
+ */
 export const FLICK_ANGLE = 4;
 
-/** How near a seam between two layers a touch lands to take both: this share of a sticker's width on each side of the line between them, so that the middle of a sticker, and a little more than half of its width, is still the one layer. */
+/** How near a seam between two layers a touch lands to take both: this share of a sticker's width on each side of the line between them, so that the middle of a sticker, and a little more than half of its width, is still the one layer.
+ *
+ * @example
+ * ```ts
+ * import { SEAM_BAND } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(SEAM_BAND);
+ * ```
+ */
 export const SEAM_BAND = 0.18;
 
-/** The layer a drag has picked: its axis and layer, and the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule. `also` is the layer beside it that turns with it, where the drag began on the seam between the two. */
+/** The layer a drag has picked: its axis and layer, and the way across the screen (a unit vector, x right and y down) that turns it forwards by the right-hand rule. `also` is the layer beside it that turns with it, where the drag began on the seam between the two.
+ *
+ * @example
+ * ```ts
+ * import type { DragPick } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: DragPick = { axis: 0, layer: 2, along: [1, 0] };
+ * console.log(value.layer);
+ * ```
+ */
 export type DragPick = { axis: CubeAxis; layer: number; along: [number, number]; also?: number };
 
-/** A seam a hand has taken hold of: a turn about this axis would carry the layer the sticker is in and the one `beside` it, together. */
+/** A seam a hand has taken hold of: a turn about this axis would carry the layer the sticker is in and the one `beside` it, together.
+ *
+ * @example
+ * ```ts
+ * import type { Seam } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: Seam = { axis: 0, beside: 1 };
+ * console.log(value.beside);
+ * ```
+ */
 export type Seam = { axis: CubeAxis; beside: number };
 
 /** A model point, in the cube's doubled units, as the screen draws it: in pixels from the cube's middle (y down), with the perspective the cube is drawn in. `k` is the pixels in one doubled unit, `lens` the eye's distance in pixels. */
@@ -106,6 +215,24 @@ function projected(view: Mat3, v: Vec3, k: number, lens: number): [number, numbe
  * across the line, or begun anywhere else on the sticker, turns the one layer
  * as ever. `pointer` is in pixels from the cube's middle, y down, as the cube
  * is drawn; none on a 2×2, where both layers are the whole cube.
+ *
+ * @param slot - The sticker’s centre and outward normal.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param pointer - The pointer position relative to the cube’s middle, in pixels with y down.
+ * @param k - The model-to-screen drawing scale.
+ * @param lens - The perspective distance used to draw the cube.
+ * @param band - The fraction of a sticker’s width treated as a seam.
+ * @returns The seams a touch at this place on a sticker is taking hold of, nearest first: where it lands within `SEAM_BAND` of a sticker's width of the line that parts the sticker's layer from the one beside it, along either of the two directions the sticker can be turned across. Each is a turn about an axis that takes both layers, and is made only if the drag that follows goes that way: a drag across the line, or begun anywhere else on the sticker, turns the one layer as ever. `pointer` is in pixels from the cube's middle, y down, as the cube is drawn; none on a 2×2, where both layers are the whole cube.
+ *
+ * @example
+ * ```ts
+ * import { cubeSlots, seamsAt, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const slot = cubeSlots(3).slots[0]!;
+ * console.log(seamsAt(slot, 3, view, [0, 0], 100, 600));
+ * ```
  */
 export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: readonly [number, number], k: number, lens: number, band = SEAM_BAND): Seam[] {
   if (n < 3) return [];
@@ -144,6 +271,23 @@ export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: reado
  * likelier is picked whatever the odds. A drag that began on a seam
  * (`seamsAt`) and goes the way that turns about the seam's axis picks the
  * layer beside as well (`also`).
+ *
+ * @param slot - The sticker’s centre and outward normal.
+ * @param n - The cube’s side length.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param dx - The horizontal pointer displacement in pixels.
+ * @param dy - The vertical pointer displacement in pixels.
+ * @param seams - The nearby seams selected at the start of the drag.
+ * @returns The layer a drag across a sticker means, once it can be told: null while the pointer has not gone far enough, or while the two layers that carry the sticker are too nearly as likely as each other. Past `DRAG_DECIDE_PX` the likelier is picked whatever the odds. A drag that began on a seam (`seamsAt`) and goes the way that turns about the seam's axis picks the layer beside as well (`also`).
+ *
+ * @example
+ * ```ts
+ * import { cubeSlots, pickDrag, viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const view = viewMatrix(-30, -20);
+ * const slot = cubeSlots(3).slots[0]!;
+ * console.log(pickDrag(slot, 3, view, 40, 0));
+ * ```
  */
 export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, dy: number, seams: readonly Seam[] = []): DragPick | null {
   const far = Math.hypot(dx, dy);
@@ -161,7 +305,22 @@ export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, d
   return { axis: best.candidate.axis, layer: layerOf(slot.centre, best.candidate.axis, n), along: best.along, ...(seam === undefined ? {} : { also: seam.beside }) };
 }
 
-/** The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. `quarterPx` is the pixels that make a quarter turn. */
+/** The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. `quarterPx` is the pixels that make a quarter turn.
+ *
+ * @param pick - The layer and screen direction selected by a drag.
+ * @param dx - The horizontal pointer displacement in pixels.
+ * @param dy - The vertical pointer displacement in pixels.
+ * @param quarterPx - The pointer distance in pixels that makes a quarter turn.
+ * @returns The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. `quarterPx` is the pixels that make a quarter turn.
+ *
+ * @example
+ * ```ts
+ * import { dragAngle } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
+ * console.log(dragAngle(pick, 40, 0, 100));
+ * ```
+ */
 export function dragAngle(pick: DragPick, dx: number, dy: number, quarterPx: number): number {
   const angle = ((pick.along[0] * dx + pick.along[1] * dy) / Math.max(quarterPx, 1)) * 90;
   return Math.max(-180, Math.min(180, angle));
@@ -176,6 +335,18 @@ export function dragAngle(pick: DragPick, dx: number, dy: number, quarterPx: num
  * is a half turn. A flick, still moving fast the way it was dragged, makes
  * the quarter turn from short of the point. `speed` is in degrees a
  * millisecond, signed like the angle.
+ *
+ * @param angle - The signed drag angle in degrees.
+ * @param speed - The signed drag speed in degrees per millisecond.
+ * @param commitAngle - The drag angle in degrees at which a resting release commits a turn.
+ * @returns What letting go makes of a dragged layer: the quarter turns it snaps to, from −2 to 2, where 0 is back where it was and no move at all. Short of the point of no return (`commitAngle`) it goes back; from there up to the same distance past a quarter turn it is one quarter turn; further is a half turn. A flick, still moving fast the way it was dragged, makes the quarter turn from short of the point. `speed` is in degrees a millisecond, signed like the angle.
+ *
+ * @example
+ * ```ts
+ * import { quartersForRelease } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(quartersForRelease(60, 0));
+ * ```
  */
 export function quartersForRelease(angle: number, speed = 0, commitAngle = COMMIT_ANGLE): -2 | -1 | 0 | 1 | 2 {
   const size = Math.abs(angle);
@@ -186,18 +357,56 @@ export function quartersForRelease(angle: number, speed = 0, commitAngle = COMMI
   return 0;
 }
 
-/** Whether a dragged layer is past the point of no return: letting go now, at rest, makes a move. */
+/** Whether a dragged layer is past the point of no return: letting go now, at rest, makes a move.
+ *
+ * @param angle - The signed drag angle in degrees.
+ * @param commitAngle - The drag angle in degrees at which a resting release commits a turn.
+ * @returns Whether a dragged layer is past the point of no return: letting go now, at rest, makes a move.
+ *
+ * @example
+ * ```ts
+ * import { pastCommit } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(pastCommit(60));
+ * ```
+ */
 export function pastCommit(angle: number, commitAngle = COMMIT_ANGLE): boolean {
   return quartersForRelease(angle, 0, commitAngle) !== 0;
 }
 
-/** The move a release makes: the picked layer turned by those quarters, or null for none. */
+/** The move a release makes: the picked layer turned by those quarters, or null for none.
+ *
+ * @param pick - The layer and screen direction selected by a drag.
+ * @param quarters - The signed number of quarter turns on release; 0 cancels the move.
+ * @returns The move a release makes: the picked layer turned by those quarters, or null for none.
+ *
+ * @example
+ * ```ts
+ * import { moveForRelease } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
+ * console.log(moveForRelease(pick, 1));
+ * ```
+ */
 export function moveForRelease(pick: DragPick, quarters: number): CubeMove | null {
   if (quarters === 0) return null;
   return { axis: pick.axis, layer: pick.layer, turns: (((quarters % 4) + 4) % 4) as CubeTurns };
 }
 
-/** Every layer a release turns: the picked layer, and the one beside it where the drag took a seam, each by those quarters; none for none. */
+/** Every layer a release turns: the picked layer, and the one beside it where the drag took a seam, each by those quarters; none for none.
+ *
+ * @param pick - The layer and screen direction selected by a drag.
+ * @param quarters - The signed number of quarter turns on release; 0 cancels the move.
+ * @returns Every layer a release turns: the picked layer, and the one beside it where the drag took a seam, each by those quarters; none for none.
+ *
+ * @example
+ * ```ts
+ * import { movesForRelease } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
+ * console.log(movesForRelease(pick, 1));
+ * ```
+ */
 export function movesForRelease(pick: DragPick, quarters: number): CubeMove[] {
   const move = moveForRelease(pick, quarters);
   if (move === null) return [];

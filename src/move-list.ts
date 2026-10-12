@@ -17,10 +17,30 @@ import { WORDS, fill, languageOf, type KyuubuLanguage } from "./words.ts";
  * falling back to the player's own where the list is in a player.
  */
 
-/** One move of a list: its code, what it turns in words (worked out from the code when left out), and the name a screen reader gives its button (the code and the words when left out). */
+/** One move of a list: its code, what it turns in words (worked out from the code when left out), and the name a screen reader gives its button (the code and the words when left out).
+ *
+ * @example
+ * ```ts
+ * import type { MoveListItem } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: MoveListItem = { code: "R", label: "Right face" };
+ * console.log(value.code);
+ * ```
+ */
 export type MoveListItem = { code: string; name?: string; label?: string };
 
-/** A run of moves under a heading: a scramble, a solution. */
+/** A run of moves under a heading: a scramble, a solution.
+ *
+ * @example
+ * ```ts
+ * import type { MoveListGroup } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: MoveListGroup = { label: "Solve", items: ["R", "R'"] };
+ * console.log(value.items);
+ * ```
+ */
 export type MoveListGroup = {
   /** What the run is called, shown above it and said by a screen reader. */
   label: string;
@@ -30,7 +50,17 @@ export type MoveListGroup = {
   main?: boolean;
 };
 
-/** How a list is set up. */
+/** How a list is set up.
+ *
+ * @example
+ * ```ts
+ * import type { MoveListOptions } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: MoveListOptions = { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 };
+ * console.log(value.current);
+ * ```
+ */
 export type MoveListOptions = {
   /** The runs of moves, in order. */
   groups: readonly MoveListGroup[];
@@ -44,7 +74,17 @@ export type MoveListOptions = {
   label?: string;
 };
 
-/** A list on the page. */
+/** A list on the page.
+ *
+ * @example
+ * ```ts no-run
+ * import type { MoveListHandle } from "@johnmorrisdotca/kyuubu";
+ * import { mountMoveList } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: MoveListHandle = mountMoveList(document.createElement("div"), { groups: [{ label: "Solve", items: ["R"] }] });
+ * console.log(value.element.tagName);
+ * ```
+ */
 export type MoveListHandle = {
   /** The element the list is drawn in. */
   readonly element: HTMLElement;
@@ -63,7 +103,15 @@ const STYLE_ID = "kyuubu-moves-style";
 const INK = "var(--kyuubu-moves-ink,var(--kyuubu-player-ink,currentColor))";
 const PAPER = "var(--kyuubu-moves-paper,var(--kyuubu-player-paper,Canvas))";
 const RULE = "var(--kyuubu-moves-rule,var(--kyuubu-player-rule,color-mix(in srgb,currentColor 28%,transparent)))";
-/** The list's stylesheet, put in the page once. */
+/** The list's stylesheet, put in the page once.
+ *
+ * @example
+ * ```ts
+ * import { MOVE_LIST_CSS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MOVE_LIST_CSS.includes("."));
+ * ```
+ */
 export const MOVE_LIST_CSS = `
 .kyuubu-moves{display:grid;gap:.5rem;box-sizing:border-box;max-width:100%;max-height:var(--kyuubu-moves-height,13.5rem);overflow-y:auto;overscroll-behavior:contain;padding:2px;font:inherit;color:inherit;position:relative}
 .kyuubu-moves-group{display:flex;flex-wrap:wrap;gap:.25rem;align-items:center}
@@ -87,9 +135,20 @@ function addStyle(doc: Document): void {
 /**
  * A list of moves drawn in an element.
  *
+ * @param host - The DOM element that receives the view and controls.
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A list of moves drawn in an element.
+ *
  * @example
- * const list = mountMoveList(element, { groups: [{ label: "Solution", items: ["R", "U", "R'", "U'"] }], onPick: (index) => seek(index + 1) });
- * list.setCurrent(2); // R' is marked, and scrolled into view
+ * ```ts no-run
+ * import { mountMoveList } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const host = document.createElement("div");
+ * document.body.append(host);
+ * const list = mountMoveList(host, { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 });
+ * console.log(list.element.tagName);
+ * // Call list.destroy() when removing the list.
+ * ```
  */
 export function mountMoveList(host: HTMLElement, options: MoveListOptions): MoveListHandle {
   const doc = host.ownerDocument;

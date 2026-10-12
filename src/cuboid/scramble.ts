@@ -15,13 +15,32 @@ import { cuboidSolved, legalCuboidMoves, solvedCuboid, turnAllCuboid, turnCuboid
  *   enough as likely to land anywhere (`cuboidScrambleLength`).
  */
 
-/** The most states a cuboid has and still has its scramble drawn uniformly out of all of them. */
+/** The most states a cuboid has and still has its scramble drawn uniformly out of all of them.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_RANDOM_STATE_MAX } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(CUBOID_RANDOM_STATE_MAX);
+ * ```
+ */
 export const CUBOID_RANDOM_STATE_MAX = 20000;
 
 /**
  * How many turns a random walk that scrambles a cuboid has: 8, and 2.2 for
  * every layer that is not the whole puzzle, up to 100. Near the 25 of a 3×3 for
  * a puzzle with as many layers.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns How many turns a random walk that scrambles a cuboid has: 8, and 2.2 for every layer that is not the whole puzzle, up to 100. Near the 25 of a 3×3 for a puzzle with as many layers.
+ *
+ * @example
+ * ```ts
+ * import { cuboidScrambleLength } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidScrambleLength(dims));
+ * ```
  */
 export function cuboidScrambleLength(dims: CuboidDims): number {
   const layers = dims.reduce((sum, side) => sum + (side > 1 ? side : 0), 0);
@@ -60,7 +79,19 @@ function stateGraph(dims: CuboidDims): StateGraph | null {
   return made;
 }
 
-/** Whether a cuboid has few enough states to be scrambled to one drawn uniformly out of all of them. */
+/** Whether a cuboid has few enough states to be scrambled to one drawn uniformly out of all of them.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Whether a cuboid has few enough states to be scrambled to one drawn uniformly out of all of them.
+ *
+ * @example
+ * ```ts
+ * import { hasRandomStateScramble } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(hasRandomStateScramble(dims));
+ * ```
+ */
 export function hasRandomStateScramble(dims: CuboidDims): boolean {
   return stateGraph(dims) !== null;
 }
@@ -79,8 +110,19 @@ export function hasRandomStateScramble(dims: CuboidDims): boolean {
  * `random` is a number in [0, 1), like `Math.random`; pass `seededRandom(seed)`
  * for the same scramble from the same seed everywhere.
  *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param length - The requested number of scramble moves; omitted cuboid lengths use its scrambling strategy.
+ * @param random - A source of numbers in [0, 1), such as seededRandom(seed).
+ * @returns A scramble. Without a `length`, a puzzle that has few enough states (`hasRandomStateScramble`) is scrambled to a state drawn uniformly from all the states that are not solved, by the shortest turns that reach it; any other is scrambled by a random walk of `cuboidScrambleLength` turns, one more than that half the time, so that a puzzle whose graph has two sides can land on either. With a `length`, a random walk of exactly that many turns, each of a layer chosen at random and a turn that layer can make, never two in a row of the same layer, which would join into one. Never leaves the puzzle solved: a turn is added until it is not. `random` is a number in [0, 1), like `Math.random`; pass `seededRandom(seed)` for the same scramble from the same seed everywhere.
+ *
  * @example
- * cuboidMovesNotation(randomCuboidScramble([2, 3, 3], undefined, seededRandom("club night")), [2, 3, 3]);
+ * ```ts
+ * import { cuboidMovesNotation, randomCuboidScramble } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { seededRandom } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidMovesNotation(randomCuboidScramble(dims, 8, seededRandom("docs")), dims));
+ * ```
  */
 export function randomCuboidScramble(dims: CuboidDims, length?: number, random: () => number = Math.random): CuboidMove[] {
   const graph = length === undefined ? stateGraph(dims) : null;

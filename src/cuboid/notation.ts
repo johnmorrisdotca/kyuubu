@@ -17,7 +17,17 @@ import { legalTurns, type CuboidDims, type CuboidMove } from "./model.ts";
  * cubie deep) is refused too (`"whole-puzzle"`).
  */
 
-/** Why a piece of notation is not a move on this cuboid. */
+/** Why a piece of notation is not a move on this cuboid.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidFault } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * 
+ * const value: CuboidFault = "half-turn-only";
+ * console.log(value);
+ * ```
+ */
 export type CuboidFault =
   /** It is not notation at all. */
   | "unknown"
@@ -58,7 +68,21 @@ function suffixOf(turns: CubeTurns, positive: boolean): string {
   return turns === turnsFor("cw", positive) ? "" : "'";
 }
 
-/** A move as a person writes it on this cuboid: `R`, `R'`, `R2`, `2U2`, `M2`. The move should be one the cuboid can make. */
+/** A move as a person writes it on this cuboid: `R`, `R'`, `R2`, `2U2`, `M2`. The move should be one the cuboid can make.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A move as a person writes it on this cuboid: `R`, `R'`, `R2`, `2U2`, `M2`. The move should be one the cuboid can make.
+ *
+ * @example
+ * ```ts
+ * import { cuboidMoveNotation, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(cuboidMoveNotation(cmove, dims));
+ * ```
+ */
 export function cuboidMoveNotation(move: CuboidMove, dims: CuboidDims): string {
   const depth = dims[move.axis];
   if (depth % 2 === 1 && depth > 1 && move.layer === (depth - 1) / 2) {
@@ -71,12 +95,36 @@ export function cuboidMoveNotation(move: CuboidMove, dims: CuboidDims): string {
   return `${fromFace > 1 ? fromFace : ""}${face}${suffixOf(move.turns, positive)}`;
 }
 
-/** Moves as a person writes them, a space between each. */
+/** Moves as a person writes them, a space between each.
+ *
+ * @param moves - The turns, in their execution order.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Moves as a person writes them, a space between each.
+ *
+ * @example
+ * ```ts
+ * import { cuboidMovesNotation, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(cuboidMovesNotation([cmove], dims));
+ * ```
+ */
 export function cuboidMovesNotation(moves: readonly CuboidMove[], dims: CuboidDims): string {
   return moves.map((move) => cuboidMoveNotation(move, dims)).join(" ");
 }
 
-/** What reading one piece of notation gives: the move, or why it is not one. */
+/** What reading one piece of notation gives: the move, or why it is not one.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidReading } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { readCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidReading = readCuboidMove("U", [2, 3, 3]);
+ * console.log(value);
+ * ```
+ */
 export type CuboidReading = { move: CuboidMove } | { fault: CuboidFault };
 
 function checked(dims: CuboidDims, move: CuboidMove): CuboidReading {
@@ -85,21 +133,63 @@ function checked(dims: CuboidDims, move: CuboidMove): CuboidReading {
   return legalTurns(dims, move.axis, move.layer).includes(move.turns) ? { move } : { fault: "half-turn-only" };
 }
 
-/** A face turned, `depth` layers in from it (1 is the face itself), on this cuboid: the move, or why not. */
+/** A face turned, `depth` layers in from it (1 is the face itself), on this cuboid: the move, or why not.
+ *
+ * @param face - The face letter: U, R, F, D, L or B.
+ * @param depth - The layer depth counted from the named face, starting at 1.
+ * @param amount - The turn direction: cw, half or ccw.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A face turned, `depth` layers in from it (1 is the face itself), on this cuboid: the move, or why not.
+ *
+ * @example
+ * ```ts
+ * import { cuboidFaceMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidFaceMove("R", 1, "cw", dims));
+ * ```
+ */
 export function cuboidFaceMove(face: Letter, depth: number, amount: "cw" | "half" | "ccw", dims: CuboidDims): CuboidReading {
   const { axis, positive } = FACE_AXES[face];
   if (!Number.isInteger(depth) || depth < 1 || depth > dims[axis]) return { fault: "no-such-layer" };
   return checked(dims, { axis, layer: positive ? dims[axis] - depth : depth - 1, turns: turnsFor(amount, positive) });
 }
 
-/** The middle layer of an odd side, turned as M, E or S: the move, or why not. An even side has none. */
+/** The middle layer of an odd side, turned as M, E or S: the move, or why not. An even side has none.
+ *
+ * @param letter - The slice letter M, E or S; whole-cube turns use x, y or z.
+ * @param amount - The turn direction: cw, half or ccw.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns The middle layer of an odd side, turned as M, E or S: the move, or why not. An even side has none.
+ *
+ * @example
+ * ```ts
+ * import { cuboidMiddleMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidMiddleMove("M", "half", dims));
+ * ```
+ */
 export function cuboidMiddleMove(letter: "M" | "E" | "S", amount: "cw" | "half" | "ccw", dims: CuboidDims): CuboidReading {
   const axis = (letter === "M" ? 0 : letter === "E" ? 1 : 2) as CubeAxis;
   if (dims[axis] % 2 === 0) return { fault: "no-such-layer" };
   return checked(dims, { axis, layer: (dims[axis] - 1) / 2, turns: turnsFor(amount, MIDDLE[axis].followsPositive) });
 }
 
-/** One piece of notation read for this cuboid: `R`, `R'`, `R2`, `2R'`, `M2`. */
+/** One piece of notation read for this cuboid: `R`, `R'`, `R2`, `2R'`, `M2`.
+ *
+ * @param text - The text to parse or format.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns One piece of notation read for this cuboid: `R`, `R'`, `R2`, `2R'`, `M2`.
+ *
+ * @example
+ * ```ts
+ * import { readCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(readCuboidMove("U", dims));
+ * ```
+ */
 export function readCuboidMove(text: string, dims: CuboidDims): CuboidReading {
   const found = /^([2-7]?)([RLUDFBMES])(2|'|)$/.exec(text.trim());
   if (found === null) return { fault: "unknown" };
@@ -109,22 +199,71 @@ export function readCuboidMove(text: string, dims: CuboidDims): CuboidReading {
   return cuboidFaceMove(letter as Letter, found[1] === "" ? 1 : Number(found[1]), amount, dims);
 }
 
-/** One piece of notation as a move, or null where it is not one on this cuboid. */
+/** One piece of notation as a move, or null where it is not one on this cuboid.
+ *
+ * @param text - The text to parse or format.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns One piece of notation as a move, or null where it is not one on this cuboid.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(parseCuboidMove("R", dims));
+ * ```
+ */
 export function parseCuboidMove(text: string, dims: CuboidDims): CuboidMove | null {
   const read = readCuboidMove(text, dims);
   return "move" in read ? read.move : null;
 }
 
-/** A line of notation as moves, or null where any of it is not a move on this cuboid. */
+/** A line of notation as moves, or null where any of it is not a move on this cuboid.
+ *
+ * @param text - The text to parse or format.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A line of notation as moves, or null where any of it is not a move on this cuboid.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(parseCuboidMoves("R U2", dims));
+ * ```
+ */
 export function parseCuboidMoves(text: string, dims: CuboidDims): CuboidMove[] | null {
   const read = readCuboidMoves(text, dims);
   return read.ok ? read.moves : null;
 }
 
-/** What reading a line gives: its moves, or the first piece that is not one, where it began (counted in characters from 0) and why. */
+/** What reading a line gives: its moves, or the first piece that is not one, where it began (counted in characters from 0) and why.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidLineReading } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { readCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidLineReading = readCuboidMoves("R U2", [2, 3, 3]);
+ * console.log(value.ok);
+ * ```
+ */
 export type CuboidLineReading = { ok: true; moves: CuboidMove[] } | { ok: false; token: string; at: number; fault: CuboidFault };
 
-/** A line of notation read for this cuboid, saying which piece is wrong and why where one is. */
+/** A line of notation read for this cuboid, saying which piece is wrong and why where one is.
+ *
+ * @param text - The text to parse or format.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A line of notation read for this cuboid, saying which piece is wrong and why where one is.
+ *
+ * @example
+ * ```ts
+ * import { readCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(readCuboidMoves("R U2", dims));
+ * ```
+ */
 export function readCuboidMoves(text: string, dims: CuboidDims): CuboidLineReading {
   const moves: CuboidMove[] = [];
   for (const found of text.matchAll(/\S+/g)) {

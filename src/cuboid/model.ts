@@ -18,18 +18,65 @@ import type { CubeAxis, CubeTurns, StickerSlot, Vec3 } from "../types.ts";
  * not a layer: turning it moves nothing relative to the rest.
  */
 
-/** The width, height and depth of a cuboid, in cubies: each a whole number from 1 to 7. */
+/** The width, height and depth of a cuboid, in cubies: each a whole number from 1 to 7.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * 
+ * const value: CuboidDims = [2, 3, 3];
+ * console.log(value);
+ * ```
+ */
 export type CuboidDims = readonly [number, number, number];
 
-/** One turn of a layer: its axis, its layer from the axis's negative side (0 to the axis's depth − 1), and one, two or three quarter turns by the right-hand rule. A two is a half turn, the only turn of a layer whose slice is not square. */
+/** One turn of a layer: its axis, its layer from the axis's negative side (0 to the axis's depth − 1), and one, two or three quarter turns by the right-hand rule. A two is a half turn, the only turn of a layer whose slice is not square.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidMove = parseCuboidMove("R", [2, 3, 3])!;
+ * console.log(value);
+ * ```
+ */
 export type CuboidMove = { axis: CubeAxis; layer: number; turns: CubeTurns };
 
-/** The least a side of a cuboid can be. */
+/** The least a side of a cuboid can be.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_MIN_SIDE } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(CUBOID_MIN_SIDE);
+ * ```
+ */
 export const CUBOID_MIN_SIDE = 1;
-/** The most a side of a cuboid can be. */
+/** The most a side of a cuboid can be.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_MAX_SIDE } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(CUBOID_MAX_SIDE);
+ * ```
+ */
 export const CUBOID_MAX_SIDE = 7;
 
-/** Whether this is a cuboid the package makes: three whole numbers from 1 to 7, and not 1×1×1, which has nothing to turn. */
+/** Whether this is a cuboid the package makes: three whole numbers from 1 to 7, and not 1×1×1, which has nothing to turn.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Whether this is a cuboid the package makes: three whole numbers from 1 to 7, and not 1×1×1, which has nothing to turn.
+ *
+ * @example
+ * ```ts
+ * import { isCuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(isCuboidDims([2, 3, 3]));
+ * ```
+ */
 export function isCuboidDims(dims: unknown): dims is CuboidDims {
   return (
     Array.isArray(dims) &&
@@ -39,12 +86,35 @@ export function isCuboidDims(dims: unknown): dims is CuboidDims {
   );
 }
 
-/** A cuboid's name as it is written: `2×3×3`. */
+/** A cuboid's name as it is written: `2×3×3`.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A cuboid's name as it is written: `2×3×3`.
+ *
+ * @example
+ * ```ts
+ * import { cuboidName } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidName(dims));
+ * ```
+ */
 export function cuboidName(dims: CuboidDims): string {
   return dims.join("×");
 }
 
-/** A cuboid read from `2x3x3`, `2×3×3`, `2 3 3` or `2,3,3`: its dims, or null where it is not one the package makes. */
+/** A cuboid read from `2x3x3`, `2×3×3`, `2 3 3` or `2,3,3`: its dims, or null where it is not one the package makes.
+ *
+ * @param text - The text to parse or format.
+ * @returns A cuboid read from `2x3x3`, `2×3×3`, `2 3 3` or `2,3,3`: its dims, or null where it is not one the package makes.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(parseCuboidDims("2x3x3"));
+ * ```
+ */
 export function parseCuboidDims(text: string): CuboidDims | null {
   const found = /^\s*(\d)\s*[x×*,\s]\s*(\d)\s*[x×*,\s]\s*(\d)\s*$/i.exec(text);
   if (found === null) return null;
@@ -52,7 +122,19 @@ export function parseCuboidDims(text: string): CuboidDims | null {
   return isCuboidDims(dims) ? (dims as unknown as CuboidDims) : null;
 }
 
-/** Whether two cuboids are the same puzzle turned about in the hand: the same three sides in any order. */
+/** Whether two cuboids are the same puzzle turned about in the hand: the same three sides in any order.
+ *
+ * @param a - The first cuboid’s three dimensions.
+ * @param b - The second cuboid’s three dimensions.
+ * @returns Whether two cuboids are the same puzzle turned about in the hand: the same three sides in any order.
+ *
+ * @example
+ * ```ts
+ * import { sameCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * console.log(sameCuboid([2, 3, 3], [3, 2, 3]));
+ * ```
+ */
 export function sameCuboid(a: CuboidDims, b: CuboidDims): boolean {
   const sorted = (dims: CuboidDims) => [...dims].sort((x, y) => x - y).join(",");
   return sorted(a) === sorted(b);
@@ -63,12 +145,34 @@ const scale = (a: Vec3, k: number): Vec3 => [a[0] * k, a[1] * k, a[2] * k];
 const axisOfVector = (v: Vec3): CubeAxis => (v[0] !== 0 ? 0 : v[1] !== 0 ? 1 : 2);
 const keyOf = (slot: StickerSlot) => `${slot.centre.join(",")}|${slot.normal.join(",")}`;
 
-/** One face of a cuboid: how many columns and rows of stickers it has as it is seen from outside, and where its stickers begin in the state. */
+/** One face of a cuboid: how many columns and rows of stickers it has as it is seen from outside, and where its stickers begin in the state.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidFace } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { cuboidFaces } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const value: CuboidFace = cuboidFaces([2, 3, 3])[0]!;
+ * console.log(value.face);
+ * ```
+ */
 export type CuboidFace = { face: CubeFace; cols: number; rows: number; start: number };
 
 const facesBySize = new Map<string, readonly CuboidFace[]>();
 
-/** The six faces of a cuboid, in the order the state is written, with their size and where each begins. */
+/** The six faces of a cuboid, in the order the state is written, with their size and where each begins.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns The six faces of a cuboid, in the order the state is written, with their size and where each begins.
+ *
+ * @example
+ * ```ts
+ * import { cuboidFaces } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidFaces(dims));
+ * ```
+ */
 export function cuboidFaces(dims: CuboidDims): readonly CuboidFace[] {
   const key = dims.join(",");
   const known = facesBySize.get(key);
@@ -86,14 +190,38 @@ export function cuboidFaces(dims: CuboidDims): readonly CuboidFace[] {
   return made;
 }
 
-/** How many stickers a cuboid has: the area of its surface. */
+/** How many stickers a cuboid has: the area of its surface.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns How many stickers a cuboid has: the area of its surface.
+ *
+ * @example
+ * ```ts
+ * import { cuboidStickerCount } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidStickerCount(dims));
+ * ```
+ */
 export function cuboidStickerCount(dims: CuboidDims): number {
   return 2 * (dims[0] * dims[1] + dims[1] * dims[2] + dims[0] * dims[2]);
 }
 
 const slotsBySize = new Map<string, { slots: StickerSlot[]; index: Map<string, number> }>();
 
-/** Every sticker slot of a cuboid, in the order its state is written, and the way back from a slot to its place. A slot's centre is in doubled coordinates, so a cubie's is a whole step from the middle along each axis. */
+/** Every sticker slot of a cuboid, in the order its state is written, and the way back from a slot to its place. A slot's centre is in doubled coordinates, so a cubie's is a whole step from the middle along each axis.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Every sticker slot of a cuboid, in the order its state is written, and the way back from a slot to its place. A slot's centre is in doubled coordinates, so a cubie's is a whole step from the middle along each axis.
+ *
+ * @example
+ * ```ts
+ * import { cuboidSlots } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidSlots(dims).slots.length);
+ * ```
+ */
 export function cuboidSlots(dims: CuboidDims): { slots: readonly StickerSlot[]; index: ReadonlyMap<string, number> } {
   const key = dims.join(",");
   const known = slotsBySize.get(key);
@@ -114,12 +242,39 @@ export function cuboidSlots(dims: CuboidDims): { slots: readonly StickerSlot[]; 
   return made;
 }
 
-/** The layer, 0 to the axis's depth − 1 from its negative side, that a cubie centre sits in. */
+/** The layer, 0 to the axis's depth − 1 from its negative side, that a cubie centre sits in.
+ *
+ * @param centre - The cubie centre in doubled model coordinates.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns The layer, 0 to the axis's depth − 1 from its negative side, that a cubie centre sits in.
+ *
+ * @example
+ * ```ts
+ * import { cuboidLayerOf } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidLayerOf([1, 0, 0], 0, dims));
+ * ```
+ */
 export function cuboidLayerOf(centre: Vec3, axis: CubeAxis, dims: CuboidDims): number {
   return (centre[axis] + dims[axis] - 1) / 2;
 }
 
-/** The two axes a layer across `axis` is a slice of, and so what its slice measures: the other two sides. */
+/** The two axes a layer across `axis` is a slice of, and so what its slice measures: the other two sides.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @returns The two axes a layer across `axis` is a slice of, and so what its slice measures: the other two sides.
+ *
+ * @example
+ * ```ts
+ * import { sliceOf } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(sliceOf(dims, 0));
+ * ```
+ */
 export function sliceOf(dims: CuboidDims, axis: CubeAxis): [number, number] {
   const others = ([0, 1, 2] as CubeAxis[]).filter((one) => one !== axis);
   return [dims[others[0]], dims[others[1]]];
@@ -129,6 +284,19 @@ export function sliceOf(dims: CuboidDims, axis: CubeAxis): [number, number] {
  * The turns a layer can make: `[1, 2, 3]` where its slice is square, `[2]`
  * where it is not, and none where there is no such layer or the layer is the
  * whole puzzle.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @param layer - The layer index counted from the negative side of the axis.
+ * @returns The turns a layer can make: `[1, 2, 3]` where its slice is square, `[2]` where it is not, and none where there is no such layer or the layer is the whole puzzle.
+ *
+ * @example
+ * ```ts
+ * import { legalTurns } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(legalTurns(dims, 1, 0));
+ * ```
  */
 export function legalTurns(dims: CuboidDims, axis: CubeAxis, layer: number): readonly CubeTurns[] {
   if (!Number.isInteger(layer) || layer < 0 || layer >= dims[axis] || dims[axis] === 1) return [];
@@ -136,18 +304,57 @@ export function legalTurns(dims: CuboidDims, axis: CubeAxis, layer: number): rea
   return a === b ? [1, 2, 3] : [2];
 }
 
-/** Whether a layer turns only by a half turn: it has a slice that is not square. */
+/** Whether a layer turns only by a half turn: it has a slice that is not square.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @returns Whether a layer turns only by a half turn: it has a slice that is not square.
+ *
+ * @example
+ * ```ts
+ * import { halfTurnOnly } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(halfTurnOnly(dims, 1));
+ * ```
+ */
 export function halfTurnOnly(dims: CuboidDims, axis: CubeAxis): boolean {
   const [a, b] = sliceOf(dims, axis);
   return a !== b;
 }
 
-/** Whether a move can be made on this cuboid: its layer exists, is not the whole puzzle, and its turn is one that layer may make. */
+/** Whether a move can be made on this cuboid: its layer exists, is not the whole puzzle, and its turn is one that layer may make.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param move - The turn to apply, name or invert.
+ * @returns Whether a move can be made on this cuboid: its layer exists, is not the whole puzzle, and its turn is one that layer may make.
+ *
+ * @example
+ * ```ts
+ * import { cuboidMoveLegal, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(cuboidMoveLegal(dims, cmove));
+ * ```
+ */
 export function cuboidMoveLegal(dims: CuboidDims, move: CuboidMove): boolean {
   return legalTurns(dims, move.axis, move.layer).includes(move.turns);
 }
 
-/** Every move a cuboid can make, by axis, layer and turn. */
+/** Every move a cuboid can make, by axis, layer and turn.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Every move a cuboid can make, by axis, layer and turn.
+ *
+ * @example
+ * ```ts
+ * import { legalCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(legalCuboidMoves(dims).length);
+ * ```
+ */
 export function legalCuboidMoves(dims: CuboidDims): CuboidMove[] {
   const moves: CuboidMove[] = [];
   for (const axis of [0, 1, 2] as CubeAxis[]) {
@@ -156,7 +363,19 @@ export function legalCuboidMoves(dims: CuboidDims): CuboidMove[] {
   return moves;
 }
 
-/** A solved cuboid: each face one letter. */
+/** A solved cuboid: each face one letter.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns A solved cuboid: each face one letter.
+ *
+ * @example
+ * ```ts
+ * import { solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(solvedCuboid(dims));
+ * ```
+ */
 export function solvedCuboid(dims: CuboidDims): string {
   return cuboidFaces(dims)
     .map(({ face, cols, rows }) => face.repeat(cols * rows))
@@ -165,7 +384,21 @@ export function solvedCuboid(dims: CuboidDims): string {
 
 const permutations = new Map<string, Int32Array>();
 
-/** Where every sticker goes under a legal turn: `to[i]` is the slot the sticker in slot `i` lands on. Worked out once and kept; an illegal move throws a `RangeError`. */
+/** Where every sticker goes under a legal turn: `to[i]` is the slot the sticker in slot `i` lands on. Worked out once and kept; an illegal move throws a `RangeError`.
+ *
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param move - The turn to apply, name or invert.
+ * @returns Where every sticker goes under a legal turn: `to[i]` is the slot the sticker in slot `i` lands on. Worked out once and kept; an illegal move throws a `RangeError`.
+ *
+ * @example
+ * ```ts
+ * import { cuboidPermutationOf, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(Array.from(cuboidPermutationOf(dims, cmove)).slice(0, 6));
+ * ```
+ */
 export function cuboidPermutationOf(dims: CuboidDims, move: CuboidMove): Int32Array {
   if (!cuboidMoveLegal(dims, move)) throw new RangeError(`The ${cuboidName(dims)} cuboid cannot make that turn: axis ${move.axis}, layer ${move.layer}, ${move.turns} quarter turns`);
   const key = `${dims.join(",")}:${move.axis}:${move.layer}:${move.turns}`;
@@ -190,7 +423,22 @@ export function cuboidPermutationOf(dims: CuboidDims, move: CuboidMove): Int32Ar
   return to;
 }
 
-/** The state after one turn; an illegal turn throws a `RangeError`. The state passed in is never changed. */
+/** The state after one turn; an illegal turn throws a `RangeError`. The state passed in is never changed.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param move - The turn to apply, name or invert.
+ * @returns The state after one turn; an illegal turn throws a `RangeError`. The state passed in is never changed.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidMove, solvedCuboid, turnCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(turnCuboid(solvedCuboid(dims), dims, cmove));
+ * ```
+ */
 export function turnCuboid(state: string, dims: CuboidDims, move: CuboidMove): string {
   const to = cuboidPermutationOf(dims, move);
   const out = new Array<string>(state.length);
@@ -198,12 +446,40 @@ export function turnCuboid(state: string, dims: CuboidDims, move: CuboidMove): s
   return out.join("");
 }
 
-/** The state after every turn in order. */
+/** The state after every turn in order.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @param moves - The turns, in their execution order.
+ * @returns The state after every turn in order.
+ *
+ * @example
+ * ```ts
+ * import { cuboidSolved, parseCuboidMove, solvedCuboid, turnAllCuboid, undoCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(cuboidSolved(turnAllCuboid(solvedCuboid(dims), dims, [cmove, undoCuboidMove(cmove)]), dims));
+ * ```
+ */
 export function turnAllCuboid(state: string, dims: CuboidDims, moves: readonly CuboidMove[]): string {
   return moves.reduce((at, move) => turnCuboid(at, dims, move), state);
 }
 
-/** SOLVED: every face one colour, whichever colour it is, so a cuboid solved and then turned whole in the hand is still solved. One pass over the stickers. */
+/** SOLVED: every face one colour, whichever colour it is, so a cuboid solved and then turned whole in the hand is still solved. One pass over the stickers.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns SOLVED: every face one colour, whichever colour it is, so a cuboid solved and then turned whole in the hand is still solved. One pass over the stickers.
+ *
+ * @example
+ * ```ts
+ * import { cuboidSolved, solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(cuboidSolved(solvedCuboid(dims), dims));
+ * ```
+ */
 export function cuboidSolved(state: string, dims: CuboidDims): boolean {
   for (const { cols, rows, start } of cuboidFaces(dims)) {
     for (let at = start + 1; at < start + cols * rows; at += 1) if (state[at] !== state[start]) return false;
@@ -211,7 +487,20 @@ export function cuboidSolved(state: string, dims: CuboidDims): boolean {
   return true;
 }
 
-/** Whether a string is a state of a cuboid this size: the right length, and each face's letter as many times as the face has stickers. It does not say the state can be reached by turning. */
+/** Whether a string is a state of a cuboid this size: the right length, and each face's letter as many times as the face has stickers. It does not say the state can be reached by turning.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param dims - The cuboid’s x, y and z dimensions, in that order.
+ * @returns Whether a string is a state of a cuboid this size: the right length, and each face's letter as many times as the face has stickers. It does not say the state can be reached by turning.
+ *
+ * @example
+ * ```ts
+ * import { isCuboidState, solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(isCuboidState(solvedCuboid(dims), dims));
+ * ```
+ */
 export function isCuboidState(state: string, dims: CuboidDims): boolean {
   if (state.length !== cuboidStickerCount(dims)) return false;
   const counts = new Map<string, number>();
@@ -219,12 +508,38 @@ export function isCuboidState(state: string, dims: CuboidDims): boolean {
   return cuboidFaces(dims).every(({ face, cols, rows }) => counts.get(face) === cols * rows) && counts.size === 6;
 }
 
-/** The turn that takes one back. */
+/** The turn that takes one back.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @returns The turn that takes one back.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidMove, undoCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(undoCuboidMove(cmove));
+ * ```
+ */
 export function undoCuboidMove(move: CuboidMove): CuboidMove {
   return { ...move, turns: (4 - move.turns) as CubeTurns };
 }
 
-/** A list of moves undone, last first. */
+/** A list of moves undone, last first.
+ *
+ * @param moves - The turns, in their execution order.
+ * @returns A list of moves undone, last first.
+ *
+ * @example
+ * ```ts
+ * import { parseCuboidMove, undoCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * const cmove = parseCuboidMove("R", dims)!;
+ * console.log(undoCuboidMoves([cmove]));
+ * ```
+ */
 export function undoCuboidMoves(moves: readonly CuboidMove[]): CuboidMove[] {
   return [...moves].reverse().map(undoCuboidMove);
 }

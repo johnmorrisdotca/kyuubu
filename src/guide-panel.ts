@@ -17,7 +17,17 @@ import { WORDS, fill, languageOf, stageName, stageSays, type CubeWords, type Kyu
  * and everything it colours is a custom property beginning `--kyuubu-guide-`.
  */
 
-/** How a guide beside a cube is set up: what it walks, and how it speaks. */
+/** How a guide beside a cube is set up: what it walks, and how it speaks.
+ *
+ * @example
+ * ```ts
+ * import type { GuidePanelOptions } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: GuidePanelOptions = { moves: "R U", locale: "ja" };
+ * console.log(value.locale);
+ * ```
+ */
 export type GuidePanelOptions = GuideSource & {
   /** English or Japanese; the page's `lang` when left out. */
   locale?: KyuubuLanguage;
@@ -27,7 +37,17 @@ export type GuidePanelOptions = GuideSource & {
   onEnd?: () => void;
 };
 
-/** A guide beside a cube, on the page. */
+/** A guide beside a cube, on the page.
+ *
+ * @example
+ * ```ts no-run
+ * import type { GuideHandle } from "@johnmorrisdotca/kyuubu";
+ * import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: GuideHandle = mountGuide(document.createElement("div"), new CubeView(document.createElement("div"), { size: 3, interactive: true }), { moves: "R U" });
+ * console.log(value.guide.next?.text);
+ * ```
+ */
 export type GuideHandle = {
   /** The guide it shows: what is next, what has been done, any detour. */
   readonly guide: Guide;
@@ -43,7 +63,15 @@ export type GuideHandle = {
 };
 
 const STYLE_ID = "kyuubu-guide-style";
-/** The guide's stylesheet, put in the page once. */
+/** The guide's stylesheet, put in the page once.
+ *
+ * @example
+ * ```ts
+ * import { GUIDE_CSS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(GUIDE_CSS.includes("."));
+ * ```
+ */
 export const GUIDE_CSS = `
 .kyuubu-guide{display:grid;gap:.3rem;font:inherit;color:inherit;max-width:100%}
 .kyuubu-guide p{margin:0}
@@ -73,9 +101,24 @@ function addStyle(doc: Document): void {
  * hint, and a person makes each movement on it. The view must let a person
  * turn it (`interactive`).
  *
+ * @param host - The DOM element that receives the view and controls.
+ * @param view - The view matrix, or mounted CubeView for a guide.
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A guide drawn in an element, for the cube in `view`: the view shows the hint, and a person makes each movement on it. The view must let a person turn it (`interactive`).
+ *
  * @example
- * const view = new CubeView(cubeElement, { size: 3, state });
- * mountGuide(guideElement, view, { method: true });
+ * ```ts no-run
+ * import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const host = document.createElement("div");
+ * const panel = document.createElement("div");
+ * host.style.cssText = "width:300px;height:300px;position:relative";
+ * document.body.append(host, panel);
+ * const cube = new CubeView(host, { size: 3, interactive: true });
+ * const guide = mountGuide(panel, cube, { moves: "R U R' U'" });
+ * console.log(guide.guide.next?.text);
+ * // Call guide.destroy() and cube.destroy() when removing them.
+ * ```
  */
 export function mountGuide(host: HTMLElement, view: CubeView, options: GuidePanelOptions): GuideHandle {
   const doc = host.ownerDocument;

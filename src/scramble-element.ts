@@ -17,16 +17,42 @@ import { languageOf } from "./words.ts";
  * it; importing `@johnmorrisdotca/kyuubu/element/define` does that too.
  */
 
-/** The attributes the element reads. Changing any draws the cube afresh, except `pace` and `paused`, which change the loop alone. */
+/** The attributes the element reads. Changing any draws the cube afresh, except `pace` and `paused`, which change the loop alone.
+ *
+ * @example
+ * ```ts
+ * import { SCRAMBLE_ELEMENT_ATTRIBUTES } from "@johnmorrisdotca/kyuubu/element";
+ * 
+ * console.log(SCRAMBLE_ELEMENT_ATTRIBUTES);
+ * ```
+ */
 export const SCRAMBLE_ELEMENT_ATTRIBUTES = ["size", "pace", "paused", "scale", "width", "theme", "faces", "interactive", "seed", "lang"] as const;
 
-/** The name the element is registered under. */
+/** The name the element is registered under.
+ *
+ * @example
+ * ```ts
+ * import { SCRAMBLE_ELEMENT_NAME } from "@johnmorrisdotca/kyuubu/element";
+ * 
+ * console.log(SCRAMBLE_ELEMENT_NAME);
+ * ```
+ */
 export const SCRAMBLE_ELEMENT_NAME = "kyuubu-scramble";
 
 /**
  * What the element adds to an ordinary one. Every attribute is also a property
  * that writes it, as React, Vue and Svelte set them: reading gives the text of the
  * attribute, or `null`, and a flag (`paused`, `faces`, `interactive`) reads as a boolean.
+ *
+ * @example
+ * ```ts no-run
+ * import type { KyuubuScrambleElement } from "@johnmorrisdotca/kyuubu/element";
+ * 
+ * import "@johnmorrisdotca/kyuubu/element/define";
+ * 
+ * const value: KyuubuScrambleElement = document.createElement("kyuubu-scramble") as KyuubuScrambleElement;
+ * console.log(value.running);
+ * ```
  */
 export type KyuubuScrambleElement = HTMLElement & {
   get size(): string | null;
@@ -55,7 +81,18 @@ export type KyuubuScrambleElement = HTMLElement & {
 
 let made: CustomElementConstructor | null = null;
 
-/** A pace from an attribute: a name, or seconds. Anything else is left to the default. */
+/** A pace from an attribute: a name, or seconds. Anything else is left to the default.
+ *
+ * @param value - The attribute or candidate value to validate.
+ * @returns The pace name or positive seconds value, or undefined to use the default pace.
+ *
+ * @example
+ * ```ts
+ * import { paceFromAttribute } from "@johnmorrisdotca/kyuubu/element";
+ * 
+ * console.log(paceFromAttribute("slow"));
+ * ```
+ */
 export function paceFromAttribute(value: string | null): number | ScramblePace | undefined {
   if (value === null) return undefined;
   if (value in SCRAMBLE_PACES) return value as ScramblePace;
@@ -146,6 +183,17 @@ export const SCRAMBLE_ELEMENT_SCALES: readonly CubeScale[] = CUBE_SCALES;
 /**
  * Register `<kyuubu-scramble>`, once. Where there is no browser, or the name
  * is already taken, it does nothing.
+ *
+ * @param name - The custom-element name to register.
+ * @returns Nothing; the custom element is registered when a browser is available and its name is free.
+ *
+ * @example
+ * ```ts no-run
+ * import { defineScramble } from "@johnmorrisdotca/kyuubu/element";
+ * 
+ * defineScramble();
+ * console.log(customElements.get("kyuubu-scramble") !== undefined);
+ * ```
  */
 export function defineScramble(name: string = SCRAMBLE_ELEMENT_NAME): void {
   if (typeof customElements === "undefined" || typeof HTMLElement === "undefined") return;

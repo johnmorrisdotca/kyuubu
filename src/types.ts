@@ -15,13 +15,43 @@
  * and is never counted as a move.
  */
 
-/** An axis of the cube: 0 is x (to the right), 1 is y (up) and 2 is z (towards the viewer). */
+/** An axis of the cube: 0 is x (to the right), 1 is y (up) and 2 is z (towards the viewer).
+ *
+ * @example
+ * ```ts
+ * import type { CubeAxis } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeAxis = 0;
+ * console.log(value);
+ * ```
+ */
 export type CubeAxis = 0 | 1 | 2;
 
-/** One, two or three quarter turns, counter-clockwise seen from the axis's positive end. */
+/** One, two or three quarter turns, counter-clockwise seen from the axis's positive end.
+ *
+ * @example
+ * ```ts
+ * import type { CubeTurns } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeTurns = 2;
+ * console.log(value);
+ * ```
+ */
 export type CubeTurns = 1 | 2 | 3;
 
-/** One turn: a layer, or the whole cube, turned about an axis by one, two or three quarter turns. */
+/** One turn: a layer, or the whole cube, turned about an axis by one, two or three quarter turns.
+ *
+ * @example
+ * ```ts
+ * import type { CubeMove } from "@johnmorrisdotca/kyuubu";
+ * import { parseMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CubeMove = parseMove("R", 3)!;
+ * console.log(value);
+ * ```
+ */
 export type CubeMove = {
   /** The axis turned about. */
   axis: CubeAxis;
@@ -31,8 +61,28 @@ export type CubeMove = {
   turns: CubeTurns;
 };
 
-/** A point in the cube's doubled coordinates: a cubie's centre is a whole even or odd step from the middle, by the cube's size. */
+/** A point in the cube's doubled coordinates: a cubie's centre is a whole even or odd step from the middle, by the cube's size.
+ *
+ * @example
+ * ```ts
+ * import type { Vec3 } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: Vec3 = [1, 0, 0];
+ * console.log(value);
+ * ```
+ */
 export type Vec3 = readonly [number, number, number];
 
-/** Where one sticker slot sits: its cubie's centre and the direction it faces. */
+/** Where one sticker slot sits: its cubie's centre and the direction it faces.
+ *
+ * @example
+ * ```ts
+ * import type { StickerSlot } from "@johnmorrisdotca/kyuubu";
+ * import { cubeSlots } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: StickerSlot = cubeSlots(3).slots[0]!;
+ * console.log(value.normal);
+ * ```
+ */
 export type StickerSlot = { centre: Vec3; normal: Vec3 };
