@@ -1,0 +1,58 @@
+{
+  "job": "Twisty cube puzzle for the browser",
+  "pitch": {
+    "en": "Turn CSS 3D cubes by touch, keys or notation, reproduce a scramble from a seed, and follow a solve one named step at a time.",
+    "ja": "CSS 3Dのキューブをタッチ、キー、回転記号で回します。シードでスクランブルを再現し、名前付きの手順で解き方を追えます。"
+  },
+  "name": {
+    "en": "Kyuubu (キューブ) is the Japanese spelling of cube.",
+    "ja": "「キューブ」は、英語のcubeを表す日本語の表記です。"
+  },
+  "entries": {
+    ".": {
+      "en": "Cube engine and views",
+      "ja": "キューブのエンジンと表示"
+    },
+    "./react": {
+      "en": "React components",
+      "ja": "Reactコンポーネント"
+    },
+    "./famous": {
+      "en": "Record solves",
+      "ja": "記録の解法"
+    },
+    "./player": {
+      "en": "Replay player",
+      "ja": "リプレイプレーヤー"
+    },
+    "./element": {
+      "en": "Cube elements",
+      "ja": "キューブの要素"
+    },
+    "./element/define": {
+      "en": "Register cube tags",
+      "ja": "キューブの登録"
+    },
+    "./cuboid": {
+      "en": "Cuboid engine",
+      "ja": "直方体のエンジン"
+    },
+    "./cuboid/draw": {
+      "en": "Cuboid drawing",
+      "ja": "直方体の描画"
+    },
+    "./cuboid/play": {
+      "en": "Cuboid player",
+      "ja": "直方体の操作"
+    },
+    "./cuboid/element": {
+      "en": "Cuboid elements",
+      "ja": "直方体の要素"
+    },
+    "./cuboid/element/define": {
+      "en": "Register cuboids",
+      "ja": "直方体の登録"
+    }
+  },
+  "icon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f2320'/%3E%3Crect x='4' y='4' width='7' height='7' rx='1.5' fill='%23b5452c'/%3E%3Crect x='12.5' y='4' width='7' height='7' rx='1.5' fill='%23fffdf7'/%3E%3Crect x='21' y='4' width='7' height='7' rx='1.5' fill='%232f7a4f'/%3E%3Crect x='4' y='12.5' width='7' height='7' rx='1.5' fill='%23e0b43b'/%3E%3Crect x='12.5' y='12.5' width='7' height='7' rx='1.5' fill='%232b5f8f'/%3E%3Crect x='21' y='12.5' width='7' height='7' rx='1.5' fill='%23d97a2b'/%3E%3Crect x='4' y='21' width='7' height='7' rx='1.5' fill='%232f7a4f'/%3E%3Crect x='12.5' y='21' width='7' height='7' rx='1.5' fill='%23b5452c'/%3E%3Crect x='21' y='21' width='7' height='7' rx='1.5' fill='%23fffdf7'/%3E%3C/svg%3E"
+}

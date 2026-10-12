@@ -173,3 +173,7 @@ reconstruction are published. To add one:
 4. `pnpm test` plays every solve in the list.
 
 Or open an "Add a solve" issue with the same things, and someone will.
+
+## Documentation site
+
+`pnpm docs:check` checks every public example and guide link. `pnpm docs:site` builds the bilingual reference and Pagefind search after the SDK build. Keep public summaries, parameters, return values and standalone examples with the code; browser examples use `ts no-run`. Update paired guides in `docs/guides/` and `docs/guides/ja/`, and mark new Japanese for review before release. The site generator and its shared tests are copied unchanged from the family pilot.

@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 ### Added
 
+- Add the shared English/Japanese documentation site, checked public API examples, guides, local search and machine-readable pages.
+
 - Build the distribution before source tests in the full gate, so demo-builder imports work in a clean checkout.
 
 - Add Markdown and SQL downloads for solve histories, using the family’s shared escape-safe writers.

@@ -63,6 +63,6 @@ src/
 
 Tests live in `test/`, apart from the code, and `test/docs.test.js` runs the
 README's examples. `bin/` is the few lines that hand the command line the real
-process, `scripts/` builds the demo and its API reference page and checks the
+process, `scripts/` builds the demo, bilingual documentation and API index, and checks the
 package as npm packs it, `demo/` is the site published on GitHub Pages, and
 `e2e/` taps it in real browsers.

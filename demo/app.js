@@ -39,6 +39,7 @@ const WORDS = {
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toFamous: "Famous solves",
+    pageDocs: "Docs",
     toApi: "API reference",
     toBuilder: "Builder",
     toCubes: "Turning cubes",
@@ -135,6 +136,7 @@ const WORDS = {
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
     toFamous: "有名なソルブ",
+    pageDocs: "ドキュメント",
     toApi: "API（英語）",
     toBuilder: "ビルダー",
     toCubes: "回り続けるキューブ",
@@ -260,6 +262,7 @@ const record = () => ({ size: view.size, scramble, moves });
 
 /** Everything on the page that is made of the cube's state and the language, drawn again. */
 function draw() {
+  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   const n = view.size;
   $("count").textContent = String(moves.filter(countsAsMove).length);
   $("log").textContent = moves.length === 0 ? say("none") : movesNotation(moves.slice(-60), n);
