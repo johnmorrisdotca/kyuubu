@@ -21,7 +21,17 @@ import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
  * beginning `--kyuubu-player-`, so a page can dress it.
  */
 
-/** How a player is set up: the solve, and how it is shown. */
+/** How a player is set up: the solve, and how it is shown.
+ *
+ * @example
+ * ```ts
+ * import type { PlayerOptions } from "@johnmorrisdotca/kyuubu/player";
+ * 
+ * 
+ * const value: PlayerOptions = { size: 3, scramble: "R", solution: "R'", autoplay: false };
+ * console.log(value.size);
+ * ```
+ */
 export type PlayerOptions = ReplaySource & {
   /** Start playing as soon as it is drawn. */
   autoplay?: boolean;
@@ -49,7 +59,17 @@ export type PlayerOptions = ReplaySource & {
   onEnd?: () => void;
 };
 
-/** A player on the page. */
+/** A player on the page.
+ *
+ * @example
+ * ```ts no-run
+ * import type { PlayerHandle } from "@johnmorrisdotca/kyuubu/player";
+ * import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
+ * 
+ * const value: PlayerHandle = mountPlayer(document.createElement("div"), { scramble: "R", solution: "R'", autoplay: false });
+ * console.log(value.plan?.solved);
+ * ```
+ */
 export type PlayerHandle = {
   /** The solve as it was read, or why it could not be. */
   readonly plan: ReplayPlan | null;
@@ -81,7 +101,15 @@ export type PlayerHandle = {
 };
 
 const STYLE_ID = "kyuubu-player-style";
-/** The player's stylesheet, put in the page once. */
+/** The player's stylesheet, put in the page once.
+ *
+ * @example
+ * ```ts
+ * import { PLAYER_CSS } from "@johnmorrisdotca/kyuubu/player";
+ * 
+ * console.log(PLAYER_CSS.includes("."));
+ * ```
+ */
 export const PLAYER_CSS = `
 .kyuubu-player{display:grid;gap:.5rem;font:inherit;color:inherit;max-width:100%}
 .kyuubu-player-cube{aspect-ratio:1;width:100%;position:relative;background:var(--kyuubu-player-felt,transparent);border-radius:var(--kyuubu-player-radius,12px);touch-action:none}
@@ -116,8 +144,20 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
 /**
  * A solve drawn in an element, with its controls.
  *
+ * @param host - The DOM element that receives the view and controls.
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A solve drawn in an element, with its controls.
+ *
  * @example
- * mountPlayer(document.getElementById("solve"), { scramble: "R U R' U'", solution: "U R U' R'", timeMs: 2000, autoplay: true });
+ * ```ts no-run
+ * import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
+ * 
+ * const host = document.createElement("div");
+ * document.body.append(host);
+ * const player = mountPlayer(host, { size: 3, scramble: "R", solution: "R'", autoplay: false });
+ * console.log(player.plan?.solved);
+ * // Call player.destroy() when removing the player.
+ * ```
  */
 export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHandle {
   const doc = host.ownerDocument;

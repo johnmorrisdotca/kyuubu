@@ -27,7 +27,17 @@ import { CUBOID_WORDS } from "./words.ts";
  *   half; the arrows look round it. The wheel over the puzzle looks round it.
  */
 
-/** Everything a cuboid on the screen can be told when it is made. Only `dims` is needed. */
+/** Everything a cuboid on the screen can be told when it is made. Only `dims` is needed.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidViewOptions } from "@johnmorrisdotca/kyuubu/cuboid/draw";
+ * 
+ * 
+ * const value: CuboidViewOptions = { dims: [2, 3, 3], interactive: true, keyboard: "focus" };
+ * console.log(value.dims);
+ * ```
+ */
 export type CuboidViewOptions = {
   /** The puzzle's width, height and depth: each 1 to 7, and not 1×1×1. */
   dims: CuboidDims;
@@ -65,7 +75,17 @@ export type CuboidViewOptions = {
   label?: string;
 };
 
-/** What a cuboid tells the listeners `on` adds: a turn a person made, with the stickers after it; and the view turned, in degrees. */
+/** What a cuboid tells the listeners `on` adds: a turn a person made, with the stickers after it; and the view turned, in degrees.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidViewEvents } from "@johnmorrisdotca/kyuubu/cuboid/draw";
+ * 
+ * 
+ * const value: CuboidViewEvents = { turn: (move, state) => console.log(move, state), look: (yaw, pitch) => console.log(yaw, pitch) };
+ * console.log(Object.keys(value));
+ * ```
+ */
 export type CuboidViewEvents = {
   turn: (move: CuboidMove, state: string) => void;
   look: (yaw: number, pitch: number) => void;
@@ -89,9 +109,20 @@ type LiveDrag = { pick: CuboidDragPick; angle: number; committed: boolean; sampl
  * takes it away again with every listener. A turn the puzzle cannot make
  * throws a `RangeError`, as `turnCuboid` does.
  *
+ *
  * @example
- * const view = new CuboidView(document.getElementById("puzzle"), { dims: [3, 3, 1], onTurn: (move, state) => save(state) });
- * view.turn(parseCuboidMove("U2", [3, 3, 1])!);
+ * ```ts no-run
+ * import { CuboidView } from "@johnmorrisdotca/kyuubu/cuboid/draw";
+ * 
+ * const host = document.createElement("div");
+ * host.style.cssText = "width:300px;height:300px;position:relative";
+ * document.body.append(host);
+ * const cube = new CuboidView(host, { dims: [2, 3, 3], interactive: true });
+ * console.log(cube.state);
+ * // Call cube.destroy() when the host is removed.
+ * ```
+ * @param host - The DOM host with a size and position.
+ * @param options - View or replay options.
  */
 export class CuboidView {
   /** The element the puzzle was made in. */

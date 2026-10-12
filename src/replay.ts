@@ -14,22 +14,94 @@ import type { CubeMove } from "./types.ts";
  * where they are known (`stepMs`).
  */
 
-/** How long a step takes when the solve gives no time of its own, in milliseconds. */
+/** How long a step takes when the solve gives no time of its own, in milliseconds.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_STEP_MS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_STEP_MS);
+ * ```
+ */
 export const REPLAY_STEP_MS = 400;
-/** The speeds a replay offers: the solve's own pace, half, a quarter and a tenth of it. */
+/** The speeds a replay offers: the solve's own pace, half, a quarter and a tenth of it.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_SPEEDS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_SPEEDS);
+ * ```
+ */
 export const REPLAY_SPEEDS = [1, 0.5, 0.25, 0.1] as const;
-/** How long a looped replay rests on the solved cube before it begins again, in milliseconds. */
+/** How long a looped replay rests on the solved cube before it begins again, in milliseconds.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_LOOP_REST_MS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_LOOP_REST_MS);
+ * ```
+ */
 export const REPLAY_LOOP_REST_MS = 1200;
-/** The longest solve a replay takes, in steps. */
+/** The longest solve a replay takes, in steps.
+ *
+ * @example
+ * ```ts
+ * import { MAX_REPLAY_STEPS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_REPLAY_STEPS);
+ * ```
+ */
 export const MAX_REPLAY_STEPS = 2000;
-/** How many turns moving the slider shows one by one: a longer jump goes straight to this many steps short of where it is going, and turns the rest. */
+/** How many turns moving the slider shows one by one: a longer jump goes straight to this many steps short of where it is going, and turns the rest.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_SCRUB_TURNS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_SCRUB_TURNS);
+ * ```
+ */
 export const REPLAY_SCRUB_TURNS = 6;
-/** How long each turn made by moving the slider takes, in milliseconds. */
+/** How long each turn made by moving the slider takes, in milliseconds.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_SCRUB_MS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_SCRUB_MS);
+ * ```
+ */
 export const REPLAY_SCRUB_MS = 70;
-/** How long each turn of the scramble takes when the replay walks through it, in milliseconds. */
+/** How long each turn of the scramble takes when the replay walks through it, in milliseconds.
+ *
+ * @example
+ * ```ts
+ * import { REPLAY_SCRAMBLE_STEP_MS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(REPLAY_SCRAMBLE_STEP_MS);
+ * ```
+ */
 export const REPLAY_SCRAMBLE_STEP_MS = 200;
 
-/** A solve ready to be played: read, checked and timed. */
+/** A solve ready to be played: read, checked and timed.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayPlan } from "@johnmorrisdotca/kyuubu";
+ * import { planReplay } from "@johnmorrisdotca/kyuubu";
+ * 
+ * function requirePlan() {
+ *   const result = planReplay({ scramble: "R", solution: "R'" });
+ *   if (!result.ok) throw new Error("Invalid replay");
+ *   return result.plan;
+ * }
+ * 
+ * const value: ReplayPlan = requirePlan();
+ * console.log(value.solved);
+ * ```
+ */
 export type ReplayPlan = {
   /** The cube's side. */
   size: number;
@@ -53,7 +125,17 @@ export type ReplayPlan = {
   pace: "spread" | "given" | "default";
 };
 
-/** What a replay is made from. */
+/** What a replay is made from.
+ *
+ * @example
+ * ```ts
+ * import type { ReplaySource } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: ReplaySource = { size: 3, scramble: "R", solution: "R'", timeMs: 1000 };
+ * console.log(value.timeMs);
+ * ```
+ */
 export type ReplaySource = {
   /** The cube's side: 3 when left out. */
   size?: number;
@@ -67,13 +149,33 @@ export type ReplaySource = {
   stepMs?: readonly number[];
 };
 
-/** Why a replay could not be planned: which text would not read, and where. */
+/** Why a replay could not be planned: which text would not read, and where.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayFault } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: ReplayFault = { part: "solution", fault: { token: "oops", at: 0, line: 1, column: 1, reason: "unknown" } };
+ * console.log(value.part);
+ * ```
+ */
 export type ReplayFault = { part: "size" | "scramble" | "solution" | "length"; fault?: NotationFault };
 
 /**
  * A scramble and a solve read, checked and timed. A solve that does not end
  * on a solved cube is still planned, with `solved: false`, so that it can be
  * shown and said to be unfinished; only text that cannot be read is refused.
+ *
+ * @param source - The scramble and solution to plan, or the guide’s explicit moves or solving method.
+ * @returns A scramble and a solve read, checked and timed. A solve that does not end on a solved cube is still planned, with `solved: false`, so that it can be shown and said to be unfinished; only text that cannot be read is refused.
+ *
+ * @example
+ * ```ts
+ * import { planReplay } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(planReplay({ size: 3, scramble: "R U", solution: "U' R'", timeMs: 1000 }));
+ * ```
  */
 export function planReplay(source: ReplaySource): { ok: true; plan: ReplayPlan } | { ok: false; fault: ReplayFault } {
   const size = source.size ?? 3;
@@ -109,7 +211,17 @@ export function planReplay(source: ReplaySource): { ok: true; plan: ReplayPlan }
   };
 }
 
-/** The turns that take a cube from one position of a solve to another, for a slider that turns the cube as it moves. */
+/** The turns that take a cube from one position of a solve to another, for a slider that turns the cube as it moves.
+ *
+ * @example
+ * ```ts
+ * import type { ScrubPath } from "@johnmorrisdotca/kyuubu";
+ * import { parseSolve, scrubPath } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: ScrubPath = scrubPath(parseSolve("R U", 3).steps.map((step) => step.moves), 0, 2);
+ * console.log(value.turns.length);
+ * ```
+ */
 export type ScrubPath = {
   /** The position the cube is shown at to begin with: where it is, or, for a long jump, `REPLAY_SCRUB_TURNS` steps short of where it is going. */
   from: number;
@@ -124,8 +236,21 @@ export type ScrubPath = {
  * steps short of the end and turns only those, so that a long drag catches up
  * at once and does not play every turn. `steps` is each step's layers.
  *
+ * @param steps - The ordered steps of the solve.
+ * @param from - The starting step position.
+ * @param to - The destination step position.
+ * @param shown - The maximum number of turns animated during a scrub.
+ * @returns What moving the slider from one position of a solve to another turns: the steps between, forwards when going on and each one undone, last first, when going back. A jump of more than `shown` steps goes straight to `shown` steps short of the end and turns only those, so that a long drag catches up at once and does not play every turn. `steps` is each step's layers.
+ *
  * @example
- * scrubPath(plan.steps.map((step) => step.moves), 10, 7); // the last three steps undone, 9th first
+ * ```ts
+ * import { parseMoves, parseSolve, scrubPath } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const reading = parseSolve("R U", 3);
+ * const steps = reading.steps;
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(scrubPath(steps.map((step) => step.moves), 0, 2));
+ * ```
  */
 export function scrubPath(steps: readonly (readonly CubeMove[])[], from: number, to: number, shown: number = REPLAY_SCRUB_TURNS): ScrubPath {
   const last = steps.length;
@@ -143,7 +268,17 @@ export function scrubPath(steps: readonly (readonly CubeMove[])[], from: number,
   return { from: start, turns };
 }
 
-/** The part of a cube's view a replay needs: `CubeView` is one. */
+/** The part of a cube's view a replay needs: `CubeView` is one.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayCube } from "@johnmorrisdotca/kyuubu";
+ * import { movesNotation } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: ReplayCube = { setState: (state) => console.log(state), turnTogether: (moves) => console.log(movesNotation(moves, 3)) };
+ * console.log(typeof value.turnTogether);
+ * ```
+ */
 export type ReplayCube = {
   setState(state: string, size?: number): void;
   turnTogether(moves: readonly CubeMove[], options?: { animate?: boolean; ms?: number }): void;
@@ -151,10 +286,30 @@ export type ReplayCube = {
   readonly busy?: boolean;
 };
 
-/** The clock a replay runs by; the page's own unless a test gives another. */
+/** The clock a replay runs by; the page's own unless a test gives another.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayClock } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: ReplayClock = { set: (run, ms) => setTimeout(run, ms), clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>) };
+ * console.log(typeof value.set);
+ * ```
+ */
 export type ReplayClock = { set(run: () => void, ms: number): unknown; clear(handle: unknown): void };
 
-/** What a replay tells whoever is showing it. */
+/** What a replay tells whoever is showing it.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayStatus } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: ReplayStatus = { position: 0, total: 2, playing: false, ended: false, scrambleAt: 1, scrambleTotal: 1, speed: 1, loop: false, elapsedMs: 0 };
+ * console.log(value.position);
+ * ```
+ */
 export type ReplayStatus = {
   /** How many steps have been made: 0 on the scrambled cube, `total` at the end. */
   position: number;
@@ -176,7 +331,17 @@ export type ReplayStatus = {
   elapsedMs: number;
 };
 
-/** How a replay is set up. */
+/** How a replay is set up.
+ *
+ * @example
+ * ```ts
+ * import type { ReplayOptions } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: ReplayOptions = { speed: 2, loop: false, onEnd: () => console.log("Finished") };
+ * console.log(value.speed);
+ * ```
+ */
 export type ReplayOptions = {
   /** The speed it starts at: 1, the solve's own pace, when left out. */
   speed?: number;
@@ -196,9 +361,23 @@ const pageClock: ReplayClock = { set: (run, ms) => setTimeout(run, ms), clear: (
  * A planned solve played on a cube: play, pause, a step either way, anywhere
  * by `seek`, faster or slower, once or over and over.
  *
+ *
  * @example
- * const planned = planReplay({ scramble: "R U R' U'", solution: "U R U' R'", timeMs: 2000 });
- * if (planned.ok) new Replay(view, planned.plan).play();
+ * ```ts
+ * import { Replay, cubeSolved, planReplay, turnAll } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const result = planReplay({ scramble: "R", solution: "R'" });
+ * if (result.ok) {
+ *   let state = result.plan.start;
+ *   const replay = new Replay({ setState: (next) => { state = next; }, turnTogether: (moves) => { state = turnAll(state, 3, moves); } }, result.plan);
+ *   replay.seek(result.plan.steps.length);
+ *   console.log(cubeSolved(state, 3));
+ *   replay.destroy();
+ * }
+ * ```
+ * @param cube - The host’s cube state and turning interface.
+ * @param plan - The validated replay plan.
+ * @param options - View or replay options.
  */
 export class Replay {
   readonly plan: ReplayPlan;

@@ -20,7 +20,17 @@ import type { CubeMove, Vec3 } from "./types.ts";
  * cube held that way.
  */
 
-/** The stages of the method, in the order they are done. */
+/** The stages of the method, in the order they are done.
+ *
+ * @example
+ * ```ts
+ * import type { SolveStage } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: SolveStage = "whiteCross";
+ * console.log(value);
+ * ```
+ */
 export type SolveStage =
   | "hold"
   | "whiteCross"
@@ -32,10 +42,30 @@ export type SolveStage =
   | "yellowCorners"
   | "yellowEdges";
 
-/** A part of a step: turns to line something up, or one of the method's algorithms. */
+/** A part of a step: turns to line something up, or one of the method's algorithms.
+ *
+ * @example
+ * ```ts
+ * import type { SolvePart } from "@johnmorrisdotca/kyuubu";
+ * import { movesNotation, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolvePart = { moves: parseMoves("R U", 3)! };
+ * console.log(movesNotation(value.moves, 3));
+ * ```
+ */
 export type SolvePart = { moves: CubeMove[]; algorithm?: SolveAlgorithm };
 
-/** One step of a solve: its stage, the turns that do it, and the parts they come in. */
+/** One step of a solve: its stage, the turns that do it, and the parts they come in.
+ *
+ * @example
+ * ```ts
+ * import type { SolveStep } from "@johnmorrisdotca/kyuubu";
+ * import { solveSteps, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolveStep = solveSteps(solvedCube(2), 2)![0]!;
+ * console.log(value.stage);
+ * ```
+ */
 export type SolveStep = {
   stage: SolveStage;
   /** The turns, in order, for a cube held as the step before left it, with a turn of a face followed by another of the same face written as one. */
@@ -46,7 +76,15 @@ export type SolveStep = {
   algorithms: SolveAlgorithm[];
 };
 
-/** The algorithms the method uses, by name. The notation is for white on the bottom. */
+/** The algorithms the method uses, by name. The notation is for white on the bottom.
+ *
+ * @example
+ * ```ts
+ * import { SOLVE_ALGORITHMS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(SOLVE_ALGORITHMS).slice(0, 8));
+ * ```
+ */
 export const SOLVE_ALGORITHMS = {
   cornerIn: "R U R' U'",
   edgeRight: "U R U' R' U' F' U F",
@@ -56,10 +94,28 @@ export const SOLVE_ALGORITHMS = {
   cornerCycle: "R' F R' B2 R F' R' B2 R2",
   edgeCycle: "R U' R U R U R U' R' U' R2",
 } as const;
-/** The name of one of the method's algorithms: a key of `SOLVE_ALGORITHMS`. */
+/** The name of one of the method's algorithms: a key of `SOLVE_ALGORITHMS`.
+ *
+ * @example
+ * ```ts
+ * import type { SolveAlgorithm } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: SolveAlgorithm = "sune";
+ * console.log(value);
+ * ```
+ */
 export type SolveAlgorithm = keyof typeof SOLVE_ALGORITHMS;
 
-/** The sizes the method is written for. */
+/** The sizes the method is written for.
+ *
+ * @example
+ * ```ts
+ * import { SOLVABLE_SIZES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(SOLVABLE_SIZES);
+ * ```
+ */
 export const SOLVABLE_SIZES: readonly number[] = [2, 3];
 
 /** The colour a person calls white: the up face's letter in a solved cube. */
@@ -298,7 +354,19 @@ function oneByOne(
   return { state: now, steps: out, placed };
 }
 
-/** Turns of one layer in a row written as one, and any that come to nothing left out: "U' U2" is "U", "U' U" is nothing. */
+/** Turns of one layer in a row written as one, and any that come to nothing left out: "U' U2" is "U", "U' U" is nothing.
+ *
+ * @param moves - The turns, in their execution order.
+ * @returns Turns of one layer in a row written as one, and any that come to nothing left out: "U' U2" is "U", "U' U" is nothing.
+ *
+ * @example
+ * ```ts
+ * import { joinTurns, movesNotation, parseMove, undoOf } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(movesNotation(joinTurns([move, undoOf(move)]), 3));
+ * ```
+ */
 export function joinTurns(moves: readonly CubeMove[]): CubeMove[] {
   const out: CubeMove[] = [];
   for (const move of moves) {
@@ -347,6 +415,17 @@ function allAtOnce(
  * The layer-by-layer solve of a 2×2 or 3×3 in this state, as steps a person
  * can follow, or null for a size the method is not written for. Turning every
  * step's moves in order, from `state`, leaves the cube solved.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @returns The layer-by-layer solve of a 2×2 or 3×3 in this state, as steps a person can follow, or null for a size the method is not written for. Turning every step's moves in order, from `state`, leaves the cube solved.
+ *
+ * @example
+ * ```ts
+ * import { parseMove, solveSteps, solvedCube, turnCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(solveSteps(turnCube(solvedCube(2), 2, parseMove("R", 2)!), 2)?.map((step) => step.stage));
+ * ```
  */
 export function solveSteps(state: string, n: number): SolveStep[] | null {
   if (!SOLVABLE_SIZES.includes(n)) return null;

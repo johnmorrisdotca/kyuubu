@@ -19,10 +19,30 @@ import { WORDS, fill, type CubeWords, type KyuubuLanguage } from "./words.ts";
  * and a wide turn a layer at a time: what is left of it is asked for next.
  */
 
-/** What a guide walks: moves as written (`"R U R' U'"`, wide turns and rotations read as `parseSolve` reads them), or as moves, each a movement; or the layer-by-layer method, step by step from the cube as it is (2×2 and 3×3). */
+/** What a guide walks: moves as written (`"R U R' U'"`, wide turns and rotations read as `parseSolve` reads them), or as moves, each a movement; or the layer-by-layer method, step by step from the cube as it is (2×2 and 3×3).
+ *
+ * @example
+ * ```ts
+ * import type { GuideSource } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: GuideSource = { moves: "R U R' U'" };
+ * console.log(value);
+ * ```
+ */
 export type GuideSource = { moves: string | readonly (CubeMove | readonly CubeMove[] | SolveMove)[] } | { method: true };
 
-/** The movement a guide asks for now. */
+/** The movement a guide asks for now.
+ *
+ * @example
+ * ```ts
+ * import type { GuideStep } from "@johnmorrisdotca/kyuubu";
+ * import { Guide, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: GuideStep = new Guide(solvedCube(3), 3, { moves: "R U" }).next!;
+ * console.log(value.text);
+ * ```
+ */
 export type GuideStep = {
   /** What is still to turn of it: the whole movement at first, less any layer or quarter already made. */
   moves: CubeMove[];
@@ -42,7 +62,17 @@ export type GuideStep = {
   stage?: SolveStage;
 };
 
-/** What a guide made of a turn it was told of: the movement finished, part of it made, a detour, or a detour taken back by hand. */
+/** What a guide made of a turn it was told of: the movement finished, part of it made, a detour, or a detour taken back by hand.
+ *
+ * @example
+ * ```ts
+ * import type { GuideHeard } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: GuideHeard = "done";
+ * console.log(value);
+ * ```
+ */
 export type GuideHeard = "done" | "part" | "off" | "back";
 
 const same = (a: CubeMove, b: CubeMove) => a.axis === b.axis && a.layer === b.layer && a.turns === b.turns;
@@ -57,6 +87,18 @@ function movementOf(entry: CubeMove | readonly CubeMove[] | SolveMove): CubeMove
  * A movement in notation: one layer as `moveNotation` writes it; several
  * layers from a face inwards, about one axis and as far, as a wide turn
  * (`Rw`, `3Rw'`); anything else as its moves one after another.
+ *
+ * @param moves - The turns, in their execution order.
+ * @param n - The cube’s side length.
+ * @returns A movement in notation: one layer as `moveNotation` writes it; several layers from a face inwards, about one axis and as far, as a wide turn (`Rw`, `3Rw'`); anything else as its moves one after another.
+ *
+ * @example
+ * ```ts
+ * import { movementText, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(movementText(moves, 3));
+ * ```
  */
 export function movementText(moves: readonly CubeMove[], n: number): string {
   if (moves.length === 1) return moveNotation(moves[0], n);
@@ -79,10 +121,18 @@ export function movementText(moves: readonly CubeMove[], n: number): string {
  * A guide through a list of moves or the method's steps, for a cube of side
  * `n` starting from `state`.
  *
+ *
  * @example
- * const guide = new Guide(view.state, 3, { moves: "R U R' U'" });
- * guide.next;              // { text: "R", moves: [{ axis: 0, layer: 2, turns: 3 }], index: 0, total: 4, … }
- * guide.heard(someMove);   // "done", "part", "off" or "back"
+ * ```ts
+ * import { Guide, parseMove, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const guide = new Guide(solvedCube(3), 3, { moves: "R U" });
+ * console.log(guide.next?.text);
+ * console.log(guide.heard(parseMove("R", 3)!));
+ * ```
+ * @param state - The initial sticker-state string.
+ * @param n - The cube’s side length.
+ * @param source - Explicit guide moves or the solving method.
  */
 export class Guide {
   /** The cube's side. */
@@ -245,6 +295,19 @@ const WHOLE: Record<CubeAxis, Record<CubeTurns, keyof CubeWords>> = {
  * "Turn the right face away from you.", 「右の面を奥に回します。」. For a turn of
  * the whole cube, where its faces go. Null for turns that are not one
  * movement (different axes, or different amounts).
+ *
+ * @param moves - The turns, in their execution order.
+ * @param n - The cube’s side length.
+ * @param language - English or Japanese for the displayed words.
+ * @returns A movement in plain words, for a cube held with its front towards you: "Turn the right face away from you.", 「右の面を奥に回します。」. For a turn of the whole cube, where its faces go. null for turns that are not one movement (different axes, or different amounts).
+ *
+ * @example
+ * ```ts
+ * import { movementSays, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(movementSays(moves, 3, "en"));
+ * ```
  */
 export function movementSays(moves: readonly CubeMove[], n: number, language: KyuubuLanguage = "en"): string | null {
   const words = WORDS[language];
@@ -268,7 +331,18 @@ export function movementSays(moves: readonly CubeMove[], n: number, language: Ky
   return fill(words.guideTurn, { layers: named, way: words[WAYS[first.axis][first.turns === 1 ? 0 : 1]] });
 }
 
-/** The key or keys that make a turn of the whole cube: `X`, `Shift+X`, `X X`. */
+/** The key or keys that make a turn of the whole cube: `X`, `Shift+X`, `X X`.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @returns The key or keys that make a turn of the whole cube: `X`, `Shift+X`, `X X`.
+ *
+ * @example
+ * ```ts
+ * import { rotationKeys, wholeMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(rotationKeys(wholeMove("x", "cw")));
+ * ```
+ */
 export function rotationKeys(move: CubeMove): string {
   const letter = ["X", "Y", "Z"][move.axis];
   if (move.turns === 2) return `${letter} ${letter}`;

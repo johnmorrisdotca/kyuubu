@@ -27,11 +27,16 @@ const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
  * What a move turns, in a few plain words, in English or Japanese; null for
  * anything that is not a move in standard form.
  *
+ * @param code - The encoded moves or standard notation to read.
+ * @param language - English or Japanese for the displayed words.
+ * @returns What a move turns, in a few plain words, in English or Japanese; null for anything that is not a move in standard form.
+ *
  * @example
- * moveName("R'"); // "Right face, anticlockwise"
- * moveName("Rw"); // "Right two layers, clockwise"
- * moveName("x2"); // "Whole cube on x, twice"
- * moveName("R'", "ja"); // "右の面、反時計回り"
+ * ```ts
+ * import { moveName } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(moveName("R2", "en"));
+ * ```
  */
 export function moveName(code: string, language: KyuubuLanguage = "en"): string | null {
   const words = WORDS[language];

@@ -22,16 +22,56 @@ import type { KyuubuLanguage } from "./words.ts";
  * the choice is the same one; the builder page draws the cube's three.
  */
 
-/** How a choice is made: a number in a range, on or off, one of a few, a colour, or text (moves are text with notation in it). */
+/** How a choice is made: a number in a range, on or off, one of a few, a colour, or text (moves are text with notation in it).
+ *
+ * @example
+ * ```ts
+ * import type { OptionKind } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: OptionKind = "boolean";
+ * console.log(value);
+ * ```
+ */
 export type OptionKind = "number" | "boolean" | "choice" | "colour" | "text" | "moves";
 
-/** The three ways a cube is made. */
+/** The three ways a cube is made.
+ *
+ * @example
+ * ```ts
+ * import type { CubeMaker } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeMaker = "player";
+ * console.log(value);
+ * ```
+ */
 export type CubeMaker = "view" | "player" | "turning";
 
-/** What the choices are gathered under, in the order a page shows them. */
+/** What the choices are gathered under, in the order a page shows them.
+ *
+ * @example
+ * ```ts
+ * import type { OptionGroup } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: OptionGroup = "replay";
+ * console.log(value);
+ * ```
+ */
 export type OptionGroup = "size" | "look" | "turning" | "input" | "scramble" | "solve" | "replay" | "guide" | "words";
 
-/** One choice. */
+/** One choice.
+ *
+ * @example
+ * ```ts
+ * import type { CubeOption } from "@johnmorrisdotca/kyuubu";
+ * import { CUBE_OPTIONS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CubeOption = CUBE_OPTIONS[0]!;
+ * console.log(value.id);
+ * ```
+ */
 export type CubeOption = {
   /** Its one name, in kebab case: what the builder's controls and its address call it. */
   id: string;
@@ -59,7 +99,15 @@ const face = (letter: "U" | "R" | "F" | "D" | "L" | "B", id: string, en: [string
   say: { en: { label: en[0], help: en[1] }, ja: { label: ja[0], help: ja[1] } },
 });
 
-/** Every choice the package offers, grouped, with what each is called in each way of making a cube. */
+/** Every choice the package offers, grouped, with what each is called in each way of making a cube.
+ *
+ * @example
+ * ```ts
+ * import { CUBE_OPTIONS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(CUBE_OPTIONS.slice(0, 5).map((option) => option.id));
+ * ```
+ */
 export const CUBE_OPTIONS: readonly CubeOption[] = [
   {
     id: "size",
@@ -429,7 +477,15 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
   },
 ];
 
-/** The order the groups are shown in, with what each is called. */
+/** The order the groups are shown in, with what each is called.
+ *
+ * @example
+ * ```ts
+ * import { CUBE_OPTION_GROUPS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(CUBE_OPTION_GROUPS).slice(0, 8));
+ * ```
+ */
 export const CUBE_OPTION_GROUPS: Readonly<Record<OptionGroup, Record<KyuubuLanguage, string>>> = {
   size: { en: "Size and shape", ja: "大きさと形" },
   look: { en: "Colours and look", ja: "色と見た目" },
@@ -447,6 +503,13 @@ export const CUBE_OPTION_GROUPS: Readonly<Record<OptionGroup, Record<KyuubuLangu
  * name there, each with why: a function, a value that is itself the state, a
  * list that needs a program to write. A name is in this list or in
  * `CUBE_OPTIONS`, or `test/options.test.ts` fails.
+ *
+ * @example
+ * ```ts
+ * import { CUBE_OPTIONS_LEFT_OUT } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(CUBE_OPTIONS_LEFT_OUT).slice(0, 8));
+ * ```
  */
 export const CUBE_OPTIONS_LEFT_OUT: Readonly<Record<string, string>> = {
   "view.state": "the stickers themselves: a state is the cube's, and is made by turning it",

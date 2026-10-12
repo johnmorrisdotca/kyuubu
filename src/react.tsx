@@ -6,7 +6,19 @@ import type { CubeMove } from "./types.ts";
 import { mountMoveList, type MoveListHandle, type MoveListOptions } from "./move-list.ts";
 import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
 
-/** What a parent can ask of the cube on the screen. */
+/** What a parent can ask of the cube on the screen.
+ *
+ * @example
+ * ```ts no-run
+ * import type { KyuubuHandle } from "@johnmorrisdotca/kyuubu/react";
+ * 
+ * import { createRef } from "react";
+ * 
+ * const handle = createRef<KyuubuHandle>();
+ * handle.current?.resetLook();
+ * console.log(handle.current?.state());
+ * ```
+ */
 export type KyuubuHandle = {
   /** Turn a layer, animated; told to `onTurn` only when `report` is set. */
   turn: (move: CubeMove, options?: { report?: boolean; animate?: boolean }) => void;
@@ -24,7 +36,17 @@ export type KyuubuHandle = {
   showHint: (moves: CubeMove | readonly CubeMove[] | null) => void;
 };
 
-/** The component's props: every option of `CubeView`, a `state` the parent may keep, and the box's `className`, `style` and `data-*`. */
+/** The component's props: every option of `CubeView`, a `state` the parent may keep, and the box's `className`, `style` and `data-*`.
+ *
+ * @example
+ * ```ts
+ * import type { KyuubuProps } from "@johnmorrisdotca/kyuubu/react";
+ * 
+ * 
+ * const value: KyuubuProps = { size: 3, interactive: true, "data-puzzle": "daily" };
+ * console.log(value.size);
+ * ```
+ */
 export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
   /**
    * The stickers the cube starts with. Read when the cube is made, and again
@@ -51,6 +73,17 @@ export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
  * the work. It fills the box it is given: with no `className` that box is a
  * square as wide as its container, and a `className` must position it
  * (relative or absolute) and give it a size.
+ *
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A React host element that mounts and maintains a CubeView in the browser.
+ *
+ * @example
+ * ```ts
+ * import { Kyuubu } from "@johnmorrisdotca/kyuubu/react";
+ * 
+ * import { createElement } from "react";
+ * console.log(createElement(Kyuubu, { size: 3, interactive: true }).props.size);
+ * ```
  */
 export function Kyuubu({ ref, className, style, size, state, interactive: interactiveGiven, hint = null, onTurn, onLook, ...rest }: KyuubuProps) {
   const { scale, width } = rest;
@@ -143,7 +176,17 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
   return <div ref={box} className={className} style={boxStyle} {...data} />;
 }
 
-/** The props of `KyuubuMoves`: every option of the list, and the box's `className` and `style`. */
+/** The props of `KyuubuMoves`: every option of the list, and the box's `className` and `style`.
+ *
+ * @example
+ * ```ts
+ * import type { KyuubuMovesProps } from "@johnmorrisdotca/kyuubu/react";
+ * 
+ * 
+ * const value: KyuubuMovesProps = { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 };
+ * console.log(value.current);
+ * ```
+ */
 export type KyuubuMovesProps = MoveListOptions & {
   className?: string;
   style?: CSSProperties;
@@ -155,6 +198,17 @@ export type KyuubuMovesProps = MoveListOptions & {
  * it the runs of moves and the one just made, and it marks that one and
  * scrolls it into view; `onPick` hears a press or a key. The runs are drawn
  * again only when what they say changes.
+ *
+ * @param options - Options for this call; omitted fields retain their documented defaults.
+ * @returns A React host element that mounts and maintains the move list in the browser.
+ *
+ * @example
+ * ```ts
+ * import { KyuubuMoves } from "@johnmorrisdotca/kyuubu/react";
+ * 
+ * import { createElement } from "react";
+ * console.log(createElement(KyuubuMoves, { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 }).props.current);
+ * ```
  */
 export function KyuubuMoves({ ref, className, style, groups, current = null, locale, label, onPick }: KyuubuMovesProps) {
   const box = useRef<HTMLDivElement>(null);

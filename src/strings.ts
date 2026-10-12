@@ -10,7 +10,17 @@ import { WORDS, type CubeWords, type KyuubuLanguage } from "./words.ts";
  * listed beside its English in `docs/strings-ja.md`.
  */
 
-/** The command line's words: its help, its refusals and what it reports. */
+/** The command line's words: its help, its refusals and what it reports.
+ *
+ * @example
+ * ```ts
+ * import type { CliWords } from "@johnmorrisdotca/kyuubu";
+ * import { STRINGS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CliWords = STRINGS.en;
+ * console.log(value.cliAlreadySolved);
+ * ```
+ */
 export type CliWords = {
   cliUsage: string;
   cliBadOption: string;
@@ -32,7 +42,17 @@ export type CliWords = {
   cliState: string;
 };
 
-/** Every word the package says: the cube's and the command line's. */
+/** Every word the package says: the cube's and the command line's.
+ *
+ * @example
+ * ```ts
+ * import type { KyuubuStrings } from "@johnmorrisdotca/kyuubu";
+ * import { STRINGS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: KyuubuStrings = STRINGS.en;
+ * console.log(value.cubeLabel);
+ * ```
+ */
 export type KyuubuStrings = CubeWords & CliWords;
 
 const USAGE_EN = `Usage: kyuubu [options] [turns]
@@ -151,7 +171,15 @@ function both(language: KyuubuLanguage): KyuubuStrings {
   return { ...WORDS[language], ...CLI[language] };
 }
 
-/** The package's words in both languages. A page in a third language passes its own table where one is taken: `{ ...STRINGS.en, solved: "Resuelto" }`. */
+/** The package's words in both languages. A page in a third language passes its own table where one is taken: `{ ...STRINGS.en, solved: "Resuelto" }`.
+ *
+ * @example
+ * ```ts
+ * import { STRINGS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(STRINGS.en).slice(0, 5));
+ * ```
+ */
 export const STRINGS: Readonly<Record<KyuubuLanguage, KyuubuStrings>> = {
   en: /* @__PURE__ */ both("en"),
   ja: /* @__PURE__ */ both("ja"),

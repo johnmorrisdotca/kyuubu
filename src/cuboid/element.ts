@@ -19,16 +19,42 @@ import { parseCuboidDims, type CuboidDims } from "./model.ts";
  * Importing this file where there is no browser does nothing and throws nothing.
  */
 
-/** The attributes the element reads. Changing any draws the player afresh. */
+/** The attributes the element reads. Changing any draws the player afresh.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_ELEMENT_ATTRIBUTES } from "@johnmorrisdotca/kyuubu/cuboid/element";
+ * 
+ * console.log(CUBOID_ELEMENT_ATTRIBUTES);
+ * ```
+ */
 export const CUBOID_ELEMENT_ATTRIBUTES = ["dims", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "readout", "movelist", "scrub"] as const;
 
-/** The name the element is registered under. */
+/** The name the element is registered under.
+ *
+ * @example
+ * ```ts
+ * import { CUBOID_ELEMENT_NAME } from "@johnmorrisdotca/kyuubu/cuboid/element";
+ * 
+ * console.log(CUBOID_ELEMENT_NAME);
+ * ```
+ */
 export const CUBOID_ELEMENT_NAME = "kyuubu-cuboid";
 
 /**
  * What the element adds to an ordinary one. Every attribute is also a property
  * that writes it, as React, Vue and Svelte set them: reading gives the text of
  * the attribute, or `null`, and a flag (`autoplay`, `controls`, `loop`, `readout`, `movelist`, `scrub`) reads as a boolean.
+ *
+ * @example
+ * ```ts no-run
+ * import type { KyuubuCuboidElement } from "@johnmorrisdotca/kyuubu/cuboid/element";
+ * 
+ * import "@johnmorrisdotca/kyuubu/cuboid/element/define";
+ * 
+ * const value: KyuubuCuboidElement = document.createElement("kyuubu-cuboid") as KyuubuCuboidElement;
+ * console.log(value.controls);
+ * ```
  */
 export type KyuubuCuboidElement = HTMLElement & {
   get dims(): string | null;
@@ -137,6 +163,17 @@ function build(): CustomElementConstructor {
 /**
  * Register `<kyuubu-cuboid>`, once. Where there is no browser, or the name is
  * already taken, it does nothing. A page that wants another name passes it.
+ *
+ * @param name - The custom-element name to register.
+ * @returns Nothing; the custom element is registered when a browser is available and its name is free.
+ *
+ * @example
+ * ```ts no-run
+ * import { defineCuboid } from "@johnmorrisdotca/kyuubu/cuboid/element";
+ * 
+ * defineCuboid();
+ * console.log(customElements.get("kyuubu-cuboid") !== undefined);
+ * ```
  */
 export function defineCuboid(name: string = CUBOID_ELEMENT_NAME): void {
   if (typeof customElements === "undefined" || typeof HTMLElement === "undefined") return;

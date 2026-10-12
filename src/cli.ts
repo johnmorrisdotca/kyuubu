@@ -15,7 +15,17 @@ import { VERSION } from "./version.ts";
  * itself, so a program can call it without starting one.
  */
 
-/** What the command line is told about where it runs. All of it may be left out. */
+/** What the command line is told about where it runs. All of it may be left out.
+ *
+ * @example
+ * ```ts
+ * import type { CliSurroundings } from "@johnmorrisdotca/kyuubu";
+ * import { seededRandom } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CliSurroundings = { env: {}, locale: "en", colour: false, random: seededRandom("docs") };
+ * console.log(value.locale);
+ * ```
+ */
 export type CliSurroundings = {
   /** The environment: `LC_ALL`, `LC_MESSAGES` and `LANG` choose the language, and `NO_COLOR` turns colour off. */
   env?: Readonly<Record<string, string | undefined>>;
@@ -29,12 +39,38 @@ export type CliSurroundings = {
   random?: () => number;
 };
 
-/** What the command line came to: the exit code, and what goes to standard output and standard error. */
+/** What the command line came to: the exit code, and what goes to standard output and standard error.
+ *
+ * @example
+ * ```ts
+ * import type { CliResult } from "@johnmorrisdotca/kyuubu";
+ * import { runCli } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: CliResult = runCli(["--help"]);
+ * console.log(value.code);
+ * ```
+ */
 export type CliResult = { code: 0 | 1 | 2; out: string; err: string };
 
-/** The longest scramble the command line will make. */
+/** The longest scramble the command line will make.
+ *
+ * @example
+ * ```ts
+ * import { MAX_CLI_LENGTH } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_CLI_LENGTH);
+ * ```
+ */
 export const MAX_CLI_LENGTH = 1000;
-/** The most scrambles the command line makes at once. */
+/** The most scrambles the command line makes at once.
+ *
+ * @example
+ * ```ts
+ * import { MAX_CLI_COUNT } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_CLI_COUNT);
+ * ```
+ */
 export const MAX_CLI_COUNT = 100;
 
 type Mode = "scramble" | "apply" | "verify" | "solve";
@@ -65,6 +101,18 @@ const TERMINAL: Readonly<Record<CubeFace, string>> = {
  *     …
  *
  * With `colour`, each sticker is a block of its colour in place of its letter.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @param colour - Whether the printed cube uses coloured blocks instead of letters.
+ * @returns The cube unfolded flat, as lines of text: the top above the front, the left, front, right and back in a row, and the bottom below. U U U U U U U U U L L L F F F R R R B B B … With `colour`, each sticker is a block of its colour in place of its letter.
+ *
+ * @example
+ * ```ts
+ * import { cubeNet, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(cubeNet(solvedCube(2), 2));
+ * ```
  */
 export function cubeNet(state: string, n: number, colour = false): string {
   const face = (letter: CubeFace, row: number) => {
@@ -97,9 +145,16 @@ function readTurns(text: string, n: number): { moves: CubeMove[] } | { bad: stri
  * make, a cube that is not solved under `--verify`), and 2 is a command that
  * was itself wrong.
  *
+ * @param args - Arguments after the command name.
+ * @param surroundings - Host-provided environment, input, locale and random source.
+ * @returns The whole command line. `args` are the arguments after the command's name; the result is the exit code and the text for each stream. Exit code 0 is done, 1 is something asked for that could not be done (turns the cube cannot make, a cube that is not solved under `--verify`), and 2 is a command that was itself wrong.
+ *
  * @example
- * runCli(["--seed", "club night"]).out;                       // one scramble, the same everywhere
- * runCli(["--verify", "--from", "R U", "U' R'"]).code;        // 0: those turns solve it
+ * ```ts
+ * import { runCli } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(runCli(["--size", "2", "--scramble", "R", "--verify", "R'"], { colour: false }));
+ * ```
  */
 export function runCli(args: readonly string[], surroundings: CliSurroundings = {}): CliResult {
   const env = surroundings.env ?? {};

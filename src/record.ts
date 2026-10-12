@@ -17,21 +17,79 @@ import { VERSION } from "./version.ts";
  * notation, never taken from the file.
  */
 
-/** The version of the JSON's shape. It goes up only if a reader of the old shape would be wrong about the new one. */
+/** The version of the JSON's shape. It goes up only if a reader of the old shape would be wrong about the new one.
+ *
+ * @example
+ * ```ts
+ * import { RECORD_FORMAT } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(RECORD_FORMAT);
+ * ```
+ */
 export const RECORD_FORMAT = 1;
 
-/** The smallest cube a record may be of. */
+/** The smallest cube a record may be of.
+ *
+ * @example
+ * ```ts
+ * import { MIN_RECORD_SIZE } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MIN_RECORD_SIZE);
+ * ```
+ */
 export const MIN_RECORD_SIZE = 2;
-/** The largest cube a record may be of: the package is made and tested for 2×2 to 7×7. */
+/** The largest cube a record may be of: the package is made and tested for 2×2 to 7×7.
+ *
+ * @example
+ * ```ts
+ * import { MAX_RECORD_SIZE } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_RECORD_SIZE);
+ * ```
+ */
 export const MAX_RECORD_SIZE = 7;
-/** The most turns one record may hold, scramble and solve each. */
+/** The most turns one record may hold, scramble and solve each.
+ *
+ * @example
+ * ```ts
+ * import { MAX_RECORD_MOVES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_RECORD_MOVES);
+ * ```
+ */
 export const MAX_RECORD_MOVES = 10000;
-/** The most solves read from one file. */
+/** The most solves read from one file.
+ *
+ * @example
+ * ```ts
+ * import { MAX_RECORDS } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_RECORDS);
+ * ```
+ */
 export const MAX_RECORDS = 1000;
-/** The longest seed kept with a solve. */
+/** The longest seed kept with a solve.
+ *
+ * @example
+ * ```ts
+ * import { MAX_RECORD_SEED } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(MAX_RECORD_SEED);
+ * ```
+ */
 export const MAX_RECORD_SEED = 200;
 
-/** One solve: the cube's size, the scramble that mixed it, and the turns made after. */
+/** One solve: the cube's size, the scramble that mixed it, and the turns made after.
+ *
+ * @example
+ * ```ts
+ * import type { SolveRecord } from "@johnmorrisdotca/kyuubu";
+ * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolveRecord = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000 };
+ * console.log(summarize(value).solved);
+ * ```
+ */
 export type SolveRecord = {
   /** The cube's side, 2 to 7. */
   size: number;
@@ -47,7 +105,17 @@ export type SolveRecord = {
   seed?: string;
 };
 
-/** What a record comes to, worked out from its turns. */
+/** What a record comes to, worked out from its turns.
+ *
+ * @example
+ * ```ts
+ * import type { SolveSummary } from "@johnmorrisdotca/kyuubu";
+ * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: SolveSummary = summarize({ size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)! });
+ * console.log(value.solved);
+ * ```
+ */
 export type SolveSummary = {
   size: number;
   /** The scramble in notation. */
@@ -64,7 +132,20 @@ export type SolveSummary = {
   count: number;
 };
 
-/** A record's scramble and turns in notation, the cube before and after, whether it ended solved, and its count of moves. */
+/** A record's scramble and turns in notation, the cube before and after, whether it ended solved, and its count of moves.
+ *
+ * @param record - The solve record to summarize or write.
+ * @returns A record's scramble and turns in notation, the cube before and after, whether it ended solved, and its count of moves.
+ *
+ * @example
+ * ```ts
+ * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(summarize(record));
+ * ```
+ */
 export function summarize(record: SolveRecord): SolveSummary {
   const start = turnAll(solvedCube(record.size), record.size, record.scramble);
   const state = turnAll(start, record.size, record.moves);
@@ -85,6 +166,18 @@ const list = (records: SolveRecord | readonly SolveRecord[]): readonly SolveReco
  * One solve or many, as JSON: `{ "format": 1, "generator": "kyuubu 1.1.0", "solves": [ … ] }`.
  * Each solve carries its size, its scramble and its turns in notation, and what
  * they come to (`state`, `solved`, `count`), for a reader that does not have the package.
+ *
+ * @param records - One or more solve records to export.
+ * @returns One solve or many, as JSON: `{ "format": 1, "generator": "kyuubu 1.1.0", "solves": [ … ] }`. Each solve carries its size, its scramble and its turns in notation, and what they come to (`state`, `solved`, `count`), for a reader that does not have the package.
+ *
+ * @example
+ * ```ts
+ * import { parseMoves, toJSON } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(toJSON(record));
+ * ```
  */
 export function toJSON(records: SolveRecord | readonly SolveRecord[]): string {
   const solves = list(records).map((record) => {
@@ -124,6 +217,18 @@ function rebuilt(entry: unknown): SolveRecord | null {
  * not this format, or a later one. Each solve is put together again from its
  * size and its notation; one whose notation the cube cannot turn is left out,
  * and what the file says of `state`, `solved` and `count` is ignored.
+ *
+ * @param text - The text to parse or format.
+ * @returns The solves in a JSON export, or null where the text is not one: not JSON, not this format, or a later one. Each solve is put together again from its size and its notation; one whose notation the cube cannot turn is left out, and what the file says of `state`, `solved` and `count` is ignored.
+ *
+ * @example
+ * ```ts
+ * import { fromJSON, parseMoves, toJSON } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(fromJSON(toJSON(record))?.length);
+ * ```
  */
 export function fromJSON(text: string): SolveRecord[] | null {
   let data: unknown;
@@ -153,6 +258,18 @@ const seconds = (ms: number) => (ms / 1000).toFixed(2);
  *     time: 12.34
  *
  * A line is left out where there is nothing to say. `fromText` reads it back.
+ *
+ * @param record - The solve record to summarize or write.
+ * @returns A solve as a few plain lines, to paste in a chat or a note: 3x3 scramble: R U2 F' solve: F U2 R' time: 12.34 A line is left out where there is nothing to say. `fromText` reads it back.
+ *
+ * @example
+ * ```ts
+ * import { parseMoves, toText } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(toText(record));
+ * ```
  */
 export function toText(record: SolveRecord): string {
   const summary = summarize(record);
@@ -170,6 +287,18 @@ export function toText(record: SolveRecord): string {
  * `scramble:`, `solve:`, `time:` and `seed:` name the rest, in any order and
  * either case. Lines with no name are turns of the solve, so a bare line of
  * notation is read too.
+ *
+ * @param text - The text to parse or format.
+ * @returns A solve read back from plain lines, or null where they are not one. The size is a line such as `3x3` or `3×3` (a 3×3 where there is none), and `scramble:`, `solve:`, `time:` and `seed:` name the rest, in any order and either case. Lines with no name are turns of the solve, so a bare line of notation is read too.
+ *
+ * @example
+ * ```ts
+ * import { fromText, parseMoves, toText } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(fromText(toText(record))?.size);
+ * ```
  */
 export function fromText(text: string): SolveRecord | null {
   if (text.length > 200000) return null;
@@ -218,6 +347,18 @@ function cell(value: string | number | boolean | undefined): string {
  * A list of solves as CSV, for a spreadsheet: a header, then a row a solve,
  * with lines ended CRLF as RFC 4180 has them. The columns are `time` (when,
  * ISO 8601), `size`, `scramble`, `moves`, `count`, `solved`, `seconds` and `seed`.
+ *
+ * @param records - One or more solve records to export.
+ * @returns A list of solves as CSV, for a spreadsheet: a header, then a row a solve, with lines ended CRLF as RFC 4180 has them. The columns are `time` (when, ISO 8601), `size`, `scramble`, `moves`, `count`, `solved`, `seconds` and `seed`.
+ *
+ * @example
+ * ```ts
+ * import { parseMoves, toCSV } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
+ * console.log(toCSV([record]));
+ * ```
  */
 export function toCSV(records: readonly SolveRecord[]): string {
   const rows = records.map((record) => {

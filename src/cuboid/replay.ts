@@ -11,13 +11,39 @@ import { cuboidMoveNotation, readCuboidMoves, type CuboidFault } from "./notatio
  * set to a state and turned.
  */
 
-/** A cuboid solve ready to be played: a `ReplayPlan` whose `size` is the longest side, with the puzzle's own `dims`. */
+/** A cuboid solve ready to be played: a `ReplayPlan` whose `size` is the longest side, with the puzzle's own `dims`.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidReplayPlan } from "@johnmorrisdotca/kyuubu/cuboid";
+ * import { planCuboidReplay } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * function requireCuboidPlan() {
+ *   const result = planCuboidReplay({ dims: [2, 3, 3], scramble: "R", solution: "R'" });
+ *   if (!result.ok) throw new Error("Invalid replay");
+ *   return result.plan;
+ * }
+ * 
+ * const value: CuboidReplayPlan = requireCuboidPlan();
+ * console.log(value.solved);
+ * ```
+ */
 export type CuboidReplayPlan = ReplayPlan & {
   /** The puzzle's width, height and depth. */
   dims: CuboidDims;
 };
 
-/** What a cuboid replay is made from. */
+/** What a cuboid replay is made from.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidReplaySource } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * 
+ * const value: CuboidReplaySource = { dims: [2, 3, 3], scramble: "R", solution: "R'", timeMs: 1000 };
+ * console.log(value.dims);
+ * ```
+ */
 export type CuboidReplaySource = {
   /** The puzzle's width, height and depth. */
   dims: CuboidDims;
@@ -31,13 +57,34 @@ export type CuboidReplaySource = {
   stepMs?: readonly number[];
 };
 
-/** Why a cuboid replay could not be planned: which text would not read, where and why. */
+/** Why a cuboid replay could not be planned: which text would not read, where and why.
+ *
+ * @example
+ * ```ts
+ * import type { CuboidReplayFault } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * 
+ * const value: CuboidReplayFault = { part: "solution", token: "U", at: 0, fault: "half-turn-only" };
+ * console.log(value.fault);
+ * ```
+ */
 export type CuboidReplayFault = { part: "dims" | "scramble" | "solution" | "length"; token?: string; at?: number; fault?: CuboidFault };
 
 /**
  * A scramble and a solve read, checked and timed. A solve that does not end on
  * a solved puzzle is still planned, with `solved: false`; only text that
  * cannot be read is refused, with the piece and what is wrong with it.
+ *
+ * @param source - The scramble and solution to plan, or the guide’s explicit moves or solving method.
+ * @returns A scramble and a solve read, checked and timed. A solve that does not end on a solved puzzle is still planned, with `solved: false`; only text that cannot be read is refused, with the piece and what is wrong with it.
+ *
+ * @example
+ * ```ts
+ * import { planCuboidReplay } from "@johnmorrisdotca/kyuubu/cuboid";
+ * 
+ * const dims = [2, 3, 3] as const;
+ * console.log(planCuboidReplay({ dims: [2, 3, 3], scramble: "R", solution: "R'", timeMs: 1000 }));
+ * ```
  */
 export function planCuboidReplay(source: CuboidReplaySource): { ok: true; plan: CuboidReplayPlan } | { ok: false; fault: CuboidReplayFault } {
   const dims = source.dims;

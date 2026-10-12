@@ -7,7 +7,17 @@ import type { CubeAxis, Vec3 } from "../types.ts";
  * rather than as CSS rotations, whose sense of "positive" is not the model's.
  */
 
-/** A 3×3 matrix, rows of three. */
+/** A 3×3 matrix, rows of three.
+ *
+ * @example
+ * ```ts
+ * import type { Mat3 } from "@johnmorrisdotca/kyuubu";
+ * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const value: Mat3 = viewMatrix(-30, -20);
+ * console.log(value);
+ * ```
+ */
 export type Mat3 = readonly [Vec3, Vec3, Vec3];
 
 /** The matrix that changes nothing. */
@@ -46,7 +56,19 @@ export function rotation(axis: CubeAxis, radians: number): Mat3 {
   return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
 }
 
-/** The way the viewer looks at the cube: turned about the model's y (yaw), then tipped about the screen's x (pitch), in degrees. */
+/** The way the viewer looks at the cube: turned about the model's y (yaw), then tipped about the screen's x (pitch), in degrees.
+ *
+ * @param yaw - The viewing angle about model y, in degrees.
+ * @param pitch - The viewing angle about screen x, in degrees.
+ * @returns The way the viewer looks at the cube: turned about the model's y (yaw), then tipped about the screen's x (pitch), in degrees.
+ *
+ * @example
+ * ```ts
+ * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(viewMatrix(-30, -20));
+ * ```
+ */
 export function viewMatrix(yaw: number, pitch: number): Mat3 {
   return multiply(rotation(0, (pitch * Math.PI) / 180), rotation(1, (yaw * Math.PI) / 180));
 }

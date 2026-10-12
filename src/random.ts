@@ -7,9 +7,15 @@
  * from mulberry32: small, quick and even enough for a scramble. It is not for
  * secrets.
  *
+ * @param seed - Text that reproduces the same random sequence.
+ * @returns A SEEDED RANDOM SOURCE: the same seed gives the same numbers, in the same order, on every device and in every version from 1.1.0 on. Hand it to `randomScramble` and two people a world apart turn the same scramble. The seed is any text. It is hashed to 32 bits (xmur3) and the numbers come from mulberry32: small, quick and even enough for a scramble. It is not for secrets.
+ *
  * @example
- * const random = seededRandom("club night");
- * movesNotation(randomScramble(3, 25, random), 3); // the same 25 turns, everywhere
+ * ```ts
+ * import { seededRandom } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(seededRandom("docs")());
+ * ```
  */
 export function seededRandom(seed: string): () => number {
   let hash = 1779033703 ^ seed.length;

@@ -17,7 +17,17 @@ import { FAMOUS_SOLVE_DATA } from "./famous.data.ts";
  * CONTRIBUTING.md: a source is asked for, and `pnpm solve:check` plays it.
  */
 
-/** One famous solve. */
+/** One famous solve.
+ *
+ * @example
+ * ```ts
+ * import type { FamousSolve } from "@johnmorrisdotca/kyuubu/famous";
+ * import { FAMOUS_SOLVES } from "@johnmorrisdotca/kyuubu/famous";
+ * 
+ * const value: FamousSolve = FAMOUS_SOLVES[0]!;
+ * console.log(value.solver);
+ * ```
+ */
 export type FamousSolve = {
   /** A short name for it, fixed for good: the solver and the time. */
   id: string;
@@ -51,10 +61,29 @@ export type FamousSolve = {
   checked: string;
 };
 
-/** The famous solves, the newest record first. */
+/** The famous solves, the newest record first.
+ *
+ * @example
+ * ```ts
+ * import { FAMOUS_SOLVES } from "@johnmorrisdotca/kyuubu/famous";
+ * 
+ * console.log(FAMOUS_SOLVES.slice(0, 3).map((solve) => solve.id));
+ * ```
+ */
 export const FAMOUS_SOLVES: readonly FamousSolve[] = FAMOUS_SOLVE_DATA;
 
-/** One famous solve by its id, or undefined. */
+/** One famous solve by its id, or undefined.
+ *
+ * @param id - The recorded solve’s id.
+ * @returns The matching solve, or undefined when no record has this id.
+ *
+ * @example
+ * ```ts
+ * import { FAMOUS_SOLVES, famousSolve } from "@johnmorrisdotca/kyuubu/famous";
+ * 
+ * console.log(famousSolve(FAMOUS_SOLVES[0]!.id)?.solver);
+ * ```
+ */
 export function famousSolve(id: string): FamousSolve | undefined {
   return FAMOUS_SOLVES.find((solve) => solve.id === id);
 }

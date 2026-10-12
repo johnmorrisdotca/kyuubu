@@ -12,12 +12,38 @@ import type { CubeAxis, CubeMove, CubeTurns, StickerSlot, Vec3 } from "./types.t
  * slot they land on is where the sticker goes.
  */
 
-/** The faces in the order a state is written: up, right, front, down, left, back. Each letter is also that face's colour when solved. */
+/** The faces in the order a state is written: up, right, front, down, left, back. Each letter is also that face's colour when solved.
+ *
+ * @example
+ * ```ts
+ * import { CUBE_FACE_ORDER } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(CUBE_FACE_ORDER);
+ * ```
+ */
 export const CUBE_FACE_ORDER = ["U", "R", "F", "D", "L", "B"] as const;
-/** A face's letter: U, R, F, D, L or B. */
+/** A face's letter: U, R, F, D, L or B.
+ *
+ * @example
+ * ```ts
+ * import type { CubeFace } from "@johnmorrisdotca/kyuubu";
+ * 
+ * 
+ * const value: CubeFace = "U";
+ * console.log(value);
+ * ```
+ */
 export type CubeFace = (typeof CUBE_FACE_ORDER)[number];
 
-/** Which way each face looks, and its rows and columns as the face is seen from outside, in the order above. */
+/** Which way each face looks, and its rows and columns as the face is seen from outside, in the order above.
+ *
+ * @example
+ * ```ts
+ * import { FACE_FRAMES } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(Object.keys(FACE_FRAMES).slice(0, 8));
+ * ```
+ */
 export const FACE_FRAMES: Readonly<Record<CubeFace, { normal: Vec3; right: Vec3; down: Vec3 }>> = {
   U: { normal: [0, 1, 0], right: [1, 0, 0], down: [0, 0, 1] },
   R: { normal: [1, 0, 0], right: [0, 0, -1], down: [0, -1, 0] },
@@ -27,7 +53,18 @@ export const FACE_FRAMES: Readonly<Record<CubeFace, { normal: Vec3; right: Vec3;
   B: { normal: [0, 0, -1], right: [-1, 0, 0], down: [0, -1, 0] },
 };
 
-/** The face whose outward normal this is. */
+/** The face whose outward normal this is.
+ *
+ * @param normal - The outward face normal in model coordinates.
+ * @returns The face whose outward normal this is.
+ *
+ * @example
+ * ```ts
+ * import { faceOfNormal } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(faceOfNormal([0, 1, 0]));
+ * ```
+ */
 export function faceOfNormal(normal: Vec3): CubeFace {
   return CUBE_FACE_ORDER.find((face) => FACE_FRAMES[face].normal.every((value, at) => value === normal[at]))!;
 }
@@ -36,7 +73,19 @@ const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const scale = (a: Vec3, k: number): Vec3 => [a[0] * k, a[1] * k, a[2] * k];
 const keyOf = (slot: StickerSlot) => `${slot.centre.join(",")}|${slot.normal.join(",")}`;
 
-/** A quarter turn counter-clockwise, seen from the axis's positive end. */
+/** A quarter turn counter-clockwise, seen from the axis's positive end.
+ *
+ * @param v - The vector to rotate in model coordinates.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @returns A quarter turn counter-clockwise, seen from the axis's positive end.
+ *
+ * @example
+ * ```ts
+ * import { quarterTurn } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(quarterTurn([1, 0, 0], 2));
+ * ```
+ */
 export function quarterTurn(v: Vec3, axis: CubeAxis): Vec3 {
   if (axis === 0) return [v[0], -v[2], v[1]];
   if (axis === 1) return [v[2], v[1], -v[0]];
@@ -45,7 +94,18 @@ export function quarterTurn(v: Vec3, axis: CubeAxis): Vec3 {
 
 const slotsBySize = new Map<number, { slots: StickerSlot[]; index: Map<string, number> }>();
 
-/** Every sticker slot of a cube of this size, in the order its state is written, and the way back from a slot to its place. */
+/** Every sticker slot of a cube of this size, in the order its state is written, and the way back from a slot to its place.
+ *
+ * @param n - The cube’s side length.
+ * @returns Every sticker slot of a cube of this size, in the order its state is written, and the way back from a slot to its place.
+ *
+ * @example
+ * ```ts
+ * import { cubeSlots } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(cubeSlots(3).slots.length);
+ * ```
+ */
 export function cubeSlots(n: number): { slots: readonly StickerSlot[]; index: ReadonlyMap<string, number> } {
   const known = slotsBySize.get(n);
   if (known !== undefined) return known;
@@ -65,17 +125,53 @@ export function cubeSlots(n: number): { slots: readonly StickerSlot[]; index: Re
   return made;
 }
 
-/** The layer, 0 to n − 1 from the axis's negative side, that a cubie centre sits in. */
+/** The layer, 0 to n − 1 from the axis's negative side, that a cubie centre sits in.
+ *
+ * @param centre - The cubie centre in doubled model coordinates.
+ * @param axis - The model axis: 0 for x, 1 for y, or 2 for z.
+ * @param n - The cube’s side length.
+ * @returns The layer, 0 to n − 1 from the axis's negative side, that a cubie centre sits in.
+ *
+ * @example
+ * ```ts
+ * import { layerOf } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(layerOf([2, 2, 2], 0, 3));
+ * ```
+ */
 export function layerOf(centre: Vec3, axis: CubeAxis, n: number): number {
   return (centre[axis] + n - 1) / 2;
 }
 
-/** The face letter a solved cube shows at this slot. */
+/** The face letter a solved cube shows at this slot.
+ *
+ * @param at - The sticker’s index in the state string.
+ * @param n - The cube’s side length.
+ * @returns The face letter a solved cube shows at this slot.
+ *
+ * @example
+ * ```ts
+ * import { faceOfSlot } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(faceOfSlot(0, 3));
+ * ```
+ */
 export function faceOfSlot(at: number, n: number): CubeFace {
   return CUBE_FACE_ORDER[Math.floor(at / (n * n))];
 }
 
-/** A solved cube of this size. */
+/** A solved cube of this size.
+ *
+ * @param n - The cube’s side length.
+ * @returns A solved cube of this size.
+ *
+ * @example
+ * ```ts
+ * import { solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * console.log(solvedCube(2));
+ * ```
+ */
 export function solvedCube(n: number): string {
   return CUBE_FACE_ORDER.map((face) => face.repeat(n * n)).join("");
 }
@@ -85,6 +181,18 @@ const permutations = new Map<string, Int32Array>();
 /**
  * Where every sticker goes under one turn: `to[i]` is the slot the sticker in
  * slot `i` lands on. Worked out once and kept.
+ *
+ * @param n - The cube’s side length.
+ * @param move - The turn to apply, name or invert.
+ * @returns Where every sticker goes under one turn: `to[i]` is the slot the sticker in slot `i` lands on. Worked out once and kept.
+ *
+ * @example
+ * ```ts
+ * import { parseMove, permutationOf } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(Array.from(permutationOf(3, move)).slice(0, 6));
+ * ```
  */
 export function permutationOf(n: number, move: CubeMove): Int32Array {
   const key = `${n}:${move.axis}:${move.layer}:${move.turns}`;
@@ -109,12 +217,40 @@ export function permutationOf(n: number, move: CubeMove): Int32Array {
   return to;
 }
 
-/** Whether a move can be made on a cube of this size. */
+/** Whether a move can be made on a cube of this size.
+ *
+ * @param n - The cube’s side length.
+ * @param move - The turn to apply, name or invert.
+ * @returns Whether a move can be made on a cube of this size.
+ *
+ * @example
+ * ```ts
+ * import { moveFits, parseMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(moveFits(3, move));
+ * ```
+ */
 export function moveFits(n: number, move: CubeMove): boolean {
   return move.layer === "all" || (Number.isInteger(move.layer) && move.layer >= 0 && move.layer < n);
 }
 
-/** The state after one turn. */
+/** The state after one turn.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @param move - The turn to apply, name or invert.
+ * @returns The state after one turn.
+ *
+ * @example
+ * ```ts
+ * import { parseMove, solvedCube, turnCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const state = solvedCube(3);
+ * const move = parseMove("R", 3)!;
+ * console.log(turnCube(state, 3, move));
+ * ```
+ */
 export function turnCube(state: string, n: number, move: CubeMove): string {
   const to = permutationOf(n, move);
   const out = new Array<string>(state.length);
@@ -122,7 +258,22 @@ export function turnCube(state: string, n: number, move: CubeMove): string {
   return out.join("");
 }
 
-/** The state after every turn in order. */
+/** The state after every turn in order.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @param moves - The turns, in their execution order.
+ * @returns The state after every turn in order.
+ *
+ * @example
+ * ```ts
+ * import { cubeSolved, parseMoves, solvedCube, turnAll, undoAll } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const state = solvedCube(3);
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(cubeSolved(turnAll(state, 3, [...moves, ...undoAll(moves)]), 3));
+ * ```
+ */
 export function turnAll(state: string, n: number, moves: readonly CubeMove[]): string {
   return moves.reduce((at, move) => turnCube(at, n, move), state);
 }
@@ -131,6 +282,18 @@ export function turnAll(state: string, n: number, moves: readonly CubeMove[]): s
  * SOLVED: every face one colour. Which colour does not matter, so a cube
  * solved and then turned whole in the hand is still solved, and a 2×2 or 4×4,
  * which has no fixed centres, is solved in whichever way round it ends.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @returns SOLVED: every face one colour. Which colour does not matter, so a cube solved and then turned whole in the hand is still solved, and a 2×2 or 4×4, which has no fixed centres, is solved in whichever way round it ends.
+ *
+ * @example
+ * ```ts
+ * import { cubeSolved, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const state = solvedCube(3);
+ * console.log(cubeSolved(state, 3));
+ * ```
  */
 export function cubeSolved(state: string, n: number): boolean {
   const face = n * n;
@@ -140,22 +303,71 @@ export function cubeSolved(state: string, n: number): boolean {
   return true;
 }
 
-/** The move that takes this one back. */
+/** The move that takes this one back.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @returns The move that takes this one back.
+ *
+ * @example
+ * ```ts
+ * import { moveNotation, parseMove, undoOf } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(moveNotation(undoOf(move), 3));
+ * ```
+ */
 export function undoOf(move: CubeMove): CubeMove {
   return { ...move, turns: (4 - move.turns) as CubeTurns };
 }
 
-/** A list of moves undone, last first. */
+/** A list of moves undone, last first.
+ *
+ * @param moves - The turns, in their execution order.
+ * @returns A list of moves undone, last first.
+ *
+ * @example
+ * ```ts
+ * import { movesNotation, parseMoves, undoAll } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(movesNotation(undoAll(moves), 3));
+ * ```
+ */
 export function undoAll(moves: readonly CubeMove[]): CubeMove[] {
   return [...moves].reverse().map(undoOf);
 }
 
-/** Whether a move counts towards a solve's moves: a turn of the whole cube in the hand does not. */
+/** Whether a move counts towards a solve's moves: a turn of the whole cube in the hand does not.
+ *
+ * @param move - The turn to apply, name or invert.
+ * @returns Whether a move counts towards a solve's moves: a turn of the whole cube in the hand does not.
+ *
+ * @example
+ * ```ts
+ * import { countsAsMove, parseMove } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const move = parseMove("R", 3)!;
+ * console.log(countsAsMove(move));
+ * ```
+ */
 export function countsAsMove(move: CubeMove): boolean {
   return move.layer !== "all";
 }
 
-/** Whether a string is a state of a cube this size: the right length, and the right number of every colour. */
+/** Whether a string is a state of a cube this size: the right length, and the right number of every colour.
+ *
+ * @param state - The sticker-state string in the package’s face order.
+ * @param n - The cube’s side length.
+ * @returns Whether a string is a state of a cube this size: the right length, and the right number of every colour.
+ *
+ * @example
+ * ```ts
+ * import { isCubeState, solvedCube } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const state = solvedCube(3);
+ * console.log(isCubeState(state, 3));
+ * ```
+ */
 export function isCubeState(state: string, n: number): boolean {
   if (state.length !== 6 * n * n) return false;
   const counts = new Map<string, number>();
@@ -171,12 +383,36 @@ export function isCubeState(state: string, n: number): boolean {
 
 const AXES = "xyz";
 
-/** Moves written three characters each, such as `x23y02z*1`: compact, and readable without knowing the cube's size. */
+/** Moves written three characters each, such as `x23y02z*1`: compact, and readable without knowing the cube's size.
+ *
+ * @param moves - The turns, in their execution order.
+ * @returns Moves written three characters each, such as `x23y02z*1`: compact, and readable without knowing the cube's size.
+ *
+ * @example
+ * ```ts
+ * import { encodeCubeMoves, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(encodeCubeMoves(moves));
+ * ```
+ */
 export function encodeCubeMoves(moves: readonly CubeMove[]): string {
   return moves.map((move) => `${AXES[move.axis]}${move.layer === "all" ? "*" : move.layer}${move.turns}`).join("");
 }
 
-/** The moves written in a code, or null where any of it is not a move. */
+/** The moves written in a code, or null where any of it is not a move.
+ *
+ * @param code - The encoded moves or standard notation to read.
+ * @returns The moves written in a code, or null where any of it is not a move.
+ *
+ * @example
+ * ```ts
+ * import { decodeCubeMoves, encodeCubeMoves, parseMoves } from "@johnmorrisdotca/kyuubu";
+ * 
+ * const moves = parseMoves("R U2", 3)!;
+ * console.log(decodeCubeMoves(encodeCubeMoves(moves)));
+ * ```
+ */
 export function decodeCubeMoves(code: string): CubeMove[] | null {
   if (code.length % 3 !== 0) return null;
   const moves: CubeMove[] = [];
