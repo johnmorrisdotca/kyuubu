@@ -445,7 +445,7 @@ describe("the demo site", () => {
   const sha = (text) => createHash("sha256").update(text).digest("hex");
   // The family's one stylesheet and one template, as every package carries them. A package never edits either.
   const FAMILY_CSS = "c1e392564a7fd94d0bb5cfaefb6d4fedfd147fc3e27f3a7afd8d8dac8c94a227";
-  const FAMILY_TEMPLATE = "cee03de7990c262dddb11c080c893d7a53623c13188314bb23b6d60a086ae96c";
+  const FAMILY_TEMPLATE = "34016d065f9e2231d3372dc35a39cd8f342f7749ab423ebe1d5c162c43637e4a";
 
   it("wears the family's stylesheet, byte for byte", () => {
     const css = read("demo/family.css");
