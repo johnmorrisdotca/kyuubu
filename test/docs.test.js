@@ -354,7 +354,7 @@ describe("the README's reference", () => {
       const one = family.find((entry) => entry.id === match[2]);
       expect([match[1], match[3]], match[2]).toEqual([one.name, one.kana]);
     }
-    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six"];
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six", "twenty-seven", "twenty-eight"];
     expect(block).toContain(`Kyuubu is one of ${words[family.length]} packages`);
     expect(block).toContain("**This package is Kyuubu.**");
     expect(family.length).toBeGreaterThanOrEqual(19);
@@ -445,7 +445,7 @@ describe("the demo site", () => {
   const sha = (text) => createHash("sha256").update(text).digest("hex");
   // The family's one stylesheet and one template, as every package carries them. A package never edits either.
   const FAMILY_CSS = "c1e392564a7fd94d0bb5cfaefb6d4fedfd147fc3e27f3a7afd8d8dac8c94a227";
-  const FAMILY_TEMPLATE = "34016d065f9e2231d3372dc35a39cd8f342f7749ab423ebe1d5c162c43637e4a";
+  const FAMILY_TEMPLATE = "6fd8dcbdf819abcaeec890f75ee77e553ffab4ea9b0e2df40674d9b99da4a906";
 
   it("wears the family's stylesheet, byte for byte", () => {
     const css = read("demo/family.css");
