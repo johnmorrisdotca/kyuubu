@@ -2,7 +2,7 @@
 title: Use a cuboid
 section: how-to
 order: 4
-description: Learn use a cuboid.
+description: Choose cuboid dimensions, match turns to the slice shape, and draw and replay a cuboid.
 ---
 
 ## Choose dimensions

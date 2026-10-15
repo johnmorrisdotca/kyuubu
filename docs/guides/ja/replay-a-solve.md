@@ -2,12 +2,12 @@
 title: ソルブを再生する
 section: how-to
 order: 3
-description: ソルブを再生するの使い方と注意点。
+description: ソルブの回転記号を確認し、プレイヤーで再生して、時間を設定し、記録として保存します。
 ---
 
 ## 回転記号を先に確認する
 
-[planReplay](api:planReplay)は読み取れない入力と、読み取れるが未完成のソルブを区別します。`ok: false`の場合は問題のある部分が返ります。`ok: true`には状態と時間配分が入り、最後まで揃ったかは `plan.solved`で確認できます。
+[planReplay](api:planReplay)は読み取れない入力と、読み取れるが未完成のソルブを区別します。`ok: false`の場合は問題のある部分が返ります。`ok: true`には状態と時間配分が入り、最後まで揃ったかは`plan.solved`で確認できます。
 
 ```ts
 import { planReplay } from "@johnmorrisdotca/kyuubu";
@@ -19,7 +19,7 @@ else console.log(result.fault.part, result.fault.fault?.token);
 
 ## 再生の操作を置く
 
-[プレイヤー](entry:player)は React なしでキューブ、手順一覧、スライダーと操作ボタンを表示します。自動再生は任意です。
+[プレイヤー](entry:player)はReactなしでキューブ、手順一覧、スライダーと操作ボタンを表示します。自動再生は任意です。
 
 ```ts no-run
 import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
@@ -38,4 +38,4 @@ player.seek(1);
 
 ## ソルブを保存する
 
-`SolveRecord`にはサイズ、スクランブル、ソルブの各手と、任意の時間、日時、シードを入れます。JSON とテキストは書き出して読み戻せます。CSV、Markdown、SQL のダウンロードは[List downloads](../../list-downloads.md)を参照してください。
+`SolveRecord`にはサイズ、スクランブル、ソルブの各手と、任意の時間、日時、シードを入れます。JSONとテキストは書き出して読み戻せます。CSV、Markdown、SQLのダウンロードは[List downloads](../../list-downloads.md)を参照してください。

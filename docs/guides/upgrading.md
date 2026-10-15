@@ -2,12 +2,12 @@
 title: Upgrading and coming from other libraries
 section: upgrading
 order: 10
-description: Learn upgrading and coming from other libraries.
+description: Stay on version 1, move from another cube library, and choose the right entry point.
 ---
 
 ## Within version 1
 
-This documentation rollout changes comments, guides and site navigation without changing the SDK's exported behavior. Keep imports from the named entry points. [Changelog](../../CHANGELOG.md) records version-specific additions; existing detailed Markdown references remain linked.
+Keep imports from the named entry points. [Changelog](../../CHANGELOG.md) records version-specific additions; existing detailed Markdown references remain linked.
 
 ## Coming from another cube library
 
@@ -16,7 +16,3 @@ Translate its state representation deliberately: Kyuubu stores stickers in U, R,
 ## Choosing an integration
 
 Use the core for state and notation, CubeView for a native browser view, the React entry for components and refs, the player for controls, and the element definition entry for HTML tags. Dispose directly mounted handles on removal. The docs search index is built locally with the site and adds no hosted service.
-
-## Before releasing
-
-Review newly written Japanese and compare the API examples with the installed package. Local documentation changes do not publish a package, change repository settings or upload a social preview.

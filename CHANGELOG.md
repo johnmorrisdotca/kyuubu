@@ -4,23 +4,22 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-- Synchronize documentation tooling for repository layouts, generated type references, Node entry points and repository-specific README links.
+## [1.13.0] - 2026-10-14
 
-- Keep large documentation resource catalogues on the entry index and the active resource beside core navigation, preserving every reference page; render valid default imports in HTML and Markdown.
+The demo's builder is the family's shared embed builder, solve histories download as Markdown and SQL, and the package has an English and Japanese documentation site with a checked example for every export. Cube state, notation, solving and replay are unchanged.
+
 ### Added
 
 - Add the shared English/Japanese documentation site, checked public API examples, guides, local search and machine-readable pages.
-
 - Build the distribution before source tests in the full gate, so demo-builder imports work in a clean checkout.
-
 - Add Markdown and SQL downloads for solve histories, using the family’s shared escape-safe writers.
-
 - Move the builder controls, code tabs and shareable links into the shared family embed builder, keeping the live cube preview and adding plain-HTML and iframe-URL output.
 
 ### Changed
 
+- Synchronize documentation tooling for repository layouts, generated type references, Node entry points and repository-specific README links.
+- Keep large documentation resource catalogues on the entry index and the active resource beside core navigation, preserving every reference page; render valid default imports in HTML and Markdown.
 - Group the package family by kind, alphabetize each group, and include the geography packages and REST in Pieces in the shared footer and README.
-
 - Update the shared family description for addresses in all seven supported countries, including France and Germany.
 
 ## [1.12.0] - 2026-10-06
@@ -435,7 +434,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.1...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.12.0...v1.13.0
 [1.8.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.0...v1.8.1
 [1.7.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.5.0...v1.6.0

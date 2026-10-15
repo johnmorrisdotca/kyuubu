@@ -2,7 +2,7 @@
 title: Getting started
 section: tutorial
 order: 1
-description: Learn getting started.
+description: Install Kyuubu, scramble and undo a cube, then put a playable view on a page.
 ---
 
 Install the package, scramble a cube, undo the scramble and put an interactive view on a page. The state engine works without a browser. Use Node 22 or later for the standalone TypeScript examples.

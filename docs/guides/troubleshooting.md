@@ -2,7 +2,7 @@
 title: Troubleshooting & FAQ
 section: troubleshooting
 order: 9
-description: Learn troubleshooting & faq.
+description: Find out why a view is blank, why a read returns null or throws, and what is stored or sent.
 ---
 
 ## The view is blank
@@ -29,4 +29,4 @@ The low-level engine expects a legal move. Check `cuboidMoveLegal` or parse with
 
 ## Does the package store or upload a solve?
 
-The engine and builder do not upload records. The builder stores settings in its address. Host applications choose any history storage themselves. Exported files are made locally. New Japanese documentation needs language review before release.
+The engine and builder do not upload records. The builder stores settings in its address. Host applications choose any history storage themselves. Exported files are made locally.

@@ -343,7 +343,7 @@ describe("the README's reference", () => {
     const block = readme.slice(from, readme.indexOf("\n## ", from));
     expect([...block.matchAll(/^- \[/gm)]).toHaveLength(family.length);
     for (const one of family) expect(block).toContain(`- [${one.name}](${familyRepo(one.id)}) (${one.kana}):`);
-    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six", "twenty-seven", "twenty-eight"];
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty", "thirty-one", "thirty-two"];
     expect(block).toContain(`Kyuubu is one of ${words[family.length]} packages`);
     expect(block).toContain("**This package is Kyuubu.**");
     expect(family.length).toBeGreaterThanOrEqual(19);
@@ -434,7 +434,7 @@ describe("the demo site", () => {
   const sha = (text) => createHash("sha256").update(text).digest("hex");
   // The family's one stylesheet and one template, as every package carries them. A package never edits either.
   const FAMILY_CSS = "c1e392564a7fd94d0bb5cfaefb6d4fedfd147fc3e27f3a7afd8d8dac8c94a227";
-  const FAMILY_TEMPLATE = "08e9d500321ad4b7c3b86935362459c847a67fc62a448bef98d2dda4ec6aa495";
+  const FAMILY_TEMPLATE = "fcc192026cf284303344e108b20e6181126607c670a881a6b3bf8479da26ab03";
 
   it("wears the family's stylesheet, byte for byte", () => {
     const css = read("demo/family.css");

@@ -2,7 +2,7 @@
 title: Input and motion
 section: how-to
 order: 8
-description: Learn input and motion.
+description: Choose where keys go, how drags pick a layer, and how a scrambling cube is paced and stopped.
 ---
 
 ## Keep keys in their place

@@ -2,7 +2,7 @@
 title: The method and the guide
 section: explanation
 order: 7
-description: Learn the method and the guide.
+description: Get beginner-method steps for 2×2 and 3×3, and follow a guide that reacts to real turns.
 ---
 
 ## A beginner's method
@@ -21,7 +21,7 @@ if (steps !== null) {
 console.log(solveSteps(solvedCube(4), 4));
 ```
 
-## A guide hears real turns
+## A guide that follows real turns
 
 [Guide](api:Guide) is a pure state machine. Its source is explicit moves or `{ method: true }`. It asks for the next movement and hears the user's turns: done, part, off or back. A half turn may be completed by two quarter turns, and wide moves may be made one layer at a time. Detours are kept and can be undone.
 

@@ -2,7 +2,7 @@
 title: State and notation
 section: explanation
 order: 6
-description: Learn state and notation.
+description: Read how a cube is stored as stickers, how turns are parsed, and which entry point holds what.
 ---
 
 ## Stickers are the state

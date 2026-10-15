@@ -2,7 +2,7 @@
 title: Embed and share a cube
 section: how-to
 order: 5
-description: Learn embed and share a cube.
+description: Put a cube or a scrambling cube on a page with the builder, the custom elements or an iframe, and share the settings as a link.
 ---
 
 ## Start with the builder

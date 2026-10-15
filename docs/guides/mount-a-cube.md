@@ -2,7 +2,7 @@
 title: Mount a cube
 section: how-to
 order: 2
-description: Learn mount a cube.
+description: Draw a cube in a host element and choose its input, colours and React component.
 ---
 
 ## Give the host a size

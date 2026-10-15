@@ -2,7 +2,7 @@
 title: Replay a solve
 section: how-to
 order: 3
-description: Learn replay a solve.
+description: Check a solve's notation, replay it with a player, set its timing and save it as a record.
 ---
 
 ## Validate the notation first

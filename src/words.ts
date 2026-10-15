@@ -434,11 +434,11 @@ export function stageSays(stage: SolveStage, language: KyuubuLanguage = "en"): s
   return WORDS[language][`says${upper(stage)}` as keyof CubeWords];
 }
 
-/** The name of one of the method's algorithms, as a person would say it: "Sune", 「コーナーの三点交換」.
+/** The name of one of the method's algorithms, as a person would say it: "Three corners round", 「コーナーの三点交換」.
  *
  * @param algorithm - The named solving algorithm.
  * @param language - English or Japanese for the displayed words.
- * @returns The name of one of the method's algorithms, as a person would say it: "Sune", 「コーナーの三点交換」.
+ * @returns The name of one of the method's algorithms, as a person would say it: "Three corners round", 「コーナーの三点交換」.
  *
  * @example
  * ```ts
