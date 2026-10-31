@@ -1,3 +1,4 @@
+import { type Cloth, isCloth } from "../cloth.ts";
 import { reflectAttributes } from "../reflect.ts";
 import type { ReplayStatus } from "../replay.ts";
 import { CUBE_THEMES } from "../view/view.ts";
@@ -37,6 +38,7 @@ export const CUBOID_ELEMENT_ATTRIBUTES = [
   "loop",
   "speed",
   "theme",
+  "cloth",
   "lang",
   "readout",
   "movelist",
@@ -88,6 +90,8 @@ export type KyuubuCuboidElement = HTMLElement & {
   set speed(value: string | number | boolean | null | undefined);
   get theme(): string | null;
   set theme(value: string | number | boolean | null | undefined);
+  get cloth(): string | null;
+  set cloth(value: string | number | boolean | null | undefined);
   get readout(): boolean;
   set readout(value: boolean | string | null | undefined);
   get movelist(): boolean;
@@ -142,6 +146,7 @@ function build(): CustomElementConstructor {
         loop: has("loop"),
         speed: speed > 0 ? speed : undefined,
         theme: theme !== null && theme in CUBE_THEMES ? CUBE_THEMES[theme as keyof typeof CUBE_THEMES] : undefined,
+        cloth: isCloth(this.getAttribute("cloth")) ? (this.getAttribute("cloth") as Cloth) : undefined,
         readout: this.hasAttribute("readout") ? has("readout") : undefined,
         moveList: this.hasAttribute("movelist") ? has("movelist") : undefined,
         animateScrub: this.hasAttribute("scrub") ? has("scrub") : undefined,

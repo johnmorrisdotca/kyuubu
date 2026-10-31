@@ -42,6 +42,7 @@ test("setting each observed attribute as a property sets the attribute, on both 
     "loop",
     "speed",
     "theme",
+    "cloth",
     "guide",
     "readout",
     "movelist",

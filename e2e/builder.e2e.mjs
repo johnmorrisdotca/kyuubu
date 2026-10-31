@@ -358,3 +358,19 @@ test("the header links to it from the other pages", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-ready", "true");
   await expect(page).toHaveURL(/builder\.html/);
 });
+
+test("the cloth is an option of the player: the code says it, the stage wears it, and the embed reads it", async ({
+  page,
+}) => {
+  await serve(page);
+  await page.goto(`${HOST}builder.html?lang=en#make=player`);
+  await expect(code(page)).not.toHaveText("");
+  const blue = page.locator('[data-option="cloth"] button[data-value="blue"]');
+  await blue.click();
+  await expect(code(page)).toContainText("blue");
+  await expect(stage(page).locator(".kyuubu-player")).toHaveCSS("--kyuubu-player-felt", "#2865a6");
+  await page.goto(`${HOST}embed.html#scramble=R+U&moves=U'+R'&cloth=red`);
+  await expect(page.locator(".kyuubu-player")).toHaveCSS("--kyuubu-player-felt", "#a3342e");
+  await page.goto(`${HOST}embed.html#scramble=R+U&moves=U'+R'&cloth=plaid`);
+  await expect(page.locator(".kyuubu-player-cube")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+});

@@ -78,6 +78,8 @@ export type CubeOption = {
   default?: string | number | boolean;
   /** The ways to choose from, for a `choice`. */
   choices?: readonly string[];
+  /** The words for each choice, by language; the value itself is what is written in code. */
+  choiceLabels?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   /** The least, the most and the step, for a `number`. */
   range?: { min: number; max: number; step: number };
   /** What each way of making a cube calls it: `view` the `CubeView` option (`colours.U` is one face), `player` the `mountPlayer` option, `cube` the attribute of `<kyuubu-cube>` and the embed's address, `turning` the attribute of `<kyuubu-scramble>`; and for a cuboid, `cuboid` the `CuboidView` option, `cuboidPlayer` the `mountCuboidPlayer` option and `cuboidElement` the attribute of `<kyuubu-cuboid>`. Absent where that way does not have it. */

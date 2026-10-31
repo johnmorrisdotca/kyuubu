@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- A player's stage can be laid in the family's five cloths: `<kyuubu-cube cloth="blue">`, `<kyuubu-cuboid cloth="blue">`, the `cloth` player option, the `cloth` embed parameter and Builder option, and `KYUUBU_CLOTHS`, `isCloth` and `clothVars`.
+
 ## [1.13.1] - 2026-10-31
 
 ### Changed

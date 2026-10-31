@@ -12,6 +12,7 @@ only what it uses.
 ```text
 src/
 ├── cli.ts               the command line as a pure function: arguments in, text and an exit code out
+├── cloth.ts             the five cloths a player's stage may be laid in
 ├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
 ├── cuboid/               the cuboid: a box-shaped turning puzzle, a × b × c from 1 to 7 on a side
 │   ├── draw-hands.ts     the pointer and the keys that turn a cuboid, and the queue of turns they make

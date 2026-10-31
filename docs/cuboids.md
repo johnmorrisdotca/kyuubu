@@ -60,7 +60,7 @@ cannot turn is never picked.
 
 `dims` is `3x3x1`, `3×3×1`, `3 3 1` or `3,3,1`; the other attributes are the
 `<kyuubu-cuboid>`'s own: `scramble`, `moves`, `time`, `autoplay`, `controls`,
-`loop`, `speed`, `theme` and `lang`, and `readout`, `movelist` and `scrub`, each on
+`loop`, `speed`, `theme`, `cloth` and `lang`, and `readout`, `movelist` and `scrub`, each on
 unless `"false"`, as on the cube, and it has `play()`, `pause()`, `step()`,
 `seek()` and `restart()`. Under the puzzle it names the move just made in large
 type (`R2`, with "Right face, twice" beside it, `cuboidMoveName` is the words

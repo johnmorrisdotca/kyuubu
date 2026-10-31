@@ -1,4 +1,5 @@
 export { type CliResult, type CliSurroundings, cubeNet, MAX_CLI_COUNT, MAX_CLI_LENGTH, runCli } from "./cli.ts";
+export { type Cloth, clothVars, isCloth, KYUUBU_CLOTHS } from "./cloth.ts";
 export {
   CUBE_FACE_ORDER,
   type CubeFace,

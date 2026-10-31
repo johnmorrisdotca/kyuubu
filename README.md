@@ -9,7 +9,7 @@
   <a href="./LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-2f5d4a"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
-  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="38.5 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-38.5%20kB-2f5d4a"></a>
+  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="39.0 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-39.0%20kB-2f5d4a"></a>
   <a href="https://www.npmjs.com/package/@johnmorrisdotca/kyuubu#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
@@ -858,6 +858,8 @@ an editor shows on hover.
 The tables of every export (the model, notation, scrambles, the solve, export and import, the replay, the player and famous solves, scale, show me, words, `CubeView` and `<Kyuubu />`) are in [docs/API.md](docs/API.md), and each one, with its signature and doc comment, is in the [API reference](https://johnmorrisdotca.github.io/kyuubu/api.html).
 
 ## Theming
+
+The player's stage takes one of the family's five cloths, the same set as the boards on itsutsu.com: `cloth="blue"` on `<kyuubu-cube>`, or `cloth: "blue"` when you mount it. `--kyuubu-player-felt` is the property it sets; `KYUUBU_CLOTHS`, `isCloth`, `clothVars` and the type `Cloth` hold the colours.
 
 Every colour, and the shape of a sticker, can be set three ways: as an
 option when the cube is made, as a CSS custom property on the cube's element

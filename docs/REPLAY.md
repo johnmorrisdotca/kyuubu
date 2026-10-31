@@ -123,7 +123,7 @@ cannot turn its layers, until they press "Turn it yourself": then the cube
 is theirs, the solve's next move is shown on it (see *Show me on the cube*),
 and each move they make brings the next. Options: `size`, `scramble`,
 `solution`, `timeMs`, `stepMs`, `autoplay`, `loop`, `controls`, `speed`,
-`theme`, `locale`, `guide` (start with the cube handed over), `readout` and
+`theme`, `cloth`, `locale`, `guide` (start with the cube handed over), `readout` and
 `moveList` (the move just made in large type and in words, and the moves as
 buttons; on unless `controls` is `false`, or unless said otherwise), `animateScrub`
 (on unless said otherwise), `onChange`, `onEnd`. The handle has `load(source)` (another solve on the same cube), `play()`, `pause()`, `step(1 | -1)`,
@@ -219,6 +219,7 @@ One tag, where the page may run a script. It needs no build step:
 | `controls` | Shown unless `controls="false"` |
 | `speed` | The speed to start at: `1`, `0.5`, `0.25`, `0.1` |
 | `theme` | `standard`, `paper` or `stickerless` |
+| `cloth` | `green`, `blue`, `red`, `black` or `wood`: the stage behind the cube |
 | `lang` | `en` or `ja`; the page's language when left out |
 | `guide` | Start with the cube handed to the viewer, to follow the solve by hand |
 | `readout`, `movelist` | The move just made in large type and in words, and the moves as buttons: shown unless `"false"` (and, with `controls="false"`, only if asked for) |
@@ -248,7 +249,7 @@ An iframe, where the page allows no scripts (a forum, a blog):
 <iframe src="https://johnmorrisdotca.github.io/kyuubu/embed.html#scramble=R+U+R'+U'&moves=U+R+U'+R'&time=2.5" title="Kyuubu" width="360" height="600" style="border:0;max-width:100%" loading="lazy"></iframe>
 ```
 
-The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`,
+The address carries everything: `scramble`, `moves`, `time`, `size`, `theme`, `cloth`,
 `lang`, `speed`, and `autoplay=1`, `loop=1`, `controls=0`, `guide=1`, `readout=0`, `movelist=0`, `scrub=0`. The page stores
 nothing, tracks nothing and loads nothing from anywhere else. A browser takes
 an address of a few thousand characters, which is room for any solve of a

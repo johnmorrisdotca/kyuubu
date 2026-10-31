@@ -1,7 +1,25 @@
 /* Kyuubu's own: the cube on its felt, and what sits round it. Everything else is family.css. */
 :root {
-  --intro-room: 11.5rem;
-  --intro-room-wide: 6.5rem;
+  --intro-room: 12.5rem;
+  --intro-room-wide: 8.5rem;
+}
+/* Room kept for the longer of the two languages, so that switching moves nothing below: one line height for both alphabets, and the header's pills and the felt's words their tallest wrap. */
+.cube-page {
+  line-height: 1.35;
+}
+.cube-page nav {
+  min-height: 104px;
+  align-content: flex-start;
+}
+@media (max-width: 760px) {
+  .cube-page nav {
+    min-height: 158px;
+  }
+}
+@media (max-width: 480px) {
+  .cube-page nav {
+    min-height: 318px;
+  }
 }
 /* A quick second tap on a phone presses a button again, never zooms the page; two fingers still zoom it. */
 .cube-page {

@@ -1,3 +1,4 @@
+import { type Cloth, clothVars } from "../cloth.ts";
 import { type MoveListGroup, type MoveListHandle, mountMoveList } from "../move-list.ts";
 import { REPLAY_SPEEDS, Replay, type ReplayCube, type ReplayStatus } from "../replay.ts";
 import type { CubeTheme } from "../view/view.ts";
@@ -44,6 +45,8 @@ export type CuboidPlayerOptions = CuboidReplaySource & {
   speed?: number;
   /** The puzzle's colours. */
   theme?: CubeTheme;
+  /** The cloth the stage behind the puzzle is laid in: "green", "blue", "red", "black" or "wood", the family's five. With none, the stage is clear. */
+  cloth?: Cloth;
   /** Show the code of the move just made in large type, with what it turns in words, and say it to a screen reader as it changes. True unless said otherwise; with `controls: false`, off unless this says true. */
   readout?: boolean;
   /** Show the moves as buttons, the one just made marked and scrolled into view, each one taking the replay to it. True unless said otherwise; with `controls: false`, off unless this says true. */
@@ -166,6 +169,7 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
 
   const root = doc.createElement("div");
   root.className = "kyuubu-cuboid-player";
+  for (const [name, value] of Object.entries<string>(clothVars(options.cloth))) root.style.setProperty(name, value);
   root.dataset.kyuubuCuboidPlayer = "";
   const stage = doc.createElement("div");
   stage.className = "kyuubu-cuboid-player-stage";

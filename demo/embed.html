@@ -47,6 +47,7 @@
           animateScrub: on("scrub", true),
           speed: speed > 0 ? speed : undefined,
           theme: q.get("theme") in CUBE_THEMES ? CUBE_THEMES[q.get("theme")] : undefined,
+          cloth: ["green", "blue", "red", "black", "wood"].includes(q.get("cloth")) ? q.get("cloth") : undefined,
           locale: lang,
           onChange: (status) => parent !== window && parent.postMessage({ kyuubu: "step", ...status }, "*"),
           onEnd: () => parent !== window && parent.postMessage({ kyuubu: "end" }, "*"),

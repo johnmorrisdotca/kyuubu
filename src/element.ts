@@ -1,3 +1,4 @@
+import { type Cloth, isCloth } from "./cloth.ts";
 import { mountPlayer, type PlayerHandle } from "./player.ts";
 import { reflectAttributes } from "./reflect.ts";
 import type { ReplayStatus } from "./replay.ts";
@@ -34,6 +35,7 @@ export const CUBE_ELEMENT_ATTRIBUTES = [
   "loop",
   "speed",
   "theme",
+  "cloth",
   "lang",
   "guide",
   "readout",
@@ -80,6 +82,8 @@ export type KyuubuCubeElement = HTMLElement & {
   set speed(value: string | number | boolean | null | undefined);
   get theme(): string | null;
   set theme(value: string | number | boolean | null | undefined);
+  get cloth(): string | null;
+  set cloth(value: string | number | boolean | null | undefined);
   get guide(): boolean;
   set guide(value: boolean | string | null | undefined);
   get readout(): boolean;
@@ -138,6 +142,7 @@ function build(): CustomElementConstructor {
         loop: has("loop"),
         speed: speed > 0 ? speed : undefined,
         theme: theme !== null && theme in CUBE_THEMES ? CUBE_THEMES[theme as keyof typeof CUBE_THEMES] : undefined,
+        cloth: isCloth(this.getAttribute("cloth")) ? (this.getAttribute("cloth") as Cloth) : undefined,
         locale: this.hasAttribute("lang") ? languageOf(this.getAttribute("lang")) : undefined,
         onChange: (status) => this.dispatchEvent(new CustomEvent("kyuubu-step", { detail: status, bubbles: true })),
         onEnd: () => this.dispatchEvent(new CustomEvent("kyuubu-end", { bubbles: true })),

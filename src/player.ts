@@ -1,3 +1,4 @@
+import { type Cloth, clothVars } from "./cloth.ts";
 import { solvedCube } from "./cube.ts";
 import { type GuideHandle, mountGuide } from "./guide-panel.ts";
 import { type MoveListGroup, type MoveListHandle, mountMoveList } from "./move-list.ts";
@@ -54,6 +55,8 @@ export type PlayerOptions = ReplaySource & {
   speed?: number;
   /** The cube's colours. */
   theme?: CubeTheme;
+  /** The cloth the stage behind the cube is laid in: "green", "blue", "red", "black" or "wood", the family's five. With none, the stage is clear. */
+  cloth?: Cloth;
   /** Start with the cube for the viewer to turn themselves, the solve's next move shown on it, rather than played for them. */
   guide?: boolean;
   /** Show the code of the move just made in large type, with what it turns in words, and say it to a screen reader as it changes. True unless said otherwise; with `controls: false`, off unless this says true. */
@@ -155,6 +158,7 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   const root = doc.createElement("div");
   root.className = "kyuubu-player";
   root.dataset.kyuubuPlayer = "";
+  for (const [name, value] of Object.entries<string>(clothVars(options.cloth))) root.style.setProperty(name, value);
   const stage = doc.createElement("div");
   stage.className = "kyuubu-player-cube";
   root.append(stage);

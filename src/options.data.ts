@@ -133,6 +133,21 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
       },
     },
   },
+  {
+    id: "cloth",
+    group: "look",
+    kind: "choice",
+    choices: ["green", "blue", "red", "black", "wood"],
+    choiceLabels: {
+      en: { green: "Green", blue: "Blue", red: "Red", black: "Black", wood: "Wood" },
+      ja: { green: "緑", blue: "青", red: "赤", black: "黒", wood: "木目" },
+    },
+    names: { player: "cloth", cube: "cloth", cuboidPlayer: "cloth", cuboidElement: "cloth" },
+    say: {
+      en: { label: "Cloth", help: "The cloth on the stage behind the cube. Unless said, the stage is clear." },
+      ja: { label: "テーブルの色", help: "キューブの後ろの台の色です。指定がなければ透明です。" },
+    },
+  },
   face("U", "colour-up", ["Top colour", "The colour of the top face."], ["上の色", "上の面の色です。"]),
   face("R", "colour-right", ["Right colour", "The colour of the right face."], ["右の色", "右の面の色です。"]),
   face("F", "colour-front", ["Front colour", "The colour of the front face."], ["前の色", "前の面の色です。"]),
