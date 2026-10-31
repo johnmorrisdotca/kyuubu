@@ -18,8 +18,8 @@ import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
  * @example
  * ```ts
  * import type { CubeFaceLetter } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeFaceLetter = "R";
  * console.log(value);
  * ```
@@ -66,7 +66,7 @@ function suffixOf(turns: CubeTurns, positive: boolean): string {
  * @example
  * ```ts
  * import { moveNotation, parseMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(moveNotation(move, 3));
  * ```
@@ -93,7 +93,7 @@ export function moveNotation(move: CubeMove, n: number): string {
  * @example
  * ```ts
  * import { movesNotation, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(movesNotation(moves, 3));
  * ```
@@ -113,11 +113,16 @@ export function movesNotation(moves: readonly CubeMove[], n: number): string {
  * @example
  * ```ts
  * import { faceMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(faceMove("R", 1, "cw", 3));
  * ```
  */
-export function faceMove(face: CubeFaceLetter, depth: number, amount: "cw" | "half" | "ccw", n: number): CubeMove | null {
+export function faceMove(
+  face: CubeFaceLetter,
+  depth: number,
+  amount: "cw" | "half" | "ccw",
+  n: number,
+): CubeMove | null {
   if (!Number.isInteger(depth) || depth < 1 || depth > n) return null;
   const { axis, positive } = FACE_AXES[face];
   return { axis, layer: positive ? n - depth : depth - 1, turns: turnsFor(amount, positive) };
@@ -133,7 +138,7 @@ export function faceMove(face: CubeFaceLetter, depth: number, amount: "cw" | "ha
  * @example
  * ```ts
  * import { middleMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(middleMove("M", "half", 3));
  * ```
  */
@@ -152,7 +157,7 @@ export function middleMove(letter: "M" | "E" | "S", amount: "cw" | "half" | "ccw
  * @example
  * ```ts
  * import { wholeMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(wholeMove("x", "cw"));
  * ```
  */
@@ -172,7 +177,7 @@ export function wholeMove(letter: "x" | "y" | "z", amount: "cw" | "half" | "ccw"
  * @example
  * ```ts
  * import { parseMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(parseMove("R'", 3));
  * ```
  */
@@ -195,12 +200,15 @@ export function parseMove(text: string, n: number): CubeMove | null {
  * @example
  * ```ts
  * import { parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(parseMoves("R U2", 3));
  * ```
  */
 export function parseMoves(text: string, n: number): CubeMove[] | null {
-  const parts = text.trim().split(/\s+/).filter((part) => part.length > 0);
+  const parts = text
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part.length > 0);
   const moves = parts.map((part) => parseMove(part, n));
   return moves.every((move) => move !== null) ? (moves as CubeMove[]) : null;
 }

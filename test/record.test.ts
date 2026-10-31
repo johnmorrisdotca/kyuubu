@@ -21,7 +21,14 @@ import {
 } from "../src/index.ts";
 
 const moves = (text: string, n = 3) => parseMoves(text, n)!;
-const solve: SolveRecord = { size: 3, scramble: moves("R U2 F'"), moves: moves("F U2 R'"), ms: 12340, at: Date.UTC(2026, 8, 30, 12), seed: "club night" };
+const solve: SolveRecord = {
+  size: 3,
+  scramble: moves("R U2 F'"),
+  moves: moves("F U2 R'"),
+  ms: 12340,
+  at: Date.UTC(2026, 8, 30, 12),
+  seed: "club night",
+};
 
 describe("what a solve comes to", () => {
   it("is worked out from its turns", () => {
@@ -59,7 +66,17 @@ describe("a solve as JSON", () => {
     const data = JSON.parse(toJSON(solve));
     expect(data.format).toBe(RECORD_FORMAT);
     expect(data.generator).toBe(`kyuubu ${VERSION}`);
-    expect(data.solves[0]).toEqual({ size: 3, scramble: "R U2 F'", moves: "F U2 R'", state: solvedCube(3), solved: true, count: 3, ms: 12340, at: "2026-09-30T12:00:00.000Z", seed: "club night" });
+    expect(data.solves[0]).toEqual({
+      size: 3,
+      scramble: "R U2 F'",
+      moves: "F U2 R'",
+      state: solvedCube(3),
+      solved: true,
+      count: 3,
+      ms: 12340,
+      at: "2026-09-30T12:00:00.000Z",
+      seed: "club night",
+    });
   });
 
   it("carries a whole layer-by-layer solve, and it still solves when read back", () => {
@@ -70,14 +87,29 @@ describe("a solve as JSON", () => {
   });
 
   it("trusts nothing it reads: what the file says the turns come to is ignored", () => {
-    const lie = JSON.stringify({ format: 1, solves: [{ size: 3, scramble: "R", moves: "U", state: solvedCube(3), solved: true, count: 99 }] });
+    const lie = JSON.stringify({
+      format: 1,
+      solves: [{ size: 3, scramble: "R", moves: "U", state: solvedCube(3), solved: true, count: 99 }],
+    });
     const [read] = fromJSON(lie)!;
     expect(read).toEqual({ size: 3, scramble: moves("R"), moves: moves("U") });
     expect(summarize(read)).toMatchObject({ solved: false, count: 1 });
   });
 
   it("is null for what is not an export", () => {
-    for (const text of ["", "not json", "null", "[]", "42", '"text"', '{"format":2,"solves":[]}', '{"format":1}', '{"format":1,"solves":{}}', '{"solves":[]}']) expect(fromJSON(text), text).toBeNull();
+    for (const text of [
+      "",
+      "not json",
+      "null",
+      "[]",
+      "42",
+      '"text"',
+      '{"format":2,"solves":[]}',
+      '{"format":1}',
+      '{"format":1,"solves":{}}',
+      '{"solves":[]}',
+    ])
+      expect(fromJSON(text), text).toBeNull();
   });
 
   it("leaves out a solve it cannot rebuild, and keeps the rest", () => {
@@ -103,9 +135,13 @@ describe("a solve as JSON", () => {
 
   it("drops a time, a date or a seed that is not one, and keeps the solve", () => {
     const odd = { size: 3, scramble: "R", moves: "R'", ms: -5, at: "yesterday", seed: 7 };
-    expect(fromJSON(JSON.stringify({ format: 1, solves: [odd] }))).toEqual([{ size: 3, scramble: moves("R"), moves: moves("R'") }]);
+    expect(fromJSON(JSON.stringify({ format: 1, solves: [odd] }))).toEqual([
+      { size: 3, scramble: moves("R"), moves: moves("R'") },
+    ]);
     const long = { size: 3, scramble: "R", moves: "", ms: Infinity, seed: "s".repeat(201) };
-    expect(fromJSON(JSON.stringify({ format: 1, solves: [long] }))).toEqual([{ size: 3, scramble: moves("R"), moves: [] }]);
+    expect(fromJSON(JSON.stringify({ format: 1, solves: [long] }))).toEqual([
+      { size: 3, scramble: moves("R"), moves: [] },
+    ]);
   });
 });
 
@@ -128,12 +164,31 @@ describe("a solve as plain text", () => {
 
   it("reads a bare line of notation, a × for the x, either case, and Windows line endings", () => {
     expect(fromText("R U R' U'")).toEqual({ size: 3, scramble: [], moves: moves("R U R' U'") });
-    expect(fromText("2×2\r\nSCRAMBLE: R U\r\nSolve: U'\r\nR'\r\nTime: 3.5 s\r\n")).toEqual({ size: 2, scramble: moves("R U", 2), moves: moves("U' R'", 2), ms: 3500 });
+    expect(fromText("2×2\r\nSCRAMBLE: R U\r\nSolve: U'\r\nR'\r\nTime: 3.5 s\r\n")).toEqual({
+      size: 2,
+      scramble: moves("R U", 2),
+      moves: moves("U' R'", 2),
+      ms: 3500,
+    });
     expect(fromText("4 x 4\nmoves: 2R")).toEqual({ size: 4, scramble: [], moves: moves("2R", 4) });
   });
 
   it("is null for what is not a solve", () => {
-    for (const text of ["", "   \n", "hello", "3x4\nR", "8x8\nR", "1x1\nR", "3x3", "3x3\n2x2\nR", "2x2\nsolve: M", "scramble: R Q", "solve: R\ntime: soon", "solve: R\ntime:"]) expect(fromText(text), text).toBeNull();
+    for (const text of [
+      "",
+      "   \n",
+      "hello",
+      "3x4\nR",
+      "8x8\nR",
+      "1x1\nR",
+      "3x3",
+      "3x3\n2x2\nR",
+      "2x2\nsolve: M",
+      "scramble: R Q",
+      "solve: R\ntime: soon",
+      "solve: R\ntime:",
+    ])
+      expect(fromText(text), text).toBeNull();
   });
 });
 

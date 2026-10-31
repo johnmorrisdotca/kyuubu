@@ -1,8 +1,29 @@
 import { describe, expect, it } from "vitest";
 
-import { SOLVE_ALGORITHMS, STRINGS, WORDS, algorithmName, fill, languageOf, stageName, stageSays, type SolveAlgorithm, type SolveStage } from "../src/index.ts";
+import {
+  SOLVE_ALGORITHMS,
+  STRINGS,
+  WORDS,
+  algorithmName,
+  fill,
+  languageOf,
+  stageName,
+  stageSays,
+  type SolveAlgorithm,
+  type SolveStage,
+} from "../src/index.ts";
 
-const STAGES: SolveStage[] = ["hold", "whiteCross", "whiteCorners", "whiteLayer", "middleLayer", "yellowCross", "yellowFace", "yellowCorners", "yellowEdges"];
+const STAGES: SolveStage[] = [
+  "hold",
+  "whiteCross",
+  "whiteCorners",
+  "whiteLayer",
+  "middleLayer",
+  "yellowCross",
+  "yellowFace",
+  "yellowCorners",
+  "yellowEdges",
+];
 
 describe("the package's words", () => {
   it("has a Japanese line for every English one, and keeps every place to fill in", () => {
@@ -17,7 +38,11 @@ describe("the package's words", () => {
   it("is the cube's words and the command line's, together", () => {
     for (const language of ["en", "ja"] as const) {
       expect(STRINGS[language]).toMatchObject(WORDS[language]);
-      expect(Object.keys(STRINGS[language]).filter((key) => !(key in WORDS[language])).every((key) => key.startsWith("cli"))).toBe(true);
+      expect(
+        Object.keys(STRINGS[language])
+          .filter((key) => !(key in WORDS[language]))
+          .every((key) => key.startsWith("cli")),
+      ).toBe(true);
     }
   });
 
@@ -48,6 +73,15 @@ describe("the package's words", () => {
   });
 
   it("reads a language tag", () => {
-    expect([languageOf("ja"), languageOf("ja-JP"), languageOf("JA_jp.UTF-8"), languageOf("en-GB"), languageOf("fr"), languageOf(""), languageOf(null), languageOf(undefined)]).toEqual(["ja", "ja", "ja", "en", "en", "en", "en", "en"]);
+    expect([
+      languageOf("ja"),
+      languageOf("ja-JP"),
+      languageOf("JA_jp.UTF-8"),
+      languageOf("en-GB"),
+      languageOf("fr"),
+      languageOf(""),
+      languageOf(null),
+      languageOf(undefined),
+    ]).toEqual(["ja", "ja", "ja", "en", "en", "en", "en", "en"]);
   });
 });

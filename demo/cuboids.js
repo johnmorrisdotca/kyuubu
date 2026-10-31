@@ -23,7 +23,8 @@ import "./dist/cuboid/element-define.js";
 // The page's own words, in the two languages the package speaks. Set as text, never as HTML.
 const WORDS = {
   en: {
-    pitch: "Turning puzzles shaped like a box: a 2×3×3, a floppy 1×3×3, a tall pillar, or any a×b×c from 1 to 7 on a side.",
+    pitch:
+      "Turning puzzles shaped like a box: a 2×3×3, a floppy 1×3×3, a tall pillar, or any a×b×c from 1 to 7 on a side.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toCube: "The cube",
@@ -50,7 +51,8 @@ const WORDS = {
     sideZ: "Depth",
     customNone: "A cuboid needs one side of 2 or more: 1×1×1 has nothing to turn.",
     layersTitle: "What turns, and how far",
-    layersText: "Each pair of faces has layers across the puzzle. A layer turns a quarter only if its slice is square; otherwise it turns a half turn, written with a 2.",
+    layersText:
+      "Each pair of faces has layers across the puzzle. A layer turns a quarter only if its slice is square; otherwise it turns a half turn, written with a 2.",
     axisX: "R / L",
     axisY: "U / D",
     axisZ: "F / B",
@@ -64,9 +66,11 @@ const WORDS = {
     scrambleWas: "Scramble",
     yourMoves: "Your moves",
     none: "None yet.",
-    notationHelp: "R L U D F B turn a face a quarter clockwise, R' the other way, R2 a half turn. M E S are the middle layer of an odd side and 2R is the layer next in from R. A layer that is not square only half turns, so R is refused there and R2 is the way to write it. There are no x, y or z: a puzzle turned whole in the hand is another puzzle on its side.",
+    notationHelp:
+      "R L U D F B turn a face a quarter clockwise, R' the other way, R2 a half turn. M E S are the middle layer of an odd side and 2R is the layer next in from R. A layer that is not square only half turns, so R is refused there and R2 is the way to write it. There are no x, y or z: a puzzle turned whole in the hand is another puzzle on its side.",
     embedTitle: "On your page",
-    embedText: "One tag plays a solve on any cuboid; the model, notation and scrambles are plain functions. The puzzle below is the tag.",
+    embedText:
+      "One tag plays a solve on any cuboid; the model, notation and scrambles are plain functions. The puzzle below is the tag.",
     foot: "Nothing here is stored. Rubik's Cube is a trademark of its owner; Kyuubu is not affiliated with it.",
   },
   ja: {
@@ -97,7 +101,8 @@ const WORDS = {
     sideZ: "奥行き",
     customNone: "直方体には2以上の辺がひとつ必要です。1×1×1は回せるところがありません。",
     layersTitle: "回るところと、回せる角度",
-    layersText: "向かい合う面のペアごとに、パズルを横切る層があります。層の切り口が正方形のときだけ1/4回転でき、そうでなければ半回転だけで、2をつけて書きます。",
+    layersText:
+      "向かい合う面のペアごとに、パズルを横切る層があります。層の切り口が正方形のときだけ1/4回転でき、そうでなければ半回転だけで、2をつけて書きます。",
     axisX: "R / L",
     axisY: "U / D",
     axisZ: "F / B",
@@ -111,9 +116,11 @@ const WORDS = {
     scrambleWas: "スクランブル",
     yourMoves: "回した手順",
     none: "まだありません。",
-    notationHelp: "R L U D F B は面を時計回りに1/4回転し、R' は反時計回り、R2 は半回転です。M E S は奇数の辺の中央の層、2R は R の隣の層です。正方形でない層は半回転しかできないので、そこでは R は受け付けず、R2 と書きます。x y z はありません。手で持ち替えたパズルは、向きの違う別のパズルだからです。",
+    notationHelp:
+      "R L U D F B は面を時計回りに1/4回転し、R' は反時計回り、R2 は半回転です。M E S は奇数の辺の中央の層、2R は R の隣の層です。正方形でない層は半回転しかできないので、そこでは R は受け付けず、R2 と書きます。x y z はありません。手で持ち替えたパズルは、向きの違う別のパズルだからです。",
     embedTitle: "自分のページに置く",
-    embedText: "タグ1つで、どの直方体の解き方も再生できます。モデル、回転記号、スクランブルは普通の関数です。下のパズルがそのタグです。",
+    embedText:
+      "タグ1つで、どの直方体の解き方も再生できます。モデル、回転記号、スクランブルは普通の関数です。下のパズルがそのタグです。",
     foot: "ここでは何も保存しません。Rubik's Cube は権利者の商標です。Kyuubu は権利者とは関係ありません。",
   },
 };
@@ -128,7 +135,14 @@ let moves = [];
 let banner = null;
 let timed = false;
 
-const page = familyLanguage({ id: "kyuubu", words: WORDS, onChange: (lang) => { view.setLocale(lang); draw(); } });
+const page = familyLanguage({
+  id: "kyuubu",
+  words: WORDS,
+  onChange: (lang) => {
+    view.setLocale(lang);
+    draw();
+  },
+});
 const say = (key, values) => {
   let text = page.word(key);
   for (const [name, value] of Object.entries(values ?? {})) text = text.replaceAll(`{${name}}`, String(value));
@@ -138,7 +152,9 @@ const preset = () => CUBOID_PRESETS.find((one) => sameCuboid(one.dims, dims));
 
 /** Everything on the page that is made of the puzzle's state and the language, drawn again. */
 function draw() {
-  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
+  document
+    .querySelector('[data-say="pageDocs"]')
+    ?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   const solved = cuboidSolved(view.state, dims);
   $("name").textContent = cuboidName(dims);
   $("count").textContent = String(moves.length);
@@ -153,7 +169,9 @@ function draw() {
   $("says").textContent = known === undefined ? say("layersText") : known.says[page.lang];
   for (const button of $("picker").querySelectorAll("button")) {
     button.setAttribute("aria-pressed", String(known !== undefined && button.dataset.key === known.key));
-    button.querySelector(".cuboid-pick-name").textContent = CUBOID_PRESETS.find((one) => one.key === button.dataset.key).name[page.lang];
+    button.querySelector(".cuboid-pick-name").textContent = CUBOID_PRESETS.find(
+      (one) => one.key === button.dataset.key,
+    ).name[page.lang];
   }
   for (const [axis, select] of [0, 1, 2].map((axis) => [axis, $(`side-${axis}`)])) select.value = String(dims[axis]);
   $("axes").replaceChildren(
@@ -166,7 +184,8 @@ function draw() {
       count.textContent = say("layersCount", { n: dims[axis] });
       const how = document.createElement("span");
       const turns = legalTurns(dims, axis, 0);
-      how.textContent = turns.length === 0 ? say("layerOne") : halfTurnOnly(dims, axis) ? say("layerHalf") : say("layerQuarter");
+      how.textContent =
+        turns.length === 0 ? say("layerOne") : halfTurnOnly(dims, axis) ? say("layerHalf") : say("layerQuarter");
       how.dataset.turns = turns.join("");
       li.append(name, count, how);
       return li;

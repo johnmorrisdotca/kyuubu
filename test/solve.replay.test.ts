@@ -3,8 +3,25 @@ import { describe, expect, it } from "vitest";
 import { cubeSolved, solvedCube, turnAll } from "../src/cube.ts";
 import { FAMOUS_SOLVES, famousSolve } from "../src/famous.ts";
 import { parseMoves } from "../src/notation.ts";
-import { applySolve, countSolveMoves, parseSolve, parseSolveMove, solveMoves, solveText } from "../src/reconstruction.ts";
-import { planReplay, Replay, REPLAY_LOOP_REST_MS, REPLAY_SCRAMBLE_STEP_MS, REPLAY_SCRUB_TURNS, REPLAY_STEP_MS, scrubPath, type ReplayClock, type ReplayCube } from "../src/replay.ts";
+import {
+  applySolve,
+  countSolveMoves,
+  parseSolve,
+  parseSolveMove,
+  solveMoves,
+  solveText,
+} from "../src/reconstruction.ts";
+import {
+  planReplay,
+  Replay,
+  REPLAY_LOOP_REST_MS,
+  REPLAY_SCRAMBLE_STEP_MS,
+  REPLAY_SCRUB_TURNS,
+  REPLAY_STEP_MS,
+  scrubPath,
+  type ReplayClock,
+  type ReplayCube,
+} from "../src/replay.ts";
 import type { CubeMove } from "../src/types.ts";
 
 const steps = (text: string, n = 3) => {
@@ -26,7 +43,10 @@ describe("a solve as it is written down", () => {
   });
 
   it("reads the lower-case letter reconstructions write for a wide turn", () => {
-    for (const face of ["r", "l", "u", "d", "f", "b"]) expect(after(`${face} ${face}2 ${face}'`)).toBe(after(`${face.toUpperCase()}w ${face.toUpperCase()}w2 ${face.toUpperCase()}w'`));
+    for (const face of ["r", "l", "u", "d", "f", "b"])
+      expect(after(`${face} ${face}2 ${face}'`)).toBe(
+        after(`${face.toUpperCase()}w ${face.toUpperCase()}w2 ${face.toUpperCase()}w'`),
+      );
     expect(steps("r")[0].text).toBe("Rw");
   });
 
@@ -87,7 +107,12 @@ describe("the famous solves", () => {
   it("each plays from its scramble to a solved cube", () => {
     expect(FAMOUS_SOLVES.length).toBeGreaterThanOrEqual(12);
     for (const solve of FAMOUS_SOLVES) {
-      const planned = planReplay({ size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs });
+      const planned = planReplay({
+        size: solve.size,
+        scramble: solve.scramble,
+        solution: solve.solution,
+        timeMs: solve.timeMs,
+      });
       expect(planned.ok, solve.id).toBe(true);
       if (planned.ok) {
         expect(planned.plan.solved, solve.id).toBe(true);
@@ -102,7 +127,28 @@ describe("the famous solves", () => {
     for (const solve of FAMOUS_SOLVES) {
       expect(ids.has(solve.id)).toBe(false);
       ids.add(solve.id);
-      expect(Object.keys(solve).filter((key) => !["id", "size", "timeMs", "solver", "country", "competition", "competitionId", "from", "to", "record", "scramble", "solution", "reconstructedBy", "source", "checked"].includes(key))).toEqual([]);
+      expect(
+        Object.keys(solve).filter(
+          (key) =>
+            ![
+              "id",
+              "size",
+              "timeMs",
+              "solver",
+              "country",
+              "competition",
+              "competitionId",
+              "from",
+              "to",
+              "record",
+              "scramble",
+              "solution",
+              "reconstructedBy",
+              "source",
+              "checked",
+            ].includes(key),
+        ),
+      ).toEqual([]);
       for (const day of [solve.from, solve.to, solve.checked]) expect(day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(solve.from <= solve.to).toBe(true);
       expect(solve.source).toMatch(/^https?:\/\//);
@@ -123,7 +169,8 @@ function rig() {
   const asked: string[] = [];
   const cube: ReplayCube = {
     setState: (state) => asked.push(`set:${state.slice(0, 9)}`),
-    turnTogether: (moves: readonly CubeMove[], options) => asked.push(`turn:${moves.length}:${options?.ms === undefined ? "own" : Math.round(options.ms)}`),
+    turnTogether: (moves: readonly CubeMove[], options) =>
+      asked.push(`turn:${moves.length}:${options?.ms === undefined ? "own" : Math.round(options.ms)}`),
   };
   let now = 0;
   let next = 1;
@@ -185,7 +232,11 @@ describe("a replay", () => {
     const { asked, cube, clock, wind } = rig();
     const seen: number[] = [];
     let ended = 0;
-    const replay = new Replay(cube, plan, { clock, onChange: (status) => seen.push(status.position), onEnd: () => (ended += 1) });
+    const replay = new Replay(cube, plan, {
+      clock,
+      onChange: (status) => seen.push(status.position),
+      onEnd: () => (ended += 1),
+    });
     expect(asked).toEqual([`set:${plan.start.slice(0, 9)}`]);
     replay.play();
     expect(replay.status).toMatchObject({ position: 1, playing: true, ended: false });
@@ -196,7 +247,12 @@ describe("a replay", () => {
     wind(1500);
     expect(replay.status).toMatchObject({ position: 4, playing: false, ended: true, elapsedMs: 2000 });
     expect(ended).toBe(1);
-    expect(asked.filter((line) => line.startsWith("turn"))).toEqual(["turn:1:450", "turn:1:450", "turn:1:450", "turn:1:450"]);
+    expect(asked.filter((line) => line.startsWith("turn"))).toEqual([
+      "turn:1:450",
+      "turn:1:450",
+      "turn:1:450",
+      "turn:1:450",
+    ]);
     expect(seen).toContain(4);
   });
 
@@ -290,7 +346,8 @@ describe("turning the cube as the slider moves", () => {
   const list = steps(solution);
 
   /** The cube a path leaves: from the cube at the path's own start, every turn made. */
-  const endOf = (states: string[], path: { from: number; turns: CubeMove[][] }) => path.turns.reduce((cube, turn) => turnAll(cube, 3, turn), states[path.from]);
+  const endOf = (states: string[], path: { from: number; turns: CubeMove[][] }) =>
+    path.turns.reduce((cube, turn) => turnAll(cube, 3, turn), states[path.from]);
 
   it("turns the steps between, forwards going on", () => {
     expect(scrubPath(list, 2, 5)).toEqual({ from: 2, turns: [list[2], list[3], list[4]] });
@@ -478,7 +535,13 @@ describe("a step back is the move turned the other way", () => {
         state = turnAll(state, n, moves);
       },
     };
-    return { cube, turned, get state() { return state; } };
+    return {
+      cube,
+      turned,
+      get state() {
+        return state;
+      },
+    };
   };
   const planned = planReplay({ scramble: "F R U R' U' F' x", solution: "x' Rw U Rw' U' F R U R' U' F'", timeMs: 3000 });
   if (!planned.ok) throw new Error("the plan should read");
@@ -495,7 +558,10 @@ describe("a step back is the move turned the other way", () => {
       expect(replay.status.position, `from ${at}`).toBe(at - 1);
       expect(shown.turned, `from ${at}`).toHaveLength(1);
       // Exactly what turning the step does, the other way: the same layers, each turned as far the other way.
-      expect(shown.turned[0].map((move) => ({ ...move, turns: 4 - move.turns })), `from ${at}`).toEqual(plan.steps[at - 1].moves);
+      expect(
+        shown.turned[0].map((move) => ({ ...move, turns: 4 - move.turns })),
+        `from ${at}`,
+      ).toEqual(plan.steps[at - 1].moves);
       expect(shown.state, `from ${at}`).toBe(plan.states[at - 1]);
     }
   });

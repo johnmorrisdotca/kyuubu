@@ -22,8 +22,8 @@ import { WORDS, fill, languageOf, stageName, stageSays, type CubeWords, type Kyu
  * @example
  * ```ts
  * import type { GuidePanelOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: GuidePanelOptions = { moves: "R U", locale: "ja" };
  * console.log(value.locale);
  * ```
@@ -43,7 +43,7 @@ export type GuidePanelOptions = GuideSource & {
  * ```ts no-run
  * import type { GuideHandle } from "@johnmorrisdotca/kyuubu";
  * import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: GuideHandle = mountGuide(document.createElement("div"), new CubeView(document.createElement("div"), { size: 3, interactive: true }), { moves: "R U" });
  * console.log(value.guide.next?.text);
  * ```
@@ -68,7 +68,7 @@ const STYLE_ID = "kyuubu-guide-style";
  * @example
  * ```ts
  * import { GUIDE_CSS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(GUIDE_CSS.includes("."));
  * ```
  */
@@ -109,7 +109,7 @@ function addStyle(doc: Document): void {
  * @example
  * ```ts no-run
  * import { CubeView, mountGuide } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const host = document.createElement("div");
  * const panel = document.createElement("div");
  * host.style.cssText = "width:300px;height:300px;position:relative";
@@ -123,7 +123,8 @@ function addStyle(doc: Document): void {
 export function mountGuide(host: HTMLElement, view: CubeView, options: GuidePanelOptions): GuideHandle {
   const doc = host.ownerDocument;
   addStyle(doc);
-  let language: KyuubuLanguage = options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
+  let language: KyuubuLanguage =
+    options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
   const say = (key: keyof CubeWords, values?: Record<string, string | number>) => fill(WORDS[language][key], values);
   let guide = new Guide(view.state, view.size, options);
   let ended = false;
@@ -192,7 +193,8 @@ export function mountGuide(host: HTMLElement, view: CubeView, options: GuidePane
     root.dataset.state = next === null ? "done" : detours.length > 0 ? "off" : "on";
     root.dataset.done = String(guide.done);
     stage.hidden = next?.stage === undefined;
-    if (next?.stage !== undefined) stage.textContent = `${stageName(next.stage, language)} · ${stageSays(next.stage, language)}`;
+    if (next?.stage !== undefined)
+      stage.textContent = `${stageName(next.stage, language)} · ${stageSays(next.stage, language)}`;
     // The hint on the cube: the way back from a detour, or the movement to make.
     const last = detours.at(-1);
     view.showHint(last !== undefined ? (last.layer === "all" ? null : undoOf(last)) : (next?.moves ?? null));
@@ -215,7 +217,10 @@ export function mountGuide(host: HTMLElement, view: CubeView, options: GuidePane
       doIt.hidden = false;
     }
     off.hidden = detours.length === 0;
-    off.textContent = detours.length === 0 ? "" : `${say("guideOff", { made: movesNotation(detours, view.size), wanted: next?.left ?? "" })}${language === "ja" ? "" : " "}${say("guideOffHow")}`;
+    off.textContent =
+      detours.length === 0
+        ? ""
+        : `${say("guideOff", { made: movesNotation(detours, view.size), wanted: next?.left ?? "" })}${language === "ja" ? "" : " "}${say("guideOffHow")}`;
     back.hidden = detours.length === 0;
     options.onChange?.(guide, heard);
     if (next === null && !ended) {

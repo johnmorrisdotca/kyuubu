@@ -23,8 +23,8 @@ import type { CubeAxis, CubeTurns, StickerSlot, Vec3 } from "../types.ts";
  * @example
  * ```ts
  * import type { CuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
- * 
+ *
+ *
  * const value: CuboidDims = [2, 3, 3];
  * console.log(value);
  * ```
@@ -37,7 +37,7 @@ export type CuboidDims = readonly [number, number, number];
  * ```ts
  * import type { CuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidMove = parseCuboidMove("R", [2, 3, 3])!;
  * console.log(value);
  * ```
@@ -49,7 +49,7 @@ export type CuboidMove = { axis: CubeAxis; layer: number; turns: CubeTurns };
  * @example
  * ```ts
  * import { CUBOID_MIN_SIDE } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(CUBOID_MIN_SIDE);
  * ```
  */
@@ -59,7 +59,7 @@ export const CUBOID_MIN_SIDE = 1;
  * @example
  * ```ts
  * import { CUBOID_MAX_SIDE } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(CUBOID_MAX_SIDE);
  * ```
  */
@@ -73,7 +73,7 @@ export const CUBOID_MAX_SIDE = 7;
  * @example
  * ```ts
  * import { isCuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(isCuboidDims([2, 3, 3]));
  * ```
  */
@@ -94,7 +94,7 @@ export function isCuboidDims(dims: unknown): dims is CuboidDims {
  * @example
  * ```ts
  * import { cuboidName } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidName(dims));
  * ```
@@ -111,7 +111,7 @@ export function cuboidName(dims: CuboidDims): string {
  * @example
  * ```ts
  * import { parseCuboidDims } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(parseCuboidDims("2x3x3"));
  * ```
  */
@@ -131,7 +131,7 @@ export function parseCuboidDims(text: string): CuboidDims | null {
  * @example
  * ```ts
  * import { sameCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(sameCuboid([2, 3, 3], [3, 2, 3]));
  * ```
  */
@@ -151,7 +151,7 @@ const keyOf = (slot: StickerSlot) => `${slot.centre.join(",")}|${slot.normal.joi
  * ```ts
  * import type { CuboidFace } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { cuboidFaces } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidFace = cuboidFaces([2, 3, 3])[0]!;
  * console.log(value.face);
  * ```
@@ -168,7 +168,7 @@ const facesBySize = new Map<string, readonly CuboidFace[]>();
  * @example
  * ```ts
  * import { cuboidFaces } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidFaces(dims));
  * ```
@@ -198,7 +198,7 @@ export function cuboidFaces(dims: CuboidDims): readonly CuboidFace[] {
  * @example
  * ```ts
  * import { cuboidStickerCount } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidStickerCount(dims));
  * ```
@@ -217,7 +217,7 @@ const slotsBySize = new Map<string, { slots: StickerSlot[]; index: Map<string, n
  * @example
  * ```ts
  * import { cuboidSlots } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidSlots(dims).slots.length);
  * ```
@@ -232,7 +232,10 @@ export function cuboidSlots(dims: CuboidDims): { slots: readonly StickerSlot[]; 
     const depth = dims[axisOfVector(frame.normal)];
     for (let row = 0; row < rows; row += 1) {
       for (let col = 0; col < cols; col += 1) {
-        const centre = add(add(scale(frame.normal, depth - 1), scale(frame.right, 2 * col - (cols - 1))), scale(frame.down, 2 * row - (rows - 1)));
+        const centre = add(
+          add(scale(frame.normal, depth - 1), scale(frame.right, 2 * col - (cols - 1))),
+          scale(frame.down, 2 * row - (rows - 1)),
+        );
         slots.push({ centre, normal: frame.normal });
       }
     }
@@ -252,7 +255,7 @@ export function cuboidSlots(dims: CuboidDims): { slots: readonly StickerSlot[]; 
  * @example
  * ```ts
  * import { cuboidLayerOf } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidLayerOf([1, 0, 0], 0, dims));
  * ```
@@ -270,7 +273,7 @@ export function cuboidLayerOf(centre: Vec3, axis: CubeAxis, dims: CuboidDims): n
  * @example
  * ```ts
  * import { sliceOf } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(sliceOf(dims, 0));
  * ```
@@ -293,7 +296,7 @@ export function sliceOf(dims: CuboidDims, axis: CubeAxis): [number, number] {
  * @example
  * ```ts
  * import { legalTurns } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(legalTurns(dims, 1, 0));
  * ```
@@ -313,7 +316,7 @@ export function legalTurns(dims: CuboidDims, axis: CubeAxis, layer: number): rea
  * @example
  * ```ts
  * import { halfTurnOnly } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(halfTurnOnly(dims, 1));
  * ```
@@ -332,7 +335,7 @@ export function halfTurnOnly(dims: CuboidDims, axis: CubeAxis): boolean {
  * @example
  * ```ts
  * import { cuboidMoveLegal, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(cuboidMoveLegal(dims, cmove));
@@ -350,7 +353,7 @@ export function cuboidMoveLegal(dims: CuboidDims, move: CuboidMove): boolean {
  * @example
  * ```ts
  * import { legalCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(legalCuboidMoves(dims).length);
  * ```
@@ -358,7 +361,8 @@ export function cuboidMoveLegal(dims: CuboidDims, move: CuboidMove): boolean {
 export function legalCuboidMoves(dims: CuboidDims): CuboidMove[] {
   const moves: CuboidMove[] = [];
   for (const axis of [0, 1, 2] as CubeAxis[]) {
-    for (let layer = 0; layer < dims[axis]; layer += 1) for (const turns of legalTurns(dims, axis, layer)) moves.push({ axis, layer, turns });
+    for (let layer = 0; layer < dims[axis]; layer += 1)
+      for (const turns of legalTurns(dims, axis, layer)) moves.push({ axis, layer, turns });
   }
   return moves;
 }
@@ -371,7 +375,7 @@ export function legalCuboidMoves(dims: CuboidDims): CuboidMove[] {
  * @example
  * ```ts
  * import { solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(solvedCuboid(dims));
  * ```
@@ -393,14 +397,17 @@ const permutations = new Map<string, Int32Array>();
  * @example
  * ```ts
  * import { cuboidPermutationOf, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(Array.from(cuboidPermutationOf(dims, cmove)).slice(0, 6));
  * ```
  */
 export function cuboidPermutationOf(dims: CuboidDims, move: CuboidMove): Int32Array {
-  if (!cuboidMoveLegal(dims, move)) throw new RangeError(`The ${cuboidName(dims)} cuboid cannot make that turn: axis ${move.axis}, layer ${move.layer}, ${move.turns} quarter turns`);
+  if (!cuboidMoveLegal(dims, move))
+    throw new RangeError(
+      `The ${cuboidName(dims)} cuboid cannot make that turn: axis ${move.axis}, layer ${move.layer}, ${move.turns} quarter turns`,
+    );
   const key = `${dims.join(",")}:${move.axis}:${move.layer}:${move.turns}`;
   const known = permutations.get(key);
   if (known !== undefined) return known;
@@ -433,7 +440,7 @@ export function cuboidPermutationOf(dims: CuboidDims, move: CuboidMove): Int32Ar
  * @example
  * ```ts
  * import { parseCuboidMove, solvedCuboid, turnCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(turnCuboid(solvedCuboid(dims), dims, cmove));
@@ -456,7 +463,7 @@ export function turnCuboid(state: string, dims: CuboidDims, move: CuboidMove): s
  * @example
  * ```ts
  * import { cuboidSolved, parseCuboidMove, solvedCuboid, turnAllCuboid, undoCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(cuboidSolved(turnAllCuboid(solvedCuboid(dims), dims, [cmove, undoCuboidMove(cmove)]), dims));
@@ -475,7 +482,7 @@ export function turnAllCuboid(state: string, dims: CuboidDims, moves: readonly C
  * @example
  * ```ts
  * import { cuboidSolved, solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidSolved(solvedCuboid(dims), dims));
  * ```
@@ -496,7 +503,7 @@ export function cuboidSolved(state: string, dims: CuboidDims): boolean {
  * @example
  * ```ts
  * import { isCuboidState, solvedCuboid } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(isCuboidState(solvedCuboid(dims), dims));
  * ```
@@ -516,7 +523,7 @@ export function isCuboidState(state: string, dims: CuboidDims): boolean {
  * @example
  * ```ts
  * import { parseCuboidMove, undoCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(undoCuboidMove(cmove));
@@ -534,7 +541,7 @@ export function undoCuboidMove(move: CuboidMove): CuboidMove {
  * @example
  * ```ts
  * import { parseCuboidMove, undoCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(undoCuboidMoves([cmove]));

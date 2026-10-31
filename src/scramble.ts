@@ -8,7 +8,7 @@ import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
  * @example
  * ```ts
  * import { FULL_SCRAMBLE_LENGTHS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(FULL_SCRAMBLE_LENGTHS);
  * ```
  */
@@ -19,8 +19,8 @@ export const FULL_SCRAMBLE_LENGTHS: Readonly<Record<number, number>> = { 2: 11, 
  * @example
  * ```ts
  * import type { ScrambleOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ScrambleOptions = { faces: true };
  * console.log(value.faces);
  * ```
@@ -49,15 +49,22 @@ export type ScrambleOptions = {
  * @example
  * ```ts
  * import { movesNotation, randomScramble, seededRandom } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(movesNotation(randomScramble(3, 8, seededRandom("docs")), 3));
  * ```
  */
-export function randomScramble(n: number, length: number, random: () => number = Math.random, options: ScrambleOptions = {}): CubeMove[] {
+export function randomScramble(
+  n: number,
+  length: number,
+  random: () => number = Math.random,
+  options: ScrambleOptions = {},
+): CubeMove[] {
   const moves: CubeMove[] = [];
   let lastAxis: CubeAxis | null = null;
   while (moves.length < length || cubeSolved(turnAll(solvedCube(n), n, moves), n)) {
-    const axis = (lastAxis === null ? Math.floor(random() * 3) : (lastAxis + 1 + Math.floor(random() * 2)) % 3) as CubeAxis;
+    const axis = (
+      lastAxis === null ? Math.floor(random() * 3) : (lastAxis + 1 + Math.floor(random() * 2)) % 3
+    ) as CubeAxis;
     const layer = options.faces === true ? (random() < 0.5 ? 0 : n - 1) : Math.floor(random() * n);
     const turns = (1 + Math.floor(random() * 3)) as CubeTurns;
     moves.push({ axis, layer, turns });

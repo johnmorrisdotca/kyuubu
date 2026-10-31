@@ -23,24 +23,42 @@ const open = async (page, address = "builder.html?lang=en") => {
 };
 const clipboard = (page) =>
   page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (text) => void (window.__copied = text) } });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async (text) => void (window.__copied = text) },
+    });
   });
 const maker = (page, name) => page.locator(`#bld-makers [data-maker="${name}"]`).click();
 const pick = (page, id, value) => page.locator(`[data-option="${id}"] [data-value="${value}"]`).click();
 
-const applies = (name) => CUBE_OPTIONS.filter((option) => option.names[MAKERS[name].names] !== undefined || (MAKERS[name].element !== undefined && option.names[MAKERS[name].element] !== undefined));
+const applies = (name) =>
+  CUBE_OPTIONS.filter(
+    (option) =>
+      option.names[MAKERS[name].names] !== undefined ||
+      (MAKERS[name].element !== undefined && option.names[MAKERS[name].element] !== undefined),
+  );
 
-test("there is a control for every choice the package lists, for each way of making a cube, grouped and said in a line each", async ({ page }) => {
+test("there is a control for every choice the package lists, for each way of making a cube, grouped and said in a line each", async ({
+  page,
+}) => {
   const errors = await open(page);
   for (const name of ["view", "player", "turning"]) {
     await maker(page, name);
     const shown = await page.locator("[data-option]").evaluateAll((all) => all.map((el) => el.dataset.option));
-    expect(shown.sort(), name).toEqual(applies(name).map((option) => option.id).sort());
+    expect(shown.sort(), name).toEqual(
+      applies(name)
+        .map((option) => option.id)
+        .sort(),
+    );
     // Each is in a group that has its name, and has its own plain line.
-    const groups = await page.locator(".cube-bld-group").evaluateAll((all) => all.map((el) => [el.dataset.group, el.querySelector("summary").textContent]));
+    const groups = await page
+      .locator(".cube-bld-group")
+      .evaluateAll((all) => all.map((el) => [el.dataset.group, el.querySelector("summary").textContent]));
     for (const [group, label] of groups) expect(label).toBe(CUBE_OPTION_GROUPS[group].en);
     expect(groups.length).toBeGreaterThan(2);
-    const lines = await page.locator("[data-option]").evaluateAll((all) => all.map((el) => el.querySelector(".fam-fine")?.textContent ?? ""));
+    const lines = await page
+      .locator("[data-option]")
+      .evaluateAll((all) => all.map((el) => el.querySelector(".fam-fine")?.textContent ?? ""));
     for (const line of lines) expect(line.length).toBeGreaterThan(15);
   }
   expect(errors).toEqual([]);
@@ -60,7 +78,10 @@ test("choosing a size turns the cube beside it, the code and the address", async
   // A colour of its own, and taking it back.
   await page.locator("#opt-colour-up").fill("#ff00aa");
   await expect(code(page)).toContainText('colours: { U: "#ff00aa" }');
-  await expect(stage(page).locator('[data-face="U"]').first().locator("> div")).toHaveCSS("background-color", "rgb(255, 0, 170)");
+  await expect(stage(page).locator('[data-face="U"]').first().locator("> div")).toHaveCSS(
+    "background-color",
+    "rgb(255, 0, 170)",
+  );
   await page.locator('[data-option="colour-up"] button').click();
   await expect(code(page)).not.toContainText("colours");
   // A number typed, a flag, a choice.
@@ -92,7 +113,9 @@ test("every format is there for every way of making a cube, and each follows the
       await pick(page, "size", 4);
       await pick(page, "theme", "stickerless");
     }
-    const formats = await page.locator("#bld-formats [data-format]").evaluateAll((all) => all.map((el) => el.dataset.format));
+    const formats = await page
+      .locator("#bld-formats [data-format]")
+      .evaluateAll((all) => all.map((el) => el.dataset.format));
     expect(formats, name).toEqual(MAKERS[name].formats);
     for (const format of formats) {
       await tab(page, format).click();
@@ -100,7 +123,9 @@ test("every format is there for every way of making a cube, and each follows the
       const text = await code(page).textContent();
       if (name === "player") {
         expect(text, `${name} ${format}`).toMatch(format === "module" ? /scramble: "R U R' U'"/ : /R(\+|\s)U(\+|\s)R/);
-        expect(text, `${name} ${format}`).toMatch(format === "module" ? /timeMs: 3130/ : /time(=|=")3\.13|time=\{3\.13\}/);
+        expect(text, `${name} ${format}`).toMatch(
+          format === "module" ? /timeMs: 3130/ : /time(=|=")3\.13|time=\{3\.13\}/,
+        );
         expect(text, `${name} ${format}`).toMatch(/autoplay/);
       } else {
         expect(text, `${name} ${format}`).toMatch(/\b4\b/);
@@ -171,14 +196,23 @@ test.describe("the copied code makes the same cube", () => {
     await page.locator("#opt-fill").fill("0.8");
     const text = await code(page).textContent();
     const same = await page.evaluate(async (source) => {
-      const body = source.replace('"@johnmorrisdotca/kyuubu"', '"http://kyuubu.test/dist/index.js"').replace('document.getElementById("cube")', "window.__box");
+      const body = source
+        .replace('"@johnmorrisdotca/kyuubu"', '"http://kyuubu.test/dist/index.js"')
+        .replace('document.getElementById("cube")', "window.__box");
       const box = document.createElement("div");
       box.style.cssText = "width:300px;height:300px;position:relative";
       document.body.append(box);
       window.__box = box;
       await import(URL.createObjectURL(new Blob([body], { type: "text/javascript" })));
-      const look = (root) => [...root.querySelectorAll("[data-slot]")].map((el) => `${el.dataset.face}:${el.firstElementChild.style.background}`).join("|");
-      return { made: look(box), shown: look(document.querySelector("#bld-stage")), count: box.querySelectorAll("[data-slot]").length };
+      const look = (root) =>
+        [...root.querySelectorAll("[data-slot]")]
+          .map((el) => `${el.dataset.face}:${el.firstElementChild.style.background}`)
+          .join("|");
+      return {
+        made: look(box),
+        shown: look(document.querySelector("#bld-stage")),
+        count: box.querySelectorAll("[data-slot]").length,
+      };
     }, text);
     expect(same.count).toBe(96);
     expect(same.made).toBe(same.shown);
@@ -202,27 +236,55 @@ test.describe("the copied code makes the same cube", () => {
       const made = holder.querySelector("kyuubu-cube");
       const shown = document.querySelector("#bld-stage");
       const state = (root) => root.querySelector("[data-kyuubu]").dataset.state;
-      return { made: state(made), shown: state(shown), tokens: [made.querySelectorAll("[data-kyuubu-moves] button").length, shown.querySelectorAll("[data-kyuubu-moves] button").length], look: [made, shown].map((root) => [...root.querySelectorAll("[data-kyuubu] [data-slot]")].map((el) => el.firstElementChild.style.background).join("|")) };
+      return {
+        made: state(made),
+        shown: state(shown),
+        tokens: [
+          made.querySelectorAll("[data-kyuubu-moves] button").length,
+          shown.querySelectorAll("[data-kyuubu-moves] button").length,
+        ],
+        look: [made, shown].map((root) =>
+          [...root.querySelectorAll("[data-kyuubu] [data-slot]")]
+            .map((el) => el.firstElementChild.style.background)
+            .join("|"),
+        ),
+      };
     }, text);
     expect(same.made).toBe(same.shown);
     expect(same.tokens[0]).toBe(same.tokens[1]);
     expect(same.look[0]).toBe(same.look[1]);
   });
 
-  test("the iframe of a solve, and of a cube that keeps turning, opened in a page of its own", async ({ page, context }) => {
+  test("the iframe of a solve, and of a cube that keeps turning, opened in a page of its own", async ({
+    page,
+    context,
+  }) => {
     await open(page);
     await maker(page, "player");
     await page.locator("#opt-scramble").fill("R U R' U' R' F R2 U' R' U' R U R' F'");
     await page.locator("#opt-solution").fill("F R U R' U' R U R' U R2 U' R' U R U2 R'");
     await pick(page, "theme", "paper");
     await tab(page, "iframe").click();
-    let src = /src="([^"]+)"/.exec(await code(page).textContent())[1].replaceAll("&amp;", "&").replace("https://johnmorrisdotca.github.io/kyuubu/", HOST);
+    let src = /src="([^"]+)"/
+      .exec(await code(page).textContent())[1]
+      .replaceAll("&amp;", "&")
+      .replace("https://johnmorrisdotca.github.io/kyuubu/", HOST);
     const solve = await context.newPage();
     await serve(solve);
     await solve.goto(src);
     await expect(solve.locator("[data-kyuubu-player]")).toBeVisible();
-    expect(await solve.locator("[data-kyuubu]").getAttribute("data-state")).toBe(await stage(page).locator("[data-kyuubu]").getAttribute("data-state"));
-    expect(await solve.locator("[data-kyuubu] [data-slot]").evaluateAll((all) => all.map((el) => el.firstElementChild.style.background).join("|"))).toBe(await stage(page).locator("[data-kyuubu] [data-slot]").evaluateAll((all) => all.map((el) => el.firstElementChild.style.background).join("|")));
+    expect(await solve.locator("[data-kyuubu]").getAttribute("data-state")).toBe(
+      await stage(page).locator("[data-kyuubu]").getAttribute("data-state"),
+    );
+    expect(
+      await solve
+        .locator("[data-kyuubu] [data-slot]")
+        .evaluateAll((all) => all.map((el) => el.firstElementChild.style.background).join("|")),
+    ).toBe(
+      await stage(page)
+        .locator("[data-kyuubu] [data-slot]")
+        .evaluateAll((all) => all.map((el) => el.firstElementChild.style.background).join("|")),
+    );
 
     await maker(page, "turning");
     await pick(page, "size", 5);
@@ -230,13 +292,18 @@ test.describe("the copied code makes the same cube", () => {
     await pick(page, "theme", "paper");
     await page.locator('[data-option="paused"] button').click();
     await tab(page, "iframe").click();
-    src = /src="([^"]+)"/.exec(await code(page).textContent())[1].replaceAll("&amp;", "&").replace("https://johnmorrisdotca.github.io/kyuubu/", HOST);
+    src = /src="([^"]+)"/
+      .exec(await code(page).textContent())[1]
+      .replaceAll("&amp;", "&")
+      .replace("https://johnmorrisdotca.github.io/kyuubu/", HOST);
     const turning = await context.newPage();
     await serve(turning);
     await turning.goto(src);
     await expect(turning.locator("[data-kyuubu]")).toBeVisible();
     await expect(turning.locator("[data-kyuubu] [data-slot]")).toHaveCount(150);
-    expect(await turning.locator("[data-kyuubu] [data-slot]").evaluateAll(lookOfAll)).toBe(await stage(page).locator("kyuubu-scramble [data-slot]").evaluateAll(lookOfAll));
+    expect(await turning.locator("[data-kyuubu] [data-slot]").evaluateAll(lookOfAll)).toBe(
+      await stage(page).locator("kyuubu-scramble [data-slot]").evaluateAll(lookOfAll),
+    );
   });
 });
 
@@ -255,8 +322,23 @@ test("the page is in Japanese when asked, and fits a phone, light and dark", asy
   for (const scheme of ["light", "dark"]) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.setViewportSize({ width: 390, height: 844 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), scheme).toBeLessThanOrEqual(0);
-    const small = await page.locator("main button, main input:not([type=hidden]), main summary").evaluateAll((all) => all.filter((el) => { const box = el.getBoundingClientRect(); return box.width > 0 && getComputedStyle(el).visibility !== "hidden" && (box.width < 43.5 || box.height < 43.5); }).map((el) => `${el.tagName}#${el.id} ${Math.round(el.getBoundingClientRect().width)}x${Math.round(el.getBoundingClientRect().height)}`));
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+      scheme,
+    ).toBeLessThanOrEqual(0);
+    const small = await page.locator("main button, main input:not([type=hidden]), main summary").evaluateAll((all) =>
+      all
+        .filter((el) => {
+          const box = el.getBoundingClientRect();
+          return (
+            box.width > 0 && getComputedStyle(el).visibility !== "hidden" && (box.width < 43.5 || box.height < 43.5)
+          );
+        })
+        .map(
+          (el) =>
+            `${el.tagName}#${el.id} ${Math.round(el.getBoundingClientRect().width)}x${Math.round(el.getBoundingClientRect().height)}`,
+        ),
+    );
     expect(small, scheme).toEqual([]);
   }
 });

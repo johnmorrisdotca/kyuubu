@@ -21,7 +21,7 @@ import { VERSION } from "./version.ts";
  * ```ts
  * import type { CliSurroundings } from "@johnmorrisdotca/kyuubu";
  * import { seededRandom } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CliSurroundings = { env: {}, locale: "en", colour: false, random: seededRandom("docs") };
  * console.log(value.locale);
  * ```
@@ -45,7 +45,7 @@ export type CliSurroundings = {
  * ```ts
  * import type { CliResult } from "@johnmorrisdotca/kyuubu";
  * import { runCli } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CliResult = runCli(["--help"]);
  * console.log(value.code);
  * ```
@@ -57,7 +57,7 @@ export type CliResult = { code: 0 | 1 | 2; out: string; err: string };
  * @example
  * ```ts
  * import { MAX_CLI_LENGTH } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_CLI_LENGTH);
  * ```
  */
@@ -67,7 +67,7 @@ export const MAX_CLI_LENGTH = 1000;
  * @example
  * ```ts
  * import { MAX_CLI_COUNT } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_CLI_COUNT);
  * ```
  */
@@ -75,10 +75,27 @@ export const MAX_CLI_COUNT = 100;
 
 type Mode = "scramble" | "apply" | "verify" | "solve";
 
-const VALUED: Readonly<Record<string, string>> = { "-n": "--size", "-l": "--length", "-c": "--count", "-s": "--seed", "-f": "--from" };
+const VALUED: Readonly<Record<string, string>> = {
+  "-n": "--size",
+  "-l": "--length",
+  "-c": "--count",
+  "-s": "--seed",
+  "-f": "--from",
+};
 const BARE: Readonly<Record<string, string>> = { "-j": "--json", "-h": "--help", "-v": "--version" };
 const TAKES_VALUE = new Set(["--size", "--length", "--count", "--seed", "--from", "--state", "--lang"]);
-const FLAGS = new Set(["--scramble", "--apply", "--verify", "--solve", "--stdin", "--faces", "--json", "--no-color", "--help", "--version"]);
+const FLAGS = new Set([
+  "--scramble",
+  "--apply",
+  "--verify",
+  "--solve",
+  "--stdin",
+  "--faces",
+  "--json",
+  "--no-color",
+  "--help",
+  "--version",
+]);
 
 /** The standard colours as a terminal's 24-bit background, by face letter. */
 const TERMINAL: Readonly<Record<CubeFace, string>> = {
@@ -110,19 +127,24 @@ const TERMINAL: Readonly<Record<CubeFace, string>> = {
  * @example
  * ```ts
  * import { cubeNet, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(cubeNet(solvedCube(2), 2));
  * ```
  */
 export function cubeNet(state: string, n: number, colour = false): string {
   const face = (letter: CubeFace, row: number) => {
     const at = CUBE_FACE_ORDER.indexOf(letter) * n * n + row * n;
-    return [...state.slice(at, at + n)].map((sticker) => (colour && sticker in TERMINAL ? `\u001b[48;2;${TERMINAL[sticker as CubeFace]}m  \u001b[0m` : sticker)).join(colour ? "" : " ");
+    return [...state.slice(at, at + n)]
+      .map((sticker) =>
+        colour && sticker in TERMINAL ? `\u001b[48;2;${TERMINAL[sticker as CubeFace]}m  \u001b[0m` : sticker,
+      )
+      .join(colour ? "" : " ");
   };
   const gap = " ".repeat(colour ? 2 * n + 1 : 2 * n);
   const lines: string[] = [];
   for (let row = 0; row < n; row += 1) lines.push(`${gap}${face("U", row)}`);
-  for (let row = 0; row < n; row += 1) lines.push((["L", "F", "R", "B"] as const).map((letter) => face(letter, row)).join(" "));
+  for (let row = 0; row < n; row += 1)
+    lines.push((["L", "F", "R", "B"] as const).map((letter) => face(letter, row)).join(" "));
   for (let row = 0; row < n; row += 1) lines.push(`${gap}${face("D", row)}`);
   return `${lines.join("\n")}\n`;
 }
@@ -130,7 +152,10 @@ export function cubeNet(state: string, n: number, colour = false): string {
 /** The turns in a line of notation, or the first part of it that is not one. */
 function readTurns(text: string, n: number): { moves: CubeMove[] } | { bad: string } {
   const moves: CubeMove[] = [];
-  for (const part of text.trim().split(/\s+/).filter((one) => one !== "")) {
+  for (const part of text
+    .trim()
+    .split(/\s+/)
+    .filter((one) => one !== "")) {
     const move = parseMove(part, n);
     if (move === null) return { bad: part };
     moves.push(move);
@@ -152,7 +177,7 @@ function readTurns(text: string, n: number): { moves: CubeMove[] } | { bad: stri
  * @example
  * ```ts
  * import { runCli } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(runCli(["--size", "2", "--verify", "--from", "R", "R'"], { colour: false }));
  * ```
  */
@@ -183,8 +208,13 @@ export function runCli(args: readonly string[], surroundings: CliSurroundings = 
   const asked = given.get("--lang");
   if (asked === "en" || asked === "ja") language = asked;
   else if (asked !== undefined) wrong.push({ key: "cliBadLang", values: { value: asked } });
-  const say = (key: keyof KyuubuStrings, values: Record<string, string | number> = {}) => fill(STRINGS[language][key], values);
-  const refuse = (code: 1 | 2, key: keyof KyuubuStrings, values: Record<string, string | number> = {}): CliResult => ({ code, out: "", err: `kyuubu: ${say(key, values)}\n` });
+  const say = (key: keyof KyuubuStrings, values: Record<string, string | number> = {}) =>
+    fill(STRINGS[language][key], values);
+  const refuse = (code: 1 | 2, key: keyof KyuubuStrings, values: Record<string, string | number> = {}): CliResult => ({
+    code,
+    out: "",
+    err: `kyuubu: ${say(key, values)}\n`,
+  });
 
   if (wrong.length > 0) return refuse(2, wrong[0].key, wrong[0].values);
   if (flags.has("--help")) return { code: 0, out: say("cliUsage"), err: "" };
@@ -194,12 +224,27 @@ export function runCli(args: readonly string[], surroundings: CliSurroundings = 
   if (modes.length > 1) return refuse(2, "cliOneMode");
   const mode: Mode = modes[0] ?? "scramble";
   const json = flags.has("--json");
-  const colour = surroundings.colour === true && !flags.has("--no-color") && (env.NO_COLOR === undefined || env.NO_COLOR === "") && !json;
+  const colour =
+    surroundings.colour === true &&
+    !flags.has("--no-color") &&
+    (env.NO_COLOR === undefined || env.NO_COLOR === "") &&
+    !json;
 
-  const whole = (name: string, fallback: number, low: number, high: number, key: keyof KyuubuStrings): number | CliResult => {
+  const whole = (
+    name: string,
+    fallback: number,
+    low: number,
+    high: number,
+    key: keyof KyuubuStrings,
+  ): number | CliResult => {
     const value = given.get(name);
     if (value === undefined) return fallback;
-    const read = name === "--size" ? /^(\d+)(?:\s*[x×]\s*\1)?$/i.exec(value.trim())?.[1] : /^\d+$/.test(value.trim()) ? value.trim() : undefined;
+    const read =
+      name === "--size"
+        ? /^(\d+)(?:\s*[x×]\s*\1)?$/i.exec(value.trim())?.[1]
+        : /^\d+$/.test(value.trim())
+          ? value.trim()
+          : undefined;
     const number = read === undefined ? NaN : Number(read);
     return Number.isInteger(number) && number >= low && number <= high ? number : refuse(2, key, { value });
   };
@@ -214,12 +259,19 @@ export function runCli(args: readonly string[], surroundings: CliSurroundings = 
     const seed = given.get("--seed");
     // One seed serves the whole command: its scrambles come one after another from the same source.
     const random = seed === undefined ? (surroundings.random ?? Math.random) : seededRandom(seed);
-    const scrambles = Array.from({ length: count }, () => randomScramble(n, length, random, { faces: flags.has("--faces") }));
+    const scrambles = Array.from({ length: count }, () =>
+      randomScramble(n, length, random, { faces: flags.has("--faces") }),
+    );
     if (json) {
       const body = {
         format: RECORD_FORMAT,
         generator: `kyuubu ${VERSION}`,
-        scrambles: scrambles.map((moves) => ({ size: n, scramble: movesNotation(moves, n), state: turnAll(solvedCube(n), n, moves), ...(seed === undefined ? {} : { seed }) })),
+        scrambles: scrambles.map((moves) => ({
+          size: n,
+          scramble: movesNotation(moves, n),
+          state: turnAll(solvedCube(n), n, moves),
+          ...(seed === undefined ? {} : { seed }),
+        })),
       };
       return { code: 0, out: `${JSON.stringify(body, null, 2)}\n`, err: "" };
     }
@@ -264,7 +316,12 @@ export function runCli(args: readonly string[], surroundings: CliSurroundings = 
         size: n,
         state: end,
         count: total,
-        steps: steps.map((step) => ({ stage: step.stage, name: stageName(step.stage, language), moves: movesNotation(step.moves, n), algorithms: step.algorithms.map((name) => ({ name, moves: SOLVE_ALGORITHMS[name] })) })),
+        steps: steps.map((step) => ({
+          stage: step.stage,
+          name: stageName(step.stage, language),
+          moves: movesNotation(step.moves, n),
+          algorithms: step.algorithms.map((name) => ({ name, moves: SOLVE_ALGORITHMS[name] })),
+        })),
       };
       return { code: 0, out: `${JSON.stringify(body, null, 2)}\n`, err: "" };
     }
@@ -273,15 +330,34 @@ export function runCli(args: readonly string[], surroundings: CliSurroundings = 
     const width = (text: string) => [...text].reduce((sum, char) => sum + (char.charCodeAt(0) > 0x2e7f ? 2 : 1), 0);
     const names = steps.map((step) => stageName(step.stage, language));
     const widest = Math.max(...names.map(width));
-    const lines = steps.map((step, at) => `${names[at]}${" ".repeat(widest - width(names[at]) + 2)}${movesNotation(step.moves, n)}`);
-    return { code: 0, out: `${lines.join("\n")}\n${say("cliSteps", { count: total, steps: steps.length })}\n`, err: "" };
+    const lines = steps.map(
+      (step, at) => `${names[at]}${" ".repeat(widest - width(names[at]) + 2)}${movesNotation(step.moves, n)}`,
+    );
+    return {
+      code: 0,
+      out: `${lines.join("\n")}\n${say("cliSteps", { count: total, steps: steps.length })}\n`,
+      err: "",
+    };
   }
 
   const solved = cubeSolved(end, n);
   if (json) {
-    const body = { format: RECORD_FORMAT, generator: `kyuubu ${VERSION}`, size: n, moves: movesNotation(read.moves, n), count, state: end, solved };
+    const body = {
+      format: RECORD_FORMAT,
+      generator: `kyuubu ${VERSION}`,
+      size: n,
+      moves: movesNotation(read.moves, n),
+      count,
+      state: end,
+      solved,
+    };
     return { code: mode === "verify" && !solved ? 1 : 0, out: `${JSON.stringify(body, null, 2)}\n`, err: "" };
   }
-  if (mode === "verify") return { code: solved ? 0 : 1, out: `${say(solved ? "cliSolvedIn" : "cliNotSolvedAfter", { count })}\n`, err: "" };
-  return { code: 0, out: `${cubeNet(end, n, colour)}${say("cliState")}: ${end}\n${say(solved ? "solved" : "notSolved")}\n`, err: "" };
+  if (mode === "verify")
+    return { code: solved ? 0 : 1, out: `${say(solved ? "cliSolvedIn" : "cliNotSolvedAfter", { count })}\n`, err: "" };
+  return {
+    code: 0,
+    out: `${cubeNet(end, n, colour)}${say("cliState")}: ${end}\n${say(solved ? "solved" : "notSolved")}\n`,
+    err: "",
+  };
 }

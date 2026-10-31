@@ -7,22 +7,33 @@ import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 
 const site = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png" };
+const TYPES = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".png": "image/png",
+};
 
 /** The built site answered at http://kyuubu.test/, with no port and no server. */
 export async function serve(page) {
-  if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
+  if (!existsSync(join(site, "index.html")))
+    throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
   await page.route("http://kyuubu.test/**", (route) => {
     const { pathname } = new URL(route.request().url());
     const file = join(site, pathname === "/" ? "index.html" : pathname);
     if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
-    return route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" });
+    return route.fulfill({
+      body: readFileSync(file),
+      contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream",
+    });
   });
 }
 
 /** Open the demo with a query, and collect anything the page complains of. */
 export async function open(page, query = "?lang=en") {
-  if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
+  if (!existsSync(join(site, "index.html")))
+    throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:site` does)");
   const errors = [];
   page.on("pageerror", (error) => errors.push(String(error)));
   page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
@@ -66,10 +77,20 @@ export async function sound(page, errors) {
     };
     const small = [...document.querySelectorAll("button, input, textarea, select, nav a, footer .family a, summary")]
       .filter(seen)
-      .map((el) => ({ what: el.id || el.dataset.testid || el.textContent.trim().slice(0, 20), box: el.getBoundingClientRect() }))
+      .map((el) => ({
+        what: el.id || el.dataset.testid || el.textContent.trim().slice(0, 20),
+        box: el.getBoundingClientRect(),
+      }))
       .filter(({ box }) => box.width < 43.5 || box.height < 43.5)
       .map(({ what, box }) => `${what} ${Math.round(box.width)}×${Math.round(box.height)}`);
-    const wide = [...document.querySelectorAll("main *")].filter((el) => seen(el) && el.closest("[data-kyuubu], [data-kyuubu-cuboid], .fam-table-box, pre") === null && el.getBoundingClientRect().right > window.innerWidth + 0.5).map((el) => el.tagName + "." + el.className);
+    const wide = [...document.querySelectorAll("main *")]
+      .filter(
+        (el) =>
+          seen(el) &&
+          el.closest("[data-kyuubu], [data-kyuubu-cuboid], .fam-table-box, pre") === null &&
+          el.getBoundingClientRect().right > window.innerWidth + 0.5,
+      )
+      .map((el) => el.tagName + "." + el.className);
     return { over: document.documentElement.scrollWidth - window.innerWidth, small, wide };
   });
   expect(found.over, "the page scrolls sideways").toBeLessThanOrEqual(0);

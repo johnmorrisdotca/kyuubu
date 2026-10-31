@@ -39,7 +39,9 @@ const QUARTER_PX = 100;
 /** Every turn of one layer on a cube of side n. */
 function everyTurn(n: number): CubeMove[] {
   const moves: CubeMove[] = [];
-  for (const axis of [0, 1, 2] as CubeAxis[]) for (let layer = 0; layer < n; layer += 1) for (const turns of [1, 2, 3] as CubeTurns[]) moves.push({ axis, layer, turns });
+  for (const axis of [0, 1, 2] as CubeAxis[])
+    for (let layer = 0; layer < n; layer += 1)
+      for (const turns of [1, 2, 3] as CubeTurns[]) moves.push({ axis, layer, turns });
   return moves;
 }
 
@@ -101,7 +103,8 @@ describe("the arrow for a turn", () => {
   });
 
   it("also on a 6×6 and a 7×7, from the usual side", () => {
-    for (const n of [6, 7]) for (const move of everyTurn(n)) expect(follow([move], n, viewMatrix(-35, 28)).face).not.toBeNull();
+    for (const n of [6, 7])
+      for (const move of everyTurn(n)) expect(follow([move], n, viewMatrix(-35, 28)).face).not.toBeNull();
   });
 
   it("is picked as soon as the drag begins for nearly every turn from the usual side, and the rest a little later", () => {
@@ -111,7 +114,15 @@ describe("the arrow for a turn", () => {
   });
 
   it("lies across the whole slab of a wide turn, and each layer of it is dragged along it", () => {
-    for (const [text, n] of [["Rw", 3], ["Rw'", 4], ["3Uw2", 5], ["Lw", 4], ["Fw'", 5], ["Bw", 4], ["Dw2", 3]] as const) {
+    for (const [text, n] of [
+      ["Rw", 3],
+      ["Rw'", 4],
+      ["3Uw2", 5],
+      ["Lw", 4],
+      ["Fw'", 5],
+      ["Bw", 4],
+      ["Dw2", 3],
+    ] as const) {
       const read = parseSolve(text, n);
       expect(read.ok, text).toBe(true);
       const [step] = read.steps;
@@ -121,7 +132,12 @@ describe("the arrow for a turn", () => {
         expect(hint.layers).toHaveLength(step.moves.length);
         expect(hint.arrow?.width).toBe(2 * step.moves.length);
         // Once one layer is made, the arrow for the rest still makes the rest.
-        for (const move of step.moves) follow(step.moves.filter((other) => other !== move), n, view);
+        for (const move of step.moves)
+          follow(
+            step.moves.filter((other) => other !== move),
+            n,
+            view,
+          );
       }
     }
   });
@@ -188,7 +204,9 @@ describe("the arrow for a turn of the whole cube", () => {
           expect(apply(viewMatrix(...view), normal)[2]).toBeGreaterThanOrEqual(HINT_MIN_FACING);
           expect(normal[move.axis]).toBe(0);
           // Along the side, never off it, and as long as the side lets it be.
-          expect(along[move.axis] * along[move.axis] + normal[0] * along[0] + normal[1] * along[1] + normal[2] * along[2]).toBeCloseTo(0, 9);
+          expect(
+            along[move.axis] * along[move.axis] + normal[0] * along[0] + normal[1] * along[1] + normal[2] * along[2],
+          ).toBeCloseTo(0, 9);
           expect(Math.hypot(...along)).toBeCloseTo(1, 9);
           const tip = from.map((value, k) => value + along[k] * length);
           for (const k of [0, 1, 2]) expect(Math.abs(tip[k])).toBeLessThanOrEqual(n + 1e-9);
@@ -215,7 +233,11 @@ describe("the arrow for a turn of the whole cube", () => {
           // Right-hand rule: one quarter takes a point p towards axis × p, three quarters the other way; two go either way, drawn with two heads.
           const axis = [0, 0, 0];
           axis[move.axis] = 1;
-          const velocity = [axis[1] * normal[2] - axis[2] * normal[1], axis[2] * normal[0] - axis[0] * normal[2], axis[0] * normal[1] - axis[1] * normal[0]];
+          const velocity = [
+            axis[1] * normal[2] - axis[2] * normal[1],
+            axis[2] * normal[0] - axis[0] * normal[2],
+            axis[0] * normal[1] - axis[1] * normal[0],
+          ];
           const sign = move.turns === 3 ? -1 : 1;
           const heading = velocity[0] * along[0] * sign + velocity[1] * along[1] * sign + velocity[2] * along[2] * sign;
           expect(heading).toBeCloseTo(1, 9);

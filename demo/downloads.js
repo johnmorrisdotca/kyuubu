@@ -11,7 +11,8 @@ const columnKey = (column) => (typeof column === "string" ? column : column.key)
 const columnLabel = (column) => (typeof column === "string" ? column : (column.label ?? column.key));
 
 /** One value as the text a person would read: nothing for a missing one, a list's items spaced. */
-const plain = (value) => (value === undefined || value === null ? "" : Array.isArray(value) ? value.join(" ") : String(value));
+const plain = (value) =>
+  value === undefined || value === null ? "" : Array.isArray(value) ? value.join(" ") : String(value);
 
 /** Whether a value is a number a table can right-align: a finite number, not a string that looks like one. */
 const numeric = (value) => typeof value === "number" && Number.isFinite(value);
@@ -28,15 +29,30 @@ const numeric = (value) => typeof value === "number" && Number.isFinite(value);
  * // | JP | 日本 \| Japan |
  */
 export function toMarkdown(columns, rows) {
-  const cell = (value) => plain(value).replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r\n|\r|\n/g, "<br>");
+  const cell = (value) =>
+    plain(value)
+      .replace(/\\/g, "\\\\")
+      .replace(/\|/g, "\\|")
+      .replace(/\r\n|\r|\n/g, "<br>");
   const line = (cells) => `| ${cells.join(" | ")} |`;
-  const right = columns.map((column) => rows.length > 0 && rows.every((row) => row[columnKey(column)] === undefined || row[columnKey(column)] === null || numeric(row[columnKey(column)])) && rows.some((row) => numeric(row[columnKey(column)])));
+  const right = columns.map(
+    (column) =>
+      rows.length > 0 &&
+      rows.every(
+        (row) =>
+          row[columnKey(column)] === undefined || row[columnKey(column)] === null || numeric(row[columnKey(column)]),
+      ) &&
+      rows.some((row) => numeric(row[columnKey(column)])),
+  );
 
   return `${[line(columns.map((column) => cell(columnLabel(column)))), line(right.map((aligned) => (aligned ? "---:" : "---"))), ...rows.map((row) => line(columns.map((column) => cell(row[columnKey(column)]))))].join("\n")}\n`;
 }
 
 /** A name for a table: letters, digits and underscores, so it needs no thought in any database. */
-const tableName = (name) => String(name).replace(/[^A-Za-z0-9_]+/g, "_").replace(/^_+|_+$/g, "") || "list";
+const tableName = (name) =>
+  String(name)
+    .replace(/[^A-Za-z0-9_]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "list";
 
 /** An identifier in double quotes, with any double quote inside it doubled. */
 const identifier = (name) => `"${String(name).replace(/"/g, '""')}"`;

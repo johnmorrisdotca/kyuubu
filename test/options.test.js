@@ -18,23 +18,32 @@ const keysOf = (path, opening, closing = "\n};") => {
 };
 
 const view = keysOf("src/view/view.ts", "export type CubeViewOptions = {");
-const player = [...keysOf("src/player.ts", "export type PlayerOptions = ReplaySource & {"), ...keysOf("src/replay.ts", "export type ReplaySource = {")];
+const player = [
+  ...keysOf("src/player.ts", "export type PlayerOptions = ReplaySource & {"),
+  ...keysOf("src/replay.ts", "export type ReplaySource = {"),
+];
 const cuboid = keysOf("src/cuboid/draw.ts", "export type CuboidViewOptions = {");
-const cuboidPlayer = [...keysOf("src/cuboid/play.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"), ...keysOf("src/cuboid/replay.ts", "export type CuboidReplaySource = {")];
-const names = (maker) => CUBE_OPTIONS.flatMap((option) => (option.names[maker] === undefined ? [] : [option.names[maker]]));
+const cuboidPlayer = [
+  ...keysOf("src/cuboid/play.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"),
+  ...keysOf("src/cuboid/replay.ts", "export type CuboidReplaySource = {"),
+];
+const names = (maker) =>
+  CUBE_OPTIONS.flatMap((option) => (option.names[maker] === undefined ? [] : [option.names[maker]]));
 
 describe("the choices the package offers", () => {
   it("has every option of the view, and what it leaves out it says why", () => {
     expect(view.length).toBeGreaterThan(15);
     const named = new Set(names("view").map((name) => name.split(".")[0]));
-    for (const name of view) expect(named.has(name) || `view.${name}` in CUBE_OPTIONS_LEFT_OUT, `view option ${name}`).toBe(true);
+    for (const name of view)
+      expect(named.has(name) || `view.${name}` in CUBE_OPTIONS_LEFT_OUT, `view option ${name}`).toBe(true);
   });
 
   it("has every option of the player", () => {
     expect(player).toContain("autoplay");
     expect(player).toContain("animateScrub");
     const named = new Set(names("player"));
-    for (const name of player) expect(named.has(name) || `player.${name}` in CUBE_OPTIONS_LEFT_OUT, `player option ${name}`).toBe(true);
+    for (const name of player)
+      expect(named.has(name) || `player.${name}` in CUBE_OPTIONS_LEFT_OUT, `player option ${name}`).toBe(true);
   });
 
   it("has every attribute of both custom elements", () => {
@@ -49,9 +58,14 @@ describe("the choices the package offers", () => {
     expect(cuboidPlayer).toContain("dims");
     expect(cuboidPlayer).toContain("moveList");
     const viewNames = new Set(names("cuboid").map((name) => name.split(".")[0]));
-    for (const name of cuboid) expect(viewNames.has(name) || `cuboid.${name}` in CUBE_OPTIONS_LEFT_OUT, `cuboid view option ${name}`).toBe(true);
+    for (const name of cuboid)
+      expect(viewNames.has(name) || `cuboid.${name}` in CUBE_OPTIONS_LEFT_OUT, `cuboid view option ${name}`).toBe(true);
     const playerNames = new Set(names("cuboidPlayer"));
-    for (const name of cuboidPlayer) expect(playerNames.has(name) || `cuboidPlayer.${name}` in CUBE_OPTIONS_LEFT_OUT, `cuboid player option ${name}`).toBe(true);
+    for (const name of cuboidPlayer)
+      expect(
+        playerNames.has(name) || `cuboidPlayer.${name}` in CUBE_OPTIONS_LEFT_OUT,
+        `cuboid player option ${name}`,
+      ).toBe(true);
     const element = new Set(names("cuboidElement"));
     for (const name of CUBOID_ELEMENT_ATTRIBUTES) expect(element.has(name), `<kyuubu-cuboid ${name}>`).toBe(true);
   });
@@ -125,7 +139,10 @@ describe("the choices the package offers", () => {
     expect(by("pitch").default).toBe(28);
     expect(by("keyboard").default).toBe("focus");
     expect(by("plastic").default).toBe("#111111");
-    for (const option of CUBE_OPTIONS.filter((one) => one.names.view?.startsWith("colours."))) expect(option.kind).toBe("colour");
-    expect(CUBE_OPTIONS.filter((one) => one.names.view?.startsWith("colours.")).map((one) => one.names.view)).toEqual(["U", "R", "F", "D", "L", "B"].map((letter) => `colours.${letter}`));
+    for (const option of CUBE_OPTIONS.filter((one) => one.names.view?.startsWith("colours.")))
+      expect(option.kind).toBe("colour");
+    expect(CUBE_OPTIONS.filter((one) => one.names.view?.startsWith("colours.")).map((one) => one.names.view)).toEqual(
+      ["U", "R", "F", "D", "L", "B"].map((letter) => `colours.${letter}`),
+    );
   });
 });

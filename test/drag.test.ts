@@ -16,7 +16,9 @@ import {
 } from "../src/index.ts";
 
 const slotAt = (n: number, centre: [number, number, number], normal: [number, number, number]) =>
-  cubeSlots(n).slots.find((slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]))!;
+  cubeSlots(n).slots.find(
+    (slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]),
+  )!;
 
 const FRONT_ON = viewMatrix(0, 0);
 const USUAL = viewMatrix(-35, 28);
@@ -109,7 +111,14 @@ describe("letting go of a dragged layer", () => {
   });
 
   it("says whether the layer is past the point, which is what the cube shows", () => {
-    expect([0, 29, 30, 100, -29, -30].map((angle) => pastCommit(angle))).toEqual([false, false, true, true, false, true]);
+    expect([0, 29, 30, 100, -29, -30].map((angle) => pastCommit(angle))).toEqual([
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+    ]);
     expect(pastCommit(40, 45)).toBe(false);
   });
 });

@@ -18,7 +18,10 @@ test("a famous solve plays from its scramble to a solved cube, at its own pace",
   await expect(page.getByTestId("watch-title")).toContainText("3.13");
   await expect(player(page)).toHaveAttribute("data-playing", "true");
   await expect(player(page)).toHaveAttribute("data-ended", "true", { timeout: 8000 });
-  await expect(player(page).locator("[data-kyuubu]")).toHaveAttribute("data-state", /^(.)\1{8}(.)\2{8}(.)\3{8}(.)\4{8}(.)\5{8}(.)\6{8}$/);
+  await expect(player(page).locator("[data-kyuubu]")).toHaveAttribute(
+    "data-state",
+    /^(.)\1{8}(.)\2{8}(.)\3{8}(.)\4{8}(.)\5{8}(.)\6{8}$/,
+  );
   await expect(page.getByTestId("facts")).toContainText("Pride in Long Beach 2023");
   await expect(page).toHaveURL(/#solve=park-3\.13$/);
 });
@@ -52,11 +55,17 @@ test("pause, a step either way, restart, the scrubber, the speed and repeat", as
   await expect(player(page).locator("[data-kyuubu]")).not.toHaveAttribute("data-state", /^(.)\1{8}/);
 });
 
-test("a pasted solve with comments and wide turns plays; a bad one says which piece; an unsolved one says so", async ({ page }) => {
+test("a pasted solve with comments and wide turns plays; a bad one says which piece; an unsolved one says so", async ({
+  page,
+}) => {
   await open(page);
   await page.locator("#tab-paste").click();
   await page.getByTestId("p-scramble").fill("L B R2 B' R2 U2 F D R2 U R2 F2 D2 R U B L2");
-  await page.getByTestId("p-moves").fill("x' // inspection\nr' U F U' r U' r' U2 r' U r // xxxcross\nR U2' R2' U' R U R U2' R' // 4th pair\nU' F' r U R' U' r' F R // ZBLL");
+  await page
+    .getByTestId("p-moves")
+    .fill(
+      "x' // inspection\nr' U F U' r U' r' U2 r' U r // xxxcross\nR U2' R2' U' R U R U2' R' // 4th pair\nU' F' r U R' U' r' F R // ZBLL",
+    );
   await page.getByTestId("p-time").fill("2.76");
   await page.getByTestId("p-play").click();
   await expect(player(page)).toHaveAttribute("data-ended", "true", { timeout: 8000 });
@@ -120,7 +129,9 @@ test("the custom element draws a solve from its attributes and tells the page as
   expect(await page.evaluate(() => document.getElementById("made").status.position)).toBe(4);
 });
 
-test("on the cube's own page a pasted solve with comments is turned, and a big cube can always be taken back", async ({ page }) => {
+test("on the cube's own page a pasted solve with comments is turned, and a big cube can always be taken back", async ({
+  page,
+}) => {
   await serve(page);
   await page.goto("http://kyuubu.test/?lang=en");
   await expect(page.locator("#stage [data-kyuubu]")).toBeVisible();
@@ -138,5 +149,7 @@ test("on the cube's own page a pasted solve with comments is turned, and a big c
   await page.getByTestId("scramble").click();
   await expect(page.getByTestId("all")).toBeEnabled();
   await page.getByTestId("all").click();
-  await expect(page.locator("#stage [data-kyuubu]")).toHaveAttribute("data-state", /^U{16}R{16}F{16}D{16}L{16}B{16}$/, { timeout: 30000 });
+  await expect(page.locator("#stage [data-kyuubu]")).toHaveAttribute("data-state", /^U{16}R{16}F{16}D{16}L{16}B{16}$/, {
+    timeout: 30000,
+  });
 });

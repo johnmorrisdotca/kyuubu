@@ -8,7 +8,8 @@ const $ = (id) => document.getElementById(id);
 
 const WORDS = {
   en: {
-    pitch: "A cube that keeps turning by itself, at a pace you choose, drawn small, medium or large. For a background, a widget or a list.",
+    pitch:
+      "A cube that keeps turning by itself, at a pace you choose, drawn small, medium or large. For a background, a widget or a list.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toCube: "The cube",
@@ -18,7 +19,8 @@ const WORDS = {
     toFamous: "Famous solves",
     toCuboids: "Cuboids",
     widgetTitle: "A cube that keeps turning",
-    widgetText: "It turns a random layer, waits, and turns another. It stops on a hidden tab, and stays still where your device asks for less motion. Pick how often it turns, or stop it.",
+    widgetText:
+      "It turns a random layer, waits, and turns another. It stops on a hidden tab, and stays still where your device asks for less motion. Pick how often it turns, or stop it.",
     paceLabel: "How often it turns",
     paceFast: "Every ½ second",
     paceNormal: "Every second",
@@ -33,7 +35,8 @@ const WORDS = {
     pickerCube: "{n}×{n}",
     picked: "You picked {n}×{n}.",
     embedTitle: "On your page",
-    embedText: "One tag, or an iframe for a page that allows no scripts. Each piece of code is for the size you picked above, the pace you chose and the scale here, and the cube beside it is made by that code.",
+    embedText:
+      "One tag, or an iframe for a page that allows no scripts. Each piece of code is for the size you picked above, the pace you chose and the scale here, and the cube beside it is made by that code.",
     embedScaleLabel: "How big on the page",
     scaleChoiceSmall: "Small",
     scaleChoiceMedium: "Medium",
@@ -45,7 +48,8 @@ const WORDS = {
     foot: "Nothing here is stored. Rubik's Cube is a trademark of its owner; Kyuubu is not affiliated with it.",
   },
   ja: {
-    pitch: "ひとりでに回り続けるキューブです。回る間隔を選べて、小・中・大の大きさで表示できます。背景やウィジェット、リストに使えます。",
+    pitch:
+      "ひとりでに回り続けるキューブです。回る間隔を選べて、小・中・大の大きさで表示できます。背景やウィジェット、リストに使えます。",
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
     toCube: "キューブ",
@@ -55,7 +59,8 @@ const WORDS = {
     toFamous: "有名なソルブ",
     toCuboids: "直方体",
     widgetTitle: "回り続けるキューブ",
-    widgetText: "ランダムに層を回して、少し待って、また別の層を回します。タブが隠れているあいだは止まり、端末が動きを減らす設定のときは動きません。回る間隔を選ぶか、止めてください。",
+    widgetText:
+      "ランダムに層を回して、少し待って、また別の層を回します。タブが隠れているあいだは止まり、端末が動きを減らす設定のときは動きません。回る間隔を選ぶか、止めてください。",
     paceLabel: "回る間隔",
     paceFast: "0.5秒ごと",
     paceNormal: "1秒ごと",
@@ -70,7 +75,8 @@ const WORDS = {
     pickerCube: "{n}×{n}",
     picked: "{n}×{n}を選びました。",
     embedTitle: "自分のページに置く",
-    embedText: "タグ1つで置けます。スクリプトが使えないページには iframe を使います。どのコードも、上で選んだサイズ、回る間隔、ここで選ぶ大きさのためのもので、横のキューブはそのコードで作られています。",
+    embedText:
+      "タグ1つで置けます。スクリプトが使えないページには iframe を使います。どのコードも、上で選んだサイズ、回る間隔、ここで選ぶ大きさのためのもので、横のキューブはそのコードで作られています。",
     embedScaleLabel: "ページでの大きさ",
     scaleChoiceSmall: "小",
     scaleChoiceMedium: "中",
@@ -122,7 +128,9 @@ function drawEmbed() {
   }
 }
 const drawWidget = () => {
-  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
+  document
+    .querySelector('[data-say="pageDocs"]')
+    ?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   $("widget-toggle").textContent = page.word(widgetOn ? "widgetStop" : "widgetStart");
   $("widget-toggle").setAttribute("aria-pressed", String(widgetOn));
   $("picked").textContent = picked === null ? "" : page.word("picked").replaceAll("{n}", String(picked));

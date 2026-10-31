@@ -29,7 +29,10 @@ Object.defineProperty(Fake.prototype, "lang", {
 
 describe("reflectAttributes", () => {
   class Thing extends Fake {}
-  reflectAttributes(Thing, ["size", "step", "lang", "autoplay", "controls"], { flags: ["autoplay"], onByDefault: ["controls"] });
+  reflectAttributes(Thing, ["size", "step", "lang", "autoplay", "controls"], {
+    flags: ["autoplay"],
+    onByDefault: ["controls"],
+  });
   const thing = () => new Thing() as unknown as Record<string, unknown> & Fake;
 
   it("writes the attribute from a property, and reads its text", () => {
@@ -47,7 +50,12 @@ describe("reflectAttributes", () => {
     expect([one.autoplay, one.controls]).toEqual([false, true]);
     one.autoplay = true;
     one.controls = false;
-    expect([one.getAttribute("autoplay"), one.getAttribute("controls"), one.autoplay, one.controls]).toEqual(["", "false", true, false]);
+    expect([one.getAttribute("autoplay"), one.getAttribute("controls"), one.autoplay, one.controls]).toEqual([
+      "",
+      "false",
+      true,
+      false,
+    ]);
     one.autoplay = false;
     one.controls = true;
     expect([one.getAttribute("autoplay"), one.getAttribute("controls"), one.controls]).toEqual([null, "", true]);

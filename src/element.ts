@@ -24,7 +24,22 @@ import { languageOf } from "./words.ts";
  * console.log(typeof CUBE_ELEMENT_ATTRIBUTES); // object
  * ```
  */
-export const CUBE_ELEMENT_ATTRIBUTES = ["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "guide", "readout", "movelist", "scrub"] as const;
+export const CUBE_ELEMENT_ATTRIBUTES = [
+  "size",
+  "scramble",
+  "moves",
+  "time",
+  "autoplay",
+  "controls",
+  "loop",
+  "speed",
+  "theme",
+  "lang",
+  "guide",
+  "readout",
+  "movelist",
+  "scrub",
+] as const;
 
 /** The name the element is registered under.
  * @example
@@ -104,7 +119,8 @@ function build(): CustomElementConstructor {
     private draw(): void {
       this.player?.destroy();
       if (this.style.display === "") this.style.display = "block";
-      const has = (name: string) => this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
+      const has = (name: string) =>
+        this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
       const time = Number(this.getAttribute("time"));
       const speed = Number(this.getAttribute("speed"));
       const theme = this.getAttribute("theme");
@@ -147,7 +163,10 @@ function build(): CustomElementConstructor {
       return this.player?.status ?? null;
     }
   };
-  reflectAttributes(element, CUBE_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop", "guide"], onByDefault: ["controls", "readout", "movelist", "scrub"] });
+  reflectAttributes(element, CUBE_ELEMENT_ATTRIBUTES, {
+    flags: ["autoplay", "loop", "guide"],
+    onByDefault: ["controls", "readout", "movelist", "scrub"],
+  });
   return element;
 }
 
@@ -170,4 +189,10 @@ export function defineCube(name: string = CUBE_ELEMENT_NAME): void {
   customElements.define(name, name === CUBE_ELEMENT_NAME ? made : class extends made {});
 }
 
-export { SCRAMBLE_ELEMENT_ATTRIBUTES, SCRAMBLE_ELEMENT_NAME, defineScramble, paceFromAttribute, type KyuubuScrambleElement } from "./scramble-element.ts";
+export {
+  SCRAMBLE_ELEMENT_ATTRIBUTES,
+  SCRAMBLE_ELEMENT_NAME,
+  defineScramble,
+  paceFromAttribute,
+  type KyuubuScrambleElement,
+} from "./scramble-element.ts";

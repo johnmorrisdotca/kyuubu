@@ -36,7 +36,12 @@ export function viewCode(spec) {
   const entries = [`size: ${spec.size}`];
   if (theme !== undefined) entries.push(`theme: CUBE_THEMES.${theme}`);
   else {
-    entries.push(`colours: ${literal(Object.entries(colours).map(([face, value]) => `${face}: ${quote(value)}`), "  ")}`);
+    entries.push(
+      `colours: ${literal(
+        Object.entries(colours).map(([face, value]) => `${face}: ${quote(value)}`),
+        "  ",
+      )}`,
+    );
     if (plastic !== undefined) entries.push(`plastic: ${quote(plastic)}`);
   }
   if (spec.turnMs !== undefined && spec.turnMs !== 160) entries.push(`turnMs: ${spec.turnMs}`);
@@ -60,13 +65,17 @@ export const SCALE_PX = { small: 72, medium: 160, large: 300 };
 
 /** The tag, and the script that defines it, for the spec. */
 export function scrambleTag(spec) {
-  const attributes = scrambleAttributes(spec).map(([name, value]) => ` ${name}="${value}"`).join("");
+  const attributes = scrambleAttributes(spec)
+    .map(([name, value]) => ` ${name}="${value}"`)
+    .join("");
   return `<script type="module" src="https://unpkg.com/@johnmorrisdotca/kyuubu/dist/element-define.js"></script>\n<kyuubu-scramble${attributes}></kyuubu-scramble>`;
 }
 
 /** The address of the embed page for the spec, relative to the page, and the frame's side in pixels. */
 export function scrambleFrame(spec) {
-  const hash = scrambleAttributes(spec).map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join("&");
+  const hash = scrambleAttributes(spec)
+    .map(([name, value]) => `${name}=${encodeURIComponent(value)}`)
+    .join("&");
   return { path: `embed-scramble.html#${hash}`, side: SCALE_PX[spec.scale] };
 }
 

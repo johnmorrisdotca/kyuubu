@@ -13,7 +13,7 @@
  * @example
  * ```ts
  * import { seededRandom } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(seededRandom("docs")());
  * ```
  */

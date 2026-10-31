@@ -10,13 +10,17 @@ const link = readSolveLink(first) ?? readSolveLink(second);
 const scramble = link?.scramble ?? first;
 const solution = link?.solution ?? second;
 if (scramble === "" && solution === "") {
-  console.error('Give a scramble and the moves: pnpm solve:check "R U R\' U\'" "U R U\' R\'"');
+  console.error("Give a scramble and the moves: pnpm solve:check \"R U R' U'\" \"U R U' R'\"");
   process.exit(2);
 }
 const planned = planReplay({ size: Number(size), scramble, solution });
 if (!planned.ok) {
   const where = planned.fault.fault;
-  console.error(where === undefined ? `Could not read the ${planned.fault.part}.` : `Could not read the ${planned.fault.part}: "${where.token}" at line ${where.line}, place ${where.column} (${where.reason}).`);
+  console.error(
+    where === undefined
+      ? `Could not read the ${planned.fault.part}.`
+      : `Could not read the ${planned.fault.part}: "${where.token}" at line ${where.line}, place ${where.column} (${where.reason}).`,
+  );
   process.exit(1);
 }
 const { plan } = planned;

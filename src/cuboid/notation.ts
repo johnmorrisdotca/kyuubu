@@ -22,8 +22,8 @@ import { legalTurns, type CuboidDims, type CuboidMove } from "./model.ts";
  * @example
  * ```ts
  * import type { CuboidFault } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
- * 
+ *
+ *
  * const value: CuboidFault = "half-turn-only";
  * console.log(value);
  * ```
@@ -77,7 +77,7 @@ function suffixOf(turns: CubeTurns, positive: boolean): string {
  * @example
  * ```ts
  * import { cuboidMoveNotation, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(cuboidMoveNotation(cmove, dims));
@@ -104,7 +104,7 @@ export function cuboidMoveNotation(move: CuboidMove, dims: CuboidDims): string {
  * @example
  * ```ts
  * import { cuboidMovesNotation, parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * const cmove = parseCuboidMove("R", dims)!;
  * console.log(cuboidMovesNotation([cmove], dims));
@@ -120,7 +120,7 @@ export function cuboidMovesNotation(moves: readonly CuboidMove[], dims: CuboidDi
  * ```ts
  * import type { CuboidReading } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { readCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidReading = readCuboidMove("U", [2, 3, 3]);
  * console.log(value);
  * ```
@@ -144,12 +144,17 @@ function checked(dims: CuboidDims, move: CuboidMove): CuboidReading {
  * @example
  * ```ts
  * import { cuboidFaceMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidFaceMove("R", 1, "cw", dims));
  * ```
  */
-export function cuboidFaceMove(face: Letter, depth: number, amount: "cw" | "half" | "ccw", dims: CuboidDims): CuboidReading {
+export function cuboidFaceMove(
+  face: Letter,
+  depth: number,
+  amount: "cw" | "half" | "ccw",
+  dims: CuboidDims,
+): CuboidReading {
   const { axis, positive } = FACE_AXES[face];
   if (!Number.isInteger(depth) || depth < 1 || depth > dims[axis]) return { fault: "no-such-layer" };
   return checked(dims, { axis, layer: positive ? dims[axis] - depth : depth - 1, turns: turnsFor(amount, positive) });
@@ -165,12 +170,16 @@ export function cuboidFaceMove(face: Letter, depth: number, amount: "cw" | "half
  * @example
  * ```ts
  * import { cuboidMiddleMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidMiddleMove("M", "half", dims));
  * ```
  */
-export function cuboidMiddleMove(letter: "M" | "E" | "S", amount: "cw" | "half" | "ccw", dims: CuboidDims): CuboidReading {
+export function cuboidMiddleMove(
+  letter: "M" | "E" | "S",
+  amount: "cw" | "half" | "ccw",
+  dims: CuboidDims,
+): CuboidReading {
   const axis = (letter === "M" ? 0 : letter === "E" ? 1 : 2) as CubeAxis;
   if (dims[axis] % 2 === 0) return { fault: "no-such-layer" };
   return checked(dims, { axis, layer: (dims[axis] - 1) / 2, turns: turnsFor(amount, MIDDLE[axis].followsPositive) });
@@ -185,7 +194,7 @@ export function cuboidMiddleMove(letter: "M" | "E" | "S", amount: "cw" | "half" 
  * @example
  * ```ts
  * import { readCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(readCuboidMove("U", dims));
  * ```
@@ -195,7 +204,8 @@ export function readCuboidMove(text: string, dims: CuboidDims): CuboidReading {
   if (found === null) return { fault: "unknown" };
   const amount = found[3] === "2" ? "half" : found[3] === "'" ? "ccw" : "cw";
   const letter = found[2];
-  if (letter === "M" || letter === "E" || letter === "S") return found[1] === "" ? cuboidMiddleMove(letter, amount, dims) : { fault: "unknown" };
+  if (letter === "M" || letter === "E" || letter === "S")
+    return found[1] === "" ? cuboidMiddleMove(letter, amount, dims) : { fault: "unknown" };
   return cuboidFaceMove(letter as Letter, found[1] === "" ? 1 : Number(found[1]), amount, dims);
 }
 
@@ -208,7 +218,7 @@ export function readCuboidMove(text: string, dims: CuboidDims): CuboidReading {
  * @example
  * ```ts
  * import { parseCuboidMove } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(parseCuboidMove("R", dims));
  * ```
@@ -227,7 +237,7 @@ export function parseCuboidMove(text: string, dims: CuboidDims): CuboidMove | nu
  * @example
  * ```ts
  * import { parseCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(parseCuboidMoves("R U2", dims));
  * ```
@@ -243,12 +253,14 @@ export function parseCuboidMoves(text: string, dims: CuboidDims): CuboidMove[] |
  * ```ts
  * import type { CuboidLineReading } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { readCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidLineReading = readCuboidMoves("R U2", [2, 3, 3]);
  * console.log(value.ok);
  * ```
  */
-export type CuboidLineReading = { ok: true; moves: CuboidMove[] } | { ok: false; token: string; at: number; fault: CuboidFault };
+export type CuboidLineReading =
+  | { ok: true; moves: CuboidMove[] }
+  | { ok: false; token: string; at: number; fault: CuboidFault };
 
 /** A line of notation read for this cuboid, saying which piece is wrong and why where one is.
  *
@@ -259,7 +271,7 @@ export type CuboidLineReading = { ok: true; moves: CuboidMove[] } | { ok: false;
  * @example
  * ```ts
  * import { readCuboidMoves } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(readCuboidMoves("R U2", dims));
  * ```

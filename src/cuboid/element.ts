@@ -24,18 +24,32 @@ import { parseCuboidDims, type CuboidDims } from "./model.ts";
  * @example
  * ```ts
  * import { CUBOID_ELEMENT_ATTRIBUTES } from "@johnmorrisdotca/kyuubu/cuboid/element";
- * 
+ *
  * console.log(CUBOID_ELEMENT_ATTRIBUTES);
  * ```
  */
-export const CUBOID_ELEMENT_ATTRIBUTES = ["dims", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "lang", "readout", "movelist", "scrub"] as const;
+export const CUBOID_ELEMENT_ATTRIBUTES = [
+  "dims",
+  "scramble",
+  "moves",
+  "time",
+  "autoplay",
+  "controls",
+  "loop",
+  "speed",
+  "theme",
+  "lang",
+  "readout",
+  "movelist",
+  "scrub",
+] as const;
 
 /** The name the element is registered under.
  *
  * @example
  * ```ts
  * import { CUBOID_ELEMENT_NAME } from "@johnmorrisdotca/kyuubu/cuboid/element";
- * 
+ *
  * console.log(CUBOID_ELEMENT_NAME);
  * ```
  */
@@ -49,9 +63,9 @@ export const CUBOID_ELEMENT_NAME = "kyuubu-cuboid";
  * @example
  * ```ts no-run
  * import type { KyuubuCuboidElement } from "@johnmorrisdotca/kyuubu/cuboid/element";
- * 
+ *
  * import "@johnmorrisdotca/kyuubu/cuboid/element/define";
- * 
+ *
  * const value: KyuubuCuboidElement = document.createElement("kyuubu-cuboid") as KyuubuCuboidElement;
  * console.log(value.controls);
  * ```
@@ -112,7 +126,8 @@ function build(): CustomElementConstructor {
     private draw(): void {
       this.player?.destroy();
       if (this.style.display === "") this.style.display = "block";
-      const has = (name: string) => this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
+      const has = (name: string) =>
+        this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
       const time = Number(this.getAttribute("time"));
       const speed = Number(this.getAttribute("speed"));
       const theme = this.getAttribute("theme");
@@ -156,7 +171,10 @@ function build(): CustomElementConstructor {
       return this.player?.status ?? null;
     }
   };
-  reflectAttributes(element, CUBOID_ELEMENT_ATTRIBUTES, { flags: ["autoplay", "loop"], onByDefault: ["controls", "readout", "movelist", "scrub"] });
+  reflectAttributes(element, CUBOID_ELEMENT_ATTRIBUTES, {
+    flags: ["autoplay", "loop"],
+    onByDefault: ["controls", "readout", "movelist", "scrub"],
+  });
   return element;
 }
 
@@ -170,7 +188,7 @@ function build(): CustomElementConstructor {
  * @example
  * ```ts no-run
  * import { defineCuboid } from "@johnmorrisdotca/kyuubu/cuboid/element";
- * 
+ *
  * defineCuboid();
  * console.log(customElements.get("kyuubu-cuboid") !== undefined);
  * ```

@@ -4,7 +4,18 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { seededRandom } from "../src/index.ts";
-import { CUBOID_MAX_SIDE, CUBOID_PRESETS, CUBOID_RANDOM_STATE_MAX, cuboidSolved, legalTurns, parseCuboidMoves, randomCuboidScramble, readCuboidMove, solvedCuboid, turnAllCuboid } from "../src/cuboid/index.ts";
+import {
+  CUBOID_MAX_SIDE,
+  CUBOID_PRESETS,
+  CUBOID_RANDOM_STATE_MAX,
+  cuboidSolved,
+  legalTurns,
+  parseCuboidMoves,
+  randomCuboidScramble,
+  readCuboidMove,
+  solvedCuboid,
+  turnAllCuboid,
+} from "../src/cuboid/index.ts";
 
 describe("the README on cuboids", () => {
   const readme = `${readFileSync("docs/CUBOIDS-USE.md", "utf8")}\n${readFileSync("README.md", "utf8")}`;
@@ -17,12 +28,19 @@ describe("the README on cuboids", () => {
       if (!line.startsWith("|")) break;
       table.push(line);
     }
-    return table.slice(2).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+    return table.slice(2).map((line) =>
+      line
+        .split("|")
+        .slice(1, -1)
+        .map((cell) => cell.trim()),
+    );
   };
 
   it("lists every named shape, in order, with its name and its line", () => {
     const listed = rows("### The shapes");
-    expect(listed.map(([label, name]) => [label, name])).toEqual(CUBOID_PRESETS.map((preset) => [preset.label, preset.name.en]));
+    expect(listed.map(([label, name]) => [label, name])).toEqual(
+      CUBOID_PRESETS.map((preset) => [preset.label, preset.name.en]),
+    );
     // The line in the README is the one the page shows, but for the clauses it adds.
     for (const [, name, says] of listed) expect(says.split(":")[0].length, name).toBeGreaterThan(5);
   });
@@ -37,14 +55,21 @@ describe("the README on cuboids", () => {
     expect(readCuboidMove("R2", [3, 3, 1])).toEqual({ move: { axis: 0, layer: 2, turns: 2 } });
     expect(readCuboidMove("F", [3, 3, 1])).toEqual({ fault: "whole-puzzle" });
     expect(parseCuboidMoves("R U2 L' D2", [2, 3, 3])).toHaveLength(4);
-    for (const fault of ["half-turn-only", "whole-puzzle", "no-such-layer", "unknown"]) expect(doc).toContain(`"${fault}"`);
-    const mixed = turnAllCuboid(solvedCuboid([2, 3, 3]), [2, 3, 3], randomCuboidScramble([2, 3, 3], undefined, seededRandom("club night")));
+    for (const fault of ["half-turn-only", "whole-puzzle", "no-such-layer", "unknown"])
+      expect(doc).toContain(`"${fault}"`);
+    const mixed = turnAllCuboid(
+      solvedCuboid([2, 3, 3]),
+      [2, 3, 3],
+      randomCuboidScramble([2, 3, 3], undefined, seededRandom("club night")),
+    );
     expect(cuboidSolved(mixed, [2, 3, 3])).toBe(false);
   });
 
   it("names every entry point the package has for cuboids, and every one is built", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8"));
-    const named = rows("### The entry points").map(([entry]) => entry.replaceAll("`", "").replace("@johnmorrisdotca/kyuubu", "."));
+    const named = rows("### The entry points").map(([entry]) =>
+      entry.replaceAll("`", "").replace("@johnmorrisdotca/kyuubu", "."),
+    );
     expect(named).toEqual(Object.keys(pkg.exports).filter((key) => key.startsWith("./cuboid")));
     for (const key of named) expect(pkg.exports[key].default).toMatch(/^\.\/dist\/cuboid\/[\w-]+\.js$/);
     expect(pkg.sideEffects).toContain("./dist/cuboid/element-define.js");

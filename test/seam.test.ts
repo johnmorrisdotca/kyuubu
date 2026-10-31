@@ -1,13 +1,27 @@
 import { describe, expect, it } from "vitest";
 
-import { SEAM_BAND, applySolve, cubeSlots, dragHint, movesForRelease, parseSolve, pickDrag, seamsAt, solvedCube, turnAll, viewMatrix } from "../src/index.ts";
+import {
+  SEAM_BAND,
+  applySolve,
+  cubeSlots,
+  dragHint,
+  movesForRelease,
+  parseSolve,
+  pickDrag,
+  seamsAt,
+  solvedCube,
+  turnAll,
+  viewMatrix,
+} from "../src/index.ts";
 
 const slotAt = (n: number, centre: [number, number, number], normal: [number, number, number]) =>
-  cubeSlots(n).slots.find((slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]))!;
+  cubeSlots(n).slots.find(
+    (slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]),
+  )!;
 
 const FRONT_ON = viewMatrix(0, 0);
 /** Pixels in one of the cube's doubled units, and the eye's distance, as a cube 340 across is drawn. */
-const K = 340 / (2 * 3 * Math.sqrt(3)) * 0.9 * 1.0;
+const K = (340 / (2 * 3 * Math.sqrt(3))) * 0.9 * 1.0;
 const LENS = 1088;
 const frontRight = slotAt(3, [2, 0, 2], [0, 0, 1]);
 const frontMiddle = slotAt(3, [0, 0, 2], [0, 0, 1]);
@@ -31,7 +45,9 @@ describe("taking hold of the seam between two layers", () => {
     expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, edge - 0.04), K, LENS)).toEqual([]);
     expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, -(edge - 0.04)), K, LENS)).toEqual([]);
     // A touch on the plastic between two stickers is on a seam from either side of it.
-    expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, edge + 0.04), K, LENS)).toEqual([{ axis: 0, beside: 2 }]);
+    expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, edge + 0.04), K, LENS)).toEqual([
+      { axis: 0, beside: 2 },
+    ]);
     expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, 1), K, LENS)).toEqual([{ axis: 0, beside: 2 }]);
     expect(seamsAt(frontMiddle, 3, FRONT_ON, touch(frontMiddle, -1), K, LENS)).toEqual([{ axis: 0, beside: 0 }]);
     // The same across the sticker the other way, where it is the layers about the other axis that are neighbours.
@@ -61,7 +77,9 @@ describe("taking hold of the seam between two layers", () => {
       // Where its own right-hand edge is on the screen: the seam is found there, and not at the middle.
       const mid = slot.centre.map((value, at) => value + slot.normal[at]) as [number, number, number];
       const point = (offset: [number, number, number]): [number, number] => {
-        const moved = view.map((row) => row[0] * (mid[0] + offset[0]) + row[1] * (mid[1] + offset[1]) + row[2] * (mid[2] + offset[2]));
+        const moved = view.map(
+          (row) => row[0] * (mid[0] + offset[0]) + row[1] * (mid[1] + offset[1]) + row[2] * (mid[2] + offset[2]),
+        );
         const z = moved[2] * K;
         const f = LENS / (LENS - z);
         return [moved[0] * K * f, -moved[1] * K * f];
@@ -76,7 +94,10 @@ describe("taking hold of the seam between two layers", () => {
         const there = seamsAt(slot, 5, view, point(edge), K, LENS);
         const layer = (slot.centre[axis] + 4) / 2;
         if (layer < 4) {
-          expect(there.some((seam) => seam.axis === axis && seam.beside === layer + 1), `${slot.centre} ${slot.normal} ${axis}`).toBe(true);
+          expect(
+            there.some((seam) => seam.axis === axis && seam.beside === layer + 1),
+            `${slot.centre} ${slot.normal} ${axis}`,
+          ).toBe(true);
           seen += 1;
         }
       }

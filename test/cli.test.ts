@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { MAX_CLI_COUNT, MAX_CLI_LENGTH, STRINGS, VERSION, cubeNet, cubeSolved, isCubeState, parseMoves, runCli, solvedCube, turnAll } from "../src/index.ts";
+import {
+  MAX_CLI_COUNT,
+  MAX_CLI_LENGTH,
+  STRINGS,
+  VERSION,
+  cubeNet,
+  cubeSolved,
+  isCubeState,
+  parseMoves,
+  runCli,
+  solvedCube,
+  turnAll,
+} from "../src/index.ts";
 
 const run = (args: string[], surroundings = {}) => runCli(args, surroundings);
 const SOLVED = solvedCube(3);
@@ -15,7 +27,9 @@ describe("the command line's scrambles", () => {
   });
 
   it("gives the same scramble for the same seed, and says --scramble is what it does anyway", () => {
-    expect(run(["--seed", "club night"]).out).toBe("B L' S' U' F' R2 B R U2 B' R2 D' F2 R U M2 B R2 S R F2 L' B' E2 B2\n");
+    expect(run(["--seed", "club night"]).out).toBe(
+      "B L' S' U' F' R2 B R U2 B' R2 D' F2 R U M2 B R2 S R F2 L' B' E2 B2\n",
+    );
     expect(run(["--scramble", "-s", "club night"]).out).toBe(run(["--seed=club night"]).out);
   });
 
@@ -29,7 +43,9 @@ describe("the command line's scrambles", () => {
   });
 
   it("turns only the outer faces with --faces", () => {
-    expect(run(["--seed", "club night", "--faces"]).out).toBe("B L' F' U' F' R2 B R U2 B' R2 D' F2 R U L2 B R2 B' R F2 L' B' D2 B2\n");
+    expect(run(["--seed", "club night", "--faces"]).out).toBe(
+      "B L' F' U' F' R2 B R U2 B' R2 D' F2 R U L2 B R2 B' R F2 L' B' D2 B2\n",
+    );
   });
 
   it("uses the random source it is handed when there is no seed", () => {
@@ -88,11 +104,19 @@ describe("the command line's turns", () => {
     expect(run(["--apply", "--from", "R U", "U' R'"]).out).toContain(`state: ${SOLVED}\nSolved\n`);
     const mixed = turnAll(SOLVED, 3, parseMoves("R U", 3)!);
     expect(run(["--apply", "--state", mixed, "U' R'"]).out).toContain("Solved\n");
-    expect(run(["--apply", "--state", "UUU"])).toEqual({ code: 1, out: "", err: "kyuubu: that is not a 3×3 cube: it takes 54 letters, 9 each of U, R, F, D, L and B\n" });
+    expect(run(["--apply", "--state", "UUU"])).toEqual({
+      code: 1,
+      out: "",
+      err: "kyuubu: that is not a 3×3 cube: it takes 54 letters, 9 each of U, R, F, D, L and B\n",
+    });
   });
 
   it("says by name which turn the cube cannot make, with exit code 1", () => {
-    expect(run(["--apply", "R Q U"])).toEqual({ code: 1, out: "", err: "kyuubu: “Q” is not a turn a 3×3 cube can make\n" });
+    expect(run(["--apply", "R Q U"])).toEqual({
+      code: 1,
+      out: "",
+      err: "kyuubu: “Q” is not a turn a 3×3 cube can make\n",
+    });
     expect(run(["-n", "2", "--apply", "M"]).err).toBe("kyuubu: “M” is not a turn a 2×2 cube can make\n");
     expect(run(["--apply", "--from", "R X", "R"]).code).toBe(1);
   });
@@ -104,7 +128,13 @@ describe("the command line's turns", () => {
     expect(run(["--apply", "R"], { colour: true, env: { NO_COLOR: "1" } }).out).not.toContain(escape);
     expect(run(["--apply", "R", "--no-color"], { colour: true }).out).not.toContain(escape);
     expect(run(["--apply", "R", "--json"], { colour: true }).out).not.toContain(escape);
-    expect(JSON.parse(run(["--apply", "R", "--json"]).out)).toMatchObject({ format: 1, size: 3, moves: "R", count: 1, solved: false });
+    expect(JSON.parse(run(["--apply", "R", "--json"]).out)).toMatchObject({
+      format: 1,
+      size: 3,
+      moves: "R",
+      count: 1,
+      solved: false,
+    });
   });
 });
 
@@ -118,7 +148,11 @@ describe("the command line's check of a solve", () => {
   });
 
   it("needs a cube to start from", () => {
-    expect(run(["--verify", "R"])).toEqual({ code: 2, out: "", err: 'kyuubu: --verify needs the cube it starts from: --from "<scramble>" or --state <state>\n' });
+    expect(run(["--verify", "R"])).toEqual({
+      code: 2,
+      out: "",
+      err: 'kyuubu: --verify needs the cube it starts from: --from "<scramble>" or --state <state>\n',
+    });
   });
 });
 
@@ -129,27 +163,48 @@ describe("the command line's solve", () => {
     const lines = out.trim().split("\n");
     expect(lines[0]).toBe("Hold it         x2");
     expect(lines.at(-1)).toMatch(/^Steps: \d+\. Moves: \d+$/);
-    const turns = lines.slice(0, -1).map((line) => line.replace(/^.+? {2,}/, "")).join(" ");
-    expect(cubeSolved(turnAll(turnAll(SOLVED, 3, parseMoves("R U2 F' L", 3)!), 3, parseMoves(turns, 3)!), 3)).toBe(true);
+    const turns = lines
+      .slice(0, -1)
+      .map((line) => line.replace(/^.+? {2,}/, ""))
+      .join(" ");
+    expect(cubeSolved(turnAll(turnAll(SOLVED, 3, parseMoves("R U2 F' L", 3)!), 3, parseMoves(turns, 3)!), 3)).toBe(
+      true,
+    );
   });
 
   it("solves a 2×2, says when there is nothing to do, and says which sizes it is for", () => {
-    expect(run(["-n", "2", "--solve", "R U2 F'"]).out).toBe("Hold it      x'\nWhite layer  F'\nWhite layer  F U F'\nWhite layer  F R2 F'\nSteps: 4. Moves: 7\n");
+    expect(run(["-n", "2", "--solve", "R U2 F'"]).out).toBe(
+      "Hold it      x'\nWhite layer  F'\nWhite layer  F U F'\nWhite layer  F R2 F'\nSteps: 4. Moves: 7\n",
+    );
     expect(run(["--solve"]).out).toBe("Already solved\n");
-    expect(run(["-n", "4", "--solve", "R"])).toEqual({ code: 1, out: "", err: "kyuubu: the step-by-step solve is for the 2×2 and the 3×3\n" });
+    expect(run(["-n", "4", "--solve", "R"])).toEqual({
+      code: 1,
+      out: "",
+      err: "kyuubu: the step-by-step solve is for the 2×2 and the 3×3\n",
+    });
   });
 
   it("says so when a cube cannot be solved by turning it", () => {
     const twisted = `RU${SOLVED.slice(2, 9)}UR${SOLVED.slice(11)}`;
     expect(isCubeState(twisted, 3)).toBe(true);
-    expect(run(["--solve", "--state", twisted])).toEqual({ code: 1, out: "", err: "kyuubu: this cube cannot be solved by turning it: a piece has been twisted or swapped\n" });
+    expect(run(["--solve", "--state", twisted])).toEqual({
+      code: 1,
+      out: "",
+      err: "kyuubu: this cube cannot be solved by turning it: a piece has been twisted or swapped\n",
+    });
   });
 
   it("prints JSON with each step's name and its algorithms", () => {
     const data = JSON.parse(run(["--solve", "R U2 F' L", "--json"]).out);
     expect(data.steps[0]).toEqual({ stage: "hold", name: "Hold it", moves: "x2", algorithms: [] });
     expect(data.steps.at(-1).algorithms[0]).toEqual({ name: "edgeCycle", moves: "R U' R U R U R U' R' U' R2" });
-    expect(data.count).toBe(data.steps.reduce((sum: number, step: { moves: string }) => sum + step.moves.split(" ").filter((move) => !/^[xyz]/.test(move)).length, 0));
+    expect(data.count).toBe(
+      data.steps.reduce(
+        (sum: number, step: { moves: string }) =>
+          sum + step.moves.split(" ").filter((move) => !/^[xyz]/.test(move)).length,
+        0,
+      ),
+    );
   });
 });
 
@@ -165,7 +220,11 @@ describe("the command line itself", () => {
     expect(run(["--bogus"])).toEqual({ code: 2, out: "", err: "kyuubu: unknown option --bogus\n" });
     expect(run(["-x"]).code).toBe(2);
     expect(run(["--seed"])).toEqual({ code: 2, out: "", err: "kyuubu: --seed needs a value\n" });
-    expect(run(["--apply", "--solve", "R"])).toEqual({ code: 2, out: "", err: "kyuubu: choose one of --scramble, --apply, --verify and --solve\n" });
+    expect(run(["--apply", "--solve", "R"])).toEqual({
+      code: 2,
+      out: "",
+      err: "kyuubu: choose one of --scramble, --apply, --verify and --solve\n",
+    });
     expect(run(["--lang", "fr"]).err).toBe("kyuubu: “fr”: the languages are en and ja\n");
   });
 
@@ -177,13 +236,34 @@ describe("the command line itself", () => {
     expect(run(["--help"], { locale: "ja-JP" }).out.startsWith("使い方")).toBe(true);
     expect(run(["--help", "--lang", "en"], { env: { LANG: "ja_JP.UTF-8" } }).out.startsWith("Usage")).toBe(true);
     expect(run(["--apply", "Q", "--lang", "ja"]).err).toBe("kyuubu: 「Q」は3×3のキューブでは回せません\n");
-    expect(run(["-n", "2", "--solve", "R U2 F'", "--lang", "ja"]).out).toBe("持ち方  x'\n白の面  F'\n白の面  F U F'\n白の面  F R2 F'\nステップ数: 4、手数: 7\n");
+    expect(run(["-n", "2", "--solve", "R U2 F'", "--lang", "ja"]).out).toBe(
+      "持ち方  x'\n白の面  F'\n白の面  F U F'\n白の面  F R2 F'\nステップ数: 4、手数: 7\n",
+    );
   });
 
   it("names every option in its help, in both languages", () => {
     const flags = (text: string) => [...text.matchAll(/--[a-z-]+/g)].map((found) => found[0]).sort();
     expect(new Set(flags(STRINGS.ja.cliUsage))).toEqual(new Set(flags(STRINGS.en.cliUsage)));
-    for (const flag of ["--scramble", "--apply", "--verify", "--solve", "--size", "--length", "--count", "--seed", "--faces", "--from", "--state", "--stdin", "--json", "--lang", "--no-color", "--help", "--version"]) expect(STRINGS.en.cliUsage, flag).toContain(flag);
+    for (const flag of [
+      "--scramble",
+      "--apply",
+      "--verify",
+      "--solve",
+      "--size",
+      "--length",
+      "--count",
+      "--seed",
+      "--faces",
+      "--from",
+      "--state",
+      "--stdin",
+      "--json",
+      "--lang",
+      "--no-color",
+      "--help",
+      "--version",
+    ])
+      expect(STRINGS.en.cliUsage, flag).toContain(flag);
   });
 });
 

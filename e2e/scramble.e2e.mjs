@@ -24,7 +24,9 @@ test.describe("with motion allowed", () => {
   test.use({ reducedMotion: "no-preference" });
 
   for (const n of [3, 7]) {
-    test(`on a ${n}×${n} the last turns of the scramble are shown, quickly, and the cube ends scrambled`, async ({ page }) => {
+    test(`on a ${n}×${n} the last turns of the scramble are shown, quickly, and the cube ends scrambled`, async ({
+      page,
+    }) => {
       await open(page);
       await tap(page, `#sizes button[data-n="${n}"]`);
       await watch(page);

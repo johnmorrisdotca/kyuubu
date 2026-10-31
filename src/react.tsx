@@ -11,9 +11,9 @@ import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
  * @example
  * ```ts no-run
  * import type { KyuubuHandle } from "@johnmorrisdotca/kyuubu/react";
- * 
+ *
  * import { createRef } from "react";
- * 
+ *
  * const handle = createRef<KyuubuHandle>();
  * handle.current?.resetLook();
  * console.log(handle.current?.state());
@@ -41,8 +41,8 @@ export type KyuubuHandle = {
  * @example
  * ```ts
  * import type { KyuubuProps } from "@johnmorrisdotca/kyuubu/react";
- * 
- * 
+ *
+ *
  * const value: KyuubuProps = { size: 3, interactive: true, "data-puzzle": "daily" };
  * console.log(value.size);
  * ```
@@ -80,12 +80,23 @@ export type KyuubuProps = Omit<CubeViewOptions, "state"> & {
  * @example
  * ```ts
  * import { Kyuubu } from "@johnmorrisdotca/kyuubu/react";
- * 
+ *
  * import { createElement } from "react";
  * console.log(createElement(Kyuubu, { size: 3, interactive: true }).props.size);
  * ```
  */
-export function Kyuubu({ ref, className, style, size, state, interactive: interactiveGiven, hint = null, onTurn, onLook, ...rest }: KyuubuProps) {
+export function Kyuubu({
+  ref,
+  className,
+  style,
+  size,
+  state,
+  interactive: interactiveGiven,
+  hint = null,
+  onTurn,
+  onLook,
+  ...rest
+}: KyuubuProps) {
   const { scale, width } = rest;
   const interactive = interactiveGiven ?? (scale === undefined ? true : CUBE_SCALE_INTERACTIVE[scale]);
   const box = useRef<HTMLDivElement>(null);
@@ -94,7 +105,21 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
   useEffect(() => {
     handlers.current = { onTurn, onLook };
   }, [onTurn, onLook]);
-  const { colours, plastic, theme, locale, keyboard, turnMs, animateScramble, commitAngle, yaw, pitch, fill, label, rounded } = rest;
+  const {
+    colours,
+    plastic,
+    theme,
+    locale,
+    keyboard,
+    turnMs,
+    animateScramble,
+    commitAngle,
+    yaw,
+    pitch,
+    fill,
+    label,
+    rounded,
+  } = rest;
   const hinted = useRef(hint);
   const data = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-")));
 
@@ -130,7 +155,19 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
     };
     // Made again only for what cannot be changed on a cube already drawn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, keyboard, plastic, yaw, pitch, fill, label, rounded, animateScramble, JSON.stringify(colours ?? {}), JSON.stringify(theme ?? {})]);
+  }, [
+    size,
+    keyboard,
+    plastic,
+    yaw,
+    pitch,
+    fill,
+    label,
+    rounded,
+    animateScramble,
+    JSON.stringify(colours ?? {}),
+    JSON.stringify(theme ?? {}),
+  ]);
 
   // The hint is shown again only when it says something else: a parent that makes a new array of the same moves on every render changes nothing.
   const hintKey = JSON.stringify(hint);
@@ -172,7 +209,8 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
   }));
 
   // With no class of its own the box is a square as wide as its container; a class says where it sits and how big it is, and is left to.
-  const boxStyle: CSSProperties = className === undefined ? { position: "relative", width: "100%", aspectRatio: "1 / 1", ...style } : { ...style };
+  const boxStyle: CSSProperties =
+    className === undefined ? { position: "relative", width: "100%", aspectRatio: "1 / 1", ...style } : { ...style };
   return <div ref={box} className={className} style={boxStyle} {...data} />;
 }
 
@@ -181,8 +219,8 @@ export function Kyuubu({ ref, className, style, size, state, interactive: intera
  * @example
  * ```ts
  * import type { KyuubuMovesProps } from "@johnmorrisdotca/kyuubu/react";
- * 
- * 
+ *
+ *
  * const value: KyuubuMovesProps = { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 };
  * console.log(value.current);
  * ```
@@ -205,12 +243,21 @@ export type KyuubuMovesProps = MoveListOptions & {
  * @example
  * ```ts
  * import { KyuubuMoves } from "@johnmorrisdotca/kyuubu/react";
- * 
+ *
  * import { createElement } from "react";
  * console.log(createElement(KyuubuMoves, { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 }).props.current);
  * ```
  */
-export function KyuubuMoves({ ref, className, style, groups, current = null, locale, label, onPick }: KyuubuMovesProps) {
+export function KyuubuMoves({
+  ref,
+  className,
+  style,
+  groups,
+  current = null,
+  locale,
+  label,
+  onPick,
+}: KyuubuMovesProps) {
   const box = useRef<HTMLDivElement>(null);
   const list = useRef<MoveListHandle | null>(null);
   const handlers = useRef({ onPick });
@@ -220,7 +267,10 @@ export function KyuubuMoves({ ref, className, style, groups, current = null, loc
   }, [onPick]);
   useEffect(() => {
     if (box.current === null) return;
-    const made = mountMoveList(box.current, { ...first.current, onPick: (index, group, at) => handlers.current.onPick?.(index, group, at) });
+    const made = mountMoveList(box.current, {
+      ...first.current,
+      onPick: (index, group, at) => handlers.current.onPick?.(index, group, at),
+    });
     list.current = made;
     return () => {
       made.destroy();

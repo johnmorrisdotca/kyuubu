@@ -14,7 +14,7 @@ import type { SolveAlgorithm, SolveStage } from "./solve.ts";
  * ```ts
  * import type { CubeWords } from "@johnmorrisdotca/kyuubu";
  * import { WORDS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CubeWords = WORDS.en;
  * console.log(value.solved);
  * ```
@@ -137,8 +137,8 @@ export type CubeWords = {
  * @example
  * ```ts
  * import type { KyuubuLanguage } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: KyuubuLanguage = "ja";
  * console.log(value);
  * ```
@@ -150,7 +150,7 @@ export type KyuubuLanguage = "en" | "ja";
  * @example
  * ```ts
  * import { WORDS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(WORDS.en).slice(0, 5));
  * ```
  */
@@ -198,7 +198,8 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     playerCannotRead: "“{token}” is not a move (line {line}, place {column}).",
     playerNoSuchLayer: "“{token}” turns a layer this cube does not have (line {line}, place {column}).",
     playerTooLong: "That is too long to play.",
-    playerEvenPace: "The solve took {time} seconds. Its moves are spread evenly over that time here; the real solve was not this even.",
+    playerEvenPace:
+      "The solve took {time} seconds. Its moves are spread evenly over that time here; the real solve was not this even.",
     playerCredit: "Kyuubu",
     guideSideR: "right",
     guideSideL: "left",
@@ -232,7 +233,8 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDrag: "Take hold of the sticker with the dot, and drag it along the arrow.",
     guideDragHalf: "A half turn: drag twice as far, or make two quarter turns the same way.",
     guideDragSlab: "{count} layers turn together: drag each of them along the arrow.",
-    guideDragSeam: "Two layers turn together: put a finger on the line between them, at the dot, and drag along the arrow. Or drag each of them in turn.",
+    guideDragSeam:
+      "Two layers turn together: put a finger on the line between them, at the dot, and drag along the arrow. Or drag each of them in turn.",
     guideLook: "Drag beside the cube to look round it, until you can see a side of the lit layer.",
     guideWholeHow: "No drag on a sticker does this: press {key}, or choose “{button}”.",
     guideOff: "You turned {made}, not {wanted}.",
@@ -310,7 +312,8 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     playerCannotRead: "「{token}」は回転記号ではありません（{line}行目、{column}文字目）。",
     playerNoSuchLayer: "「{token}」はこのキューブにない層を回します（{line}行目、{column}文字目）。",
     playerTooLong: "長すぎて再生できません。",
-    playerEvenPace: "このソルブのタイムは{time}秒です。ここでは各手をその時間に均等に割り振っています。実際のソルブはこれほど均等ではありません。",
+    playerEvenPace:
+      "このソルブのタイムは{time}秒です。ここでは各手をその時間に均等に割り振っています。実際のソルブはこれほど均等ではありません。",
     playerCredit: "Kyuubu",
     guideSideR: "右",
     guideSideL: "左",
@@ -344,7 +347,8 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
     guideDrag: "点のあるステッカーを持って、矢印に沿ってドラッグします。",
     guideDragHalf: "半回転です。2倍の距離をドラッグするか、同じ向きに2回回します。",
     guideDragSlab: "{count}つの層を一緒に回します。それぞれを矢印に沿ってドラッグします。",
-    guideDragSeam: "2つの層を一緒に回します。2つの層の間の線の上の点に指を置いて、矢印に沿ってドラッグします。1つずつドラッグしても回せます。",
+    guideDragSeam:
+      "2つの層を一緒に回します。2つの層の間の線の上の点に指を置いて、矢印に沿ってドラッグします。1つずつドラッグしても回せます。",
     guideLook: "キューブの外側をドラッグして、光っている層の側面が見えるまで見る向きを変えます。",
     guideWholeHow: "ステッカーのドラッグではできません。{key}を押すか、「{button}」を選びます。",
     guideOff: "{wanted}ではなく{made}を回しました。",
@@ -390,7 +394,7 @@ export const WORDS: Readonly<Record<KyuubuLanguage, CubeWords>> = {
  * @example
  * ```ts
  * import { fill } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(fill("A {n}×{n} cube", { n: 3 }));
  * ```
  */
@@ -409,7 +413,7 @@ const upper = (text: string) => text[0].toUpperCase() + text.slice(1);
  * @example
  * ```ts
  * import { stageName } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(stageName("whiteCross", "en"));
  * ```
  */
@@ -426,7 +430,7 @@ export function stageName(stage: SolveStage, language: KyuubuLanguage = "en"): s
  * @example
  * ```ts
  * import { stageSays } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(stageSays("whiteCross", "en"));
  * ```
  */
@@ -443,7 +447,7 @@ export function stageSays(stage: SolveStage, language: KyuubuLanguage = "en"): s
  * @example
  * ```ts
  * import { algorithmName } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(algorithmName("sune", "en"));
  * ```
  */
@@ -459,10 +463,14 @@ export function algorithmName(algorithm: SolveAlgorithm, language: KyuubuLanguag
  * @example
  * ```ts
  * import { languageOf } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(languageOf("ja-JP"));
  * ```
  */
 export function languageOf(tag: string | null | undefined): KyuubuLanguage {
-  return String(tag ?? "").toLowerCase().startsWith("ja") ? "ja" : "en";
+  return String(tag ?? "")
+    .toLowerCase()
+    .startsWith("ja")
+    ? "ja"
+    : "en";
 }

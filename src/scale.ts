@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { CUBE_SCALES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(CUBE_SCALES);
  * ```
  */
@@ -18,8 +18,8 @@ export const CUBE_SCALES = ["small", "medium", "large"] as const;
  * @example
  * ```ts
  * import type { CubeScale } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeScale = "small";
  * console.log(value);
  * ```
@@ -31,7 +31,7 @@ export type CubeScale = (typeof CUBE_SCALES)[number];
  * @example
  * ```ts
  * import { CUBE_SCALE_PX } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(CUBE_SCALE_PX);
  * ```
  */
@@ -42,7 +42,7 @@ export const CUBE_SCALE_PX: Readonly<Record<CubeScale, number>> = { small: 72, m
  * @example
  * ```ts
  * import { CUBE_SCALE_INTERACTIVE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(CUBE_SCALE_INTERACTIVE);
  * ```
  */
@@ -56,7 +56,7 @@ export const CUBE_SCALE_INTERACTIVE: Readonly<Record<CubeScale, boolean>> = { sm
  * @example
  * ```ts
  * import { isCubeScale } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(isCubeScale("small"));
  * ```
  */
@@ -76,7 +76,7 @@ export function isCubeScale(value: unknown): value is CubeScale {
  * @example
  * ```ts
  * import { cubeWidthPx } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(cubeWidthPx("small"));
  * ```
  */

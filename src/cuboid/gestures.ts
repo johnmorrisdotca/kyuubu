@@ -1,4 +1,11 @@
-import { COMMIT_ANGLE, DRAG_CLEAR_RATIO, DRAG_DECIDE_PX, DRAG_START_PX, FLICK_ANGLE, FLICK_SPEED } from "../view/gestures.ts";
+import {
+  COMMIT_ANGLE,
+  DRAG_CLEAR_RATIO,
+  DRAG_DECIDE_PX,
+  DRAG_START_PX,
+  FLICK_ANGLE,
+  FLICK_SPEED,
+} from "../view/gestures.ts";
 import { axisOf, axisVector, cross, onScreen, type Mat3 } from "../view/geometry.ts";
 import type { CubeAxis, CubeTurns, StickerSlot } from "../types.ts";
 
@@ -21,8 +28,8 @@ import { cuboidLayerOf, halfTurnOnly, legalTurns, type CuboidDims, type CuboidMo
  * @example
  * ```ts
  * import type { CuboidDragPick } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
- * 
+ *
+ *
  * const value: CuboidDragPick = { axis: 1, layer: 0, along: [1, 0], halfOnly: true };
  * console.log(value.halfOnly);
  * ```
@@ -48,13 +55,19 @@ const length = ([x, y]: [number, number]) => Math.hypot(x, y) || 1;
  * ```ts
  * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
  * import { cuboidSlots, pickCuboidDrag } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const dims = [2, 3, 3] as const;
  * console.log(pickCuboidDrag(cuboidSlots(dims).slots[0]!, dims, view, 40, 0));
  * ```
  */
-export function pickCuboidDrag(slot: StickerSlot, dims: CuboidDims, view: Mat3, dx: number, dy: number): CuboidDragPick | null {
+export function pickCuboidDrag(
+  slot: StickerSlot,
+  dims: CuboidDims,
+  view: Mat3,
+  dx: number,
+  dy: number,
+): CuboidDragPick | null {
   const far = Math.hypot(dx, dy);
   if (far < DRAG_START_PX) return null;
   const face = axisOf(slot.normal);
@@ -71,7 +84,12 @@ export function pickCuboidDrag(slot: StickerSlot, dims: CuboidDims, view: Mat3, 
   const [best, other] = ranked;
   if (best === undefined) return null;
   if (far < DRAG_DECIDE_PX && other !== undefined && best.went < other.went * DRAG_CLEAR_RATIO) return null;
-  return { axis: best.axis, layer: cuboidLayerOf(slot.centre, best.axis, dims), along: best.along, halfOnly: halfTurnOnly(dims, best.axis) };
+  return {
+    axis: best.axis,
+    layer: cuboidLayerOf(slot.centre, best.axis, dims),
+    along: best.along,
+    halfOnly: halfTurnOnly(dims, best.axis),
+  };
 }
 
 /**
@@ -89,13 +107,14 @@ export function pickCuboidDrag(slot: StickerSlot, dims: CuboidDims, view: Mat3, 
  * @example
  * ```ts
  * import { cuboidDragAngle } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const cpick = { axis: 1 as const, layer: 0, along: [1, 0] as [number, number], halfOnly: true };
  * console.log(cuboidDragAngle(cpick, 40, 0, 100));
  * ```
  */
 export function cuboidDragAngle(pick: CuboidDragPick, dx: number, dy: number, quarterPx: number): number {
-  const angle = ((pick.along[0] * dx + pick.along[1] * dy) / Math.max(pick.halfOnly ? quarterPx / 2 : quarterPx, 1)) * 90;
+  const angle =
+    ((pick.along[0] * dx + pick.along[1] * dy) / Math.max(pick.halfOnly ? quarterPx / 2 : quarterPx, 1)) * 90;
   return Math.max(-180, Math.min(180, angle));
 }
 
@@ -104,7 +123,7 @@ export function cuboidDragAngle(pick: CuboidDragPick, dx: number, dy: number, qu
  * @example
  * ```ts
  * import { HALF_TURN_COMMIT } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(HALF_TURN_COMMIT);
  * ```
  */
@@ -127,11 +146,16 @@ export const HALF_TURN_COMMIT = 90;
  * @example
  * ```ts
  * import { cuboidQuartersForRelease } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(cuboidQuartersForRelease(100, 0, true));
  * ```
  */
-export function cuboidQuartersForRelease(angle: number, speed: number, halfOnly: boolean, commitAngle = COMMIT_ANGLE): -2 | -1 | 0 | 1 | 2 {
+export function cuboidQuartersForRelease(
+  angle: number,
+  speed: number,
+  halfOnly: boolean,
+  commitAngle = COMMIT_ANGLE,
+): -2 | -1 | 0 | 1 | 2 {
   const size = Math.abs(angle);
   const way = angle < 0 ? -1 : 1;
   if (!halfOnly) {
@@ -155,7 +179,7 @@ export function cuboidQuartersForRelease(angle: number, speed: number, halfOnly:
  * @example
  * ```ts
  * import { cuboidPastCommit } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(cuboidPastCommit(100, true));
  * ```
  */
@@ -172,7 +196,7 @@ export function cuboidPastCommit(angle: number, halfOnly: boolean, commitAngle =
  * @example
  * ```ts
  * import { cuboidMoveForRelease } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const cpick = { axis: 1 as const, layer: 0, along: [1, 0] as [number, number], halfOnly: true };
  * console.log(cuboidMoveForRelease(cpick, 2));
  * ```
@@ -188,7 +212,7 @@ export function cuboidMoveForRelease(pick: CuboidDragPick, quarters: number): Cu
  * ```ts
  * import type { CuboidKeyReading } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { readCuboidKey } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidKeyReading = readCuboidKey("u", false, [2, 3, 3], 1);
  * console.log(value);
  * ```
@@ -213,7 +237,7 @@ const MIDDLES = new Set(["M", "E", "S"]);
  * @example
  * ```ts
  * import { readCuboidKey } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(readCuboidKey("u", false, dims, 1));
  * ```
@@ -223,7 +247,8 @@ export function readCuboidKey(key: string, shift: boolean, dims: CuboidDims, dep
   const letter = key.length === 1 ? key.toUpperCase() : "";
   const amount = shift ? "ccw" : "cw";
   if (!FACES.has(letter) && !MIDDLES.has(letter)) return null;
-  const turned = (how: "cw" | "half" | "ccw") => (FACES.has(letter) ? cuboidFaceMove(letter as "R", depth, how, dims) : cuboidMiddleMove(letter as "M", how, dims));
+  const turned = (how: "cw" | "half" | "ccw") =>
+    FACES.has(letter) ? cuboidFaceMove(letter as "R", depth, how, dims) : cuboidMiddleMove(letter as "M", how, dims);
   const read = turned(amount);
   if ("move" in read) return { move: read.move };
   if (read.fault !== "half-turn-only") return null;

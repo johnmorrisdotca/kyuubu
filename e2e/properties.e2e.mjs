@@ -32,13 +32,39 @@ test("setting each observed attribute as a property sets the attribute, on both 
     return out;
   });
   // Every one of them, as the text of what was set.
-  expect(seen["kyuubu-cube"].map(([name]) => name)).toEqual(["size", "scramble", "moves", "time", "autoplay", "controls", "loop", "speed", "theme", "guide", "readout", "movelist", "scrub"]);
-  expect(seen["kyuubu-scramble"].map(([name]) => name)).toEqual(["size", "pace", "paused", "scale", "width", "theme", "faces", "interactive", "seed"]);
+  expect(seen["kyuubu-cube"].map(([name]) => name)).toEqual([
+    "size",
+    "scramble",
+    "moves",
+    "time",
+    "autoplay",
+    "controls",
+    "loop",
+    "speed",
+    "theme",
+    "guide",
+    "readout",
+    "movelist",
+    "scrub",
+  ]);
+  expect(seen["kyuubu-scramble"].map(([name]) => name)).toEqual([
+    "size",
+    "pace",
+    "paused",
+    "scale",
+    "width",
+    "theme",
+    "faces",
+    "interactive",
+    "seed",
+  ]);
   for (const rows of Object.values(seen)) for (const [name, value] of rows) expect(value, name).toBe("7");
   expect(errors).toEqual([]);
 });
 
-test("a flag reads as a boolean and takes the attribute away when set to false, and controls, which is on unless it says otherwise, says it", async ({ page }) => {
+test("a flag reads as a boolean and takes the attribute away when set to false, and controls, which is on unless it says otherwise, says it", async ({
+  page,
+}) => {
   const errors = await bare(page);
   const [cube, scramble] = await page.evaluate(() => {
     const cube = document.createElement("kyuubu-cube");
@@ -50,11 +76,26 @@ test("a flag reads as a boolean and takes the attribute away when set to false, 
     cube.controls = false;
     scramble.paused = true;
     scramble.faces = true;
-    steps.push(["set", cube.autoplay, cube.loop, cube.controls, cube.getAttribute("controls"), scramble.paused, scramble.faces]);
+    steps.push([
+      "set",
+      cube.autoplay,
+      cube.loop,
+      cube.controls,
+      cube.getAttribute("controls"),
+      scramble.paused,
+      scramble.faces,
+    ]);
     cube.autoplay = false;
     cube.controls = true;
     scramble.paused = false;
-    steps.push(["unset", cube.autoplay, cube.hasAttribute("autoplay"), cube.controls, scramble.paused, scramble.hasAttribute("paused")]);
+    steps.push([
+      "unset",
+      cube.autoplay,
+      cube.hasAttribute("autoplay"),
+      cube.controls,
+      scramble.paused,
+      scramble.hasAttribute("paused"),
+    ]);
     cube.controls = null;
     steps.push(["controls null", cube.controls, cube.hasAttribute("controls")]);
     return [steps, null];
@@ -69,7 +110,9 @@ test("a flag reads as a boolean and takes the attribute away when set to false, 
   expect(errors).toEqual([]);
 });
 
-test("a property set before the element is on the page, as a framework does, is what it is drawn from", async ({ page }) => {
+test("a property set before the element is on the page, as a framework does, is what it is drawn from", async ({
+  page,
+}) => {
   const errors = await bare(page);
   await page.evaluate(() => {
     const cube = document.createElement("kyuubu-cube");
@@ -105,7 +148,12 @@ test("the methods go on working, and a name the browser gives every element is l
     const cube = document.createElement("kyuubu-cube");
     const scramble = document.createElement("kyuubu-scramble");
     cube.lang = "ja";
-    return [cube.getAttribute("lang"), ["play", "pause", "step", "seek", "restart"].map((name) => typeof cube[name]), ["play", "pause"].map((name) => typeof scramble[name]), Object.getOwnPropertyDescriptor(Object.getPrototypeOf(cube), "lang") === undefined];
+    return [
+      cube.getAttribute("lang"),
+      ["play", "pause", "step", "seek", "restart"].map((name) => typeof cube[name]),
+      ["play", "pause"].map((name) => typeof scramble[name]),
+      Object.getOwnPropertyDescriptor(Object.getPrototypeOf(cube), "lang") === undefined,
+    ];
   });
   expect(kinds).toEqual(["ja", Array(5).fill("function"), ["function", "function"], true]);
   expect(errors).toEqual([]);

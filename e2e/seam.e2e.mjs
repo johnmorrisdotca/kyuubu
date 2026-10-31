@@ -14,7 +14,9 @@ const lit = (page) => page.locator(":is(#stage, #player) [data-kyuubu] [data-sea
 /** The middle of the front face's centre sticker and of the one to its right, and the way down the cube: where fingers go. */
 async function front(page) {
   await root(page).evaluate((el) => el.scrollIntoView({ block: "center" }));
-  const boxes = await Promise.all([4, 5].map((nth) => page.locator(':is(#stage, #player) [data-kyuubu] [data-face="F"]').nth(nth).boundingBox()));
+  const boxes = await Promise.all(
+    [4, 5].map((nth) => page.locator(':is(#stage, #player) [data-kyuubu] [data-face="F"]').nth(nth).boundingBox()),
+  );
   const [centre, right] = boxes.map((box) => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 }));
   const stage = await root(page).boundingBox();
   const quarter = ((Math.min(stage.width, stage.height) * 0.9) / Math.sqrt(3)) * 0.7;
@@ -26,7 +28,11 @@ async function front(page) {
 /** A touch, or several, driven through Chromium's own input. */
 async function fingers(page) {
   const client = await page.context().newCDPSession(page);
-  const send = (type, points) => client.send("Input.dispatchTouchEvent", { type, touchPoints: points.map((point, index) => ({ x: point.x, y: point.y, id: index + 1 })) });
+  const send = (type, points) =>
+    client.send("Input.dispatchTouchEvent", {
+      type,
+      touchPoints: points.map((point, index) => ({ x: point.x, y: point.y, id: index + 1 })),
+    });
   return {
     down: (points) => send("touchStart", points),
     move: (points) => send("touchMove", points),
@@ -35,7 +41,11 @@ async function fingers(page) {
     async drag(points, pixels, { before } = {}) {
       await send("touchStart", points);
       if (before !== undefined) await before();
-      for (let at = 6; at <= pixels; at += 6) await send("touchMove", points.map((point) => ({ x: point.x, y: point.y + at })));
+      for (let at = 6; at <= pixels; at += 6)
+        await send(
+          "touchMove",
+          points.map((point) => ({ x: point.x, y: point.y + at })),
+        );
       await page.waitForTimeout(170);
       await send("touchEnd", []);
       await expect(root(page)).toHaveAttribute("data-turning", "false");
@@ -52,7 +62,13 @@ test.describe("on a phone, with real touches", () => {
     const touch = await fingers(page);
     const { right, centre, quarter, toward } = await front(page);
     // From the middle of the right-hand sticker out to a third of the way to the seam, and the other way, off the edge of the cube.
-    const places = [right, toward(0.1), toward(0.2), toward(0.28), { x: right.x - (centre.x - right.x) * 0.45, y: right.y - (centre.y - right.y) * 0.45 }];
+    const places = [
+      right,
+      toward(0.1),
+      toward(0.2),
+      toward(0.28),
+      { x: right.x - (centre.x - right.x) * 0.45, y: right.y - (centre.y - right.y) * 0.45 },
+    ];
     for (const place of places) {
       await page.locator(id("reset")).click();
       await touch.drag([place], quarter * 0.7, { before: async () => expect(await lit(page).count()).toBe(0) });
@@ -62,7 +78,9 @@ test.describe("on a phone, with real touches", () => {
     await sound(page, errors);
   });
 
-  test("a drag that begins on the seam shows the two layers, then turns both together as a wide turn", async ({ page }) => {
+  test("a drag that begins on the seam shows the two layers, then turns both together as a wide turn", async ({
+    page,
+  }) => {
     const errors = await open(page);
     const touch = await fingers(page);
     const { quarter, toward } = await front(page);
@@ -103,9 +121,16 @@ test.describe("on a phone, with real touches", () => {
     const { toward } = await front(page);
     const start = toward(0.5);
     const client = await page.context().newCDPSession(page);
-    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: start.x, y: start.y, id: 1 }] });
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: start.x, y: start.y, id: 1 }],
+    });
     // Straight across the cube, the way the seam lies across: the middle row turns, and not both columns.
-    for (let at = 6; at <= 80; at += 6) await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: start.x + at, y: start.y, id: 1 }] });
+    for (let at = 6; at <= 80; at += 6)
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: start.x + at, y: start.y, id: 1 }],
+      });
     await page.waitForTimeout(170);
     await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
     await expect(root(page)).toHaveAttribute("data-turning", "false");
@@ -122,7 +147,9 @@ test.describe("on a phone, with real touches", () => {
     expect(await cube(page)).toBe(wide("Rw'"));
     // Two fingers on layers that are not neighbours turn the one the first is on.
     await page.locator(id("reset")).click();
-    const boxes = await Promise.all([3, 5].map((nth) => page.locator(':is(#stage, #player) [data-kyuubu] [data-face="F"]').nth(nth).boundingBox()));
+    const boxes = await Promise.all(
+      [3, 5].map((nth) => page.locator(':is(#stage, #player) [data-kyuubu] [data-face="F"]').nth(nth).boundingBox()),
+    );
     const [left, far] = boxes.map((box) => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 }));
     await touch.drag([left, far], quarter * 0.7);
     await expect(page.locator(id("count"))).toHaveText("1");
@@ -133,7 +160,10 @@ test.describe("on a phone, with real touches", () => {
 test("with a mouse too: a press on the seam turns two layers, and on the sticker one", async ({ page }) => {
   await open(page);
   const { quarter, toward } = await front(page);
-  for (const [share, count] of [[0.5, "2"], [0.1, "1"]]) {
+  for (const [share, count] of [
+    [0.5, "2"],
+    [0.1, "1"],
+  ]) {
     await page.locator(id("reset")).click();
     const from = toward(share);
     await page.mouse.move(from.x, from.y);
@@ -146,7 +176,9 @@ test("with a mouse too: a press on the seam turns two layers, and on the sticker
   }
 });
 
-test("the guide's arrow for a wide turn is made by one drag from the dot at its tail, on the seam", async ({ page }) => {
+test("the guide's arrow for a wide turn is made by one drag from the dot at its tail, on the seam", async ({
+  page,
+}) => {
   const errors = await open(page);
   await panel(page, "moves");
   await page.locator(id("moves")).fill("Rw' U");

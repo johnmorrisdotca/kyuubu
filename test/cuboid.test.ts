@@ -47,7 +47,9 @@ import { viewMatrix } from "../src/view/geometry.ts";
 const dimsOf = (text: string) => parseCuboidDims(text)!;
 /** Every shape up to turning it in the hand, from 1 to 7 on a side and not 1×1×1: 83 of them. */
 const SHAPES: CuboidDims[] = [];
-for (let a = 1; a <= CUBOID_MAX_SIDE; a += 1) for (let b = a; b <= CUBOID_MAX_SIDE; b += 1) for (let c = b; c <= CUBOID_MAX_SIDE; c += 1) if (c > 1) SHAPES.push([a, b, c]);
+for (let a = 1; a <= CUBOID_MAX_SIDE; a += 1)
+  for (let b = a; b <= CUBOID_MAX_SIDE; b += 1)
+    for (let c = b; c <= CUBOID_MAX_SIDE; c += 1) if (c > 1) SHAPES.push([a, b, c]);
 const NAMED = CUBOID_PRESETS.map((preset) => preset.dims);
 /** The same shapes as they might be asked for, with the sides in every order. */
 const ORDERS = (dims: CuboidDims): CuboidDims[] => [
@@ -69,7 +71,8 @@ describe("which cuboids there are", () => {
   });
 
   it("is read from the ways people write it, and the same shape in any order is the same puzzle", () => {
-    for (const text of ["2x3x3", "2×3×3", "2 3 3", "2,3,3", " 2 X 3 x 3 "]) expect(parseCuboidDims(text)).toEqual([2, 3, 3]);
+    for (const text of ["2x3x3", "2×3×3", "2 3 3", "2,3,3", " 2 X 3 x 3 "])
+      expect(parseCuboidDims(text)).toEqual([2, 3, 3]);
     for (const text of ["1x1x1", "9x3x3", "2x3", "two", ""]) expect(parseCuboidDims(text)).toBeNull();
     expect(cuboidName([2, 3, 3])).toBe("2×3×3");
     expect(sameCuboid([3, 3, 2], [2, 3, 3])).toBe(true);
@@ -87,7 +90,15 @@ describe("which cuboids there are", () => {
       expect(preset.says.ja.length).toBeGreaterThan(10);
     }
     expect(new Set(CUBOID_PRESETS.map((preset) => preset.label)).size).toBe(CUBOID_PRESETS.length);
-    expect(CUBOID_PRESETS.map((preset) => preset.label)).toEqual(["1×2×3", "1×3×3", "2×2×3", "2×3×3", "2×3×4", "3×3×4", "3×3×5"]);
+    expect(CUBOID_PRESETS.map((preset) => preset.label)).toEqual([
+      "1×2×3",
+      "1×3×3",
+      "2×2×3",
+      "2×3×3",
+      "2×3×4",
+      "3×3×4",
+      "3×3×5",
+    ]);
   });
 });
 
@@ -149,7 +160,11 @@ describe("a cuboid of every size", () => {
 
   it("is back where it began after four quarter turns, and after two half turns, of every layer of every shape", () => {
     for (const dims of SHAPES.flatMap(ORDERS)) {
-      const mixed = turnAllCuboid(solvedCuboid(dims), dims, randomCuboidScramble(dims, 12, seededRandom(`mix ${dims}`)));
+      const mixed = turnAllCuboid(
+        solvedCuboid(dims),
+        dims,
+        randomCuboidScramble(dims, 12, seededRandom(`mix ${dims}`)),
+      );
       for (const move of legalCuboidMoves(dims)) {
         const same = Array<CuboidMove>(move.turns === 2 ? 2 : 4).fill(move.turns === 2 ? move : { ...move, turns: 1 });
         expect(turnAllCuboid(mixed, dims, same)).toBe(mixed);
@@ -239,9 +254,13 @@ describe("the notation", () => {
   it("agrees with the cube's own notation on a cuboid that is a cube", async () => {
     const { parseMoves: parseCubeMoves, turnAll, solvedCube } = await import("../src/index.ts");
     const line = "R U R' U' F2 L' D2 M E' S2 2R 2U'";
-    expect(turnAllCuboid(solvedCuboid([3, 3, 3]), [3, 3, 3], parseCuboidMoves(line, [3, 3, 3])!)).toBe(turnAll(solvedCube(3), 3, parseCubeMoves(line, 3)!));
+    expect(turnAllCuboid(solvedCuboid([3, 3, 3]), [3, 3, 3], parseCuboidMoves(line, [3, 3, 3])!)).toBe(
+      turnAll(solvedCube(3), 3, parseCubeMoves(line, 3)!),
+    );
     const four = "R U2 F' L2 2D 3B' 4R2 D";
-    expect(turnAllCuboid(solvedCuboid([4, 4, 4]), [4, 4, 4], parseCuboidMoves(four, [4, 4, 4])!)).toBe(turnAll(solvedCube(4), 4, parseCubeMoves(four, 4)!));
+    expect(turnAllCuboid(solvedCuboid([4, 4, 4]), [4, 4, 4], parseCuboidMoves(four, [4, 4, 4])!)).toBe(
+      turnAll(solvedCube(4), 4, parseCubeMoves(four, 4)!),
+    );
   });
 
   it("refuses a quarter turn where only half turns are, and says so, but takes R2", () => {
@@ -274,7 +293,8 @@ describe("the notation", () => {
     expect(readCuboidMove("M", [2, 3, 2])).toEqual({ fault: "no-such-layer" });
     expect(readCuboidMove("E2", [2, 3, 2])).toHaveProperty("move");
     expect(readCuboidMove("2M", [3, 3, 3])).toEqual({ fault: "unknown" });
-    for (const text of ["x", "y2", "z'", "Q", "R3", "Rw", "r", "", "R 2", "RR", "R''"]) expect(readCuboidMove(text, [3, 3, 3]), text).toEqual({ fault: "unknown" });
+    for (const text of ["x", "y2", "z'", "Q", "R3", "Rw", "r", "", "R 2", "RR", "R''"])
+      expect(readCuboidMove(text, [3, 3, 3]), text).toEqual({ fault: "unknown" });
   });
 
   it("counts a layer in from its nearer face, and calls the middle of an odd side M, E or S", () => {
@@ -300,7 +320,9 @@ describe("a scramble", () => {
         expect(cuboidSolved(mixed, dims), `${cuboidName(dims)} ${length}`).toBe(false);
         expect(isCuboidState(mixed, dims)).toBe(true);
         expect(turnAllCuboid(mixed, dims, undoCuboidMoves(scramble))).toBe(solvedCuboid(dims));
-        expect(parseCuboidMoves(scramble.map((move) => cuboidMoveNotation(move, dims)).join(" "), dims)).toEqual(scramble);
+        expect(parseCuboidMoves(scramble.map((move) => cuboidMoveNotation(move, dims)).join(" "), dims)).toEqual(
+          scramble,
+        );
       }
     }
   });
@@ -311,7 +333,9 @@ describe("a scramble", () => {
       // Sixty turns, and one or two more where the sixty came to solved.
       expect(scramble.length).toBeGreaterThanOrEqual(60);
       expect(scramble.length).toBeLessThanOrEqual(62);
-      scramble.slice(1).forEach((move, at) => expect(move.axis !== scramble[at].axis || move.layer !== scramble[at].layer).toBe(true));
+      scramble
+        .slice(1)
+        .forEach((move, at) => expect(move.axis !== scramble[at].axis || move.layer !== scramble[at].layer).toBe(true));
       expect(randomCuboidScramble(dims, 60, seededRandom("club night"))).toEqual(scramble);
       expect(randomCuboidScramble(dims, 60, seededRandom("another"))).not.toEqual(scramble);
     }
@@ -320,10 +344,14 @@ describe("a scramble", () => {
   it("is the same scramble from the same seed for ever: these are pinned", () => {
     const written = (text: string, length?: number) => {
       const dims = dimsOf(text);
-      return randomCuboidScramble(dims, length, seededRandom("club night")).map((move) => cuboidMoveNotation(move, dims)).join(" ");
+      return randomCuboidScramble(dims, length, seededRandom("club night"))
+        .map((move) => cuboidMoveNotation(move, dims))
+        .join(" ");
     };
     expect(written("3x3x1")).toMatchInlineSnapshot(`"L2 M2 U2 R2 D2 R2"`);
-    expect(written("2x3x3")).toMatchInlineSnapshot(`"L R2 L' R F2 E2 U2 L' U2 B2 L2 E2 S2 R' D2 F2 R B2 L R D2 S2 U2 R S2 R2 E2"`);
+    expect(written("2x3x3")).toMatchInlineSnapshot(
+      `"L R2 L' R F2 E2 U2 L' U2 B2 L2 E2 S2 R' D2 F2 R B2 L R D2 S2 U2 R S2 R2 E2"`,
+    );
     expect(written("3x3x4", 12)).toMatchInlineSnapshot(`"2F' L2 E2 B E2 F2 2B2 2F' D2 2B' F' R2"`);
   });
 
@@ -331,8 +359,10 @@ describe("a scramble", () => {
     expect(cuboidScrambleLength([3, 3, 3])).toBe(28);
     expect(cuboidScrambleLength([2, 2, 3])).toBeLessThan(cuboidScrambleLength([3, 3, 5]));
     expect(cuboidScrambleLength([7, 7, 7])).toBeLessThanOrEqual(100);
-    for (const text of ["1x1x2", "1x2x3", "1x3x3", "1x3x4"]) expect(hasRandomStateScramble(dimsOf(text)), text).toBe(true);
-    for (const text of ["2x2x3", "2x3x3", "2x3x4", "3x3x4", "3x3x5", "1x4x4"]) expect(hasRandomStateScramble(dimsOf(text)), text).toBe(false);
+    for (const text of ["1x1x2", "1x2x3", "1x3x3", "1x3x4"])
+      expect(hasRandomStateScramble(dimsOf(text)), text).toBe(true);
+    for (const text of ["2x2x3", "2x3x3", "2x3x4", "3x3x4", "3x3x5", "1x4x4"])
+      expect(hasRandomStateScramble(dimsOf(text)), text).toBe(false);
     expect(CUBOID_RANDOM_STATE_MAX).toBe(20000);
   });
 
@@ -362,7 +392,10 @@ describe("a scramble", () => {
 
   it("is shortest in the puzzles it lists, so a floppy's is a few turns", () => {
     const dims = dimsOf("3x3x1");
-    const lengths = Array.from({ length: 300 }, (_, at) => randomCuboidScramble(dims, undefined, seededRandom(`short ${at}`)).length);
+    const lengths = Array.from(
+      { length: 300 },
+      (_, at) => randomCuboidScramble(dims, undefined, seededRandom(`short ${at}`)).length,
+    );
     expect(Math.max(...lengths)).toBeLessThanOrEqual(8);
     expect(Math.min(...lengths)).toBeGreaterThanOrEqual(1);
   });
@@ -377,7 +410,9 @@ describe("a solve played back", () => {
     const dims = dimsOf("2x3x3");
     const scramble = randomCuboidScramble(dims, 10, seededRandom("replay"));
     const written = scramble.map((move) => cuboidMoveNotation(move, dims)).join(" ");
-    const solution = undoCuboidMoves(scramble).map((move) => cuboidMoveNotation(move, dims)).join(" ");
+    const solution = undoCuboidMoves(scramble)
+      .map((move) => cuboidMoveNotation(move, dims))
+      .join(" ");
     const planned = planCuboidReplay({ dims, scramble: written, solution, timeMs: 5000 });
     expect(planned.ok).toBe(true);
     if (!planned.ok) return;
@@ -397,10 +432,22 @@ describe("a solve played back", () => {
   });
 
   it("says which piece of the text is wrong, and why, and refuses a cuboid that is not one", () => {
-    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "R2", solution: "U R2" })).toEqual({ ok: false, fault: { part: "solution", token: "U", at: 0, fault: "half-turn-only" } });
-    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "R2 F", solution: "" })).toEqual({ ok: false, fault: { part: "scramble", token: "F", at: 3, fault: "whole-puzzle" } });
-    expect(planCuboidReplay({ dims: [1, 1, 1], scramble: "", solution: "" })).toEqual({ ok: false, fault: { part: "dims" } });
-    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "", solution: "R2 ".repeat(2001) })).toEqual({ ok: false, fault: { part: "length" } });
+    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "R2", solution: "U R2" })).toEqual({
+      ok: false,
+      fault: { part: "solution", token: "U", at: 0, fault: "half-turn-only" },
+    });
+    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "R2 F", solution: "" })).toEqual({
+      ok: false,
+      fault: { part: "scramble", token: "F", at: 3, fault: "whole-puzzle" },
+    });
+    expect(planCuboidReplay({ dims: [1, 1, 1], scramble: "", solution: "" })).toEqual({
+      ok: false,
+      fault: { part: "dims" },
+    });
+    expect(planCuboidReplay({ dims: [3, 3, 1], scramble: "", solution: "R2 ".repeat(2001) })).toEqual({
+      ok: false,
+      fault: { part: "length" },
+    });
   });
 });
 
@@ -425,7 +472,8 @@ describe("the words for a cuboid's moves", () => {
   });
 
   it("is nothing for what a cuboid has no such move as: a wide turn, a rotation, or text that is not a move", () => {
-    for (const text of ["", "Rw", "3Uw", "x", "y2", "z'", "R3", "r", "0R", "8R", "R2'"]) expect(cuboidMoveName(text), text).toBeNull();
+    for (const text of ["", "Rw", "3Uw", "x", "y2", "z'", "R3", "r", "0R", "8R", "R2'"])
+      expect(cuboidMoveName(text), text).toBeNull();
   });
 });
 
@@ -456,10 +504,18 @@ describe("the hands", () => {
     for (const dims of NAMED) {
       const { slots } = cuboidSlots(dims);
       slots.forEach((slot) => {
-        for (const [dx, dy] of [[40, 0], [0, 40], [30, 30], [-30, 30]]) {
+        for (const [dx, dy] of [
+          [40, 0],
+          [0, 40],
+          [30, 30],
+          [-30, 30],
+        ]) {
           const pick = pickCuboidDrag(slot, dims, view, dx, dy);
           if (pick === null) continue;
-          expect(legalTurns(dims, pick.axis, pick.layer).length, `${cuboidName(dims)} ${pick.axis} ${pick.layer}`).toBeGreaterThan(0);
+          expect(
+            legalTurns(dims, pick.axis, pick.layer).length,
+            `${cuboidName(dims)} ${pick.axis} ${pick.layer}`,
+          ).toBeGreaterThan(0);
           expect(pick.halfOnly).toBe(halfTurnOnly(dims, pick.axis));
         }
       });

@@ -4,7 +4,9 @@ import { cubeSlots, moveForDrag, moveForWheel, moveNotation, readKey, viewMatrix
 
 /** The slot of a sticker, by the direction it faces and its cubie's centre in doubled steps. */
 const slotAt = (n: number, centre: [number, number, number], normal: [number, number, number]) =>
-  cubeSlots(n).slots.find((slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]))!;
+  cubeSlots(n).slots.find(
+    (slot) => slot.centre.every((v, at) => v === centre[at]) && slot.normal.every((v, at) => v === normal[at]),
+  )!;
 
 const FRONT_ON = viewMatrix(0, 0);
 const USUAL = viewMatrix(-35, 28);

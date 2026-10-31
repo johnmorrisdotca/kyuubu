@@ -13,7 +13,16 @@ const DOWNLOADS_SHA256 = "6baed5d0d7fb76b07f556a394ee09aa98613537ee33b65b742d746
 
 const COLUMNS = [{ key: "code", label: "Code" }, "name", "note", "count", "area", "big", "borders", "flag"];
 const ROWS = [
-  { code: "JP", name: "東京", note: "It's a | pipe, a \"quote\", a back\\slash,\nand a second line", count: 14, area: 377.9, big: 3000000000, borders: ["KR", "RU"], flag: true },
+  {
+    code: "JP",
+    name: "東京",
+    note: 'It\'s a | pipe, a "quote", a back\\slash,\nand a second line',
+    count: 14,
+    area: 377.9,
+    big: 3000000000,
+    borders: ["KR", "RU"],
+    flag: true,
+  },
   { code: "GB", name: "O'Brien's", note: "", count: -2, area: 242495, big: 1, borders: [], flag: false },
   { code: "XX", name: undefined, note: null, count: null, area: null, big: null, borders: undefined, flag: null },
 ];
@@ -31,7 +40,12 @@ function cells(line) {
     else out[out.length - 1] += char;
   }
 
-  return out.map((text, at) => text.slice(at === 0 ? 0 : 1, at === out.length - 1 ? undefined : -1).replace(/<br>/g, "\n").replace(/\\(.)/g, "$1"));
+  return out.map((text, at) =>
+    text
+      .slice(at === 0 ? 0 : 1, at === out.length - 1 ? undefined : -1)
+      .replace(/<br>/g, "\n")
+      .replace(/\\(.)/g, "$1"),
+  );
 }
 
 describe("the family's shared download writers", () => {
@@ -57,7 +71,16 @@ describe("the family's shared download writers", () => {
     it("gives every cell back as it went in, 東京 and the quote and the pipe included", () => {
       const back = lines.slice(2).map(cells);
       expect(back.every((row) => row.length === COLUMNS.length)).toBe(true);
-      expect(back[0]).toEqual(["JP", "東京", "It's a | pipe, a \"quote\", a back\\slash,\nand a second line", "14", "377.9", "3000000000", "KR RU", "true"]);
+      expect(back[0]).toEqual([
+        "JP",
+        "東京",
+        'It\'s a | pipe, a "quote", a back\\slash,\nand a second line',
+        "14",
+        "377.9",
+        "3000000000",
+        "KR RU",
+        "true",
+      ]);
       expect(back[1][1]).toBe("O'Brien's");
       expect(back[2]).toEqual(["XX", "", "", "", "", "", "", ""]);
     });
@@ -71,7 +94,9 @@ describe("the family's shared download writers", () => {
     const sql = toSql("countries", COLUMNS, ROWS);
 
     it("quotes names with double quotes and text with single quotes, doubling each quote inside", () => {
-      expect(sql).toContain('CREATE TABLE "countries" ("code" TEXT, "name" TEXT, "note" TEXT, "count" INTEGER, "area" REAL, "big" BIGINT, "borders" TEXT, "flag" INTEGER);');
+      expect(sql).toContain(
+        'CREATE TABLE "countries" ("code" TEXT, "name" TEXT, "note" TEXT, "count" INTEGER, "area" REAL, "big" BIGINT, "borders" TEXT, "flag" INTEGER);',
+      );
       expect(sql).toContain("'O''Brien''s'");
       expect(sql).toContain("NULL");
       expect(sql.split("\n").filter((line) => line.startsWith("INSERT"))).toHaveLength(ROWS.length);
@@ -87,7 +112,11 @@ describe("the family's shared download writers", () => {
       database.exec(sql);
       const rows = database.prepare('SELECT * FROM "countries" ORDER BY "code" DESC').all();
       expect(rows).toHaveLength(ROWS.length);
-      const [jp, gb, xx] = [rows.find((row) => row.code === "JP"), rows.find((row) => row.code === "GB"), rows.find((row) => row.code === "XX")];
+      const [jp, gb, xx] = [
+        rows.find((row) => row.code === "JP"),
+        rows.find((row) => row.code === "GB"),
+        rows.find((row) => row.code === "XX"),
+      ];
       expect(jp.name).toBe("東京");
       expect(jp.note).toBe(ROWS[0].note);
       expect(jp.count).toBe(14);
@@ -116,7 +145,12 @@ describe("the family's shared download writers", () => {
     it("keeps text that looks like a number as text, so a leading zero survives", () => {
       const database = new DatabaseSync(":memory:");
       database.exec(toSql("codes", ["numeric"], [{ numeric: "044" }, { numeric: "392" }]));
-      expect(database.prepare('SELECT "numeric" AS n FROM "codes" ORDER BY "numeric"').all().map((row) => row.n)).toEqual(["044", "392"]);
+      expect(
+        database
+          .prepare('SELECT "numeric" AS n FROM "codes" ORDER BY "numeric"')
+          .all()
+          .map((row) => row.n),
+      ).toEqual(["044", "392"]);
       database.close();
     });
   });

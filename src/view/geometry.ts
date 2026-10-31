@@ -13,7 +13,7 @@ import type { CubeAxis, Vec3 } from "../types.ts";
  * ```ts
  * import type { Mat3 } from "@johnmorrisdotca/kyuubu";
  * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: Mat3 = viewMatrix(-30, -20);
  * console.log(value);
  * ```
@@ -51,9 +51,23 @@ export function multiply(a: Mat3, b: Mat3): Mat3 {
 export function rotation(axis: CubeAxis, radians: number): Mat3 {
   const c = Math.cos(radians);
   const s = Math.sin(radians);
-  if (axis === 0) return [[1, 0, 0], [0, c, -s], [0, s, c]];
-  if (axis === 1) return [[c, 0, s], [0, 1, 0], [-s, 0, c]];
-  return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+  if (axis === 0)
+    return [
+      [1, 0, 0],
+      [0, c, -s],
+      [0, s, c],
+    ];
+  if (axis === 1)
+    return [
+      [c, 0, s],
+      [0, 1, 0],
+      [-s, 0, c],
+    ];
+  return [
+    [c, -s, 0],
+    [s, c, 0],
+    [0, 0, 1],
+  ];
 }
 
 /** The way the viewer looks at the cube: turned about the model's y (yaw), then tipped about the screen's x (pitch), in degrees.
@@ -65,7 +79,7 @@ export function rotation(axis: CubeAxis, radians: number): Mat3 {
  * @example
  * ```ts
  * import { viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(viewMatrix(-30, -20));
  * ```
  */

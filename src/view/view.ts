@@ -1,10 +1,30 @@
-import { CUBE_FACE_ORDER, FACE_FRAMES, cubeSlots, faceOfNormal, layerOf, solvedCube, turnCube, type CubeFace } from "../cube.ts";
+import {
+  CUBE_FACE_ORDER,
+  FACE_FRAMES,
+  cubeSlots,
+  faceOfNormal,
+  layerOf,
+  solvedCube,
+  turnCube,
+  type CubeFace,
+} from "../cube.ts";
 import { CUBE_SCALE_INTERACTIVE, cubeWidthPx, type CubeScale } from "../scale.ts";
 import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
 
 import { apply, axisVector, cross, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
-import { COMMIT_ANGLE, dragAngle, movesForRelease, moveForWheel, pastCommit, pickDrag, quartersForRelease, seamsAt, type DragPick, type Seam } from "./gestures.ts";
+import {
+  COMMIT_ANGLE,
+  dragAngle,
+  movesForRelease,
+  moveForWheel,
+  pastCommit,
+  pickDrag,
+  quartersForRelease,
+  seamsAt,
+  type DragPick,
+  type Seam,
+} from "./gestures.ts";
 import { dragHint, rotationHint, type DragHint } from "./hint.ts";
 import { readKey } from "./keys.ts";
 
@@ -37,7 +57,7 @@ import { readKey } from "./keys.ts";
  * @example
  * ```ts
  * import { DEFAULT_COLOURS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(DEFAULT_COLOURS);
  * ```
  */
@@ -55,7 +75,7 @@ export const DEFAULT_COLOURS: Readonly<Record<CubeFace, string>> = {
  * @example
  * ```ts
  * import { DEFAULT_PLASTIC } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(DEFAULT_PLASTIC);
  * ```
  */
@@ -69,7 +89,7 @@ export const DEFAULT_PLASTIC = "#111";
  * ```ts
  * import type { CubeTheme } from "@johnmorrisdotca/kyuubu";
  * import { CUBE_THEMES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CubeTheme = CUBE_THEMES.paper;
  * console.log(value.plastic);
  * ```
@@ -95,13 +115,18 @@ export type CubeTheme = {
  * @example
  * ```ts
  * import { CUBE_THEMES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(CUBE_THEMES).slice(0, 8));
  * ```
  */
 export const CUBE_THEMES = {
   standard: { colours: { ...DEFAULT_COLOURS }, plastic: DEFAULT_PLASTIC, stickerInset: "6%", stickerRadius: "14%" },
-  paper: { colours: { U: "#fffdf7", R: "#b5452c", F: "#2f7a4f", D: "#e0b43b", L: "#d97a2b", B: "#2b5f8f" }, plastic: "#1f2320", stickerInset: "6%", stickerRadius: "14%" },
+  paper: {
+    colours: { U: "#fffdf7", R: "#b5452c", F: "#2f7a4f", D: "#e0b43b", L: "#d97a2b", B: "#2b5f8f" },
+    plastic: "#1f2320",
+    stickerInset: "6%",
+    stickerRadius: "14%",
+  },
   stickerless: { colours: { ...DEFAULT_COLOURS }, plastic: "#2a2a2a", stickerInset: "1.5%", stickerRadius: "10%" },
 } as const satisfies Record<string, CubeTheme>;
 
@@ -110,7 +135,7 @@ export const CUBE_THEMES = {
  * @example
  * ```ts
  * import { FACE_PROPERTIES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(FACE_PROPERTIES);
  * ```
  */
@@ -128,8 +153,8 @@ export const FACE_PROPERTIES: Readonly<Record<CubeFace, string>> = {
  * @example
  * ```ts
  * import type { CubeViewOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeViewOptions = { size: 3, interactive: true, keyboard: "focus" };
  * console.log(value.size);
  * ```
@@ -207,8 +232,8 @@ const SVG = "http://www.w3.org/2000/svg";
  * @example
  * ```ts
  * import type { CubeViewEvents } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeViewEvents = { turn: (move, state) => console.log(move, state), look: (yaw, pitch) => console.log(yaw, pitch) };
  * console.log(Object.keys(value));
  * ```
@@ -223,9 +248,21 @@ type LiveDrag = { pick: DragPick; angle: number; committed: boolean; samples: { 
 /** One step of the queue: a turn, or several layers about one axis turned as one (a wide turn), and how long it should take when that was asked for. */
 type Queued = { moves: CubeMove[]; report: boolean; ms?: number };
 /** Where an element sits on the cube, before the cube is turned to be looked at: its own x, y and z as model vectors, its centre in pixels, and, for the plastic across a turning gap, the layer it closes. */
-type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number; corners?: RoundCorner[]; drawn?: { transform: string; visible: boolean; z: string; round: string } };
+type Placed = {
+  right: Vec3;
+  down: Vec3;
+  out: Vec3;
+  at: Vec3;
+  slot?: number;
+  layer?: number;
+  corners?: RoundCorner[];
+  drawn?: { transform: string; visible: boolean; z: string; round: string };
+};
 /** A corner of a sticker that is a corner of the cube: the style that rounds it, and the cube's corner it is, as a direction from the centre (each part 1 or −1). */
-type RoundCorner = { property: "borderTopLeftRadius" | "borderTopRightRadius" | "borderBottomLeftRadius" | "borderBottomRightRadius"; vertex: Vec3 };
+type RoundCorner = {
+  property: "borderTopLeftRadius" | "borderTopRightRadius" | "borderBottomLeftRadius" | "borderBottomRightRadius";
+  vertex: Vec3;
+};
 /** A layer turning: which way, how far so far, and which layers turn. */
 type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all"> };
 
@@ -238,7 +275,7 @@ type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all
  * @example
  * ```ts no-run
  * import { CubeView } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const host = document.createElement("div");
  * host.style.cssText = "width:300px;height:300px;position:relative";
  * document.body.append(host);
@@ -252,9 +289,24 @@ type Spin = { axis: CubeAxis; radians: number; layers: ReadonlySet<number | "all
 export class CubeView {
   /** The element the cube was made in. */
   readonly host: HTMLElement;
-  private options: Required<Omit<CubeViewOptions, "state" | "onTurn" | "onLook" | "colours" | "plastic" | "theme" | "label" | "locale" | "scale" | "width">> & Pick<CubeViewOptions, "onTurn" | "onLook" | "label">;
-  private theme: { colours: Partial<Record<CubeFace, string>>; plastic?: string; stickerInset?: string; stickerRadius?: string; cornerRadius?: string };
-  private readonly listeners: { turn: Set<CubeViewEvents["turn"]>; look: Set<CubeViewEvents["look"]> } = { turn: new Set(), look: new Set() };
+  private options: Required<
+    Omit<
+      CubeViewOptions,
+      "state" | "onTurn" | "onLook" | "colours" | "plastic" | "theme" | "label" | "locale" | "scale" | "width"
+    >
+  > &
+    Pick<CubeViewOptions, "onTurn" | "onLook" | "label">;
+  private theme: {
+    colours: Partial<Record<CubeFace, string>>;
+    plastic?: string;
+    stickerInset?: string;
+    stickerRadius?: string;
+    cornerRadius?: string;
+  };
+  private readonly listeners: { turn: Set<CubeViewEvents["turn"]>; look: Set<CubeViewEvents["look"]> } = {
+    turn: new Set(),
+    look: new Set(),
+  };
   /** The turn a hint is shown for, and what it came to from where the cube is looked at now. */
   private hintMoves: CubeMove[] | null = null;
   private hintNow: DragHint | null = null;
@@ -326,9 +378,14 @@ export class CubeView {
       fill: 0.9,
       rounded: true,
       // An option passed as undefined, as a wrapper passes every prop it was not given, leaves the default standing.
-      ...(Object.fromEntries(Object.entries(options).filter(([key, value]) => value !== undefined && !["colours", "plastic", "theme", "locale"].includes(key))) as CubeViewOptions),
+      ...(Object.fromEntries(
+        Object.entries(options).filter(
+          ([key, value]) => value !== undefined && !["colours", "plastic", "theme", "locale"].includes(key),
+        ),
+      ) as CubeViewOptions),
     };
-    const given = <T extends object>(from: T | undefined) => Object.fromEntries(Object.entries(from ?? {}).filter(([, value]) => value !== undefined)) as Partial<T>;
+    const given = <T extends object>(from: T | undefined) =>
+      Object.fromEntries(Object.entries(from ?? {}).filter(([, value]) => value !== undefined)) as Partial<T>;
     this.theme = {
       ...given(options.theme),
       colours: { ...given(options.theme?.colours), ...given(options.colours) },
@@ -348,7 +405,14 @@ export class CubeView {
     this.root.dataset.turning = "false";
     this.root.dataset.dragging = "false";
     this.root.dataset.committed = "false";
-    Object.assign(this.root.style, { position: "absolute", inset: "0", touchAction: "none", userSelect: "none", outline: "none", cursor: "grab" });
+    Object.assign(this.root.style, {
+      position: "absolute",
+      inset: "0",
+      touchAction: "none",
+      userSelect: "none",
+      outline: "none",
+      cursor: "grab",
+    });
     this.pivot = this.layer();
     this.still = this.layer();
     this.turning = this.layer();
@@ -399,7 +463,9 @@ export class CubeView {
    * standard colours, pass `CUBE_THEMES.standard`, or make the cube again.
    */
   setTheme(theme: CubeTheme): void {
-    const defined = Object.fromEntries(Object.entries(theme).filter(([key, value]) => value !== undefined && key !== "colours"));
+    const defined = Object.fromEntries(
+      Object.entries(theme).filter(([key, value]) => value !== undefined && key !== "colours"),
+    );
     const colours = Object.fromEntries(Object.entries(theme.colours ?? {}).filter(([, value]) => value !== undefined));
     this.theme = { ...this.theme, ...defined, colours: { ...this.theme.colours, ...colours } };
     this.dress();
@@ -443,12 +509,19 @@ export class CubeView {
       const last = this.n - 1;
       // Which of them are rounded is decided as the cube is drawn (`draw`): only a corner on the cube's outline is.
       const corners: RoundCorner[] = [];
-      const at = (across: number, down: number): Vec3 => frame.normal.map((value, k) => value + across * frame.right[k] + down * frame.down[k]) as unknown as Vec3;
+      const at = (across: number, down: number): Vec3 =>
+        frame.normal.map((value, k) => value + across * frame.right[k] + down * frame.down[k]) as unknown as Vec3;
       if (row === 0 && col === 0) corners.push({ property: "borderTopLeftRadius", vertex: at(-1, -1) });
       if (row === 0 && col === last) corners.push({ property: "borderTopRightRadius", vertex: at(1, -1) });
       if (row === last && col === 0) corners.push({ property: "borderBottomLeftRadius", vertex: at(-1, 1) });
       if (row === last && col === last) corners.push({ property: "borderBottomRightRadius", vertex: at(1, 1) });
-      for (const property of ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomLeftRadius", "borderBottomRightRadius"] as const) sticker.style[property] = "";
+      for (const property of [
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+      ] as const)
+        sticker.style[property] = "";
       const place = this.places.get(sticker);
       if (place !== undefined) {
         place.corners = corner === "" ? [] : corners;
@@ -484,13 +557,15 @@ export class CubeView {
       box.aspectRatio = this.sized.aspectRatio;
       this.sizedByScale = false;
     } else {
-      if (!this.sizedByScale) this.sized = { width: box.width, height: box.height, maxWidth: box.maxWidth, aspectRatio: box.aspectRatio };
+      if (!this.sizedByScale)
+        this.sized = { width: box.width, height: box.height, maxWidth: box.maxWidth, aspectRatio: box.aspectRatio };
       this.sizedByScale = true;
       box.width = `${px}px`;
       box.height = "auto";
       box.maxWidth = "100%";
       box.aspectRatio = "1 / 1";
-      if (this.host.ownerDocument.defaultView?.getComputedStyle(this.host).position === "static") box.position = "relative";
+      if (this.host.ownerDocument.defaultView?.getComputedStyle(this.host).position === "static")
+        box.position = "relative";
     }
     this.root.style.cursor = this.options.interactive ? "grab" : "default";
     this.measureSide();
@@ -500,7 +575,10 @@ export class CubeView {
   /** The box's smaller side as it is now, or a size to draw at where it has none yet (a box that is hidden). */
   private measureSide(): void {
     const fallback = EDGE * 1.8;
-    this.side = Math.min(this.host.clientWidth || fallback, this.host.clientHeight || this.host.clientWidth || fallback);
+    this.side = Math.min(
+      this.host.clientWidth || fallback,
+      this.host.clientHeight || this.host.clientWidth || fallback,
+    );
   }
 
   /** Whether a person can turn it now. */
@@ -551,9 +629,12 @@ export class CubeView {
    */
   turnTogether(moves: readonly CubeMove[], { animate = true, ms }: { animate?: boolean; ms?: number } = {}): void {
     if (moves.length === 0) return;
-    const together = moves.every((move) => move.axis === moves[0].axis && move.turns === moves[0].turns && move.layer !== "all") || moves.length === 1;
+    const together =
+      moves.every((move) => move.axis === moves[0].axis && move.turns === moves[0].turns && move.layer !== "all") ||
+      moves.length === 1;
     if (!together) {
-      for (const move of moves) this.turnTogether([move], { animate, ms: ms === undefined ? undefined : ms / moves.length });
+      for (const move of moves)
+        this.turnTogether([move], { animate, ms: ms === undefined ? undefined : ms / moves.length });
       return;
     }
     this.settleDrag();
@@ -706,7 +787,13 @@ export class CubeView {
         left: `${-unit / 2}px`,
         top: `${-unit / 2}px`,
       });
-      this.places.set(sticker, { right: frame.right, down: frame.down, out: frame.normal, at: this.surface(slot), slot: at });
+      this.places.set(sticker, {
+        right: frame.right,
+        down: frame.down,
+        out: frame.normal,
+        at: this.surface(slot),
+        slot: at,
+      });
       const face = document.createElement("div");
       Object.assign(face.style, { position: "absolute", pointerEvents: "none" });
       sticker.append(face);
@@ -722,7 +809,9 @@ export class CubeView {
   /** The stickers of the layer a hint is for lit, with a ring round each, and every other sticker dimmed; or all as they were, with no hint. */
   private light(): void {
     const moves = this.hintMoves;
-    const layers = new Set(moves === null || moves.some((move) => move.layer === "all") ? [] : moves.map((move) => move.layer as number));
+    const layers = new Set(
+      moves === null || moves.some((move) => move.layer === "all") ? [] : moves.map((move) => move.layer as number),
+    );
     const axis = moves?.[0]?.axis ?? 0;
     const { slots } = cubeSlots(this.n);
     const ring = `0 0 0 ${Math.max(1.5, this.unit() * 0.055).toFixed(2)}px var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
@@ -771,7 +860,9 @@ export class CubeView {
     }
     const scaled = (v: Vec3) => apply(view, v).map((value) => value * scale) as unknown as Vec3;
     // Its middle, half its length on from the sticker it starts at, lifted a hair off the face.
-    const middle = arrow.from.map((value, k) => (value + (arrow.along[k] * arrow.length) / 2) * half + arrow.normal[k] * 0.6) as unknown as Vec3;
+    const middle = arrow.from.map(
+      (value, k) => (value + (arrow.along[k] * arrow.length) / 2) * half + arrow.normal[k] * 0.6,
+    ) as unknown as Vec3;
     element.style.transform = `perspective(${lens}px) ${placement(scaled(arrow.along), scaled(cross(arrow.along, arrow.normal)), apply(view, arrow.normal), scaled(middle))}`;
     element.style.visibility = "";
     element.dataset.drag = hint.drag!.map((value) => value.toFixed(4)).join(",");
@@ -801,12 +892,19 @@ export class CubeView {
   private drawArrow(element: HTMLDivElement, length: number, width: number, half: boolean, whole: boolean): void {
     for (const running of element.getAnimations?.({ subtree: true }) ?? []) running.cancel();
     const unit = this.unit();
-    const shaft = whole ? Math.min(width * 0.5, unit * 0.55) : Math.min(width * 0.6, unit * (width > unit * 1.01 ? 0.3 : 0.2));
+    const shaft = whole
+      ? Math.min(width * 0.5, unit * 0.55)
+      : Math.min(width * 0.6, unit * (width > unit * 1.01 ? 0.3 : 0.2));
     const headWide = whole ? width * 0.9 : Math.min(width * 0.92, shaft * 3.2);
     const headLong = headWide * (whole ? 0.5 : 0.72);
     const mid = width / 2;
     const edge = Math.max(1, unit * 0.035);
-    Object.assign(element.style, { width: `${length}px`, height: `${width}px`, left: `${-length / 2}px`, top: `${-width / 2}px` });
+    Object.assign(element.style, {
+      width: `${length}px`,
+      height: `${width}px`,
+      left: `${-length / 2}px`,
+      top: `${-width / 2}px`,
+    });
     const svg = document.createElementNS(SVG, "svg");
     svg.setAttribute("width", String(length));
     svg.setAttribute("height", String(width));
@@ -832,7 +930,10 @@ export class CubeView {
       made.push(bar);
       for (const tip of heads) {
         const head = document.createElementNS(SVG, "polygon");
-        head.setAttribute("points", `${tip - headLong},${mid - headWide / 2} ${tip},${mid} ${tip - headLong},${mid + headWide / 2}`);
+        head.setAttribute(
+          "points",
+          `${tip - headLong},${mid - headWide / 2} ${tip},${mid} ${tip - headLong},${mid + headWide / 2}`,
+        );
         made.push(head);
       }
       return made;
@@ -848,7 +949,8 @@ export class CubeView {
     body.style.fill = `var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
     body.append(...shapes());
     svg.append(outline, body);
-    const calm = this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const calm =
+      this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
     if (!calm) {
       const runner = document.createElementNS(SVG, "circle");
       runner.setAttribute("cx", "0");
@@ -933,10 +1035,13 @@ export class CubeView {
       // Facing the eye, which sits `lens` pixels in front of the cube's centre.
       const facing = -out[0] * at[0] - out[1] * at[1] + out[2] * (lens - at[2]) > 1e-6;
       // An element that has never faced the eye is kept at no size, hidden: left as it is laid out, the plastic across a turning gap would be a 300 pixel box that makes the page scroll sideways.
-      const transform = facing ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}` : (place.drawn?.transform ?? "scale(0)");
+      const transform = facing
+        ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}`
+        : (place.drawn?.transform ?? "scale(0)");
       let z = "0";
       if (facing && spin !== null && pieces > 1) {
-        const piece = pieceOf[place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n)];
+        const piece =
+          pieceOf[place.slot === undefined ? place.layer! : layerOf(slots[place.slot].centre, spin.axis, this.n)];
         z = String(nearIsPositive ? piece : pieces - 1 - piece);
       }
       // Only what changed is written: most of a cube stands still through a turn, and a style written is work for the page.
@@ -974,7 +1079,8 @@ export class CubeView {
 
   /** How long a quarter turn takes now: no time at all on a device that asks for reduced motion. */
   private quarterMs(): number {
-    const calm = this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const calm =
+      this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
     return calm ? 0 : this.options.turnMs;
   }
 
@@ -982,7 +1088,9 @@ export class CubeView {
   private lift(move: CubeMove, others: readonly CubeMove[] = []): { moving: number[]; covers: HTMLDivElement[] } {
     const { slots } = cubeSlots(this.n);
     const layers = new Set([move, ...others].map((one) => one.layer));
-    const moving = slots.map((slot, at) => (layers.has("all") || layers.has(layerOf(slot.centre, move.axis, this.n)) ? at : -1)).filter((at) => at >= 0);
+    const moving = slots
+      .map((slot, at) => (layers.has("all") || layers.has(layerOf(slot.centre, move.axis, this.n)) ? at : -1))
+      .filter((at) => at >= 0);
     for (const at of moving) this.turning.append(this.stickers[at]);
     const covers = this.covers(move, layers);
     this.spin = { axis: move.axis, radians: 0, layers };
@@ -992,9 +1100,11 @@ export class CubeView {
 
   /** The turning group put back as it was, its stickers still again. */
   private lower(): void {
-    for (const sticker of [...this.turning.children]) if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
+    for (const sticker of [...this.turning.children])
+      if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
     this.turning.replaceChildren();
-    for (const cover of [...this.still.children]) if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
+    for (const cover of [...this.still.children])
+      if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
     for (const element of [...this.places.keys()]) if (element.dataset.cover !== undefined) this.places.delete(element);
     this.spin = null;
     this.draw();
@@ -1015,7 +1125,9 @@ export class CubeView {
     if (this.drag === null) delete this.root.dataset.angle;
     for (const sticker of [...this.turning.children] as HTMLElement[]) {
       if (sticker.dataset.slot === undefined) continue;
-      (sticker.firstChild as HTMLDivElement).style.filter = committed ? `var(--kyuubu-commit-filter, ${COMMIT_FILTER})` : "";
+      (sticker.firstChild as HTMLDivElement).style.filter = committed
+        ? `var(--kyuubu-commit-filter, ${COMMIT_FILTER})`
+        : "";
     }
   }
 
@@ -1028,7 +1140,10 @@ export class CubeView {
       this.shown = this.target;
       this.paint();
     }
-    this.lift({ axis: pick.axis, layer: pick.layer, turns: 1 }, pick.also === undefined ? [] : [{ axis: pick.axis, layer: pick.also, turns: 1 }]);
+    this.lift(
+      { axis: pick.axis, layer: pick.layer, turns: 1 },
+      pick.also === undefined ? [] : [{ axis: pick.axis, layer: pick.also, turns: 1 }],
+    );
     if (pick.also !== undefined) this.root.dataset.seam = "held";
     // Where the pointer went down counts as the first place the layer was: a flick is measured from there.
     this.drag = { pick, angle: 0, committed: false, samples: [{ at, angle: 0 }] };
@@ -1132,7 +1247,12 @@ export class CubeView {
       quarters = move.turns === 3 ? -1 : move.turns;
       const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
       // Faster while turns are waiting behind this one, so a typed sequence never lags the hands; a turn given its own time keeps it.
-      duration = job.ms !== undefined ? (calm ? 0 : job.ms) : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
+      duration =
+        job.ms !== undefined
+          ? calm
+            ? 0
+            : job.ms
+          : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
       if (duration > 0) break;
       for (const one of job.moves) this.shown = turnCube(this.shown, this.n, one);
       jumped = true;
@@ -1189,12 +1309,16 @@ export class CubeView {
     const frame = FACE_FRAMES[CUBE_FACE_ORDER.find((face) => FACE_FRAMES[face].normal[move.axis] === 1)!];
     const edges: number[] = [];
     // A gap opens wherever a turning layer meets a still one.
-    for (let layer = 0; layer < this.n - 1; layer += 1) if (layers.has(layer) !== layers.has(layer + 1)) edges.push(2 * layer - this.n + 2);
+    for (let layer = 0; layer < this.n - 1; layer += 1)
+      if (layers.has(layer) !== layers.has(layer + 1)) edges.push(2 * layer - this.n + 2);
     const made: HTMLDivElement[] = [];
     for (const edge of edges) {
       const below = (edge + this.n - 2) / 2;
       // One square closes the piece below the gap, facing up the axis, and one the piece above it, facing down.
-      for (const [layer, facing] of [[below, 1], [below + 1, -1]] as const) {
+      for (const [layer, facing] of [
+        [below, 1],
+        [below + 1, -1],
+      ] as const) {
         const group = layers.has(layer) ? this.turning : this.still;
         const cover = document.createElement("div");
         cover.dataset.cover = "";
@@ -1208,7 +1332,13 @@ export class CubeView {
           borderRadius: this.corner(),
           pointerEvents: "none",
         });
-        this.places.set(cover, { right: frame.right, down: frame.down, out: out.map((value) => value * facing) as unknown as Vec3, at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3, layer });
+        this.places.set(cover, {
+          right: frame.right,
+          down: frame.down,
+          out: out.map((value) => value * facing) as unknown as Vec3,
+          at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3,
+          layer,
+        });
         group.append(cover);
         made.push(cover);
       }
@@ -1221,9 +1351,19 @@ export class CubeView {
     const box = this.root.getBoundingClientRect();
     // A cube drawn inside something scaled (a zoomed page) is measured in its own pixels.
     const zoom = box.width / (this.root.offsetWidth || box.width) || 1;
-    const pointer: [number, number] = [(clientX - (box.left + box.width / 2)) / zoom, (clientY - (box.top + box.height / 2)) / zoom];
+    const pointer: [number, number] = [
+      (clientX - (box.left + box.width / 2)) / zoom,
+      (clientY - (box.top + box.height / 2)) / zoom,
+    ];
     const scale = (this.side * this.options.fill) / (EDGE * Math.sqrt(3));
-    return seamsAt(cubeSlots(this.n).slots[slot], this.n, this.view(), pointer, (this.unit() / 2) * scale, Math.round(this.side * 3.2));
+    return seamsAt(
+      cubeSlots(this.n).slots[slot],
+      this.n,
+      this.view(),
+      pointer,
+      (this.unit() / 2) * scale,
+      Math.round(this.side * 3.2),
+    );
   }
 
   /** The seams two fingers, down on two stickers, take hold of: each axis about which the layers of the two are neighbours. */
@@ -1237,7 +1377,8 @@ export class CubeView {
   /** The two layers a touch on a seam would turn, drawn with a ring on each of their stickers before anything moves; or none. */
   private lightSeam(seam: Seam | null, slot: number | null): void {
     const slots = cubeSlots(this.n).slots;
-    const layers = seam === null || slot === null ? null : new Set([layerOf(slots[slot].centre, seam.axis, this.n), seam.beside]);
+    const layers =
+      seam === null || slot === null ? null : new Set([layerOf(slots[slot].centre, seam.axis, this.n), seam.beside]);
     const ring = `2px solid var(--kyuubu-hint-colour, ${HINT_COLOUR})`;
     this.stickers.forEach((sticker, at) => {
       const face = sticker.firstChild as HTMLDivElement;
@@ -1259,7 +1400,9 @@ export class CubeView {
 
   private slotAt(target: EventTarget | null): number | null {
     const sticker = (target as HTMLElement | null)?.closest?.("[data-slot]") as HTMLElement | null;
-    return sticker === null || sticker === undefined || !this.root.contains(sticker) ? null : Number(sticker.dataset.slot);
+    return sticker === null || sticker === undefined || !this.root.contains(sticker)
+      ? null
+      : Number(sticker.dataset.slot);
   }
 
   private personTurns(move: CubeMove): void {
@@ -1267,7 +1410,12 @@ export class CubeView {
     this.turn(move, { report: true });
   }
 
-  private bind<K extends keyof HTMLElementEventMap>(element: HTMLElement | Document, type: K, handler: (event: HTMLElementEventMap[K]) => void, passive = true): void {
+  private bind<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Document,
+    type: K,
+    handler: (event: HTMLElementEventMap[K]) => void,
+    passive = true,
+  ): void {
     const listener = handler as EventListener;
     element.addEventListener(type, listener, { passive });
     this.cleanups.push(() => element.removeEventListener(type, listener));
@@ -1289,15 +1437,42 @@ export class CubeView {
       const slot = this.options.interactive ? this.slotAt(event.target) : null;
       const first = this.gesture;
       // A second finger on another sticker, before the layer is picked: the two together take two neighbouring layers.
-      if (first !== null && first.id !== event.pointerId && !first.done && first.slot !== null && first.partner === null && slot !== null && this.drag === null && event.pointerType === "touch") {
-        first.partner = { id: event.pointerId, slot, x: event.clientX, y: event.clientY, now: [event.clientX, event.clientY] };
+      if (
+        first !== null &&
+        first.id !== event.pointerId &&
+        !first.done &&
+        first.slot !== null &&
+        first.partner === null &&
+        slot !== null &&
+        this.drag === null &&
+        event.pointerType === "touch"
+      ) {
+        first.partner = {
+          id: event.pointerId,
+          slot,
+          x: event.clientX,
+          y: event.clientY,
+          now: [event.clientX, event.clientY],
+        };
         this.root.dataset.seam = "pair";
         return;
       }
       if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
       const seams = slot === null ? [] : this.seamsUnder(slot, event.clientX, event.clientY);
-      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch, now: [event.clientX, event.clientY], seams, partner: null };
-      this.lightSeam(slot === null ? null : seams[0] ?? null, slot);
+      this.gesture = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        at: event.timeStamp,
+        slot,
+        done: false,
+        yaw: this.yaw,
+        pitch: this.pitch,
+        now: [event.clientX, event.clientY],
+        seams,
+        partner: null,
+      };
+      this.lightSeam(slot === null ? null : (seams[0] ?? null), slot);
       this.root.style.cursor = "grabbing";
     });
     this.bind(this.root, "pointermove", (event) => {
@@ -1317,7 +1492,12 @@ export class CubeView {
       // A drag that wanders well off the cube's element is given up: the layer goes back.
       const box = this.root.getBoundingClientRect();
       const room = Math.max(DRAG_LEAVE_LEAST, Math.min(box.width, box.height) * DRAG_LEAVE);
-      if (event.clientX < box.left - room || event.clientX > box.right + room || event.clientY < box.top - room || event.clientY > box.bottom + room) {
+      if (
+        event.clientX < box.left - room ||
+        event.clientX > box.right + room ||
+        event.clientY < box.top - room ||
+        event.clientY > box.bottom + room
+      ) {
         gesture.done = true;
         this.endDrag(false, event.timeStamp);
         return;
@@ -1356,7 +1536,9 @@ export class CubeView {
       "wheel",
       (event) => {
         event.preventDefault();
-        const delta = (Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX) * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 400 : 1);
+        const delta =
+          (Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX) *
+          (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 400 : 1);
         const slot = this.options.interactive ? this.slotAt(event.target) : null;
         if (slot === null) {
           if (event.ctrlKey) this.setLook(this.yaw, this.pitch + delta * 0.25);
@@ -1383,8 +1565,18 @@ export class CubeView {
       (event) => {
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         const from = event.target as HTMLElement | null;
-        if (from !== null && from !== this.root && (from.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(from.tagName))) return;
-        const looks: Record<string, [number, number]> = { ArrowLeft: [-15, 0], ArrowRight: [15, 0], ArrowUp: [0, -15], ArrowDown: [0, 15] };
+        if (
+          from !== null &&
+          from !== this.root &&
+          (from.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(from.tagName))
+        )
+          return;
+        const looks: Record<string, [number, number]> = {
+          ArrowLeft: [-15, 0],
+          ArrowRight: [15, 0],
+          ArrowUp: [0, -15],
+          ArrowDown: [0, 15],
+        };
         if (looks[event.key] !== undefined) {
           event.preventDefault();
           this.setLook(this.yaw + looks[event.key][0], this.pitch + looks[event.key][1]);

@@ -19,7 +19,11 @@ export type ReflectedAttributes = {
  * `null`), and a flag reads as a boolean. A name the browser already gives
  * every element, such as `lang`, is left as the browser has it.
  */
-export function reflectAttributes(element: { prototype: object }, names: readonly string[], { flags = [], onByDefault = [] }: ReflectedAttributes = {}): void {
+export function reflectAttributes(
+  element: { prototype: object },
+  names: readonly string[],
+  { flags = [], onByDefault = [] }: ReflectedAttributes = {},
+): void {
   const prototype = element.prototype;
   for (const name of names) {
     const existing = describe(prototype, name);

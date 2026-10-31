@@ -1,4 +1,12 @@
-import { planReplay, Replay, REPLAY_SPEEDS, type ReplayFault, type ReplayPlan, type ReplaySource, type ReplayStatus } from "./replay.ts";
+import {
+  planReplay,
+  Replay,
+  REPLAY_SPEEDS,
+  type ReplayFault,
+  type ReplayPlan,
+  type ReplaySource,
+  type ReplayStatus,
+} from "./replay.ts";
 import { solvedCube } from "./cube.ts";
 import { mountGuide, type GuideHandle } from "./guide-panel.ts";
 import { mountMoveList, type MoveListGroup, type MoveListHandle } from "./move-list.ts";
@@ -26,8 +34,8 @@ import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
  * @example
  * ```ts
  * import type { PlayerOptions } from "@johnmorrisdotca/kyuubu/player";
- * 
- * 
+ *
+ *
  * const value: PlayerOptions = { size: 3, scramble: "R", solution: "R'", autoplay: false };
  * console.log(value.size);
  * ```
@@ -65,7 +73,7 @@ export type PlayerOptions = ReplaySource & {
  * ```ts no-run
  * import type { PlayerHandle } from "@johnmorrisdotca/kyuubu/player";
  * import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
- * 
+ *
  * const value: PlayerHandle = mountPlayer(document.createElement("div"), { scramble: "R", solution: "R'", autoplay: false });
  * console.log(value.plan?.solved);
  * ```
@@ -75,7 +83,10 @@ export type PlayerHandle = {
   readonly plan: ReplayPlan | null;
   readonly fault: ReplayFault | null;
   /** Another solve on the same cube, in place of the one showing. The speed and the repeat are kept unless given. */
-  load(source: ReplaySource, how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean }): void;
+  load(
+    source: ReplaySource,
+    how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean },
+  ): void;
   play(): void;
   pause(): void;
   /** One step on (1) or back (-1). */
@@ -106,7 +117,7 @@ const STYLE_ID = "kyuubu-player-style";
  * @example
  * ```ts
  * import { PLAYER_CSS } from "@johnmorrisdotca/kyuubu/player";
- * 
+ *
  * console.log(PLAYER_CSS.includes("."));
  * ```
  */
@@ -151,7 +162,7 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
  * @example
  * ```ts no-run
  * import { mountPlayer } from "@johnmorrisdotca/kyuubu/player";
- * 
+ *
  * const host = document.createElement("div");
  * document.body.append(host);
  * const player = mountPlayer(host, { size: 3, scramble: "R", solution: "R'", autoplay: false });
@@ -162,8 +173,10 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
 export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHandle {
   const doc = host.ownerDocument;
   addStyle(doc);
-  let language: KyuubuLanguage = options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
-  const say = (key: keyof (typeof WORDS)["en"], values?: Record<string, string | number>) => fill(WORDS[language][key], values);
+  let language: KyuubuLanguage =
+    options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
+  const say = (key: keyof (typeof WORDS)["en"], values?: Record<string, string | number>) =>
+    fill(WORDS[language][key], values);
 
   const root = doc.createElement("div");
   root.className = "kyuubu-player";
@@ -174,9 +187,24 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   host.replaceChildren(root);
   // Arrow keys step, Home and End go to the first and last move: from any button of the player, while the viewer is not turning the cube themselves.
   root.addEventListener("keydown", (event) => {
-    if (replay === null || plan === null || follow !== null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (
+      replay === null ||
+      plan === null ||
+      follow !== null ||
+      event.defaultPrevented ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    )
+      return;
     const target = event.target as HTMLElement;
-    if (target.closest("[data-kyuubu-moves]") !== null || target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) return;
+    if (
+      target.closest("[data-kyuubu-moves]") !== null ||
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLSelectElement ||
+      target instanceof HTMLTextAreaElement
+    )
+      return;
     const scramble = plan.scramble.length;
     const now = stateNow();
     let to: number | null = null;
@@ -193,7 +221,13 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   let fault: ReplayFault | null = null;
   // One cube for as long as the player lives, whatever solves it is given: a cube made afresh for each is a
   // second set of 3D layers before the first is let go, which a phone does not always have room for.
-  const view = new CubeView(stage, { size: 3, theme: options.theme, locale: language, keyboard: "none", interactive: false });
+  const view = new CubeView(stage, {
+    size: 3,
+    theme: options.theme,
+    locale: language,
+    keyboard: "none",
+    interactive: false,
+  });
 
   const button = (key: keyof (typeof WORDS)["en"], act: () => void, name: string) => {
     const el = doc.createElement("button");
@@ -250,7 +284,8 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   guideBox.className = "kyuubu-player-guide";
   /** The viewer's own turns: the guide, and the step of the solve it started from. */
   let follow: { panel: GuideHandle; from: number } | null = null;
-  const followed = () => (follow === null ? null : Math.min(plan?.steps.length ?? 0, follow.from + follow.panel.guide.done));
+  const followed = () =>
+    follow === null ? null : Math.min(plan?.steps.length ?? 0, follow.from + follow.panel.guide.done);
 
   /** The cube handed to the viewer, from where the solve stands, with its next move shown on it. */
   const startFollow = () => {
@@ -260,7 +295,11 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     view.setState(plan.states[from], plan.size);
     view.setInteractive(true);
     root.append(guideBox);
-    const panel = mountGuide(guideBox, view, { moves: plan.steps.slice(from), locale: language, onChange: () => paint() });
+    const panel = mountGuide(guideBox, view, {
+      moves: plan.steps.slice(from),
+      locale: language,
+      onChange: () => paint(),
+    });
     follow = { panel, from };
     paint();
   };
@@ -294,9 +333,12 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     const at = stateNow() - 1;
     if (at < 0) return null;
     const scramble = plan.scramble.length;
-    return at < scramble ? { step: plan.scramble[at], scramble: true, at: at + 1, total: scramble } : { step: plan.steps[at - scramble], scramble: false, at: at - scramble + 1, total: plan.steps.length };
+    return at < scramble
+      ? { step: plan.scramble[at], scramble: true, at: at + 1, total: scramble }
+      : { step: plan.steps[at - scramble], scramble: false, at: at - scramble + 1, total: plan.steps.length };
   };
-  const whereOf = (one: { scramble: boolean; at: number; total: number }) => say(one.scramble ? "playerScrambleOf" : "playerMoveOf", { at: one.at, total: one.total });
+  const whereOf = (one: { scramble: boolean; at: number; total: number }) =>
+    say(one.scramble ? "playerScrambleOf" : "playerMoveOf", { at: one.at, total: one.total });
   /** What a screen reader is told of the move just made: at once when somebody chose it, and only once the cube has been still a moment when it is playing. */
   const announce = (text: string, playing: boolean) => {
     if (text === told) return;
@@ -336,12 +378,20 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     if (plan === null) return [];
     const item = (step: { text: string }, scramble: boolean, at: number, total: number) => {
       const name = moveName(step.text, language) ?? "";
-      return { code: step.text, name, label: say("playerToken", { code: step.text, name, where: whereOf({ scramble, at, total }) }) };
+      return {
+        code: step.text,
+        name,
+        label: say("playerToken", { code: step.text, name, where: whereOf({ scramble, at, total }) }),
+      };
     };
     const scramble = plan.scramble.length;
     return [
       { label: say("playerScrambleLabel"), items: plan.scramble.map((step, at) => item(step, true, at + 1, scramble)) },
-      { label: say("playerSolutionLabel"), main: true, items: plan.steps.map((step, at) => item(step, false, at + 1, plan!.steps.length)) },
+      {
+        label: say("playerSolutionLabel"),
+        main: true,
+        items: plan.steps.map((step, at) => item(step, false, at + 1, plan!.steps.length)),
+      },
     ];
   };
 
@@ -386,7 +436,14 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     if (fault !== null) {
       note.dataset.tone = "bad";
       const where = fault.fault;
-      note.textContent = where === undefined ? say("playerTooLong") : say(where.reason === "no-such-layer" ? "playerNoSuchLayer" : "playerCannotRead", { token: where.token, line: where.line, column: where.column });
+      note.textContent =
+        where === undefined
+          ? say("playerTooLong")
+          : say(where.reason === "no-such-layer" ? "playerNoSuchLayer" : "playerCannotRead", {
+              token: where.token,
+              line: where.line,
+              column: where.column,
+            });
     } else if (plan !== null && !plan.solved) {
       note.dataset.tone = "bad";
       note.textContent = say("playerUnsolved");
@@ -398,7 +455,10 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
   };
 
   /** A solve put on the cube, in place of the one before. */
-  const show = (source: ReplaySource, how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean }) => {
+  const show = (
+    source: ReplaySource,
+    how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean; guide?: boolean },
+  ) => {
     if (follow !== null) {
       follow.panel.destroy();
       follow = null;
@@ -448,11 +508,27 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     if (how.controls !== false) {
       const main = doc.createElement("div");
       main.className = "kyuubu-player-row";
-      const again = button("playerAgain", played(() => replay!.restart()), "again");
-      const back = button("playerBack", played(() => replay!.step(-1)), "back");
-      playButton = button("playerPlay", played(() => (replay!.status.playing ? replay!.pause() : replay!.play())), "play");
+      const again = button(
+        "playerAgain",
+        played(() => replay!.restart()),
+        "again",
+      );
+      const back = button(
+        "playerBack",
+        played(() => replay!.step(-1)),
+        "back",
+      );
+      playButton = button(
+        "playerPlay",
+        played(() => (replay!.status.playing ? replay!.pause() : replay!.play())),
+        "play",
+      );
       playButton.el.dataset.main = "";
-      const on = button("playerOn", played(() => replay!.step(1)), "on");
+      const on = button(
+        "playerOn",
+        played(() => replay!.step(1)),
+        "on",
+      );
       labelled.push(again, back, on);
       main.append(playButton.el, back.el, on.el, again.el);
       scrub.type = "range";
@@ -489,7 +565,11 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     } else if (showReadout) root.append(readout);
     if (showList) {
       root.append(listBox);
-      moves = mountMoveList(listBox, { groups: listGroups(), locale: language, onPick: (index) => played(() => goState(index + 1))() });
+      moves = mountMoveList(listBox, {
+        groups: listGroups(),
+        locale: language,
+        onPick: (index) => played(() => goState(index + 1))(),
+      });
     }
     if (showReadout) root.append(live);
   };
@@ -502,7 +582,14 @@ export function mountPlayer(host: HTMLElement, options: PlayerOptions): PlayerHa
     get fault() {
       return fault;
     },
-    load: (source, how = {}) => show(source, { speed: how.speed ?? replay?.status.speed, loop: how.loop ?? replay?.status.loop, controls: how.controls ?? options.controls, autoplay: how.autoplay, guide: how.guide }),
+    load: (source, how = {}) =>
+      show(source, {
+        speed: how.speed ?? replay?.status.speed,
+        loop: how.loop ?? replay?.status.loop,
+        controls: how.controls ?? options.controls,
+        autoplay: how.autoplay,
+        guide: how.guide,
+      }),
     play: played(() => replay?.play()),
     pause: played(() => replay?.pause()),
     step: (by) => played(() => replay?.step(by))(),

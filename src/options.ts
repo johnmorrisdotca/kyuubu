@@ -27,8 +27,8 @@ import type { KyuubuLanguage } from "./words.ts";
  * @example
  * ```ts
  * import type { OptionKind } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: OptionKind = "boolean";
  * console.log(value);
  * ```
@@ -40,8 +40,8 @@ export type OptionKind = "number" | "boolean" | "choice" | "colour" | "text" | "
  * @example
  * ```ts
  * import type { CubeMaker } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeMaker = "player";
  * console.log(value);
  * ```
@@ -53,8 +53,8 @@ export type CubeMaker = "view" | "player" | "turning";
  * @example
  * ```ts
  * import type { OptionGroup } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: OptionGroup = "replay";
  * console.log(value);
  * ```
@@ -67,7 +67,7 @@ export type OptionGroup = "size" | "look" | "turning" | "input" | "scramble" | "
  * ```ts
  * import type { CubeOption } from "@johnmorrisdotca/kyuubu";
  * import { CUBE_OPTIONS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CubeOption = CUBE_OPTIONS[0]!;
  * console.log(value.id);
  * ```
@@ -84,14 +84,27 @@ export type CubeOption = {
   /** The least, the most and the step, for a `number`. */
   range?: { min: number; max: number; step: number };
   /** What each way of making a cube calls it: `view` the `CubeView` option (`colours.U` is one face), `player` the `mountPlayer` option, `cube` the attribute of `<kyuubu-cube>` and the embed's address, `turning` the attribute of `<kyuubu-scramble>`; and for a cuboid, `cuboid` the `CuboidView` option, `cuboidPlayer` the `mountCuboidPlayer` option and `cuboidElement` the attribute of `<kyuubu-cuboid>`. Absent where that way does not have it. */
-  names: { view?: string; player?: string; cube?: string; turning?: string; cuboid?: string; cuboidPlayer?: string; cuboidElement?: string };
+  names: {
+    view?: string;
+    player?: string;
+    cube?: string;
+    turning?: string;
+    cuboid?: string;
+    cuboidPlayer?: string;
+    cuboidElement?: string;
+  };
   /** What the player's option is worth in this option's own unit: `timeMs` is milliseconds and `time` seconds. */
   factor?: { player?: number };
   /** The label and the one plain line, in each language. */
   say: Record<KyuubuLanguage, { label: string; help: string }>;
 };
 
-const face = (letter: "U" | "R" | "F" | "D" | "L" | "B", id: string, en: [string, string], ja: [string, string]): CubeOption => ({
+const face = (
+  letter: "U" | "R" | "F" | "D" | "L" | "B",
+  id: string,
+  en: [string, string],
+  ja: [string, string],
+): CubeOption => ({
   id,
   group: "look",
   kind: "colour",
@@ -104,7 +117,7 @@ const face = (letter: "U" | "R" | "F" | "D" | "L" | "B", id: string, en: [string
  * @example
  * ```ts
  * import { CUBE_OPTIONS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(CUBE_OPTIONS.slice(0, 5).map((option) => option.id));
  * ```
  */
@@ -128,8 +141,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: "3x3x3",
     names: { cuboid: "dims", cuboidPlayer: "dims", cuboidElement: "dims" },
     say: {
-      en: { label: "Width, height, depth", help: "A cuboid's three sides, each from 1 to 7 and not 1×1×1, written 3x3x1: a call takes them as [3, 3, 1]." },
-      ja: { label: "幅・高さ・奥行き", help: "直方体の3辺です。各辺は1から7まで、1×1×1は不可。3x3x1のように書きます。呼び出しでは[3, 3, 1]です。" },
+      en: {
+        label: "Width, height, depth",
+        help: "A cuboid's three sides, each from 1 to 7 and not 1×1×1, written 3x3x1: a call takes them as [3, 3, 1].",
+      },
+      ja: {
+        label: "幅・高さ・奥行き",
+        help: "直方体の3辺です。各辺は1から7まで、1×1×1は不可。3x3x1のように書きます。呼び出しでは[3, 3, 1]です。",
+      },
     },
   },
   {
@@ -139,8 +158,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     choices: CUBE_SCALES,
     names: { view: "scale", turning: "scale" },
     say: {
-      en: { label: "Scale", help: "How big it is drawn: small for a list, medium, or large. Left out, it fills its box." },
-      ja: { label: "表示の大きさ", help: "表示の大きさです。小はリスト向き、中、大。選ばないと、入れ物いっぱいに表示します。" },
+      en: {
+        label: "Scale",
+        help: "How big it is drawn: small for a list, medium, or large. Left out, it fills its box.",
+      },
+      ja: {
+        label: "表示の大きさ",
+        help: "表示の大きさです。小はリスト向き、中、大。選ばないと、入れ物いっぱいに表示します。",
+      },
     },
   },
   {
@@ -182,10 +207,24 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     group: "look",
     kind: "choice",
     choices: ["standard", "paper", "stickerless"],
-    names: { view: "theme", player: "theme", cube: "theme", turning: "theme", cuboid: "theme", cuboidPlayer: "theme", cuboidElement: "theme" },
+    names: {
+      view: "theme",
+      player: "theme",
+      cube: "theme",
+      turning: "theme",
+      cuboid: "theme",
+      cuboidPlayer: "theme",
+      cuboidElement: "theme",
+    },
     say: {
-      en: { label: "Theme", help: "A whole look at once: standard, paper or stickerless. The colours below are given on top of it." },
-      ja: { label: "テーマ", help: "見た目をまとめて選びます（標準・ペーパー・ステッカーなし）。下の色はその上に重ねて指定します。" },
+      en: {
+        label: "Theme",
+        help: "A whole look at once: standard, paper or stickerless. The colours below are given on top of it.",
+      },
+      ja: {
+        label: "テーマ",
+        help: "見た目をまとめて選びます（標準・ペーパー・ステッカーなし）。下の色はその上に重ねて指定します。",
+      },
     },
   },
   face("U", "colour-up", ["Top colour", "The colour of the top face."], ["上の色", "上の面の色です。"]),
@@ -237,7 +276,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     range: { min: 0, max: 1000, step: 20 },
     names: { view: "turnMs", cuboid: "turnMs" },
     say: {
-      en: { label: "Turn speed", help: "How long a quarter turn takes, in milliseconds, when a key, notation or code makes it." },
+      en: {
+        label: "Turn speed",
+        help: "How long a quarter turn takes, in milliseconds, when a key, notation or code makes it.",
+      },
       ja: { label: "回す速さ", help: "キーや回転記号、コードで回すとき、4分の1回転にかかる時間（ミリ秒）です。" },
     },
   },
@@ -248,8 +290,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: true,
     names: { view: "animateScramble" },
     say: {
-      en: { label: "Show the scramble turning", help: "Shows the last turns of a scramble turning, quickly; the rest are made at once." },
-      ja: { label: "スクランブルを回して見せる", help: "スクランブルの最後の数手を素早く回して見せます。それ以前は一度に行います。" },
+      en: {
+        label: "Show the scramble turning",
+        help: "Shows the last turns of a scramble turning, quickly; the rest are made at once.",
+      },
+      ja: {
+        label: "スクランブルを回して見せる",
+        help: "スクランブルの最後の数手を素早く回して見せます。それ以前は一度に行います。",
+      },
     },
   },
   {
@@ -260,7 +308,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     range: { min: 5, max: 85, step: 5 },
     names: { view: "commitAngle", cuboid: "commitAngle" },
     say: {
-      en: { label: "Point of no return", help: "How far a dragged layer must be turned, in degrees, before letting go makes the move." },
+      en: {
+        label: "Point of no return",
+        help: "How far a dragged layer must be turned, in degrees, before letting go makes the move.",
+      },
       ja: { label: "確定する角度", help: "ドラッグした層を離したときに回転が確定する角度（度）です。" },
     },
   },
@@ -271,8 +322,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: true,
     names: { view: "interactive", turning: "interactive", cuboid: "interactive" },
     say: {
-      en: { label: "Can be turned by hand", help: "Whether a person can drag a layer. A small cube is for looking at unless this says otherwise." },
-      ja: { label: "手で回せる", help: "層をドラッグして回せるかどうかです。小さいキューブは、指定しない限り見るだけです。" },
+      en: {
+        label: "Can be turned by hand",
+        help: "Whether a person can drag a layer. A small cube is for looking at unless this says otherwise.",
+      },
+      ja: {
+        label: "手で回せる",
+        help: "層をドラッグして回せるかどうかです。小さいキューブは、指定しない限り見るだけです。",
+      },
     },
   },
   {
@@ -283,8 +340,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     choices: ["focus", "page", "none"],
     names: { view: "keyboard", cuboid: "keyboard" },
     say: {
-      en: { label: "Keys", help: "Where the keys are heard: on the cube once it has focus, anywhere on the page, or nowhere." },
-      ja: { label: "キー操作", help: "キーを受け付ける場所です。キューブにフォーカスがあるとき、ページ全体、またはなし。" },
+      en: {
+        label: "Keys",
+        help: "Where the keys are heard: on the cube once it has focus, anywhere on the page, or nowhere.",
+      },
+      ja: {
+        label: "キー操作",
+        help: "キーを受け付ける場所です。キューブにフォーカスがあるとき、ページ全体、またはなし。",
+      },
     },
   },
   {
@@ -338,8 +401,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: "R U R' U'",
     names: { player: "scramble", cube: "scramble", cuboidPlayer: "scramble", cuboidElement: "scramble" },
     say: {
-      en: { label: "Scramble", help: "The moves that scramble the cube, as cubers write them: R U R' U', wide turns Rw, x y z." },
-      ja: { label: "スクランブル", help: "キューブを崩す手順です。回転記号で書きます（R U R' U'、ワイド Rw、x y z）。" },
+      en: {
+        label: "Scramble",
+        help: "The moves that scramble the cube, as cubers write them: R U R' U', wide turns Rw, x y z.",
+      },
+      ja: {
+        label: "スクランブル",
+        help: "キューブを崩す手順です。回転記号で書きます（R U R' U'、ワイド Rw、x y z）。",
+      },
     },
   },
   {
@@ -361,7 +430,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     names: { player: "timeMs", cube: "time", cuboidPlayer: "timeMs", cuboidElement: "time" },
     factor: { player: 1000 },
     say: {
-      en: { label: "Time", help: "How long the solve took, in seconds. The moves are spread over it; left out, a steady pace." },
+      en: {
+        label: "Time",
+        help: "How long the solve took, in seconds. The moves are spread over it; left out, a steady pace.",
+      },
       ja: { label: "タイム", help: "ソルブにかかった秒数です。各手をその時間に割り振ります。空なら一定の速さです。" },
     },
   },
@@ -373,7 +445,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     choices: REPLAY_SPEEDS.map(String),
     names: { player: "speed", cube: "speed", cuboidPlayer: "speed", cuboidElement: "speed" },
     say: {
-      en: { label: "Speed", help: "The speed it starts at: 1 is the solve's own pace, then a half, a quarter and a tenth." },
+      en: {
+        label: "Speed",
+        help: "The speed it starts at: 1 is the solve's own pace, then a half, a quarter and a tenth.",
+      },
       ja: { label: "再生の速さ", help: "再生を始める速さです。1は実際の速さ。ほかに2分の1、4分の1、10分の1。" },
     },
   },
@@ -407,7 +482,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     names: { player: "controls", cube: "controls", cuboidPlayer: "controls", cuboidElement: "controls" },
     say: {
       en: { label: "Controls", help: "Shows play, step, the slider and the speeds. Off, the cube plays alone." },
-      ja: { label: "操作ボタン", help: "再生、コマ送り、スライダー、速さの切り替えを表示します。オフなら再生だけです。" },
+      ja: {
+        label: "操作ボタン",
+        help: "再生、コマ送り、スライダー、速さの切り替えを表示します。オフなら再生だけです。",
+      },
     },
   },
   {
@@ -428,7 +506,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: true,
     names: { player: "moveList", cube: "movelist", cuboidPlayer: "moveList", cuboidElement: "movelist" },
     say: {
-      en: { label: "List of moves", help: "Shows the moves as buttons; the one just made is marked and each one takes the replay there." },
+      en: {
+        label: "List of moves",
+        help: "Shows the moves as buttons; the one just made is marked and each one takes the replay there.",
+      },
       ja: { label: "手順の一覧", help: "手順をボタンで表示します。いまの手に印が付き、押すとそこへ移ります。" },
     },
   },
@@ -439,7 +520,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: true,
     names: { player: "animateScrub", cube: "scrub", cuboidPlayer: "animateScrub", cuboidElement: "scrub" },
     say: {
-      en: { label: "Slider turns the cube", help: "Moving the slider turns the cube between where it was and where it goes." },
+      en: {
+        label: "Slider turns the cube",
+        help: "Moving the slider turns the cube between where it was and where it goes.",
+      },
       ja: { label: "スライダーで回す", help: "スライダーを動かすと、元の位置から新しい位置までキューブが回ります。" },
     },
   },
@@ -450,7 +534,10 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     default: false,
     names: { player: "guide", cube: "guide" },
     say: {
-      en: { label: "Turn it yourself", help: "Starts with the cube handed to the viewer, the solve's next move shown on it." },
+      en: {
+        label: "Turn it yourself",
+        help: "Starts with the cube handed to the viewer, the solve's next move shown on it.",
+      },
       ja: { label: "自分で回す", help: "キューブを見る人に渡した状態から始めます。次の手がキューブ上に示されます。" },
     },
   },
@@ -459,7 +546,15 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     group: "words",
     kind: "choice",
     choices: ["en", "ja"],
-    names: { view: "locale", player: "locale", cube: "lang", turning: "lang", cuboid: "locale", cuboidPlayer: "locale", cuboidElement: "lang" },
+    names: {
+      view: "locale",
+      player: "locale",
+      cube: "lang",
+      turning: "lang",
+      cuboid: "locale",
+      cuboidPlayer: "locale",
+      cuboidElement: "lang",
+    },
     say: {
       en: { label: "Language", help: "English or Japanese, for everything it says. Left out, it follows the page." },
       ja: { label: "言語", help: "表示される言葉の言語です。選ばないと、ページの言語に従います。" },
@@ -471,8 +566,14 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     kind: "text",
     names: { view: "label", cuboid: "label" },
     say: {
-      en: { label: "Name for a screen reader", help: "What a screen reader calls the cube. Left out, it is “A 3×3 cube”." },
-      ja: { label: "読み上げる名前", help: "スクリーンリーダーが読み上げるキューブの名前です。空なら「3×3のキューブ」のようになります。" },
+      en: {
+        label: "Name for a screen reader",
+        help: "What a screen reader calls the cube. Left out, it is “A 3×3 cube”.",
+      },
+      ja: {
+        label: "読み上げる名前",
+        help: "スクリーンリーダーが読み上げるキューブの名前です。空なら「3×3のキューブ」のようになります。",
+      },
     },
   },
 ];
@@ -482,7 +583,7 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
  * @example
  * ```ts
  * import { CUBE_OPTION_GROUPS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(CUBE_OPTION_GROUPS).slice(0, 8));
  * ```
  */
@@ -507,7 +608,7 @@ export const CUBE_OPTION_GROUPS: Readonly<Record<OptionGroup, Record<KyuubuLangu
  * @example
  * ```ts
  * import { CUBE_OPTIONS_LEFT_OUT } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(CUBE_OPTIONS_LEFT_OUT).slice(0, 8));
  * ```
  */

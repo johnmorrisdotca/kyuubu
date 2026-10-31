@@ -9,14 +9,21 @@ import { id, open, panel, serve, tap } from "./page.mjs";
 /** The demo is served without a secure address, where there is no clipboard: a stand-in that keeps what is written to it. */
 const clipboard = (page) =>
   page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (text) => void (window.__copied = text) } });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async (text) => void (window.__copied = text) },
+    });
   });
 const code = (page) => page.locator(id("example-code"));
 const preview = (page) => page.locator(`${id("example-preview")} [data-kyuubu]`);
 
-test("the code under the cube follows the size, the theme, the colours, the turn speed and the scramble choice, and the cube beside it is that code's", async ({ page }) => {
+test("the code under the cube follows the size, the theme, the colours, the turn speed and the scramble choice, and the cube beside it is that code's", async ({
+  page,
+}) => {
   await open(page);
-  await expect(code(page)).toHaveText(/import \{ CubeView, CUBE_THEMES \} from "@johnmorrisdotca\/kyuubu";\n\nnew CubeView\(document.getElementById\("cube"\), \{ size: 3, theme: CUBE_THEMES.paper \}\);/);
+  await expect(code(page)).toHaveText(
+    /import \{ CubeView, CUBE_THEMES \} from "@johnmorrisdotca\/kyuubu";\n\nnew CubeView\(document.getElementById\("cube"\), \{ size: 3, theme: CUBE_THEMES.paper \}\);/,
+  );
   await expect(preview(page).locator("[data-slot]")).toHaveCount(54);
   // A size: the code says it, and the cube beside it has that many stickers.
   await tap(page, '#sizes button[data-n="5"]');
@@ -36,7 +43,10 @@ test("the code under the cube follows the size, the theme, the colours, the turn
   await expect(code(page)).toContainText('U: "#ff00aa"');
   await expect(code(page)).toContainText("colours:");
   await expect(code(page)).toContainText("plastic:");
-  await expect(preview(page).locator('[data-face="U"] > div').first()).toHaveCSS("background-color", "rgb(255, 0, 170)");
+  await expect(preview(page).locator('[data-face="U"] > div').first()).toHaveCSS(
+    "background-color",
+    "rgb(255, 0, 170)",
+  );
   // The turn speed, under Controls; and the scramble.
   await panel(page, "keys");
   await expect(code(page)).not.toContainText("turnMs");
@@ -63,14 +73,19 @@ test("the code, run as written, makes the cube beside it", async ({ page }) => {
   const text = await code(page).textContent();
   // The code as the page would run it: its import is the package, here served from the page, and its element a box.
   const made = await page.evaluate(async (source) => {
-    const body = source.replace('from "@johnmorrisdotca/kyuubu"', 'from "http://kyuubu.test/dist/index.js"').replace('document.getElementById("cube")', "window.__box");
+    const body = source
+      .replace('from "@johnmorrisdotca/kyuubu"', 'from "http://kyuubu.test/dist/index.js"')
+      .replace('document.getElementById("cube")', "window.__box");
     const box = document.createElement("div");
     box.style.cssText = "width:160px;height:160px;position:relative";
     document.body.append(box);
     window.__box = box;
     const url = URL.createObjectURL(new Blob([body], { type: "text/javascript" }));
     await import(url);
-    return { slots: box.querySelectorAll("[data-slot]").length, label: box.querySelector("[data-kyuubu]").getAttribute("aria-label") };
+    return {
+      slots: box.querySelectorAll("[data-slot]").length,
+      label: box.querySelector("[data-kyuubu]").getAttribute("aria-label"),
+    };
   }, text);
   expect(made).toEqual({ slots: 96, label: "A 4×4 cube" });
   await expect(preview(page).locator("[data-slot]")).toHaveCount(96);
@@ -102,14 +117,22 @@ test.describe("on the page of turning cubes", () => {
     await expect(page.locator("html")).toHaveAttribute("data-ready", "true");
   };
 
-  test("the tag and the iframe follow the size picked, the pace and the scale, and the cube and frame beside them are theirs", async ({ page }) => {
+  test("the tag and the iframe follow the size picked, the pace and the scale, and the cube and frame beside them are theirs", async ({
+    page,
+  }) => {
     await goto(page);
-    await expect(tag(page)).toContainText('<kyuubu-scramble size="3" pace="normal" scale="small" theme="paper"></kyuubu-scramble>');
+    await expect(tag(page)).toContainText(
+      '<kyuubu-scramble size="3" pace="normal" scale="small" theme="paper"></kyuubu-scramble>',
+    );
     await tap(page, '#picker button[data-n="5"]');
     await tap(page, '#paces button[data-pace="slow"]');
     await tap(page, '#embed-scales button[data-scale="medium"]');
-    await expect(tag(page)).toContainText('<kyuubu-scramble size="5" pace="slow" scale="medium" theme="paper"></kyuubu-scramble>');
-    await expect(frame(page)).toContainText("embed-scramble.html#size=5&amp;pace=slow&amp;scale=medium&amp;theme=paper");
+    await expect(tag(page)).toContainText(
+      '<kyuubu-scramble size="5" pace="slow" scale="medium" theme="paper"></kyuubu-scramble>',
+    );
+    await expect(frame(page)).toContainText(
+      "embed-scramble.html#size=5&amp;pace=slow&amp;scale=medium&amp;theme=paper",
+    );
     await expect(frame(page)).toContainText('width="160" height="160"');
     // The cube beside the tag is the tag's, and the frame beside the iframe is the iframe's.
     const cube = page.locator(`${id("embed-tag-preview")} kyuubu-scramble`);
@@ -122,7 +145,10 @@ test.describe("on the page of turning cubes", () => {
     await expect(inner).toHaveAttribute("width", "160");
     await expect(page.frameLocator(`${id("embed-frame-preview")} iframe`).locator("[data-slot]")).toHaveCount(150);
     // Each pace, and each scale.
-    for (const [scale, side] of [["small", 72], ["large", 300]]) {
+    for (const [scale, side] of [
+      ["small", 72],
+      ["large", 300],
+    ]) {
       await tap(page, `#embed-scales button[data-scale="${scale}"]`);
       await expect(tag(page)).toContainText(`scale="${scale}"`);
       await expect(inner).toHaveAttribute("width", String(side));
@@ -147,7 +173,15 @@ test.describe("on the page of turning cubes", () => {
       return Object.fromEntries([...element.attributes].map((attribute) => [attribute.name, attribute.value]));
     }, copied);
     // The element writes its own style on itself; what the code says is the attributes.
-    const shown = await page.locator(`${id("embed-tag-preview")} kyuubu-scramble`).evaluate((element) => Object.fromEntries([...element.attributes].filter((attribute) => attribute.name !== "style").map((attribute) => [attribute.name, attribute.value])));
+    const shown = await page
+      .locator(`${id("embed-tag-preview")} kyuubu-scramble`)
+      .evaluate((element) =>
+        Object.fromEntries(
+          [...element.attributes]
+            .filter((attribute) => attribute.name !== "style")
+            .map((attribute) => [attribute.name, attribute.value]),
+        ),
+      );
     expect(rebuilt).toEqual(shown);
     expect(rebuilt).toEqual({ size: "4", pace: "fast", scale: "small", theme: "paper" });
   });

@@ -19,7 +19,7 @@ import type { CubeMove } from "./types.ts";
  * @example
  * ```ts
  * import { REPLAY_STEP_MS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_STEP_MS);
  * ```
  */
@@ -29,7 +29,7 @@ export const REPLAY_STEP_MS = 400;
  * @example
  * ```ts
  * import { REPLAY_SPEEDS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_SPEEDS);
  * ```
  */
@@ -39,7 +39,7 @@ export const REPLAY_SPEEDS = [1, 0.5, 0.25, 0.1] as const;
  * @example
  * ```ts
  * import { REPLAY_LOOP_REST_MS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_LOOP_REST_MS);
  * ```
  */
@@ -49,7 +49,7 @@ export const REPLAY_LOOP_REST_MS = 1200;
  * @example
  * ```ts
  * import { MAX_REPLAY_STEPS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_REPLAY_STEPS);
  * ```
  */
@@ -59,7 +59,7 @@ export const MAX_REPLAY_STEPS = 2000;
  * @example
  * ```ts
  * import { REPLAY_SCRUB_TURNS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_SCRUB_TURNS);
  * ```
  */
@@ -69,7 +69,7 @@ export const REPLAY_SCRUB_TURNS = 6;
  * @example
  * ```ts
  * import { REPLAY_SCRUB_MS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_SCRUB_MS);
  * ```
  */
@@ -79,7 +79,7 @@ export const REPLAY_SCRUB_MS = 70;
  * @example
  * ```ts
  * import { REPLAY_SCRAMBLE_STEP_MS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(REPLAY_SCRAMBLE_STEP_MS);
  * ```
  */
@@ -91,13 +91,13 @@ export const REPLAY_SCRAMBLE_STEP_MS = 200;
  * ```ts
  * import type { ReplayPlan } from "@johnmorrisdotca/kyuubu";
  * import { planReplay } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * function requirePlan() {
  *   const result = planReplay({ scramble: "R", solution: "R'" });
  *   if (!result.ok) throw new Error("Invalid replay");
  *   return result.plan;
  * }
- * 
+ *
  * const value: ReplayPlan = requirePlan();
  * console.log(value.solved);
  * ```
@@ -130,8 +130,8 @@ export type ReplayPlan = {
  * @example
  * ```ts
  * import type { ReplaySource } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ReplaySource = { size: 3, scramble: "R", solution: "R'", timeMs: 1000 };
  * console.log(value.timeMs);
  * ```
@@ -154,8 +154,8 @@ export type ReplaySource = {
  * @example
  * ```ts
  * import type { ReplayFault } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ReplayFault = { part: "solution", fault: { token: "oops", at: 0, line: 1, column: 1, reason: "unknown" } };
  * console.log(value.part);
  * ```
@@ -173,7 +173,7 @@ export type ReplayFault = { part: "size" | "scramble" | "solution" | "length"; f
  * @example
  * ```ts
  * import { planReplay } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(planReplay({ size: 3, scramble: "R U", solution: "U' R'", timeMs: 1000 }));
  * ```
  */
@@ -184,16 +184,23 @@ export function planReplay(source: ReplaySource): { ok: true; plan: ReplayPlan }
   if (!scramble.ok) return { ok: false, fault: { part: "scramble", fault: scramble.fault } };
   const solution = parseSolve(source.solution, size);
   if (!solution.ok) return { ok: false, fault: { part: "solution", fault: solution.fault } };
-  if (scramble.steps.length > MAX_REPLAY_STEPS || solution.steps.length > MAX_REPLAY_STEPS) return { ok: false, fault: { part: "length" } };
+  if (scramble.steps.length > MAX_REPLAY_STEPS || solution.steps.length > MAX_REPLAY_STEPS)
+    return { ok: false, fault: { part: "length" } };
   const scrambleStates = [solvedCube(size)];
-  for (const step of scramble.steps) scrambleStates.push(applySolve(scrambleStates[scrambleStates.length - 1], size, [step]));
+  for (const step of scramble.steps)
+    scrambleStates.push(applySolve(scrambleStates[scrambleStates.length - 1], size, [step]));
   const start = scrambleStates[scrambleStates.length - 1];
   const states = [start];
   for (const step of solution.steps) states.push(applySolve(states[states.length - 1], size, [step]));
   const count = solution.steps.length;
-  const given = source.stepMs !== undefined && source.stepMs.length === count && source.stepMs.every((ms) => Number.isFinite(ms) && ms >= 0);
+  const given =
+    source.stepMs !== undefined &&
+    source.stepMs.length === count &&
+    source.stepMs.every((ms) => Number.isFinite(ms) && ms >= 0);
   const timed = source.timeMs !== undefined && Number.isFinite(source.timeMs) && source.timeMs > 0;
-  const stepMs = given ? [...source.stepMs!] : new Array<number>(count).fill(timed && count > 0 ? source.timeMs! / count : REPLAY_STEP_MS);
+  const stepMs = given
+    ? [...source.stepMs!]
+    : new Array<number>(count).fill(timed && count > 0 ? source.timeMs! / count : REPLAY_STEP_MS);
   return {
     ok: true,
     plan: {
@@ -217,7 +224,7 @@ export function planReplay(source: ReplaySource): { ok: true; plan: ReplayPlan }
  * ```ts
  * import type { ScrubPath } from "@johnmorrisdotca/kyuubu";
  * import { parseSolve, scrubPath } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: ScrubPath = scrubPath(parseSolve("R U", 3).steps.map((step) => step.moves), 0, 2);
  * console.log(value.turns.length);
  * ```
@@ -245,14 +252,19 @@ export type ScrubPath = {
  * @example
  * ```ts
  * import { parseMoves, parseSolve, scrubPath } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const reading = parseSolve("R U", 3);
  * const steps = reading.steps;
  * const moves = parseMoves("R U2", 3)!;
  * console.log(scrubPath(steps.map((step) => step.moves), 0, 2));
  * ```
  */
-export function scrubPath(steps: readonly (readonly CubeMove[])[], from: number, to: number, shown: number = REPLAY_SCRUB_TURNS): ScrubPath {
+export function scrubPath(
+  steps: readonly (readonly CubeMove[])[],
+  from: number,
+  to: number,
+  shown: number = REPLAY_SCRUB_TURNS,
+): ScrubPath {
   const last = steps.length;
   const here = Math.max(0, Math.min(last, Math.round(from)));
   const there = Math.max(0, Math.min(last, Math.round(to)));
@@ -274,7 +286,7 @@ export function scrubPath(steps: readonly (readonly CubeMove[])[], from: number,
  * ```ts
  * import type { ReplayCube } from "@johnmorrisdotca/kyuubu";
  * import { movesNotation } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: ReplayCube = { setState: (state) => console.log(state), turnTogether: (moves) => console.log(movesNotation(moves, 3)) };
  * console.log(typeof value.turnTogether);
  * ```
@@ -291,8 +303,8 @@ export type ReplayCube = {
  * @example
  * ```ts
  * import type { ReplayClock } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ReplayClock = { set: (run, ms) => setTimeout(run, ms), clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>) };
  * console.log(typeof value.set);
  * ```
@@ -304,8 +316,8 @@ export type ReplayClock = { set(run: () => void, ms: number): unknown; clear(han
  * @example
  * ```ts
  * import type { ReplayStatus } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ReplayStatus = { position: 0, total: 2, playing: false, ended: false, scrambleAt: 1, scrambleTotal: 1, speed: 1, loop: false, elapsedMs: 0 };
  * console.log(value.position);
  * ```
@@ -336,8 +348,8 @@ export type ReplayStatus = {
  * @example
  * ```ts
  * import type { ReplayOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ReplayOptions = { speed: 2, loop: false, onEnd: () => console.log("Finished") };
  * console.log(value.speed);
  * ```
@@ -355,7 +367,10 @@ export type ReplayOptions = {
   clock?: ReplayClock;
 };
 
-const pageClock: ReplayClock = { set: (run, ms) => setTimeout(run, ms), clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>) };
+const pageClock: ReplayClock = {
+  set: (run, ms) => setTimeout(run, ms),
+  clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
+};
 
 /**
  * A planned solve played on a cube: play, pause, a step either way, anywhere
@@ -365,7 +380,7 @@ const pageClock: ReplayClock = { set: (run, ms) => setTimeout(run, ms), clear: (
  * @example
  * ```ts
  * import { Replay, cubeSolved, planReplay, turnAll } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const result = planReplay({ scramble: "R", solution: "R'" });
  * if (result.ok) {
  *   let state = result.plan.start;
@@ -431,7 +446,10 @@ export class Replay {
   /** The cube drawn as the replay stands: at the step of the scramble it has gone back to, or at the step of the solve. */
   private show(): void {
     const scrambling = this.scrambleAt < this.plan.scramble.length;
-    this.cube.setState(scrambling ? this.plan.scrambleStates[this.scrambleAt] : this.plan.states[this.at], this.plan.size);
+    this.cube.setState(
+      scrambling ? this.plan.scrambleStates[this.scrambleAt] : this.plan.states[this.at],
+      this.plan.size,
+    );
   }
 
   private advance(): void {
@@ -573,7 +591,8 @@ export class Replay {
       );
       const way = this.at > from ? 1 : -1;
       // The cube is shown where it is going to start from when that is not where it stands, or when a turn the other way is still on its way.
-      if (path.from !== from || (this.cube.busy === true && this.scrubbed !== way)) this.cube.setState(this.plan.states[path.from], this.plan.size);
+      if (path.from !== from || (this.cube.busy === true && this.scrubbed !== way))
+        this.cube.setState(this.plan.states[path.from], this.plan.size);
       for (const turn of path.turns) this.cube.turnTogether(turn, { ms: REPLAY_SCRUB_MS });
       this.scrubbed = way;
     } else {

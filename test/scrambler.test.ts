@@ -1,6 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CUBE_SCALE_PX, CUBE_SCALES, SCRAMBLE_PACES, SCRAMBLE_SHORTEST, cubeWidthPx, isCubeScale, keepScrambling, nextTurn, paceSeconds, seededRandom, type CubeMove } from "../src/index.ts";
+import {
+  CUBE_SCALE_PX,
+  CUBE_SCALES,
+  SCRAMBLE_PACES,
+  SCRAMBLE_SHORTEST,
+  cubeWidthPx,
+  isCubeScale,
+  keepScrambling,
+  nextTurn,
+  paceSeconds,
+  seededRandom,
+  type CubeMove,
+} from "../src/index.ts";
 
 /** A page that can be hidden and shown, and says so to whoever listens. */
 function fakePage() {
@@ -177,7 +189,12 @@ describe("a cube that keeps turning", () => {
   it("turns the same way from the same seed, and never about one axis twice running", () => {
     const run = () => {
       const cube = fakeCube(4);
-      const loop = keepScrambling(cube, { pace: 1, random: seededRandom("loop"), page: fakePage(), reducedMotion: false });
+      const loop = keepScrambling(cube, {
+        pace: 1,
+        random: seededRandom("loop"),
+        page: fakePage(),
+        reducedMotion: false,
+      });
       vi.advanceTimersByTime(30000);
       loop.destroy();
       return [...cube.turns];

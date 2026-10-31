@@ -1,112 +1,478 @@
 /* Kyuubu's own: the cube on its felt, and what sits round it. Everything else is family.css. */
-:root { --intro-room: 11.5rem; --intro-room-wide: 6.5rem; }
+:root {
+  --intro-room: 11.5rem;
+  --intro-room-wide: 6.5rem;
+}
 /* A quick second tap on a phone presses a button again, never zooms the page; two fingers still zoom it. */
-.cube-page { touch-action: manipulation; }
+.cube-page {
+  touch-action: manipulation;
+}
 
-.cube-layout { display: grid; gap: 14px; }
-.cube-layout > * { min-width: 0; }
-.cube-side { display: grid; gap: 14px; align-content: start; }
+.cube-layout {
+  display: grid;
+  gap: 14px;
+}
+.cube-layout > * {
+  min-width: 0;
+}
+.cube-side {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
 @media (min-width: 900px) {
-  .cube-layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+  .cube-layout {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
 }
 
 /* The felt holds the clock and the count above the cube, and a line of help below it. */
-.cube-felt { display: grid; gap: 8px; padding: 14px 14px 12px; }
-.cube-hud { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
-.cube-hud small { display: block; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
-.cube-hud b { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
-.cube-hud div:last-child { text-align: right; }
+.cube-felt {
+  display: grid;
+  gap: 8px;
+  padding: 14px 14px 12px;
+}
+.cube-hud {
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+.cube-hud small {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.cube-hud b {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.cube-hud div:last-child {
+  text-align: right;
+}
 /* The cube fills its stage, which is a square as wide as the felt and never taller than the window leaves room for. */
-.cube-stage { position: relative; width: 100%; max-width: min(560px, 62vh); aspect-ratio: 1; margin: 0 auto; }
-.cube-stage [data-kyuubu]:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; border-radius: 12px; }
+.cube-stage {
+  position: relative;
+  width: 100%;
+  max-width: min(560px, 62vh);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+.cube-stage [data-kyuubu]:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+  border-radius: 12px;
+}
 /* Room for two lines in either language, so the felt never changes height. */
-.cube-felt .fam-hint { margin: 0; min-height: 4em; display: grid; place-items: center; }
-@media (min-width: 540px) { .cube-felt .fam-hint { min-height: 2.6em; } }
+.cube-felt .fam-hint {
+  margin: 0;
+  min-height: 4em;
+  display: grid;
+  place-items: center;
+}
+@media (min-width: 540px) {
+  .cube-felt .fam-hint {
+    min-height: 2.6em;
+  }
+}
 /* Show me on the cube: the guide sits on the felt under the cube, in the felt's own colours. */
-.cube-guide { --kyuubu-guide-ink: var(--gold); --kyuubu-guide-alert: #ffc9b8; --kyuubu-guide-button: rgba(0,0,0,.28); --kyuubu-guide-rule: rgba(255,255,255,.35); --kyuubu-guide-focus: var(--gold); min-height: 9.5em; }
-.cube-felt .fam-hint[data-tone="good"] { opacity: 1; font-weight: 700; color: var(--gold); }
+.cube-guide {
+  --kyuubu-guide-ink: var(--gold);
+  --kyuubu-guide-alert: #ffc9b8;
+  --kyuubu-guide-button: rgba(0, 0, 0, 0.28);
+  --kyuubu-guide-rule: rgba(255, 255, 255, 0.35);
+  --kyuubu-guide-focus: var(--gold);
+  min-height: 9.5em;
+}
+.cube-felt .fam-hint[data-tone="good"] {
+  opacity: 1;
+  font-weight: 700;
+  color: var(--gold);
+}
 
-.cube-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-@media (min-width: 540px) { .cube-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.cube-sizes { display: grid; grid-template-columns: repeat(6, minmax(44px, 1fr)); width: 100%; }
-.cube-sizes button { padding: 0 2px; }
+.cube-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+@media (min-width: 540px) {
+  .cube-actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.cube-sizes {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  width: 100%;
+}
+.cube-sizes button {
+  padding: 0 2px;
+}
 
 /* One panel shows at a time; each keeps to its own height. */
-.cube-panels .fam-tabs button { padding: 0 4px; font-size: .9rem; }
-.cube-step { display: grid; gap: 4px; min-height: 7.5rem; align-content: start; }
-.cube-step b { font-size: 1.05rem; }
-.cube-done { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-height: 220px; overflow-y: auto; font-size: .85rem; }
-.cube-done li { display: grid; grid-template-columns: minmax(7.5rem, auto) 1fr; gap: 4px 12px; padding: 6px 2px; border-bottom: 1px solid var(--rule); }
-.cube-done li:last-child { border-bottom: 0; }
-.cube-done li span { color: var(--muted); }
-.cube-form { display: flex; gap: 8px; }
-.cube-form .fam-field { flex: 1 1 8rem; }
-.cube-moves { min-height: 44px; resize: vertical; }
-.cube-log { min-height: 1.4em; color: var(--muted); }
-.cube-text { width: 100%; min-height: 7.5rem; }
-.cube-colours { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
-.cube-colours label { display: grid; gap: 4px; font-size: .75rem; color: var(--muted); }
-.cube-colours input { width: 100%; height: 44px; padding: 3px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); cursor: pointer; }
-.cube-solves { max-height: 240px; overflow-y: auto; }
-.more pre + pre { margin-top: 8px; }
-.more pre code { font-weight: 400; }
-.cube-wide-label { flex: 1 1 100%; }
+.cube-panels .fam-tabs button {
+  padding: 0 4px;
+  font-size: 0.9rem;
+}
+.cube-step {
+  display: grid;
+  gap: 4px;
+  min-height: 7.5rem;
+  align-content: start;
+}
+.cube-step b {
+  font-size: 1.05rem;
+}
+.cube-done {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+.cube-done li {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, auto) 1fr;
+  gap: 4px 12px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+.cube-done li:last-child {
+  border-bottom: 0;
+}
+.cube-done li span {
+  color: var(--muted);
+}
+.cube-form {
+  display: flex;
+  gap: 8px;
+}
+.cube-form .fam-field {
+  flex: 1 1 8rem;
+}
+.cube-moves {
+  min-height: 44px;
+  resize: vertical;
+}
+.cube-log {
+  min-height: 1.4em;
+  color: var(--muted);
+}
+.cube-text {
+  width: 100%;
+  min-height: 7.5rem;
+}
+.cube-colours {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+.cube-colours label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.cube-colours input {
+  width: 100%;
+  height: 44px;
+  padding: 3px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.cube-solves {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.more pre + pre {
+  margin-top: 8px;
+}
+.more pre code {
+  font-weight: 400;
+}
+.cube-wide-label {
+  flex: 1 1 100%;
+}
 
 /* The famous solves page: a solve to watch, what is known of it, and the list to choose from. */
-.cube-watch { padding: 14px; }
-.cube-watch-title { margin: 0 0 8px; font-size: 1.05rem; color: inherit; }
-.cube-watch .kyuubu-player { --kyuubu-player-paper: var(--felt, #1f4d3a); max-width: min(560px, 62vh); margin: 0 auto; }
-.cube-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: .9rem; }
-.cube-facts dt { opacity: .7; }
-.cube-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-.cube-lines { white-space: pre-wrap; }
-.cube-solve-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.cube-solve { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 0 10px; align-items: baseline; width: 100%; min-height: 44px; padding: 8px 12px; text-align: start; font: inherit; color: inherit; background: transparent; border: 1px solid var(--rule); border-radius: 12px; cursor: pointer; }
-.cube-solve b { font-variant-numeric: tabular-nums; font-size: 1.1rem; grid-row: span 2; }
-.cube-solve small { opacity: .7; }
-.cube-solve[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.cube-paste { display: grid; gap: 6px; }
-.cube-paste-row { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 8px; align-items: center; }
-.cube-code { width: 100%; min-height: 5.5rem; font-size: .8rem; }
+.cube-watch {
+  padding: 14px;
+}
+.cube-watch-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: inherit;
+}
+.cube-watch .kyuubu-player {
+  --kyuubu-player-paper: var(--felt, #1f4d3a);
+  max-width: min(560px, 62vh);
+  margin: 0 auto;
+}
+.cube-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 0.9rem;
+}
+.cube-facts dt {
+  opacity: 0.7;
+}
+.cube-facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cube-lines {
+  white-space: pre-wrap;
+}
+.cube-solve-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.cube-solve {
+  display: grid;
+  grid-template-columns: 4.2em minmax(0, 1fr);
+  gap: 0 10px;
+  align-items: baseline;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  text-align: start;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.cube-solve b {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  grid-row: span 2;
+}
+.cube-solve small {
+  opacity: 0.7;
+}
+.cube-solve[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.cube-paste {
+  display: grid;
+  gap: 6px;
+}
+.cube-paste-row {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.cube-code {
+  width: 100%;
+  min-height: 5.5rem;
+  font-size: 0.8rem;
+}
 
 /* A cube that keeps turning: each cube keeps its one square, so nothing moves while they turn. */
-.cube-row { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; margin: 14px 0; }
-.cube-row figure { margin: 0; display: grid; gap: 6px; justify-items: center; max-width: 100%; }
-.cube-row figcaption { font-size: .8rem; color: var(--muted); }
-.cube-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.cube-pick { display: grid; justify-items: center; gap: 4px; min-width: 88px; min-height: 44px; padding: 8px; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); color: inherit; cursor: pointer; font: inherit; user-select: none; -webkit-user-select: none; }
-.cube-pick span { display: block; pointer-events: none; }
-.cube-pick small { font-size: .8rem; }
-.cube-row kyuubu-scramble, .cube-pick { user-select: none; -webkit-user-select: none; }
+.cube-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: flex-end;
+  margin: 14px 0;
+}
+.cube-row figure {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  max-width: 100%;
+}
+.cube-row figcaption {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.cube-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cube-pick {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 88px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.cube-pick span {
+  display: block;
+  pointer-events: none;
+}
+.cube-pick small {
+  font-size: 0.8rem;
+}
+.cube-row kyuubu-scramble,
+.cube-pick {
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 /* The code a page shows and the cube that code makes, side by side where there is room, one over the other where there is not. */
-.cube-example { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); align-items: start; }
-.cube-example-code { min-width: 0; }
-.cube-example-preview { position: relative; width: 160px; height: 160px; max-width: 100%; }
-.cube-example-preview > * { max-width: 100%; }
-@media (min-width: 640px) { .cube-example { grid-template-columns: minmax(0, 1fr) auto; } }
+.cube-example {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+.cube-example-code {
+  min-width: 0;
+}
+.cube-example-preview {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  max-width: 100%;
+}
+.cube-example-preview > * {
+  max-width: 100%;
+}
+@media (min-width: 640px) {
+  .cube-example {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
 
 /* The builder: the cube stays in view beside the choices on a desk, and comes first above them on a phone. */
-.cube-bld-layout { align-items: start; }
-.cube-bld-controls { display: grid; gap: 14px; min-width: 0; }
-@media (min-width: 900px) { .cube-bld-preview { position: sticky; top: 12px; } }
-.cube-bld-stage { position: relative; width: 100%; max-width: min(520px, 62vh); aspect-ratio: 1; margin: 0 auto; }
-.cube-bld-stage[data-maker="player"] { aspect-ratio: auto; max-width: min(560px, 100%); min-height: 280px; }
-.cube-bld-stage .kyuubu-player { --kyuubu-player-paper: var(--felt, #1f4d3a); }
-.cube-bld-stage kyuubu-scramble { margin: 0 auto; }
-.cube-bld-group { padding: 0; display: block; }
-.cube-bld-group > summary { cursor: pointer; padding: 12px 14px; min-height: 44px; font-weight: 700; display: flex; align-items: center; }
-.cube-bld-group[open] > summary { border-bottom: 1px solid var(--rule); }
-.cube-bld-options { padding: 14px; display: grid; gap: 16px; }
-.cube-bld-option { display: grid; gap: 6px; min-width: 0; }
-.cube-bld-option > label, .cube-bld-option > .fam-label { font-weight: 600; font-size: .9rem; }
-.cube-bld-option .fam-fine { margin: 0; }
-.cube-bld-colours { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.cube-bld-colour { display: flex; gap: 8px; align-items: center; }
-.cube-bld-colour input[type="color"] { width: 64px; height: 44px; padding: 3px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); cursor: pointer; }
-.cube-bld-number { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.cube-bld-number input[type="range"] { flex: 1 1 8rem; min-height: 44px; accent-color: var(--ink); }
-.cube-bld-number input[type="number"] { width: 6.5rem; }
-.cube-bld-code pre { max-width: 100%; overflow-x: auto; }
-.cube-bld-code .fam-tabs { flex-wrap: wrap; }
-.cube-bld-code .fam-tabs button { flex: 1 1 auto; min-width: 44px; padding: 0 12px; white-space: nowrap; }
+.cube-bld-layout {
+  align-items: start;
+}
+.cube-bld-controls {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+@media (min-width: 900px) {
+  .cube-bld-preview {
+    position: sticky;
+    top: 12px;
+  }
+}
+.cube-bld-stage {
+  position: relative;
+  width: 100%;
+  max-width: min(520px, 62vh);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+.cube-bld-stage[data-maker="player"] {
+  aspect-ratio: auto;
+  max-width: min(560px, 100%);
+  min-height: 280px;
+}
+.cube-bld-stage .kyuubu-player {
+  --kyuubu-player-paper: var(--felt, #1f4d3a);
+}
+.cube-bld-stage kyuubu-scramble {
+  margin: 0 auto;
+}
+.cube-bld-group {
+  padding: 0;
+  display: block;
+}
+.cube-bld-group > summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  min-height: 44px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+.cube-bld-group[open] > summary {
+  border-bottom: 1px solid var(--rule);
+}
+.cube-bld-options {
+  padding: 14px;
+  display: grid;
+  gap: 16px;
+}
+.cube-bld-option {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.cube-bld-option > label,
+.cube-bld-option > .fam-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.cube-bld-option .fam-fine {
+  margin: 0;
+}
+.cube-bld-colours {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.cube-bld-colour {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.cube-bld-colour input[type="color"] {
+  width: 64px;
+  height: 44px;
+  padding: 3px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.cube-bld-number {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cube-bld-number input[type="range"] {
+  flex: 1 1 8rem;
+  min-height: 44px;
+  accent-color: var(--ink);
+}
+.cube-bld-number input[type="number"] {
+  width: 6.5rem;
+}
+.cube-bld-code pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.cube-bld-code .fam-tabs {
+  flex-wrap: wrap;
+}
+.cube-bld-code .fam-tabs button {
+  flex: 1 1 auto;
+  min-width: 44px;
+  padding: 0 12px;
+  white-space: nowrap;
+}

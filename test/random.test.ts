@@ -35,6 +35,8 @@ describe("a scramble of the outer faces only", () => {
   });
 
   it("is the scramble it always was when every layer may turn", () => {
-    expect(randomScramble(3, 25, seededRandom("club night"), {})).toEqual(randomScramble(3, 25, seededRandom("club night")));
+    expect(randomScramble(3, 25, seededRandom("club night"), {})).toEqual(
+      randomScramble(3, 25, seededRandom("club night")),
+    );
   });
 });

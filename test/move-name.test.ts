@@ -10,7 +10,13 @@ describe("what a move turns, in a few plain words", () => {
     expect(en("R")).toBe("Right face, clockwise");
     expect(en("R'")).toBe("Right face, anticlockwise");
     expect(en("R2")).toBe("Right face, twice");
-    for (const [letter, side] of [["L", "Left"], ["U", "Top"], ["D", "Bottom"], ["F", "Front"], ["B", "Back"]] as const) {
+    for (const [letter, side] of [
+      ["L", "Left"],
+      ["U", "Top"],
+      ["D", "Bottom"],
+      ["F", "Front"],
+      ["B", "Back"],
+    ] as const) {
       expect(en(letter)).toBe(`${side} face, clockwise`);
       expect(en(`${letter}'`)).toBe(`${side} face, anticlockwise`);
       expect(en(`${letter}2`)).toBe(`${side} face, twice`);
@@ -67,11 +73,13 @@ describe("what a move turns, in a few plain words", () => {
   });
 
   it("is nothing for what is not a move in standard form", () => {
-    for (const text of ["", "Q", "R3", "r", "rw", "Rww", "RR", "R2'", "[r]", "m", "0R", "8R", "x3", "Rw3"]) expect(moveName(text), text).toBeNull();
+    for (const text of ["", "Q", "R3", "r", "rw", "Rww", "RR", "R2'", "[r]", "m", "0R", "8R", "x3", "Rw3"])
+      expect(moveName(text), text).toBeNull();
   });
 
   it("names every step a solve is written down with, in both languages, with no brace left over", () => {
-    const text = "x2 R' D2 R' D L' U L D R' U' R D L U' L' U' R U R' y' U R' U' R Rw' U' R U' R' U2 Rw U M' E S2 3Uw 2R F B' z'";
+    const text =
+      "x2 R' D2 R' D L' U L D R' U' R D L U' L' U' R U R' y' U R' U' R Rw' U' R U' R' U2 Rw U M' E S2 3Uw 2R F B' z'";
     const read = parseSolve(text, 5);
     expect(read.ok).toBe(true);
     for (const step of read.steps) {
@@ -85,10 +93,15 @@ describe("what a move turns, in a few plain words", () => {
 
   it("names what a plan's steps are, written as the plan writes them", () => {
     const planned = planReplay({ scramble: "R U", solution: "U' R'", size: 3 });
-    expect(planned.ok && planned.plan.steps.map((step) => moveName(step.text))).toEqual(["Top face, anticlockwise", "Right face, anticlockwise"]);
+    expect(planned.ok && planned.plan.steps.map((step) => moveName(step.text))).toEqual([
+      "Top face, anticlockwise",
+      "Right face, anticlockwise",
+    ]);
   });
 
   it("has every word it needs in both languages", () => {
-    for (const language of ["en", "ja"] as const) for (const key of Object.keys(WORDS[language]).filter((one) => one.startsWith("move"))) expect(WORDS[language][key as keyof typeof WORDS.en], key).not.toBe("");
+    for (const language of ["en", "ja"] as const)
+      for (const key of Object.keys(WORDS[language]).filter((one) => one.startsWith("move")))
+        expect(WORDS[language][key as keyof typeof WORDS.en], key).not.toBe("");
   });
 });

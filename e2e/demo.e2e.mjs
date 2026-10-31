@@ -121,7 +121,11 @@ test("a solve by hand is timed, cheered and kept on the device", async ({ page }
   expect(await cube(page)).toBe(after(2, "R U"));
   await tap(page, id("scramble"));
   const scramble = (await page.locator(id("text")).inputValue()).match(/scramble: (.+)/)[1];
-  const undo = scramble.split(" ").reverse().map((move) => (move.endsWith("2") ? move : move.endsWith("'") ? move.slice(0, -1) : `${move}'`)).join(" ");
+  const undo = scramble
+    .split(" ")
+    .reverse()
+    .map((move) => (move.endsWith("2") ? move : move.endsWith("'") ? move.slice(0, -1) : `${move}'`))
+    .join(" ");
   await panel(page, "moves");
   await page.locator(id("moves")).fill(undo);
   await tap(page, id("turn"));
@@ -146,7 +150,9 @@ test("a solve is written as text, and text or JSON is read back", async ({ page 
   await tap(page, id("turn"));
   await panel(page, "save");
   await expect(page.locator(id("text"))).toHaveValue("3x3\nsolve: R U2 F'\n");
-  await page.locator(id("text")).fill(JSON.stringify({ format: 1, solves: [{ size: 4, scramble: "2R U", moves: "U' 2R'", solved: false }] }));
+  await page
+    .locator(id("text"))
+    .fill(JSON.stringify({ format: 1, solves: [{ size: 4, scramble: "2R U", moves: "U' 2R'", solved: false }] }));
   await tap(page, id("load"));
   expect(await cube(page)).toBe(solvedCube(4));
   await expect(page.locator(id("text"))).toHaveValue("4x4\nscramble: 2R U\nsolve: U' 2R'\n");

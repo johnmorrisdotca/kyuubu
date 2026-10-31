@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { SOLVE_ALGORITHMS, countsAsMove, cubeSolved, joinTurns, movesNotation, parseMoves, randomScramble, solveSteps, solvedCube, turnAll, type SolveStep } from "../src/index.ts";
+import {
+  SOLVE_ALGORITHMS,
+  countsAsMove,
+  cubeSolved,
+  joinTurns,
+  movesNotation,
+  parseMoves,
+  randomScramble,
+  solveSteps,
+  solvedCube,
+  turnAll,
+  type SolveStep,
+} from "../src/index.ts";
 
 /** A seeded random source, so a failure names a scramble that can be run again. */
 function seeded(seed: number): () => number {
@@ -14,7 +26,12 @@ function seeded(seed: number): () => number {
   };
 }
 
-const played = (state: string, n: number, steps: SolveStep[]) => turnAll(state, n, steps.flatMap((step) => step.moves));
+const played = (state: string, n: number, steps: SolveStep[]) =>
+  turnAll(
+    state,
+    n,
+    steps.flatMap((step) => step.moves),
+  );
 
 describe("the layer-by-layer solve", () => {
   it("answers nothing for a size the method is not written for", () => {
@@ -28,7 +45,17 @@ describe("the layer-by-layer solve", () => {
 
   for (const n of [2, 3]) {
     it(`solves a hundred scrambled ${n}×${n} cubes, in the method's order`, () => {
-      const order = ["hold", "whiteCross", "whiteCorners", "whiteLayer", "middleLayer", "yellowCross", "yellowFace", "yellowCorners", "yellowEdges"];
+      const order = [
+        "hold",
+        "whiteCross",
+        "whiteCorners",
+        "whiteLayer",
+        "middleLayer",
+        "yellowCross",
+        "yellowFace",
+        "yellowCorners",
+        "yellowEdges",
+      ];
       for (let seed = 1; seed <= 100; seed += 1) {
         const scramble = randomScramble(n, n === 2 ? 11 : 25, seeded(seed));
         const state = turnAll(solvedCube(n), n, scramble);
@@ -69,8 +96,16 @@ describe("a step as it is taught", () => {
       const state = turnAll(solvedCube(3), 3, randomScramble(3, 25, seeded(500 + seed)));
       for (const step of solveSteps(state, 3)!) {
         // An algorithm is turned whole, from whichever side it is done: as many turns as it is written with.
-        for (const part of step.parts) if (part.algorithm !== undefined) expect(part.moves.length).toBe(SOLVE_ALGORITHMS[part.algorithm].split(" ").length);
-        expect(turnAll(solvedCube(3), 3, step.moves)).toBe(turnAll(solvedCube(3), 3, step.parts.flatMap((part) => part.moves)));
+        for (const part of step.parts)
+          if (part.algorithm !== undefined)
+            expect(part.moves.length).toBe(SOLVE_ALGORITHMS[part.algorithm].split(" ").length);
+        expect(turnAll(solvedCube(3), 3, step.moves)).toBe(
+          turnAll(
+            solvedCube(3),
+            3,
+            step.parts.flatMap((part) => part.moves),
+          ),
+        );
       }
     }
   });

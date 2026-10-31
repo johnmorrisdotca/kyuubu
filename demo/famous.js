@@ -8,7 +8,8 @@ const $ = (id) => document.getElementById(id);
 
 const WORDS = {
   en: {
-    pitch: "Record-setting solves of the 3×3, move for move, at the speed they were made. Watch one, slow it down, step through it, or paste any solve and play it. Then put it on your own page.",
+    pitch:
+      "Record-setting solves of the 3×3, move for move, at the speed they were made. Watch one, slow it down, step through it, or paste any solve and play it. Then put it on your own page.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toCube: "The cube",
@@ -20,21 +21,25 @@ const WORDS = {
     tabList: "Famous solves",
     tabPaste: "Paste a solve",
     tabEmbed: "Embed",
-    listIntro: "World records with a published scramble and reconstruction. Each one is played by a test, and is here only because the cube ends solved.",
+    listIntro:
+      "World records with a published scramble and reconstruction. Each one is played by a test, and is here only because the cube ends solved.",
     listMore: "The list has gaps: a record with no published reconstruction is left out.",
     listAdd: "Add a solve",
     listHistory: "Every record there has been, and the current ones in every event:",
     listWiki: "the history of the 3×3 record on the Speedsolving wiki",
     listWca: "the World Cube Association's records",
     yours: "Your solve",
-    pasteIntro: "A scramble and the moves that solve it, as cubers write them: wide turns (Rw or r), M E S, x y z, comments after //. Or paste a link to alg.cubing.net in either box. It is played even if it does not end solved, and says so.",
+    pasteIntro:
+      "A scramble and the moves that solve it, as cubers write them: wide turns (Rw or r), M E S, x y z, comments after //. Or paste a link to alg.cubing.net in either box. It is played even if it does not end solved, and says so.",
     pasteScramble: "Scramble",
     pasteMoves: "Moves",
     pasteTime: "Time, in seconds",
     pasteSize: "Cube",
     pastePlay: "Play it",
-    pasteHelp: "Leave the time empty for a steady pace. The solve is put in this page's address, so the address can be shared.",
-    embedIntro: "The solve now showing, for another page. All three carry the scramble and the moves; nothing is stored anywhere.",
+    pasteHelp:
+      "Leave the time empty for a steady pace. The solve is put in this page's address, so the address can be shared.",
+    embedIntro:
+      "The solve now showing, for another page. All three carry the scramble and the moves; nothing is stored anywhere.",
     embedFrame: "An iframe, for a page that allows no scripts",
     embedTag: "One tag, for a page that does",
     embedLink: "A link to this page",
@@ -58,7 +63,8 @@ const WORDS = {
     foot: "Times, names and dates are the World Cube Association's public results; this project is not affiliated with it. Rubik's Cube is a trademark of its owner.",
   },
   ja: {
-    pitch: "3×3の記録を作ったソルブを、一手ずつ、実際の速さで。再生して、ゆっくりにして、一手ずつ進めて。自分のソルブを貼り付けて再生することも、自分のページに埋め込むこともできます。",
+    pitch:
+      "3×3の記録を作ったソルブを、一手ずつ、実際の速さで。再生して、ゆっくりにして、一手ずつ進めて。自分のソルブを貼り付けて再生することも、自分のページに埋め込むこともできます。",
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
     toCube: "キューブ",
@@ -70,21 +76,25 @@ const WORDS = {
     tabList: "有名なソルブ",
     tabPaste: "ソルブを貼り付け",
     tabEmbed: "埋め込み",
-    listIntro: "スクランブルと手順が公開されている世界記録です。どれもテストで再生し、キューブがそろうことを確かめたものだけを載せています。",
+    listIntro:
+      "スクランブルと手順が公開されている世界記録です。どれもテストで再生し、キューブがそろうことを確かめたものだけを載せています。",
     listMore: "手順が公開されていない記録は載せていないため、抜けがあります。",
     listAdd: "ソルブを追加する",
     listHistory: "歴代の記録と、全種目の現在の記録はこちら:",
     listWiki: "Speedsolving wiki の3×3記録の歴史（英語）",
     listWca: "世界キューブ協会（WCA）の記録",
     yours: "あなたのソルブ",
-    pasteIntro: "スクランブルと、それをそろえる手順を回転記号で。ワイド（Rw や r）、M E S、x y z、// のあとのコメントも読めます。alg.cubing.net のリンクをどちらかの欄に貼り付けても読み込めます。そろわない手順もそのまま再生し、そろわないことを表示します。",
+    pasteIntro:
+      "スクランブルと、それをそろえる手順を回転記号で。ワイド（Rw や r）、M E S、x y z、// のあとのコメントも読めます。alg.cubing.net のリンクをどちらかの欄に貼り付けても読み込めます。そろわない手順もそのまま再生し、そろわないことを表示します。",
     pasteScramble: "スクランブル",
     pasteMoves: "手順",
     pasteTime: "タイム（秒）",
     pasteSize: "キューブ",
     pastePlay: "再生する",
-    pasteHelp: "タイムを空にすると一定の速さで再生します。ソルブはこのページのアドレスに入るので、アドレスを共有できます。",
-    embedIntro: "いま表示しているソルブを、ほかのページに。三つともスクランブルと手順をそのまま含み、どこにも保存しません。",
+    pasteHelp:
+      "タイムを空にすると一定の速さで再生します。ソルブはこのページのアドレスに入るので、アドレスを共有できます。",
+    embedIntro:
+      "いま表示しているソルブを、ほかのページに。三つともスクランブルと手順をそのまま含み、どこにも保存しません。",
     embedFrame: "iframe（スクリプトを使えないページ用）",
     embedTag: "タグひとつ（スクリプトを使えるページ用）",
     embedLink: "このページへのリンク",
@@ -128,19 +138,29 @@ const paramsOf = (solve) => {
 const attr = (text) => text.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
 function draw() {
-  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
+  document
+    .querySelector('[data-say="pageDocs"]')
+    ?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   const solve = showing;
   const famous = solve.id !== undefined;
-  $("watch-title").textContent = famous ? say("watch", { solver: solve.solver, time: say("seconds", { time: secs(solve.timeMs) }) }) : say("yours");
+  $("watch-title").textContent = famous
+    ? say("watch", { solver: solve.solver, time: say("seconds", { time: secs(solve.timeMs) }) })
+    : say("yours");
   // One player, and one cube, for every solve shown: a new solve is loaded onto it.
   const source = { size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs };
-  if (player === null) player = mountPlayer($("player"), { ...source, locale: page.lang, animateScrub: $("animate-scrub").getAttribute("aria-pressed") === "true" });
+  if (player === null)
+    player = mountPlayer($("player"), {
+      ...source,
+      locale: page.lang,
+      animateScrub: $("animate-scrub").getAttribute("aria-pressed") === "true",
+    });
   else {
     player.setLocale(page.lang);
     player.load(source);
   }
 
-  for (const item of $("list").children) item.firstChild.setAttribute("aria-pressed", String(item.dataset.id === solve.id));
+  for (const item of $("list").children)
+    item.firstChild.setAttribute("aria-pressed", String(item.dataset.id === solve.id));
 
   const facts = $("facts");
   facts.replaceChildren();
@@ -171,8 +191,10 @@ function draw() {
   const q = paramsOf(solve);
   const base = new URL(".", location.href).href;
   const frame = `${base}embed.html#${q}`;
-  $("e-frame").value = `<iframe src="${attr(frame)}" title="Kyuubu" width="360" height="600" style="border:0;max-width:100%" loading="lazy"></iframe>`;
-  $("e-tag").value = `<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></${"script"}>\n<kyuubu-cube${solve.size !== 3 ? ` size="${solve.size}"` : ""} scramble="${attr(solve.scramble)}" moves="${attr(solve.solution.replace(/\n/g, " "))}"${solve.timeMs !== undefined ? ` time="${secs(solve.timeMs)}"` : ""} controls></kyuubu-cube>`;
+  $("e-frame").value =
+    `<iframe src="${attr(frame)}" title="Kyuubu" width="360" height="600" style="border:0;max-width:100%" loading="lazy"></iframe>`;
+  $("e-tag").value =
+    `<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kyuubu@1/dist/element-define.js"></${"script"}>\n<kyuubu-cube${solve.size !== 3 ? ` size="${solve.size}"` : ""} scramble="${attr(solve.scramble)}" moves="${attr(solve.solution.replace(/\n/g, " "))}"${solve.timeMs !== undefined ? ` time="${secs(solve.timeMs)}"` : ""} controls></kyuubu-cube>`;
   const link = `${base}famous.html#${famous ? `solve=${solve.id}` : q}`;
   $("e-link").value = link;
   history.replaceState(null, "", `#${famous ? `solve=${solve.id}` : q}`);
@@ -220,7 +242,12 @@ $("paste").addEventListener("submit", (event) => {
     $("p-moves").value = link.solution;
   }
   const time = Number($("p-time").value.replace(",", "."));
-  showing = { size: Number($("p-size").value), scramble: $("p-scramble").value, solution: $("p-moves").value, timeMs: time > 0 ? time * 1000 : undefined };
+  showing = {
+    size: Number($("p-size").value),
+    scramble: $("p-scramble").value,
+    solution: $("p-moves").value,
+    timeMs: time > 0 ? time * 1000 : undefined,
+  };
   draw();
   $("watch-title").scrollIntoView({ block: "start", behavior: "auto" });
   player.play();
@@ -261,7 +288,12 @@ const named = FAMOUS_SOLVES.find((solve) => solve.id === asked.get("solve"));
 if (named !== undefined) showing = named;
 else if (asked.has("moves")) {
   const time = Number(asked.get("time"));
-  showing = { size: asked.has("size") ? Number(asked.get("size")) : 3, scramble: asked.get("scramble") ?? "", solution: asked.get("moves") ?? "", timeMs: time > 0 ? time * 1000 : undefined };
+  showing = {
+    size: asked.has("size") ? Number(asked.get("size")) : 3,
+    scramble: asked.get("scramble") ?? "",
+    solution: asked.get("moves") ?? "",
+    timeMs: time > 0 ? time * 1000 : undefined,
+  };
   $("p-scramble").value = showing.scramble;
   $("p-moves").value = showing.solution;
   $("p-time").value = asked.get("time") ?? "";

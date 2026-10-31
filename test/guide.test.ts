@@ -107,7 +107,11 @@ describe("a guide through a list of moves", () => {
 
 describe("a guide through the method", () => {
   it("walks the layer-by-layer method, step by step, to a solved cube", () => {
-    for (const [seed, n] of [["a", 3], ["b", 3], ["c", 2]] as const) {
+    for (const [seed, n] of [
+      ["a", 3],
+      ["b", 3],
+      ["c", 2],
+    ] as const) {
       const start = scrambled(seed, n);
       const guide = new Guide(start, n, { method: true });
       const stages: string[] = [];

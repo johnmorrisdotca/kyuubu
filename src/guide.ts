@@ -24,13 +24,15 @@ import { WORDS, fill, type CubeWords, type KyuubuLanguage } from "./words.ts";
  * @example
  * ```ts
  * import type { GuideSource } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: GuideSource = { moves: "R U R' U'" };
  * console.log(value);
  * ```
  */
-export type GuideSource = { moves: string | readonly (CubeMove | readonly CubeMove[] | SolveMove)[] } | { method: true };
+export type GuideSource =
+  | { moves: string | readonly (CubeMove | readonly CubeMove[] | SolveMove)[] }
+  | { method: true };
 
 /** The movement a guide asks for now.
  *
@@ -38,7 +40,7 @@ export type GuideSource = { moves: string | readonly (CubeMove | readonly CubeMo
  * ```ts
  * import type { GuideStep } from "@johnmorrisdotca/kyuubu";
  * import { Guide, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: GuideStep = new Guide(solvedCube(3), 3, { moves: "R U" }).next!;
  * console.log(value.text);
  * ```
@@ -67,8 +69,8 @@ export type GuideStep = {
  * @example
  * ```ts
  * import type { GuideHeard } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: GuideHeard = "done";
  * console.log(value);
  * ```
@@ -95,7 +97,7 @@ function movementOf(entry: CubeMove | readonly CubeMove[] | SolveMove): CubeMove
  * @example
  * ```ts
  * import { movementText, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(movementText(moves, 3));
  * ```
@@ -125,7 +127,7 @@ export function movementText(moves: readonly CubeMove[], n: number): string {
  * @example
  * ```ts
  * import { Guide, parseMove, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const guide = new Guide(solvedCube(3), 3, { moves: "R U" });
  * console.log(guide.next?.text);
  * console.log(guide.heard(parseMove("R", 3)!));
@@ -154,7 +156,10 @@ export class Guide {
     if ("moves" in source) {
       if (typeof source.moves === "string") {
         const read = parseSolve(source.moves, n);
-        if (!read.ok) throw new SyntaxError(`“${read.fault.token}” is not a move this cube can turn (line ${read.fault.line}, place ${read.fault.column})`);
+        if (!read.ok)
+          throw new SyntaxError(
+            `“${read.fault.token}” is not a move this cube can turn (line ${read.fault.line}, place ${read.fault.column})`,
+          );
         this.list = read.steps.map(movementOf);
       } else this.list = source.moves.map(movementOf).filter((movement) => movement.length > 0);
     }
@@ -304,7 +309,7 @@ const WHOLE: Record<CubeAxis, Record<CubeTurns, keyof CubeWords>> = {
  * @example
  * ```ts
  * import { movementSays, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(movementSays(moves, 3, "en"));
  * ```
@@ -313,7 +318,13 @@ export function movementSays(moves: readonly CubeMove[], n: number, language: Ky
   const words = WORDS[language];
   if (moves.length === 0) return null;
   const [first] = moves;
-  if (moves.some((move) => move.axis !== first.axis || move.turns !== first.turns || (move.layer === "all") !== (first.layer === "all"))) return null;
+  if (
+    moves.some(
+      (move) =>
+        move.axis !== first.axis || move.turns !== first.turns || (move.layer === "all") !== (first.layer === "all"),
+    )
+  )
+    return null;
   if (first.layer === "all") return words[WHOLE[first.axis][first.turns]];
   const layers = [...new Set(moves.map((move) => move.layer as number))].sort((a, b) => a - b);
   // Named from the face the layers are nearer: the one they reach, for a wide turn.
@@ -339,7 +350,7 @@ export function movementSays(moves: readonly CubeMove[], n: number, language: Ky
  * @example
  * ```ts
  * import { rotationKeys, wholeMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(rotationKeys(wholeMove("x", "cw")));
  * ```
  */

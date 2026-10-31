@@ -109,7 +109,9 @@ test("the method is shown on the cube, a turn of the whole cube made for you", a
   await sound(page, errors);
 });
 
-test("a turn of the whole cube is drawn on the cube with an arrow, and the next one is drawn when it is made", async ({ page }) => {
+test("a turn of the whole cube is drawn on the cube with an arrow, and the next one is drawn when it is made", async ({
+  page,
+}) => {
   const errors = await open(page);
   await showTyped(page, "x' z2 R");
   await expect(root(page)).toHaveAttribute("data-hint", "whole");
@@ -134,9 +136,13 @@ test("the hint is in Japanese too, and the cube's corners are rounded", async ({
   const errors = await open(page, "?lang=ja");
   await showTyped(page, "R'");
   await expect(page.locator('[data-guide="says"]')).toHaveText("右の面を手前に回します。");
-  const corner = await page.locator(':is(#stage, #player) [data-kyuubu] [data-slot="0"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
+  const corner = await page
+    .locator(':is(#stage, #player) [data-kyuubu] [data-slot="0"]')
+    .evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
   expect(parseFloat(corner)).toBeGreaterThan(0);
-  const inner = await page.locator(':is(#stage, #player) [data-kyuubu] [data-slot="4"]').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
+  const inner = await page
+    .locator(':is(#stage, #player) [data-kyuubu] [data-slot="4"]')
+    .evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
   expect(parseFloat(inner)).toBe(0);
   await sound(page, errors);
 });
@@ -150,7 +156,8 @@ test("the player hands the cube over to follow a famous solve by hand", async ({
   await expect(player).toHaveAttribute("data-following", "true");
   await expect(page.locator("[data-kyuubu-guide]")).toBeVisible();
   // The famous solves begin by holding the cube: made for the viewer, then the first turn by hand.
-  for (let guard = 0; guard < 4 && (await root(page).getAttribute("data-hint")) !== "drag"; guard += 1) await tap(page, '[data-act="do-it"]');
+  for (let guard = 0; guard < 4 && (await root(page).getAttribute("data-hint")) !== "drag"; guard += 1)
+    await tap(page, '[data-act="do-it"]');
   const at = Number(await player.getAttribute("data-position"));
   // The first turn by hand is a wide turn, r': a drag for each of its two layers, the second asked for once the first is made.
   await expect(shown(page)).toHaveText("Rw'");

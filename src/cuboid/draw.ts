@@ -6,8 +6,27 @@ import { DEFAULT_COLOURS, FACE_PROPERTIES, DEFAULT_PLASTIC, type CubeTheme } fro
 import { fill, languageOf, type KyuubuLanguage } from "../words.ts";
 import type { CubeFace } from "../cube.ts";
 
-import { cuboidDragAngle, cuboidMoveForRelease, cuboidPastCommit, cuboidQuartersForRelease, pickCuboidDrag, readCuboidKey, type CuboidDragPick } from "./gestures.ts";
-import { cuboidFaces, cuboidLayerOf, cuboidMoveLegal, cuboidName, cuboidSlots, isCuboidDims, solvedCuboid, turnCuboid, type CuboidDims, type CuboidMove } from "./model.ts";
+import {
+  cuboidDragAngle,
+  cuboidMoveForRelease,
+  cuboidPastCommit,
+  cuboidQuartersForRelease,
+  pickCuboidDrag,
+  readCuboidKey,
+  type CuboidDragPick,
+} from "./gestures.ts";
+import {
+  cuboidFaces,
+  cuboidLayerOf,
+  cuboidMoveLegal,
+  cuboidName,
+  cuboidSlots,
+  isCuboidDims,
+  solvedCuboid,
+  turnCuboid,
+  type CuboidDims,
+  type CuboidMove,
+} from "./model.ts";
 import { CUBOID_WORDS } from "./words.ts";
 
 /**
@@ -32,8 +51,8 @@ import { CUBOID_WORDS } from "./words.ts";
  * @example
  * ```ts
  * import type { CuboidViewOptions } from "@johnmorrisdotca/kyuubu/cuboid/draw";
- * 
- * 
+ *
+ *
  * const value: CuboidViewOptions = { dims: [2, 3, 3], interactive: true, keyboard: "focus" };
  * console.log(value.dims);
  * ```
@@ -80,8 +99,8 @@ export type CuboidViewOptions = {
  * @example
  * ```ts
  * import type { CuboidViewEvents } from "@johnmorrisdotca/kyuubu/cuboid/draw";
- * 
- * 
+ *
+ *
  * const value: CuboidViewEvents = { turn: (move, state) => console.log(move, state), look: (yaw, pitch) => console.log(yaw, pitch) };
  * console.log(Object.keys(value));
  * ```
@@ -97,8 +116,20 @@ const DRAG_LEAVE_LEAST = 32;
 const SPEED_WINDOW = 100;
 const COMMIT_FILTER = "brightness(1.14)";
 
-type RoundCorner = { property: "borderTopLeftRadius" | "borderTopRightRadius" | "borderBottomLeftRadius" | "borderBottomRightRadius"; vertex: Vec3 };
-type Placed = { right: Vec3; down: Vec3; out: Vec3; at: Vec3; slot?: number; layer?: number; corners?: RoundCorner[]; drawn?: { transform: string; visible: boolean; z: string; round: string } };
+type RoundCorner = {
+  property: "borderTopLeftRadius" | "borderTopRightRadius" | "borderBottomLeftRadius" | "borderBottomRightRadius";
+  vertex: Vec3;
+};
+type Placed = {
+  right: Vec3;
+  down: Vec3;
+  out: Vec3;
+  at: Vec3;
+  slot?: number;
+  layer?: number;
+  corners?: RoundCorner[];
+  drawn?: { transform: string; visible: boolean; z: string; round: string };
+};
 type Spin = { axis: CubeAxis; radians: number; layer: number };
 type Queued = { move: CuboidMove; report: boolean; ms?: number };
 type LiveDrag = { pick: CuboidDragPick; angle: number; committed: boolean; samples: { at: number; angle: number }[] };
@@ -113,7 +144,7 @@ type LiveDrag = { pick: CuboidDragPick; angle: number; committed: boolean; sampl
  * @example
  * ```ts no-run
  * import { CuboidView } from "@johnmorrisdotca/kyuubu/cuboid/draw";
- * 
+ *
  * const host = document.createElement("div");
  * host.style.cssText = "width:300px;height:300px;position:relative";
  * document.body.append(host);
@@ -127,9 +158,21 @@ type LiveDrag = { pick: CuboidDragPick; angle: number; committed: boolean; sampl
 export class CuboidView {
   /** The element the puzzle was made in. */
   readonly host: HTMLElement;
-  private options: Required<Pick<CuboidViewOptions, "interactive" | "keyboard" | "turnMs" | "commitAngle" | "fill" | "rounded">> & Pick<CuboidViewOptions, "onTurn" | "onLook" | "label">;
-  private theme: { colours: Partial<Record<CubeFace, string>>; plastic?: string; stickerInset?: string; stickerRadius?: string; cornerRadius?: string };
-  private readonly listeners: { turn: Set<CuboidViewEvents["turn"]>; look: Set<CuboidViewEvents["look"]> } = { turn: new Set(), look: new Set() };
+  private options: Required<
+    Pick<CuboidViewOptions, "interactive" | "keyboard" | "turnMs" | "commitAngle" | "fill" | "rounded">
+  > &
+    Pick<CuboidViewOptions, "onTurn" | "onLook" | "label">;
+  private theme: {
+    colours: Partial<Record<CubeFace, string>>;
+    plastic?: string;
+    stickerInset?: string;
+    stickerRadius?: string;
+    cornerRadius?: string;
+  };
+  private readonly listeners: { turn: Set<CuboidViewEvents["turn"]>; look: Set<CuboidViewEvents["look"]> } = {
+    turn: new Set(),
+    look: new Set(),
+  };
   private language: KyuubuLanguage;
   private sides: CuboidDims;
   private target: string;
@@ -147,7 +190,16 @@ export class CuboidView {
   private animating = false;
   private frame = 0;
   private depth = 1;
-  private gesture: { id: number; x: number; y: number; at: number; slot: number | null; done: boolean; yaw: number; pitch: number } | null = null;
+  private gesture: {
+    id: number;
+    x: number;
+    y: number;
+    at: number;
+    slot: number | null;
+    done: boolean;
+    yaw: number;
+    pitch: number;
+  } | null = null;
   private drag: LiveDrag | null = null;
   private finishSnap: (() => void) | null = null;
   private readonly resize: ResizeObserver | null;
@@ -156,7 +208,8 @@ export class CuboidView {
   private readonly cleanups: (() => void)[] = [];
 
   constructor(host: HTMLElement, options: CuboidViewOptions) {
-    if (!isCuboidDims(options.dims)) throw new RangeError("A cuboid has three sides, each a whole number from 1 to 7, and is not 1×1×1");
+    if (!isCuboidDims(options.dims))
+      throw new RangeError("A cuboid has three sides, each a whole number from 1 to 7, and is not 1×1×1");
     this.host = host;
     this.options = {
       interactive: options.interactive ?? true,
@@ -169,7 +222,8 @@ export class CuboidView {
       onLook: options.onLook,
       label: options.label,
     };
-    const given = <T extends object>(from: T | undefined) => Object.fromEntries(Object.entries(from ?? {}).filter(([, value]) => value !== undefined)) as Partial<T>;
+    const given = <T extends object>(from: T | undefined) =>
+      Object.fromEntries(Object.entries(from ?? {}).filter(([, value]) => value !== undefined)) as Partial<T>;
     this.theme = {
       ...given(options.theme),
       colours: { ...given(options.theme?.colours), ...given(options.colours) },
@@ -190,7 +244,14 @@ export class CuboidView {
     this.root.dataset.turning = "false";
     this.root.dataset.dragging = "false";
     this.root.dataset.committed = "false";
-    Object.assign(this.root.style, { position: "absolute", inset: "0", touchAction: "none", userSelect: "none", outline: "none", cursor: "grab" });
+    Object.assign(this.root.style, {
+      position: "absolute",
+      inset: "0",
+      touchAction: "none",
+      userSelect: "none",
+      outline: "none",
+      cursor: "grab",
+    });
     this.pivot = this.layer();
     this.still = this.layer();
     this.turning = this.layer();
@@ -241,7 +302,9 @@ export class CuboidView {
 
   /** Change how the puzzle looks, at once and without redrawing it. What is left out of `theme` stays as it is. */
   setTheme(theme: CubeTheme): void {
-    const defined = Object.fromEntries(Object.entries(theme).filter(([key, value]) => value !== undefined && key !== "colours"));
+    const defined = Object.fromEntries(
+      Object.entries(theme).filter(([key, value]) => value !== undefined && key !== "colours"),
+    );
     const colours = Object.fromEntries(Object.entries(theme.colours ?? {}).filter(([, value]) => value !== undefined));
     this.theme = { ...this.theme, ...defined, colours: { ...this.theme.colours, ...colours } };
     this.dress();
@@ -299,7 +362,10 @@ export class CuboidView {
 
   private measureSide(): void {
     const fallback = EDGE * 1.8;
-    this.side = Math.min(this.host.clientWidth || fallback, this.host.clientHeight || this.host.clientWidth || fallback);
+    this.side = Math.min(
+      this.host.clientWidth || fallback,
+      this.host.clientHeight || this.host.clientWidth || fallback,
+    );
   }
 
   private surface(slot: StickerSlot): Vec3 {
@@ -318,8 +384,20 @@ export class CuboidView {
       const frame = FACE_FRAMES[faceOfNormal(slot.normal)];
       const sticker = document.createElement("div");
       sticker.dataset.slot = String(at);
-      Object.assign(sticker.style, { position: "absolute", width: `${unit}px`, height: `${unit}px`, left: `${-unit / 2}px`, top: `${-unit / 2}px` });
-      this.places.set(sticker, { right: frame.right, down: frame.down, out: frame.normal, at: this.surface(slot), slot: at });
+      Object.assign(sticker.style, {
+        position: "absolute",
+        width: `${unit}px`,
+        height: `${unit}px`,
+        left: `${-unit / 2}px`,
+        top: `${-unit / 2}px`,
+      });
+      this.places.set(sticker, {
+        right: frame.right,
+        down: frame.down,
+        out: frame.normal,
+        at: this.surface(slot),
+        slot: at,
+      });
       const face = document.createElement("div");
       Object.assign(face.style, { position: "absolute", pointerEvents: "none" });
       sticker.append(face);
@@ -347,12 +425,19 @@ export class CuboidView {
       const row = (frame.down.reduce((sum, value, k) => sum + value * slot.centre[k], 0) + rows - 1) / 2;
       // A corner of a face that is a corner of the puzzle is rounded where it is on the outline (`draw` decides).
       const corners: RoundCorner[] = [];
-      const at = (across: number, down: number): Vec3 => frame.normal.map((value, k) => value + across * frame.right[k] + down * frame.down[k]) as unknown as Vec3;
+      const at = (across: number, down: number): Vec3 =>
+        frame.normal.map((value, k) => value + across * frame.right[k] + down * frame.down[k]) as unknown as Vec3;
       if (row === 0 && col === 0) corners.push({ property: "borderTopLeftRadius", vertex: at(-1, -1) });
       if (row === 0 && col === cols - 1) corners.push({ property: "borderTopRightRadius", vertex: at(1, -1) });
       if (row === rows - 1 && col === 0) corners.push({ property: "borderBottomLeftRadius", vertex: at(-1, 1) });
       if (row === rows - 1 && col === cols - 1) corners.push({ property: "borderBottomRightRadius", vertex: at(1, 1) });
-      for (const property of ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomLeftRadius", "borderBottomRightRadius"] as const) sticker.style[property] = "";
+      for (const property of [
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+      ] as const)
+        sticker.style[property] = "";
       const place = this.places.get(sticker);
       if (place !== undefined) {
         place.corners = corner === "" ? [] : corners;
@@ -408,10 +493,14 @@ export class CuboidView {
       const out = apply(m, place.out);
       // Facing the eye, which sits `lens` pixels in front of the puzzle's centre.
       const facing = -out[0] * at[0] - out[1] * at[1] + out[2] * (lens - at[2]) > 1e-6;
-      const transform = facing ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}` : (place.drawn?.transform ?? "");
+      const transform = facing
+        ? `perspective(${lens}px) ${placement(scaled(m, place.right), scaled(m, place.down), out, at)}`
+        : (place.drawn?.transform ?? "");
       let z = "0";
       if (facing && spin !== null) {
-        const piece = pieceOf(place.slot === undefined ? place.layer! : cuboidLayerOf(slots[place.slot].centre, spin.axis, this.sides));
+        const piece = pieceOf(
+          place.slot === undefined ? place.layer! : cuboidLayerOf(slots[place.slot].centre, spin.axis, this.sides),
+        );
         z = String(nearIsPositive ? piece : 2 - piece);
       }
       const was = place.drawn;
@@ -444,7 +533,8 @@ export class CuboidView {
   }
 
   private quarterMs(): number {
-    const calm = this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const calm =
+      this.host.ownerDocument?.defaultView?.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
     return calm ? 0 : this.options.turnMs;
   }
 
@@ -461,9 +551,11 @@ export class CuboidView {
 
   /** The turning group put back as it was, its stickers still again. */
   private lower(): void {
-    for (const sticker of [...this.turning.children]) if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
+    for (const sticker of [...this.turning.children])
+      if ((sticker as HTMLElement).dataset.slot !== undefined) this.still.append(sticker);
     this.turning.replaceChildren();
-    for (const cover of [...this.still.children]) if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
+    for (const cover of [...this.still.children])
+      if ((cover as HTMLElement).dataset.cover !== undefined) cover.remove();
     for (const element of [...this.places.keys()]) if (element.dataset.cover !== undefined) this.places.delete(element);
     this.spin = null;
     this.draw();
@@ -486,7 +578,10 @@ export class CuboidView {
     for (const below of [layer - 1, layer]) if (below >= 0 && below < depth - 1) edges.push(below);
     for (const below of edges) {
       const edge = 2 * below - depth + 2;
-      for (const [one, facing] of [[below, 1], [below + 1, -1]] as const) {
+      for (const [one, facing] of [
+        [below, 1],
+        [below + 1, -1],
+      ] as const) {
         const cover = document.createElement("div");
         cover.dataset.cover = "";
         Object.assign(cover.style, {
@@ -499,7 +594,13 @@ export class CuboidView {
           borderRadius: this.corner(),
           pointerEvents: "none",
         });
-        this.places.set(cover, { right: frame.right, down: frame.down, out: out.map((value) => value * facing) as unknown as Vec3, at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3, layer: one });
+        this.places.set(cover, {
+          right: frame.right,
+          down: frame.down,
+          out: out.map((value) => value * facing) as unknown as Vec3,
+          at: out.map((value) => (value * edge * unit) / 2) as unknown as Vec3,
+          layer: one,
+        });
         (one === layer ? this.turning : this.still).append(cover);
       }
     }
@@ -513,7 +614,8 @@ export class CuboidView {
     this.target = state;
     this.shown = state;
     if (dims.some((side, at) => side !== this.sides[at])) {
-      if (!isCuboidDims(dims)) throw new RangeError("A cuboid has three sides, each a whole number from 1 to 7, and is not 1×1×1");
+      if (!isCuboidDims(dims))
+        throw new RangeError("A cuboid has three sides, each a whole number from 1 to 7, and is not 1×1×1");
       this.sides = dims;
       this.root.setAttribute("aria-label", this.label());
       this.root.dataset.dims = cuboidName(dims);
@@ -523,8 +625,12 @@ export class CuboidView {
   }
 
   /** Turn a layer, animated after any turns already on their way. Told to `onTurn` only when `report` says so. A turn the puzzle cannot make throws a `RangeError`. */
-  turn(move: CuboidMove, { report = false, animate = true, ms }: { report?: boolean; animate?: boolean; ms?: number } = {}): void {
-    if (!cuboidMoveLegal(this.sides, move)) throw new RangeError(`The ${cuboidName(this.sides)} cuboid cannot make that turn`);
+  turn(
+    move: CuboidMove,
+    { report = false, animate = true, ms }: { report?: boolean; animate?: boolean; ms?: number } = {},
+  ): void {
+    if (!cuboidMoveLegal(this.sides, move))
+      throw new RangeError(`The ${cuboidName(this.sides)} cuboid cannot make that turn`);
     this.settleDrag();
     this.target = turnCuboid(this.target, this.sides, move);
     if (report) this.told(move);
@@ -599,7 +705,9 @@ export class CuboidView {
     if (this.drag === null) delete this.root.dataset.angle;
     for (const sticker of [...this.turning.children] as HTMLElement[]) {
       if (sticker.dataset.slot === undefined) continue;
-      (sticker.firstChild as HTMLDivElement).style.filter = committed ? `var(--kyuubu-commit-filter, ${COMMIT_FILTER})` : "";
+      (sticker.firstChild as HTMLDivElement).style.filter = committed
+        ? `var(--kyuubu-commit-filter, ${COMMIT_FILTER})`
+        : "";
     }
   }
 
@@ -699,7 +807,12 @@ export class CuboidView {
     for (; job !== undefined; job = this.queue.shift()) {
       quarters = job.move.turns === 3 ? -1 : job.move.turns;
       const calm = this.quarterMs() === 0 && this.options.turnMs !== 0;
-      duration = job.ms !== undefined ? (calm ? 0 : job.ms) : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
+      duration =
+        job.ms !== undefined
+          ? calm
+            ? 0
+            : job.ms
+          : (this.quarterMs() * Math.abs(quarters) ** 0.6) / (1 + this.queue.length);
       if (duration > 0) break;
       this.shown = turnCuboid(this.shown, this.sides, job.move);
       jumped = true;
@@ -747,10 +860,17 @@ export class CuboidView {
 
   private slotAt(target: EventTarget | null): number | null {
     const sticker = (target as HTMLElement | null)?.closest?.("[data-slot]") as HTMLElement | null;
-    return sticker === null || sticker === undefined || !this.root.contains(sticker) ? null : Number(sticker.dataset.slot);
+    return sticker === null || sticker === undefined || !this.root.contains(sticker)
+      ? null
+      : Number(sticker.dataset.slot);
   }
 
-  private bind<K extends keyof HTMLElementEventMap>(element: HTMLElement | Document, type: K, handler: (event: HTMLElementEventMap[K]) => void, passive = true): void {
+  private bind<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Document,
+    type: K,
+    handler: (event: HTMLElementEventMap[K]) => void,
+    passive = true,
+  ): void {
     const listener = handler as EventListener;
     element.addEventListener(type, listener, { passive });
     this.cleanups.push(() => element.removeEventListener(type, listener));
@@ -769,7 +889,16 @@ export class CuboidView {
       this.root.setPointerCapture?.(event.pointerId);
       if (this.options.keyboard === "focus") this.root.focus({ preventScroll: true });
       const slot = this.options.interactive ? this.slotAt(event.target) : null;
-      this.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp, slot, done: false, yaw: this.yaw, pitch: this.pitch };
+      this.gesture = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        at: event.timeStamp,
+        slot,
+        done: false,
+        yaw: this.yaw,
+        pitch: this.pitch,
+      };
       this.root.style.cursor = "grabbing";
     });
     this.bind(this.root, "pointermove", (event) => {
@@ -784,7 +913,12 @@ export class CuboidView {
       // A drag that wanders well off the puzzle's element is given up: the layer goes back.
       const box = this.root.getBoundingClientRect();
       const room = Math.max(DRAG_LEAVE_LEAST, Math.min(box.width, box.height) * DRAG_LEAVE);
-      if (event.clientX < box.left - room || event.clientX > box.right + room || event.clientY < box.top - room || event.clientY > box.bottom + room) {
+      if (
+        event.clientX < box.left - room ||
+        event.clientX > box.right + room ||
+        event.clientY < box.top - room ||
+        event.clientY > box.bottom + room
+      ) {
         gesture.done = true;
         this.endDrag(false, event.timeStamp);
         return;
@@ -794,7 +928,8 @@ export class CuboidView {
         if (pick === null) return;
         this.beginDrag(pick, gesture.at);
       }
-      if (this.drag !== null) this.followDrag(cuboidDragAngle(this.drag.pick, dx, dy, this.quarterPx()), event.timeStamp);
+      if (this.drag !== null)
+        this.followDrag(cuboidDragAngle(this.drag.pick, dx, dy, this.quarterPx()), event.timeStamp);
     });
     const end = (released: boolean) => (event: PointerEvent) => {
       if (this.gesture?.id !== event.pointerId) return;
@@ -815,7 +950,9 @@ export class CuboidView {
       "wheel",
       (event) => {
         event.preventDefault();
-        const delta = (Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX) * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 400 : 1);
+        const delta =
+          (Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX) *
+          (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 400 : 1);
         if (event.ctrlKey) this.setLook(this.yaw, this.pitch + delta * 0.25);
         else this.setLook(this.yaw + delta * 0.25, this.pitch);
       },
@@ -830,8 +967,18 @@ export class CuboidView {
       (event) => {
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         const from = event.target as HTMLElement | null;
-        if (from !== null && from !== this.root && (from.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(from.tagName))) return;
-        const looks: Record<string, [number, number]> = { ArrowLeft: [-15, 0], ArrowRight: [15, 0], ArrowUp: [0, -15], ArrowDown: [0, 15] };
+        if (
+          from !== null &&
+          from !== this.root &&
+          (from.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(from.tagName))
+        )
+          return;
+        const looks: Record<string, [number, number]> = {
+          ArrowLeft: [-15, 0],
+          ArrowRight: [15, 0],
+          ArrowUp: [0, -15],
+          ArrowDown: [0, 15],
+        };
         if (looks[event.key] !== undefined) {
           event.preventDefault();
           this.setLook(this.yaw + looks[event.key][0], this.pitch + looks[event.key][1]);

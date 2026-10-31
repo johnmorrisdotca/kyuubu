@@ -16,7 +16,7 @@ import type { CuboidDims } from "./model.ts";
  * ```ts
  * import type { CuboidPreset } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { CUBOID_PRESETS } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidPreset = CUBOID_PRESETS[0]!;
  * console.log(value.dims);
  * ```
@@ -38,7 +38,7 @@ export type CuboidPreset = {
  * @example
  * ```ts
  * import { CUBOID_PRESETS } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(CUBOID_PRESETS.map((preset) => preset.key));
  * ```
  */
@@ -48,49 +48,70 @@ export const CUBOID_PRESETS: readonly CuboidPreset[] = [
     label: "1×2×3",
     dims: [3, 2, 1],
     name: { en: "Brick", ja: "レンガ" },
-    says: { en: "The smallest with a name: five turns, all half turns, and 192 states in all.", ja: "名前のある中で最小です。回し方は5つ、すべて半回転で、状態は全部で192通りです。" },
+    says: {
+      en: "The smallest with a name: five turns, all half turns, and 192 states in all.",
+      ja: "名前のある中で最小です。回し方は5つ、すべて半回転で、状態は全部で192通りです。",
+    },
   },
   {
     key: "floppy",
     label: "1×3×3",
     dims: [3, 3, 1],
     name: { en: "Floppy", ja: "フロッピー" },
-    says: { en: "A flat 3×3 one cubie thick: half turns only, 768 states (192 if only the outer slices turn).", ja: "厚さ1の平たい3×3です。半回転だけで、状態は768通りです（外側の層だけ回すなら192通り）。" },
+    says: {
+      en: "A flat 3×3 one cubie thick: half turns only, 768 states (192 if only the outer slices turn).",
+      ja: "厚さ1の平たい3×3です。半回転だけで、状態は768通りです（外側の層だけ回すなら192通り）。",
+    },
   },
   {
     key: "tower",
     label: "2×2×3",
     dims: [2, 3, 2],
     name: { en: "Tower", ja: "タワー" },
-    says: { en: "A 2×2 with a layer added: the three layers turn a quarter, the sides only a half.", ja: "2×2に層をひとつ足した形です。3つの層は1/4回転でき、側面は半回転だけです。" },
+    says: {
+      en: "A 2×2 with a layer added: the three layers turn a quarter, the sides only a half.",
+      ja: "2×2に層をひとつ足した形です。3つの層は1/4回転でき、側面は半回転だけです。",
+    },
   },
   {
     key: "domino",
     label: "2×3×3",
     dims: [3, 2, 3],
     name: { en: "Domino", ja: "ドミノ" },
-    says: { en: "A 3×3 cut in half: the two 3×3 slices turn a quarter, the sides only a half.", ja: "3×3を半分にした形です。2つの3×3の層は1/4回転でき、側面は半回転だけです。" },
+    says: {
+      en: "A 3×3 cut in half: the two 3×3 slices turn a quarter, the sides only a half.",
+      ja: "3×3を半分にした形です。2つの3×3の層は1/4回転でき、側面は半回転だけです。",
+    },
   },
   {
     key: "block",
     label: "2×3×4",
     dims: [2, 4, 3],
     name: { en: "Block", ja: "ブロック" },
-    says: { en: "No slice is square, so every turn of it is a half turn.", ja: "どの層も正方形ではないので、すべての回転が半回転です。" },
+    says: {
+      en: "No slice is square, so every turn of it is a half turn.",
+      ja: "どの層も正方形ではないので、すべての回転が半回転です。",
+    },
   },
   {
     key: "pillar",
     label: "3×3×4",
     dims: [3, 4, 3],
     name: { en: "Pillar", ja: "ピラー" },
-    says: { en: "A 3×3 with a fourth layer: the four layers turn a quarter, the long sides only a half.", ja: "3×3に4つ目の層を足した形です。4つの層は1/4回転でき、長い側面は半回転だけです。" },
+    says: {
+      en: "A 3×3 with a fourth layer: the four layers turn a quarter, the long sides only a half.",
+      ja: "3×3に4つ目の層を足した形です。4つの層は1/4回転でき、長い側面は半回転だけです。",
+    },
   },
   {
     key: "tall-pillar",
     label: "3×3×5",
     dims: [3, 5, 3],
     name: { en: "Tall pillar", ja: "トールピラー" },
-    says: { en: "The pillar with a fifth layer, and the biggest of the named shapes.", ja: "ピラーに5つ目の層を足した形で、名前のある中で最大です。" },
+    says: {
+      en: "The pillar with a fifth layer, and the biggest of the named shapes.",
+      ja: "ピラーに5つ目の層を足した形で、名前のある中で最大です。",
+    },
   },
 ];
 
@@ -102,7 +123,7 @@ export const CUBOID_PRESETS: readonly CuboidPreset[] = [
  * @example
  * ```ts
  * import { CUBOID_PRESETS, cuboidPreset } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidPreset(CUBOID_PRESETS[0]!.key)?.dims);
  * ```

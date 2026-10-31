@@ -20,8 +20,8 @@
  * @example
  * ```ts
  * import type { CubeAxis } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeAxis = 0;
  * console.log(value);
  * ```
@@ -33,8 +33,8 @@ export type CubeAxis = 0 | 1 | 2;
  * @example
  * ```ts
  * import type { CubeTurns } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeTurns = 2;
  * console.log(value);
  * ```
@@ -47,7 +47,7 @@ export type CubeTurns = 1 | 2 | 3;
  * ```ts
  * import type { CubeMove } from "@johnmorrisdotca/kyuubu";
  * import { parseMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CubeMove = parseMove("R", 3)!;
  * console.log(value);
  * ```
@@ -66,8 +66,8 @@ export type CubeMove = {
  * @example
  * ```ts
  * import type { Vec3 } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: Vec3 = [1, 0, 0];
  * console.log(value);
  * ```
@@ -80,7 +80,7 @@ export type Vec3 = readonly [number, number, number];
  * ```ts
  * import type { StickerSlot } from "@johnmorrisdotca/kyuubu";
  * import { cubeSlots } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: StickerSlot = cubeSlots(3).slots[0]!;
  * console.log(value.normal);
  * ```

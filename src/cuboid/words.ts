@@ -13,7 +13,7 @@ import type { CuboidFault } from "./notation.ts";
  * ```ts
  * import type { CuboidWords } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { CUBOID_WORDS } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const value: CuboidWords = CUBOID_WORDS.en;
  * console.log(value.cuboidLabel);
  * ```
@@ -40,7 +40,7 @@ export type CuboidWords = {
  * @example
  * ```ts
  * import { CUBOID_WORDS } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(Object.keys(CUBOID_WORDS.en).slice(0, 5));
  * ```
  */
@@ -49,7 +49,8 @@ export const CUBOID_WORDS: Readonly<Record<KyuubuLanguage, CuboidWords>> = {
     cuboidLabel: "A {dims} cuboid",
     faultUnknown: "“{token}” is not a move.",
     faultNoSuchLayer: "“{token}” turns a layer this cuboid does not have.",
-    faultHalfTurnOnly: "“{token}” would be a quarter turn, and that layer is not square, so it only makes half turns. Write “{half}”.",
+    faultHalfTurnOnly:
+      "“{token}” would be a quarter turn, and that layer is not square, so it only makes half turns. Write “{half}”.",
     faultWholePuzzle: "“{token}” is a side one cubie deep, which is the whole puzzle: turning it moves nothing.",
     faultDims: "That is not a cuboid: each side is a whole number from 1 to 7.",
     faultLength: "That is too long to play.",
@@ -58,7 +59,8 @@ export const CUBOID_WORDS: Readonly<Record<KyuubuLanguage, CuboidWords>> = {
     cuboidLabel: "{dims}の直方体パズル",
     faultUnknown: "「{token}」は回転記号ではありません。",
     faultNoSuchLayer: "「{token}」はこの直方体にない層を回します。",
-    faultHalfTurnOnly: "「{token}」は1/4回転ですが、その層は正方形ではないので半回転しかできません。「{half}」と書いてください。",
+    faultHalfTurnOnly:
+      "「{token}」は1/4回転ですが、その層は正方形ではないので半回転しかできません。「{half}」と書いてください。",
     faultWholePuzzle: "「{token}」は奥行きが1つだけの辺で、パズル全体です。回しても何も動きません。",
     faultDims: "直方体ではありません。各辺は1から7までの整数です。",
     faultLength: "長すぎて再生できません。",
@@ -75,13 +77,18 @@ export const CUBOID_WORDS: Readonly<Record<KyuubuLanguage, CuboidWords>> = {
  * @example
  * ```ts
  * import { faultSays } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(faultSays("half-turn-only", "U", "en"));
  * ```
  */
 export function faultSays(fault: CuboidFault, token: string, language: KyuubuLanguage = "en"): string {
   const words = CUBOID_WORDS[language];
-  const text = { unknown: words.faultUnknown, "no-such-layer": words.faultNoSuchLayer, "half-turn-only": words.faultHalfTurnOnly, "whole-puzzle": words.faultWholePuzzle }[fault];
+  const text = {
+    unknown: words.faultUnknown,
+    "no-such-layer": words.faultNoSuchLayer,
+    "half-turn-only": words.faultHalfTurnOnly,
+    "whole-puzzle": words.faultWholePuzzle,
+  }[fault];
   return fill(text, { token, half: token.replace(/['2]$/, "") + "2" });
 }
 
@@ -99,7 +106,7 @@ export function faultSays(fault: CuboidFault, token: string, language: KyuubuLan
  * @example
  * ```ts
  * import { cuboidMoveName } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(cuboidMoveName("R2", "en"));
  * ```
  */

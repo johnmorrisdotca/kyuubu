@@ -42,7 +42,7 @@ function turnFor(slot: StickerSlot, n: number, axis: CubeAxis, forward: boolean)
  * @example
  * ```ts
  * import { cubeSlots, moveForDrag, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const slot = cubeSlots(3).slots[0]!;
  * console.log(moveForDrag(slot, 3, view, 40, 0));
@@ -74,13 +74,19 @@ export function moveForDrag(slot: StickerSlot, n: number, view: Mat3, dx: number
  * @example
  * ```ts
  * import { cubeSlots, moveForWheel, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const slot = cubeSlots(3).slots[0]!;
  * console.log(moveForWheel(slot, 3, view, "face", true));
  * ```
  */
-export function moveForWheel(slot: StickerSlot, n: number, view: Mat3, way: "across" | "upDown" | "face", down: boolean): CubeMove {
+export function moveForWheel(
+  slot: StickerSlot,
+  n: number,
+  view: Mat3,
+  way: "across" | "upDown" | "face",
+  down: boolean,
+): CubeMove {
   if (way === "face") {
     const axis = axisOf(slot.normal);
     const positive = slot.normal[axis] > 0;
@@ -89,7 +95,9 @@ export function moveForWheel(slot: StickerSlot, n: number, view: Mat3, way: "acr
     return { axis, layer: layerOf(slot.centre, axis, n), turns: (down ? clockwise : 4 - clockwise) as CubeTurns };
   }
   const pick = way === "across" ? 0 : 1;
-  const best = candidates(slot, view).reduce((a, b) => (Math.abs(b.screen[pick]) / length(b.screen) > Math.abs(a.screen[pick]) / length(a.screen) ? b : a));
+  const best = candidates(slot, view).reduce((a, b) =>
+    Math.abs(b.screen[pick]) / length(b.screen) > Math.abs(a.screen[pick]) / length(a.screen) ? b : a,
+  );
   const forward = best.screen[pick] > 0 === down;
   return turnFor(slot, n, best.axis, forward);
 }
@@ -106,7 +114,7 @@ export function moveForWheel(slot: StickerSlot, n: number, view: Mat3, way: "acr
  * @example
  * ```ts
  * import { DRAG_START_PX } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(DRAG_START_PX);
  * ```
  */
@@ -116,7 +124,7 @@ export const DRAG_START_PX = 9;
  * @example
  * ```ts
  * import { DRAG_DECIDE_PX } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(DRAG_DECIDE_PX);
  * ```
  */
@@ -126,7 +134,7 @@ export const DRAG_DECIDE_PX = 27;
  * @example
  * ```ts
  * import { DRAG_CLEAR_RATIO } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(DRAG_CLEAR_RATIO);
  * ```
  */
@@ -136,7 +144,7 @@ export const DRAG_CLEAR_RATIO = 1.4;
  * @example
  * ```ts
  * import { COMMIT_ANGLE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(COMMIT_ANGLE);
  * ```
  */
@@ -146,7 +154,7 @@ export const COMMIT_ANGLE = 30;
  * @example
  * ```ts
  * import { FLICK_SPEED } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(FLICK_SPEED);
  * ```
  */
@@ -156,7 +164,7 @@ export const FLICK_SPEED = 0.25;
  * @example
  * ```ts
  * import { FLICK_ANGLE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(FLICK_ANGLE);
  * ```
  */
@@ -167,7 +175,7 @@ export const FLICK_ANGLE = 4;
  * @example
  * ```ts
  * import { SEAM_BAND } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(SEAM_BAND);
  * ```
  */
@@ -178,8 +186,8 @@ export const SEAM_BAND = 0.18;
  * @example
  * ```ts
  * import type { DragPick } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: DragPick = { axis: 0, layer: 2, along: [1, 0] };
  * console.log(value.layer);
  * ```
@@ -191,8 +199,8 @@ export type DragPick = { axis: CubeAxis; layer: number; along: [number, number];
  * @example
  * ```ts
  * import type { Seam } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: Seam = { axis: 0, beside: 1 };
  * console.log(value.beside);
  * ```
@@ -228,13 +236,21 @@ function projected(view: Mat3, v: Vec3, k: number, lens: number): [number, numbe
  * @example
  * ```ts
  * import { cubeSlots, seamsAt, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const slot = cubeSlots(3).slots[0]!;
  * console.log(seamsAt(slot, 3, view, [0, 0], 100, 600));
  * ```
  */
-export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: readonly [number, number], k: number, lens: number, band = SEAM_BAND): Seam[] {
+export function seamsAt(
+  slot: StickerSlot,
+  n: number,
+  view: Mat3,
+  pointer: readonly [number, number],
+  k: number,
+  lens: number,
+  band = SEAM_BAND,
+): Seam[] {
   if (n < 3) return [];
   const face = axisOf(slot.normal);
   const surface = slot.centre.map((value, at) => value + slot.normal[at]) as unknown as Vec3;
@@ -242,7 +258,10 @@ export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: reado
   const middle = projected(view, surface, k, lens);
   const there = [pointer[0] - middle[0], pointer[1] - middle[1]];
   const half = (axis: CubeAxis): [number, number] => {
-    const [forward, back] = [projected(view, plus(surface, axisVector(axis)), k, lens), projected(view, plus(surface, axisVector(axis), -1), k, lens)];
+    const [forward, back] = [
+      projected(view, plus(surface, axisVector(axis)), k, lens),
+      projected(view, plus(surface, axisVector(axis), -1), k, lens),
+    ];
     return [(forward[0] - back[0]) / 2, (forward[1] - back[1]) / 2];
   };
   const found: { seam: Seam; near: number }[] = [];
@@ -283,13 +302,20 @@ export function seamsAt(slot: StickerSlot, n: number, view: Mat3, pointer: reado
  * @example
  * ```ts
  * import { cubeSlots, pickDrag, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const slot = cubeSlots(3).slots[0]!;
  * console.log(pickDrag(slot, 3, view, 40, 0));
  * ```
  */
-export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, dy: number, seams: readonly Seam[] = []): DragPick | null {
+export function pickDrag(
+  slot: StickerSlot,
+  n: number,
+  view: Mat3,
+  dx: number,
+  dy: number,
+  seams: readonly Seam[] = [],
+): DragPick | null {
   const far = Math.hypot(dx, dy);
   if (far < DRAG_START_PX) return null;
   const ranked = candidates(slot, view)
@@ -302,7 +328,12 @@ export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, d
   const [best, other] = ranked;
   if (far < DRAG_DECIDE_PX && other !== undefined && best.went < other.went * DRAG_CLEAR_RATIO) return null;
   const seam = seams.find((one) => one.axis === best.candidate.axis);
-  return { axis: best.candidate.axis, layer: layerOf(slot.centre, best.candidate.axis, n), along: best.along, ...(seam === undefined ? {} : { also: seam.beside }) };
+  return {
+    axis: best.candidate.axis,
+    layer: layerOf(slot.centre, best.candidate.axis, n),
+    along: best.along,
+    ...(seam === undefined ? {} : { also: seam.beside }),
+  };
 }
 
 /** The angle, in degrees, a picked layer has been dragged to: forwards is positive, and it stops at a half turn either way. `quarterPx` is the pixels that make a quarter turn.
@@ -316,7 +347,7 @@ export function pickDrag(slot: StickerSlot, n: number, view: Mat3, dx: number, d
  * @example
  * ```ts
  * import { dragAngle } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
  * console.log(dragAngle(pick, 40, 0, 100));
  * ```
@@ -344,7 +375,7 @@ export function dragAngle(pick: DragPick, dx: number, dy: number, quarterPx: num
  * @example
  * ```ts
  * import { quartersForRelease } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(quartersForRelease(60, 0));
  * ```
  */
@@ -366,7 +397,7 @@ export function quartersForRelease(angle: number, speed = 0, commitAngle = COMMI
  * @example
  * ```ts
  * import { pastCommit } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(pastCommit(60));
  * ```
  */
@@ -383,7 +414,7 @@ export function pastCommit(angle: number, commitAngle = COMMIT_ANGLE): boolean {
  * @example
  * ```ts
  * import { moveForRelease } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
  * console.log(moveForRelease(pick, 1));
  * ```
@@ -402,7 +433,7 @@ export function moveForRelease(pick: DragPick, quarters: number): CubeMove | nul
  * @example
  * ```ts
  * import { movesForRelease } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const pick = { axis: 0 as const, layer: 2, along: [1, 0] as [number, number] };
  * console.log(movesForRelease(pick, 1));
  * ```

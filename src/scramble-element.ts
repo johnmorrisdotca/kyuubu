@@ -22,18 +22,29 @@ import { languageOf } from "./words.ts";
  * @example
  * ```ts
  * import { SCRAMBLE_ELEMENT_ATTRIBUTES } from "@johnmorrisdotca/kyuubu/element";
- * 
+ *
  * console.log(SCRAMBLE_ELEMENT_ATTRIBUTES);
  * ```
  */
-export const SCRAMBLE_ELEMENT_ATTRIBUTES = ["size", "pace", "paused", "scale", "width", "theme", "faces", "interactive", "seed", "lang"] as const;
+export const SCRAMBLE_ELEMENT_ATTRIBUTES = [
+  "size",
+  "pace",
+  "paused",
+  "scale",
+  "width",
+  "theme",
+  "faces",
+  "interactive",
+  "seed",
+  "lang",
+] as const;
 
 /** The name the element is registered under.
  *
  * @example
  * ```ts
  * import { SCRAMBLE_ELEMENT_NAME } from "@johnmorrisdotca/kyuubu/element";
- * 
+ *
  * console.log(SCRAMBLE_ELEMENT_NAME);
  * ```
  */
@@ -47,9 +58,9 @@ export const SCRAMBLE_ELEMENT_NAME = "kyuubu-scramble";
  * @example
  * ```ts no-run
  * import type { KyuubuScrambleElement } from "@johnmorrisdotca/kyuubu/element";
- * 
+ *
  * import "@johnmorrisdotca/kyuubu/element/define";
- * 
+ *
  * const value: KyuubuScrambleElement = document.createElement("kyuubu-scramble") as KyuubuScrambleElement;
  * console.log(value.running);
  * ```
@@ -89,7 +100,7 @@ let made: CustomElementConstructor | null = null;
  * @example
  * ```ts
  * import { paceFromAttribute } from "@johnmorrisdotca/kyuubu/element";
- * 
+ *
  * console.log(paceFromAttribute("slow"));
  * ```
  */
@@ -121,8 +132,7 @@ function build(): CustomElementConstructor {
       else if (name === "paused") {
         if (this.hasAttribute("paused") && this.getAttribute("paused") !== "false") this.pause();
         else this.play();
-      }
-      else this.draw();
+      } else this.draw();
     }
 
     private undraw(): void {
@@ -135,7 +145,8 @@ function build(): CustomElementConstructor {
     private draw(): void {
       this.undraw();
       if (this.style.display === "") this.style.display = "block";
-      const has = (name: string) => this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
+      const has = (name: string) =>
+        this.hasAttribute(name) && this.getAttribute(name) !== "false" && this.getAttribute(name) !== "0";
       const scale = this.getAttribute("scale");
       const theme = this.getAttribute("theme");
       const width = Number(this.getAttribute("width"));
@@ -190,7 +201,7 @@ export const SCRAMBLE_ELEMENT_SCALES: readonly CubeScale[] = CUBE_SCALES;
  * @example
  * ```ts no-run
  * import { defineScramble } from "@johnmorrisdotca/kyuubu/element";
- * 
+ *
  * defineScramble();
  * console.log(customElements.get("kyuubu-scramble") !== undefined);
  * ```

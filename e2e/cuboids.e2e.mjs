@@ -2,7 +2,16 @@
 // the page still fits the screen, everything to tap is big enough, and nothing was complained of.
 import { expect, test } from "@playwright/test";
 
-import { CUBOID_PRESETS, cuboidMoveNotation, cuboidName, cuboidSolved, cuboidStickerCount, parseCuboidMoves, solvedCuboid, turnAllCuboid } from "../dist/cuboid/index.js";
+import {
+  CUBOID_PRESETS,
+  cuboidMoveNotation,
+  cuboidName,
+  cuboidSolved,
+  cuboidStickerCount,
+  parseCuboidMoves,
+  solvedCuboid,
+  turnAllCuboid,
+} from "../dist/cuboid/index.js";
 
 import { id, serve, sound, tap } from "./page.mjs";
 
@@ -66,7 +75,9 @@ test("opens on a floppy, solved, and the other pages link to it", async ({ page 
   for (const address of ["", "famous.html", "cubes.html"]) {
     await serve(page);
     await page.goto(`http://kyuubu.test/${address}?lang=en`);
-    await expect(page.locator('header a[href="cuboids.html"], nav a[href="cuboids.html"]').first()).toHaveText("Cuboids");
+    await expect(page.locator('header a[href="cuboids.html"], nav a[href="cuboids.html"]').first()).toHaveText(
+      "Cuboids",
+    );
   }
 });
 
@@ -84,9 +95,16 @@ test("every named shape is a tap away, with its own stickers and its own line", 
   await sound(page, errors);
 });
 
-test("any a×b×c from 1 to 7 is made from the three chooser, and 1×1×1 is told it has nothing to turn", async ({ page }) => {
+test("any a×b×c from 1 to 7 is made from the three chooser, and 1×1×1 is told it has nothing to turn", async ({
+  page,
+}) => {
   const errors = await open(page);
-  for (const dims of [[2, 5, 3], [7, 1, 2], [1, 1, 7], [4, 4, 4]]) {
+  for (const dims of [
+    [2, 5, 3],
+    [7, 1, 2],
+    [1, 1, 7],
+    [4, 4, 4],
+  ]) {
     for (const [axis, side] of dims.entries()) await page.locator(id(`side-${axis}`)).selectOption(String(side));
     expect(await settled(page)).toBe(solvedCuboid(dims));
     await expect(page.locator(id("name"))).toHaveText(cuboidName(dims));
@@ -95,7 +113,9 @@ test("any a×b×c from 1 to 7 is made from the three chooser, and 1×1×1 is tol
   await page.locator(id("side-0")).selectOption("1");
   await page.locator(id("side-1")).selectOption("1");
   await page.locator(id("side-2")).selectOption("1");
-  await expect(page.locator(id("custom-error"))).toHaveText("A cuboid needs one side of 2 or more: 1×1×1 has nothing to turn.");
+  await expect(page.locator(id("custom-error"))).toHaveText(
+    "A cuboid needs one side of 2 or more: 1×1×1 has nothing to turn.",
+  );
   await sound(page, errors);
 });
 
@@ -106,11 +126,15 @@ test("the list of layers says which turn a quarter and which only a half", async
   await expect(page.locator(`${id("axes")} li[data-axis="1"] span:last-child`)).toHaveText("quarter and half turns");
   await expect(page.locator(`${id("axes")} li[data-axis="0"] span:last-child`)).toHaveText("half turns only");
   await tap(page, id("pick-floppy"));
-  await expect(page.locator(`${id("axes")} li[data-axis="2"] span:last-child`)).toHaveText("one cubie deep: the whole puzzle, nothing to turn");
+  await expect(page.locator(`${id("axes")} li[data-axis="2"] span:last-child`)).toHaveText(
+    "one cubie deep: the whole puzzle, nothing to turn",
+  );
   await sound(page, errors);
 });
 
-test("a layer that only half turns follows the pointer to a half turn, goes back from short of the middle, and never makes a quarter", async ({ page }) => {
+test("a layer that only half turns follows the pointer to a half turn, goes back from short of the middle, and never makes a quarter", async ({
+  page,
+}) => {
   const errors = await open(page);
   const dims = [3, 3, 1];
   // Dragged part of the way and let go, it goes back: no move.
@@ -166,7 +190,9 @@ test("a layer whose slice is square turns a quarter by drag, where the one besid
   await sound(page, errors);
 });
 
-test("typed notation turns the puzzle, and a quarter turn of a half-turn layer is refused with the way to write it", async ({ page }) => {
+test("typed notation turns the puzzle, and a quarter turn of a half-turn layer is refused with the way to write it", async ({
+  page,
+}) => {
   const errors = await open(page);
   await page.locator(id("moves")).fill("R2 U2 M2");
   await tap(page, id("turn"));
@@ -270,7 +296,9 @@ test("the tag plays a solve on a cuboid, forward and back", async ({ page }) => 
   await sound(page, errors);
 });
 
-test("the cuboid player names the move just made and lists them, each a button that takes it there, and the slider turns the puzzle", async ({ page }) => {
+test("the cuboid player names the move just made and lists them, each a button that takes it there, and the slider turns the puzzle", async ({
+  page,
+}) => {
   const errors = await open(page);
   const element = page.locator("kyuubu-cuboid#embedded");
   await expect(element.locator(stage)).toBeVisible();

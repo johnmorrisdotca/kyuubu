@@ -38,7 +38,9 @@ describe("a cube of any size", () => {
         const once = turnCube(solvedCube(n), n, quarter);
         expect(cubeSolved(once, n)).toBe(false);
         expect(turnAll(once, n, [quarter, quarter, quarter])).toBe(solvedCube(n));
-        expect(turnCube(turnCube(solvedCube(n), n, { axis, layer, turns: 2 }), n, { axis, layer, turns: 2 })).toBe(solvedCube(n));
+        expect(turnCube(turnCube(solvedCube(n), n, { axis, layer, turns: 2 }), n, { axis, layer, turns: 2 })).toBe(
+          solvedCube(n),
+        );
       }
     }
   });

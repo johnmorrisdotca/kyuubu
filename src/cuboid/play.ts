@@ -27,8 +27,8 @@ import { CUBOID_WORDS, cuboidMoveName, faultSays } from "./words.ts";
  * @example
  * ```ts
  * import type { CuboidPlayerOptions } from "@johnmorrisdotca/kyuubu/cuboid/play";
- * 
- * 
+ *
+ *
  * const value: CuboidPlayerOptions = { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false };
  * console.log(value.dims);
  * ```
@@ -64,7 +64,7 @@ export type CuboidPlayerOptions = CuboidReplaySource & {
  * ```ts no-run
  * import type { CuboidPlayerHandle } from "@johnmorrisdotca/kyuubu/cuboid/play";
  * import { mountCuboidPlayer } from "@johnmorrisdotca/kyuubu/cuboid/play";
- * 
+ *
  * const value: CuboidPlayerHandle = mountCuboidPlayer(document.createElement("div"), { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false });
  * console.log(value.plan?.solved);
  * ```
@@ -74,7 +74,10 @@ export type CuboidPlayerHandle = {
   readonly plan: CuboidReplayPlan | null;
   readonly fault: CuboidReplayFault | null;
   /** Another solve on the same puzzle, in place of the one showing. The speed and the repeat are kept unless given. */
-  load(source: CuboidReplaySource, how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }): void;
+  load(
+    source: CuboidReplaySource,
+    how?: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean },
+  ): void;
   play(): void;
   pause(): void;
   /** One step on (1) or back (-1). */
@@ -103,7 +106,7 @@ const STYLE_ID = "kyuubu-cuboid-player-style";
  * @example
  * ```ts
  * import { CUBOID_PLAYER_CSS } from "@johnmorrisdotca/kyuubu/cuboid/play";
- * 
+ *
  * console.log(CUBOID_PLAYER_CSS.includes("."));
  * ```
  */
@@ -146,7 +149,7 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
  * @example
  * ```ts no-run
  * import { mountCuboidPlayer } from "@johnmorrisdotca/kyuubu/cuboid/play";
- * 
+ *
  * const host = document.createElement("div");
  * document.body.append(host);
  * const player = mountCuboidPlayer(host, { dims: [2, 3, 3], scramble: "R", solution: "R'", autoplay: false });
@@ -157,7 +160,8 @@ const speedName = (speed: number) => (speed === 1 ? "1×" : speed === 0.5 ? "½�
 export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOptions): CuboidPlayerHandle {
   const doc = host.ownerDocument;
   addStyle(doc);
-  let language: KyuubuLanguage = options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
+  let language: KyuubuLanguage =
+    options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
   const say = (key: keyof CubeWords, values?: Record<string, string | number>) => fill(WORDS[language][key], values);
 
   const root = doc.createElement("div");
@@ -169,9 +173,16 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
   host.replaceChildren(root);
   // Arrow keys step, Home and End go to the first and last move: from any button of the player.
   root.addEventListener("keydown", (event) => {
-    if (replay === null || plan === null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (replay === null || plan === null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey)
+      return;
     const target = event.target as HTMLElement;
-    if (target.closest("[data-kyuubu-moves]") !== null || target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) return;
+    if (
+      target.closest("[data-kyuubu-moves]") !== null ||
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLSelectElement ||
+      target instanceof HTMLTextAreaElement
+    )
+      return;
     const scramble = plan.scramble.length;
     const now = stateNow();
     let to: number | null = null;
@@ -189,7 +200,13 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
   // Dims that are not a cuboid are told to the person, under a 3×3×3 to stand in the place.
   const firstDims: CuboidDims = isCuboidDims(options.dims) ? options.dims : [3, 3, 3];
   // One puzzle for as long as the player lives, whatever solves it is given.
-  const view = new CuboidView(stage, { dims: firstDims, theme: options.theme, locale: language, keyboard: "none", interactive: false });
+  const view = new CuboidView(stage, {
+    dims: firstDims,
+    theme: options.theme,
+    locale: language,
+    keyboard: "none",
+    interactive: false,
+  });
   const cube: ReplayCube = {
     setState: (state) => view.setState(state),
     turnTogether: (moves, how) => view.turnTogether(moves as readonly CuboidMove[], how),
@@ -253,9 +270,12 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
     const at = stateNow() - 1;
     if (at < 0) return null;
     const scramble = plan.scramble.length;
-    return at < scramble ? { step: plan.scramble[at], scramble: true, at: at + 1, total: scramble } : { step: plan.steps[at - scramble], scramble: false, at: at - scramble + 1, total: plan.steps.length };
+    return at < scramble
+      ? { step: plan.scramble[at], scramble: true, at: at + 1, total: scramble }
+      : { step: plan.steps[at - scramble], scramble: false, at: at - scramble + 1, total: plan.steps.length };
   };
-  const whereOf = (one: { scramble: boolean; at: number; total: number }) => say(one.scramble ? "playerScrambleOf" : "playerMoveOf", { at: one.at, total: one.total });
+  const whereOf = (one: { scramble: boolean; at: number; total: number }) =>
+    say(one.scramble ? "playerScrambleOf" : "playerMoveOf", { at: one.at, total: one.total });
   /** What a screen reader is told of the move just made: at once when somebody chose it, and only once the puzzle has been still a moment when it is playing. */
   const announce = (text: string, playing: boolean) => {
     if (text === told) return;
@@ -294,12 +314,20 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
     if (plan === null) return [];
     const item = (step: { text: string }, scramble: boolean, at: number, total: number) => {
       const name = cuboidMoveName(step.text, language) ?? "";
-      return { code: step.text, name, label: say("playerToken", { code: step.text, name, where: whereOf({ scramble, at, total }) }) };
+      return {
+        code: step.text,
+        name,
+        label: say("playerToken", { code: step.text, name, where: whereOf({ scramble, at, total }) }),
+      };
     };
     const scramble = plan.scramble.length;
     return [
       { label: say("playerScrambleLabel"), items: plan.scramble.map((step, at) => item(step, true, at + 1, scramble)) },
-      { label: say("playerSolutionLabel"), main: true, items: plan.steps.map((step, at) => item(step, false, at + 1, plan!.steps.length)) },
+      {
+        label: say("playerSolutionLabel"),
+        main: true,
+        items: plan.steps.map((step, at) => item(step, false, at + 1, plan!.steps.length)),
+      },
     ];
   };
   /** A move or a place chosen along the scramble and the solve together, by a press, a key or the slider: counted from the solved puzzle. */
@@ -348,7 +376,11 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
     if (fault !== null) {
       note.dataset.tone = "bad";
       note.textContent =
-        fault.part === "dims" ? CUBOID_WORDS[language].faultDims : fault.part === "length" || fault.fault === undefined ? CUBOID_WORDS[language].faultLength : faultSays(fault.fault, fault.token ?? "", language);
+        fault.part === "dims"
+          ? CUBOID_WORDS[language].faultDims
+          : fault.part === "length" || fault.fault === undefined
+            ? CUBOID_WORDS[language].faultLength
+            : faultSays(fault.fault, fault.token ?? "", language);
     } else if (plan !== null && !plan.solved) {
       note.dataset.tone = "bad";
       note.textContent = say("playerUnsolved");
@@ -426,7 +458,10 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
   };
 
   /** A solve put on the puzzle, in place of the one before. */
-  const show = (source: CuboidReplaySource, how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean }) => {
+  const show = (
+    source: CuboidReplaySource,
+    how: { speed?: number; loop?: boolean; controls?: boolean; autoplay?: boolean },
+  ) => {
     replay?.destroy();
     replay = null;
     moves?.destroy();
@@ -464,7 +499,13 @@ export function mountCuboidPlayer(host: HTMLElement, options: CuboidPlayerOption
     get fault() {
       return fault;
     },
-    load: (source, how = {}) => show(source, { speed: how.speed ?? replay?.status.speed, loop: how.loop ?? replay?.status.loop, controls: how.controls ?? options.controls, autoplay: how.autoplay }),
+    load: (source, how = {}) =>
+      show(source, {
+        speed: how.speed ?? replay?.status.speed,
+        loop: how.loop ?? replay?.status.loop,
+        controls: how.controls ?? options.controls,
+        autoplay: how.autoplay,
+      }),
     play: () => replay?.play(),
     pause: () => replay?.pause(),
     step: (by) => replay?.step(by),

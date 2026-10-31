@@ -22,8 +22,8 @@ import { WORDS, fill, languageOf, type KyuubuLanguage } from "./words.ts";
  * @example
  * ```ts
  * import type { MoveListItem } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: MoveListItem = { code: "R", label: "Right face" };
  * console.log(value.code);
  * ```
@@ -35,8 +35,8 @@ export type MoveListItem = { code: string; name?: string; label?: string };
  * @example
  * ```ts
  * import type { MoveListGroup } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: MoveListGroup = { label: "Solve", items: ["R", "R'"] };
  * console.log(value.items);
  * ```
@@ -55,8 +55,8 @@ export type MoveListGroup = {
  * @example
  * ```ts
  * import type { MoveListOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: MoveListOptions = { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 };
  * console.log(value.current);
  * ```
@@ -80,7 +80,7 @@ export type MoveListOptions = {
  * ```ts no-run
  * import type { MoveListHandle } from "@johnmorrisdotca/kyuubu";
  * import { mountMoveList } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: MoveListHandle = mountMoveList(document.createElement("div"), { groups: [{ label: "Solve", items: ["R"] }] });
  * console.log(value.element.tagName);
  * ```
@@ -108,7 +108,7 @@ const RULE = "var(--kyuubu-moves-rule,var(--kyuubu-player-rule,color-mix(in srgb
  * @example
  * ```ts
  * import { MOVE_LIST_CSS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MOVE_LIST_CSS.includes("."));
  * ```
  */
@@ -142,7 +142,7 @@ function addStyle(doc: Document): void {
  * @example
  * ```ts no-run
  * import { mountMoveList } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const host = document.createElement("div");
  * document.body.append(host);
  * const list = mountMoveList(host, { groups: [{ label: "Solve", items: ["R", "R'"] }], current: 0 });
@@ -153,7 +153,8 @@ function addStyle(doc: Document): void {
 export function mountMoveList(host: HTMLElement, options: MoveListOptions): MoveListHandle {
   const doc = host.ownerDocument;
   addStyle(doc);
-  let language: KyuubuLanguage = options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
+  let language: KyuubuLanguage =
+    options.locale ?? languageOf(host.closest("[lang]")?.getAttribute("lang") ?? doc.documentElement.lang);
   let groups = options.groups;
   let current: number | null = options.current ?? null;
   let tokens: HTMLButtonElement[] = [];
@@ -199,7 +200,12 @@ export function mountMoveList(host: HTMLElement, options: MoveListOptions): Move
       else token.removeAttribute("aria-current");
       if (current !== null && index < current) token.dataset.done = "";
       else delete token.dataset.done;
-      token.tabIndex = now || (current === null && index === 0) || (current !== null && (current < 0 || current >= tokens.length) && index === 0) ? 0 : -1;
+      token.tabIndex =
+        now ||
+        (current === null && index === 0) ||
+        (current !== null && (current < 0 || current >= tokens.length) && index === 0)
+          ? 0
+          : -1;
     });
     root.dataset.current = current === null ? "" : String(current);
     if (scroll && current !== null && tokens[current] !== undefined) reveal(tokens[current]);
@@ -229,7 +235,13 @@ export function mountMoveList(host: HTMLElement, options: MoveListOptions): Move
         text.textContent = item.code;
         token.append(text);
         token.dataset.index = String(tokens.length);
-        token.setAttribute("aria-label", item.label ?? (name === "" ? item.code : fill(WORDS[language].playerToken, { code: item.code, name, where: `${at + 1}/${group.items.length}` })));
+        token.setAttribute(
+          "aria-label",
+          item.label ??
+            (name === ""
+              ? item.code
+              : fill(WORDS[language].playerToken, { code: item.code, name, where: `${at + 1}/${group.items.length}` })),
+        );
         token.addEventListener("click", () => pick(Number(token.dataset.index)));
         tokens.push(token);
         places.push({ group: g, at });

@@ -17,13 +17,13 @@ import { cuboidMoveNotation, readCuboidMoves, type CuboidFault } from "./notatio
  * ```ts
  * import type { CuboidReplayPlan } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { planCuboidReplay } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * function requireCuboidPlan() {
  *   const result = planCuboidReplay({ dims: [2, 3, 3], scramble: "R", solution: "R'" });
  *   if (!result.ok) throw new Error("Invalid replay");
  *   return result.plan;
  * }
- * 
+ *
  * const value: CuboidReplayPlan = requireCuboidPlan();
  * console.log(value.solved);
  * ```
@@ -38,8 +38,8 @@ export type CuboidReplayPlan = ReplayPlan & {
  * @example
  * ```ts
  * import type { CuboidReplaySource } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
- * 
+ *
+ *
  * const value: CuboidReplaySource = { dims: [2, 3, 3], scramble: "R", solution: "R'", timeMs: 1000 };
  * console.log(value.dims);
  * ```
@@ -62,13 +62,18 @@ export type CuboidReplaySource = {
  * @example
  * ```ts
  * import type { CuboidReplayFault } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
- * 
+ *
+ *
  * const value: CuboidReplayFault = { part: "solution", token: "U", at: 0, fault: "half-turn-only" };
  * console.log(value.fault);
  * ```
  */
-export type CuboidReplayFault = { part: "dims" | "scramble" | "solution" | "length"; token?: string; at?: number; fault?: CuboidFault };
+export type CuboidReplayFault = {
+  part: "dims" | "scramble" | "solution" | "length";
+  token?: string;
+  at?: number;
+  fault?: CuboidFault;
+};
 
 /**
  * A scramble and a solve read, checked and timed. A solve that does not end on
@@ -81,29 +86,41 @@ export type CuboidReplayFault = { part: "dims" | "scramble" | "solution" | "leng
  * @example
  * ```ts
  * import { planCuboidReplay } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(planCuboidReplay({ dims: [2, 3, 3], scramble: "R", solution: "R'", timeMs: 1000 }));
  * ```
  */
-export function planCuboidReplay(source: CuboidReplaySource): { ok: true; plan: CuboidReplayPlan } | { ok: false; fault: CuboidReplayFault } {
+export function planCuboidReplay(
+  source: CuboidReplaySource,
+): { ok: true; plan: CuboidReplayPlan } | { ok: false; fault: CuboidReplayFault } {
   const dims = source.dims;
   if (!isCuboidDims(dims)) return { ok: false, fault: { part: "dims" } };
   const scramble = readCuboidMoves(source.scramble, dims);
-  if (!scramble.ok) return { ok: false, fault: { part: "scramble", token: scramble.token, at: scramble.at, fault: scramble.fault } };
+  if (!scramble.ok)
+    return { ok: false, fault: { part: "scramble", token: scramble.token, at: scramble.at, fault: scramble.fault } };
   const solution = readCuboidMoves(source.solution, dims);
-  if (!solution.ok) return { ok: false, fault: { part: "solution", token: solution.token, at: solution.at, fault: solution.fault } };
-  if (scramble.moves.length > MAX_REPLAY_STEPS || solution.moves.length > MAX_REPLAY_STEPS) return { ok: false, fault: { part: "length" } };
+  if (!solution.ok)
+    return { ok: false, fault: { part: "solution", token: solution.token, at: solution.at, fault: solution.fault } };
+  if (scramble.moves.length > MAX_REPLAY_STEPS || solution.moves.length > MAX_REPLAY_STEPS)
+    return { ok: false, fault: { part: "length" } };
   const scrambleStates = [solvedCuboid(dims)];
-  for (const move of scramble.moves) scrambleStates.push(turnCuboid(scrambleStates[scrambleStates.length - 1], dims, move));
+  for (const move of scramble.moves)
+    scrambleStates.push(turnCuboid(scrambleStates[scrambleStates.length - 1], dims, move));
   const start = scrambleStates[scrambleStates.length - 1];
   const states = [start];
   for (const move of solution.moves) states.push(turnCuboid(states[states.length - 1], dims, move));
   const count = solution.moves.length;
-  const given = source.stepMs !== undefined && source.stepMs.length === count && source.stepMs.every((ms) => Number.isFinite(ms) && ms >= 0);
+  const given =
+    source.stepMs !== undefined &&
+    source.stepMs.length === count &&
+    source.stepMs.every((ms) => Number.isFinite(ms) && ms >= 0);
   const timed = source.timeMs !== undefined && Number.isFinite(source.timeMs) && source.timeMs > 0;
-  const stepMs = given ? [...source.stepMs!] : new Array<number>(count).fill(timed && count > 0 ? source.timeMs! / count : REPLAY_STEP_MS);
-  const written = (list: readonly CuboidMove[]): SolveMove[] => list.map((move, at) => ({ text: cuboidMoveNotation(move, dims), moves: [move], counts: true, at }));
+  const stepMs = given
+    ? [...source.stepMs!]
+    : new Array<number>(count).fill(timed && count > 0 ? source.timeMs! / count : REPLAY_STEP_MS);
+  const written = (list: readonly CuboidMove[]): SolveMove[] =>
+    list.map((move, at) => ({ text: cuboidMoveNotation(move, dims), moves: [move], counts: true, at }));
   return {
     ok: true,
     plan: {

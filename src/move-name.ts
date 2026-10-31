@@ -10,13 +10,26 @@ import { WORDS, fill, type CubeWords, type KyuubuLanguage } from "./words.ts";
  * that one says how to turn the cube with your hands, this one names the move.
  */
 
-const SIDES: Record<string, keyof CubeWords> = { R: "guideSideR", L: "guideSideL", U: "guideSideU", D: "guideSideD", F: "guideSideF", B: "guideSideB" };
+const SIDES: Record<string, keyof CubeWords> = {
+  R: "guideSideR",
+  L: "guideSideL",
+  U: "guideSideU",
+  D: "guideSideD",
+  F: "guideSideF",
+  B: "guideSideB",
+};
 const SLICES: Record<string, { name: keyof CubeWords; like: string }> = {
   M: { name: "moveSliceM", like: "L" },
   E: { name: "moveSliceE", like: "D" },
   S: { name: "moveSliceS", like: "F" },
 };
-const COUNTS: Record<number, keyof CubeWords> = { 2: "moveCount2", 3: "moveCount3", 4: "moveCount4", 5: "moveCount5", 6: "moveCount6" };
+const COUNTS: Record<number, keyof CubeWords> = {
+  2: "moveCount2",
+  3: "moveCount3",
+  4: "moveCount4",
+  5: "moveCount5",
+  6: "moveCount6",
+};
 
 const FACE = /^([2-7]?)([RLUDFB])(w?)(2|')?$/;
 const OTHER = /^([MESxyz])(2|')?$/;
@@ -34,7 +47,7 @@ const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
  * @example
  * ```ts
  * import { moveName } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(moveName("R2", "en"));
  * ```
  */

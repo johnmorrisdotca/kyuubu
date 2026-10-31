@@ -8,7 +8,12 @@ import { moveName, planReplay } from "../dist/index.js";
 import { serve } from "./page.mjs";
 
 const solve = FAMOUS_SOLVES.find((one) => one.id === "park-3.13");
-const planned = planReplay({ size: solve.size, scramble: solve.scramble, solution: solve.solution, timeMs: solve.timeMs });
+const planned = planReplay({
+  size: solve.size,
+  scramble: solve.scramble,
+  solution: solve.solution,
+  timeMs: solve.timeMs,
+});
 if (!planned.ok) throw new Error("the solve should plan");
 const plan = planned.plan;
 const S = plan.scramble.length;
@@ -29,9 +34,12 @@ const open = async (page, address = "famous.html#solve=park-3.13") => {
   await expect(page.locator("html")).toHaveAttribute("data-ready", "true");
   return errors;
 };
-const still = (page) => expect(page.locator("[data-kyuubu-player] [data-kyuubu]")).toHaveAttribute("data-turning", "false");
+const still = (page) =>
+  expect(page.locator("[data-kyuubu-player] [data-kyuubu]")).toHaveAttribute("data-turning", "false");
 
-test("the move just made is in large type with what it turns in words, and moves with Forward and Back", async ({ page }) => {
+test("the move just made is in large type with what it turns in words, and moves with Forward and Back", async ({
+  page,
+}) => {
   const errors = await open(page);
   // The scrambled cube: the scramble's last move is the one just made, and says so.
   await expect(code(page)).toHaveText(plan.scramble[S - 1].text);
@@ -60,7 +68,9 @@ test("every move reads in Japanese too", async ({ page }) => {
   await expect(token(page, S + 1)).toHaveAttribute("aria-label", /^R'：右の面、反時計回り。33手中2手目$/);
 });
 
-test("the list has every move of the scramble and the solve as a button, named with its code, its words and where it is", async ({ page }) => {
+test("the list has every move of the scramble and the solve as a button, named with its code, its words and where it is", async ({
+  page,
+}) => {
   await open(page);
   await expect(page.locator("[data-kyuubu-moves] button")).toHaveCount(S + T);
   await expect(page.locator('[data-kyuubu-moves] [role="group"]').first()).toHaveAttribute("aria-label", "Scramble");
@@ -96,7 +106,9 @@ test("a press on a move takes the replay there, and the cube is the cube after i
   expect(await stateOf(page)).toBe(plan.states[T]);
 });
 
-test("the marked move follows the replay as it plays, and the list scrolls to keep it in view without moving the page", async ({ page }) => {
+test("the marked move follows the replay as it plays, and the list scrolls to keep it in view without moving the page", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page);
   await player(page).locator('[data-speed="0.25"]').click();
@@ -104,7 +116,10 @@ test("the marked move follows the replay as it plays, and the list scrolls to ke
   const before = await page.evaluate(() => window.scrollY);
   const seen = [];
   for (let at = 0; at < 14; at += 1) {
-    const [position, index] = await page.evaluate(() => [Number(document.querySelector("[data-kyuubu-player]").dataset.position), Number(document.querySelector('[data-kyuubu-moves] button[aria-current="step"]')?.dataset.index ?? -1)]);
+    const [position, index] = await page.evaluate(() => [
+      Number(document.querySelector("[data-kyuubu-player]").dataset.position),
+      Number(document.querySelector('[data-kyuubu-moves] button[aria-current="step"]')?.dataset.index ?? -1),
+    ]);
     seen.push([position, index]);
     await page.waitForTimeout(180);
   }
@@ -115,7 +130,10 @@ test("the marked move follows the replay as it plays, and the list scrolls to ke
   const inside = await page.evaluate(() => {
     const box = document.querySelector("[data-kyuubu-moves]").getBoundingClientRect();
     const mark = document.querySelector('[data-kyuubu-moves] button[aria-current="step"]').getBoundingClientRect();
-    return { visible: mark.top >= box.top - 1 && mark.bottom <= box.bottom + 1, scrolled: document.querySelector("[data-kyuubu-moves]").scrollTop };
+    return {
+      visible: mark.top >= box.top - 1 && mark.bottom <= box.bottom + 1,
+      scrolled: document.querySelector("[data-kyuubu-moves]").scrollTop,
+    };
   });
   expect(inside.visible).toBe(true);
   expect(await page.evaluate(() => window.scrollY)).toBe(before);
@@ -154,11 +172,16 @@ test("the arrow keys step, and Home and End go to the first and last move of the
   await expect(player(page)).toHaveAttribute("data-position", String(T));
 });
 
-test("a screen reader is told the move as it changes, once the cube has been still a moment, and not for every move of a solve playing", async ({ page }) => {
+test("a screen reader is told the move as it changes, once the cube has been still a moment, and not for every move of a solve playing", async ({
+  page,
+}) => {
   await open(page);
   await page.evaluate(() => {
     window.told = [];
-    new MutationObserver(() => window.told.push(document.querySelector("[data-kyuubu-live]").textContent)).observe(document.querySelector("[data-kyuubu-live]"), { childList: true, characterData: true, subtree: true });
+    new MutationObserver(() => window.told.push(document.querySelector("[data-kyuubu-live]").textContent)).observe(
+      document.querySelector("[data-kyuubu-live]"),
+      { childList: true, characterData: true, subtree: true },
+    );
   });
   const live = page.locator("[data-kyuubu-live]");
   await expect(live).toHaveAttribute("aria-live", "polite");
@@ -267,8 +290,17 @@ test("the player and the page fit a phone, light and dark", async ({ page }) => 
     await page.emulateMedia({ colorScheme: scheme });
     await page.setViewportSize({ width: 390, height: 844 });
     await open(page);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), scheme).toBeLessThanOrEqual(0);
-    const small = await page.locator("[data-kyuubu-moves] button").evaluateAll((all) => all.filter((el) => el.getBoundingClientRect().width < 43.5 || el.getBoundingClientRect().height < 43.5).length);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+      scheme,
+    ).toBeLessThanOrEqual(0);
+    const small = await page
+      .locator("[data-kyuubu-moves] button")
+      .evaluateAll(
+        (all) =>
+          all.filter((el) => el.getBoundingClientRect().width < 43.5 || el.getBoundingClientRect().height < 43.5)
+            .length,
+      );
     expect(small).toBe(0);
   }
 });
@@ -297,7 +329,13 @@ test("the element and the embed can leave the readout, the list and the scrub ou
       defaults: [plain.readout, plain.movelist, plain.scrub, bare.readout, bare.scrub],
     };
   });
-  expect(result).toEqual({ plain: [true, true], bare: [false, false], off: [false, false], asked: [true, false], defaults: [true, true, true, false, false] });
+  expect(result).toEqual({
+    plain: [true, true],
+    bare: [false, false],
+    off: [false, false],
+    asked: [true, false],
+    defaults: [true, true, true, false, false],
+  });
 });
 
 test.describe("Back turns the move the other way, as Forward turns it", () => {
@@ -324,11 +362,19 @@ test.describe("Back turns the move the other way, as Forward turns it", () => {
           const started = performance.now();
           const tick = () => {
             // Every sticker of the turning layer that faces the eye, as drawn this frame: one that faces away is left as it was.
-            const faces = [...turning.querySelectorAll("[data-slot]")].filter((one) => one.style.visibility !== "hidden");
+            const faces = [...turning.querySelectorAll("[data-slot]")].filter(
+              (one) => one.style.visibility !== "hidden",
+            );
             lifted = Math.max(lifted, turning.querySelectorAll("[data-slot]").length);
             if (faces.length > 0) seen.add(faces.map((one) => one.style.transform).join("|"));
             if (performance.now() - started < 700) requestAnimationFrame(tick);
-            else resolve({ lifted, transforms: seen.size, ms: began === null || ended === null ? null : ended - began, began: began !== null });
+            else
+              resolve({
+                lifted,
+                transforms: seen.size,
+                ms: began === null || ended === null ? null : ended - began,
+                began: began !== null,
+              });
           };
           if (keyName === null) document.querySelector(target).click();
           else {

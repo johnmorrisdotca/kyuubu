@@ -14,7 +14,7 @@ import type { CubeMove } from "../types.ts";
  * ```ts
  * import type { KeyReading } from "@johnmorrisdotca/kyuubu";
  * import { readKey } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: KeyReading = readKey("r", false, 3, 1);
  * console.log(value);
  * ```
@@ -36,7 +36,7 @@ const WHOLE = new Set(["X", "Y", "Z"]);
  * @example
  * ```ts
  * import { readKey } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(readKey("r", false, 3, 1));
  * ```
  */

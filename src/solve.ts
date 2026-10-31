@@ -25,8 +25,8 @@ import type { CubeMove, Vec3 } from "./types.ts";
  * @example
  * ```ts
  * import type { SolveStage } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: SolveStage = "whiteCross";
  * console.log(value);
  * ```
@@ -48,7 +48,7 @@ export type SolveStage =
  * ```ts
  * import type { SolvePart } from "@johnmorrisdotca/kyuubu";
  * import { movesNotation, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolvePart = { moves: parseMoves("R U", 3)! };
  * console.log(movesNotation(value.moves, 3));
  * ```
@@ -61,7 +61,7 @@ export type SolvePart = { moves: CubeMove[]; algorithm?: SolveAlgorithm };
  * ```ts
  * import type { SolveStep } from "@johnmorrisdotca/kyuubu";
  * import { solveSteps, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolveStep = solveSteps(solvedCube(2), 2)![0]!;
  * console.log(value.stage);
  * ```
@@ -81,7 +81,7 @@ export type SolveStep = {
  * @example
  * ```ts
  * import { SOLVE_ALGORITHMS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(SOLVE_ALGORITHMS).slice(0, 8));
  * ```
  */
@@ -99,8 +99,8 @@ export const SOLVE_ALGORITHMS = {
  * @example
  * ```ts
  * import type { SolveAlgorithm } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: SolveAlgorithm = "sune";
  * console.log(value);
  * ```
@@ -112,7 +112,7 @@ export type SolveAlgorithm = keyof typeof SOLVE_ALGORITHMS;
  * @example
  * ```ts
  * import { SOLVABLE_SIZES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(SOLVABLE_SIZES);
  * ```
  */
@@ -152,7 +152,10 @@ const faceAt = (n: number, slot: number): CubeFace => faceOfNormal(cubeSlots(n).
 function faceColours(state: string, n: number): Record<CubeFace, string> {
   if (n % 2 === 1) {
     const middle = (n * n - 1) / 2;
-    return Object.fromEntries(CUBE_FACE_ORDER.map((face, at) => [face, state[at * n * n + middle]])) as Record<CubeFace, string>;
+    return Object.fromEntries(CUBE_FACE_ORDER.map((face, at) => [face, state[at * n * n + middle]])) as Record<
+      CubeFace,
+      string
+    >;
   }
   const anchor = cubiesOf(n).find((cubie) => cubie.centre.every((value) => value < 0))!;
   const colours = {} as Record<CubeFace, string>;
@@ -177,7 +180,14 @@ type Piece = { stickers: Tracked[] };
 function pieceHome(state: string, n: number, colours: Record<CubeFace, string>, home: Cubie): Piece {
   const wants = home.slots.map((slot) => colours[faceAt(n, slot)]);
   const key = [...wants].sort().join("");
-  const now = cubiesOf(n).find((cubie) => cubie.slots.length === home.slots.length && cubie.slots.map((slot) => state[slot]).sort().join("") === key)!;
+  const now = cubiesOf(n).find(
+    (cubie) =>
+      cubie.slots.length === home.slots.length &&
+      cubie.slots
+        .map((slot) => state[slot])
+        .sort()
+        .join("") === key,
+  )!;
   return {
     stickers: now.slots.map((from) => ({ from, allowed: new Set([home.slots[wants.indexOf(state[from])]]) })),
   };
@@ -188,7 +198,14 @@ function yellowUp(state: string, n: number, colours: Record<CubeFace, string>, h
   const top = new Set(cubeSlots(n).slots.flatMap((slot, at) => (faceAt(n, at) === "U" ? [at] : [])));
   const wants = home.slots.map((slot) => colours[faceAt(n, slot)]);
   const key = [...wants].sort().join("");
-  const now = cubiesOf(n).find((cubie) => cubie.slots.length === home.slots.length && cubie.slots.map((slot) => state[slot]).sort().join("") === key)!;
+  const now = cubiesOf(n).find(
+    (cubie) =>
+      cubie.slots.length === home.slots.length &&
+      cubie.slots
+        .map((slot) => state[slot])
+        .sort()
+        .join("") === key,
+  )!;
   const yellow = now.slots.find((slot) => state[slot] === colours.U)!;
   return { stickers: [{ from: yellow, allowed: top }] };
 }
@@ -238,7 +255,13 @@ function fromEachSide(n: number, algorithm: SolveAlgorithm): Step[] {
  * may end and at least one of `wanted` too (every one, when `all`). Returns
  * the steps and the pieces of `wanted` now done, or null where none was found.
  */
-function searchFor(kept: Piece[], wanted: Piece[], steps: Step[], most: number, all = false): { path: Step[]; done: number[] } | null {
+function searchFor(
+  kept: Piece[],
+  wanted: Piece[],
+  steps: Step[],
+  most: number,
+  all = false,
+): { path: Step[]; done: number[] } | null {
   const pieces = [...kept, ...wanted];
   const stickers = pieces.flatMap((piece) => piece.stickers);
   const ends = pieces.map((piece) => piece.stickers.length);
@@ -270,7 +293,13 @@ function searchFor(kept: Piece[], wanted: Piece[], steps: Step[], most: number, 
     for (const step of steps) {
       // One turn of a face, then another of the same face, is one turn written twice; a face and then its opposite are kept in one order.
       if (step.group === last && step.algorithm === undefined) continue;
-      if (step.algorithm === undefined && last.length === 1 && OPPOSITE[step.group as CubeFace] === last && step.group < last) continue;
+      if (
+        step.algorithm === undefined &&
+        last.length === 1 &&
+        OPPOSITE[step.group as CubeFace] === last &&
+        step.group < last
+      )
+        continue;
       const from = positions[depth];
       const into = positions[depth + 1];
       for (let k = 0; k < from.length; k += 1) into[k] = step.to[from[k]];
@@ -295,7 +324,9 @@ function searchFor(kept: Piece[], wanted: Piece[], steps: Step[], most: number, 
 
 /** The whole-cube turns, fewest first, that hold the cube as the method starts: white on the bottom. */
 function holding(state: string, n: number): CubeMove[] {
-  const turns = (["x", "y", "z"] as const).flatMap((letter) => (["cw", "half", "ccw"] as const).map((amount) => wholeMove(letter, amount)));
+  const turns = (["x", "y", "z"] as const).flatMap((letter) =>
+    (["cw", "half", "ccw"] as const).map((amount) => wholeMove(letter, amount)),
+  );
   const ready = (held: string) => {
     if (n % 2 === 1) return faceColours(held, n).D === WHITE;
     // A 2×2 is held by a white sticker on the bottom of its back-left corner, which the first layer is built round.
@@ -346,7 +377,11 @@ function oneByOne(
     if (found === null) throw new Error(`no ${stage} step found`);
     const step = stepFrom(stage, found.path);
     if (step !== null) out.push(step);
-    now = turnAll(now, n, found.path.flatMap((made) => made.moves));
+    now = turnAll(
+      now,
+      n,
+      found.path.flatMap((made) => made.moves),
+    );
     const done = found.done.map((at) => left[at]);
     placed.push(...done);
     left = left.filter((home) => !done.includes(home));
@@ -362,7 +397,7 @@ function oneByOne(
  * @example
  * ```ts
  * import { joinTurns, movesNotation, parseMove, undoOf } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(movesNotation(joinTurns([move, undoOf(move)]), 3));
  * ```
@@ -392,7 +427,12 @@ function stepFrom(stage: SolveStage, path: readonly Step[]): SolveStep | null {
   const kept = parts.filter((part) => part.moves.length > 0);
   const moves = joinTurns(kept.flatMap((part) => part.moves));
   if (moves.length === 0) return null;
-  return { stage, moves, parts: kept, algorithms: kept.flatMap((part) => (part.algorithm === undefined ? [] : [part.algorithm])) };
+  return {
+    stage,
+    moves,
+    parts: kept,
+    algorithms: kept.flatMap((part) => (part.algorithm === undefined ? [] : [part.algorithm])),
+  };
 }
 
 /** One stage done in a single search: every piece in `wanted` to where it may end, keeping `kept`. */
@@ -408,7 +448,14 @@ function allAtOnce(
   const colours = faceColours(state, n);
   const found = searchFor(kept(colours), wanted(colours), steps, most, true);
   if (found === null) throw new Error(`no ${stage} step found`);
-  return { state: turnAll(state, n, found.path.flatMap((step) => step.moves)), step: stepFrom(stage, found.path) };
+  return {
+    state: turnAll(
+      state,
+      n,
+      found.path.flatMap((step) => step.moves),
+    ),
+    step: stepFrom(stage, found.path),
+  };
 }
 
 /**
@@ -423,7 +470,7 @@ function allAtOnce(
  * @example
  * ```ts
  * import { parseMove, solveSteps, solvedCube, turnCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(solveSteps(turnCube(solvedCube(2), 2, parseMove("R", 2)!), 2)?.map((step) => step.stage));
  * ```
  */
@@ -435,43 +482,101 @@ export function solveSteps(state: string, n: number): SolveStep[] | null {
   let now = turnAll(state, n, hold);
   const top = (kind: "edge" | "corner") => cubiesIn(n, "top", kind);
   const bottom = (kind: "edge" | "corner") => cubiesIn(n, "bottom", kind);
-  const all = (homes: Cubie[]) => (colours: Record<CubeFace, string>) => homes.map((home) => pieceHome(now, n, colours, home));
+  const all = (homes: Cubie[]) => (colours: Record<CubeFace, string>) =>
+    homes.map((home) => pieceHome(now, n, colours, home));
   const push = (step: SolveStep | null) => step !== null && steps.push(step);
 
   let firstLayer: Cubie[];
   if (n === 2) {
     // The corner at the back left of the bottom is already home: the other three bottom corners, a face at a time, never turning the three faces round it.
     const anchor = bottom("corner").filter((cubie) => cubie.centre.every((value) => value < 0));
-    const white = oneByOne(now, n, anchor, bottom("corner").filter((cubie) => !anchor.includes(cubie)), faceTurns(n, ["U", "R", "F"]), 9, "whiteLayer");
+    const white = oneByOne(
+      now,
+      n,
+      anchor,
+      bottom("corner").filter((cubie) => !anchor.includes(cubie)),
+      faceTurns(n, ["U", "R", "F"]),
+      9,
+      "whiteLayer",
+    );
     steps.push(...white.steps);
     now = white.state;
     firstLayer = white.placed;
   } else {
     const cross = oneByOne(now, n, [], bottom("edge"), faceTurns(n, ["U", "D", "R", "L", "F", "B"]), 8, "whiteCross");
     steps.push(...cross.steps);
-    const corners = oneByOne(cross.state, n, cross.placed, bottom("corner"), [...topTurns(n), ...fromEachSide(n, "cornerIn")], 8, "whiteCorners");
+    const corners = oneByOne(
+      cross.state,
+      n,
+      cross.placed,
+      bottom("corner"),
+      [...topTurns(n), ...fromEachSide(n, "cornerIn")],
+      8,
+      "whiteCorners",
+    );
     steps.push(...corners.steps);
-    const middle = oneByOne(corners.state, n, corners.placed, cubiesIn(n, "middle", "edge"), [...topTurns(n), ...fromEachSide(n, "edgeRight"), ...fromEachSide(n, "edgeLeft")], 4, "middleLayer");
+    const middle = oneByOne(
+      corners.state,
+      n,
+      corners.placed,
+      cubiesIn(n, "middle", "edge"),
+      [...topTurns(n), ...fromEachSide(n, "edgeRight"), ...fromEachSide(n, "edgeLeft")],
+      4,
+      "middleLayer",
+    );
     steps.push(...middle.steps);
     now = middle.state;
     firstLayer = middle.placed;
 
-    const cross2 = allAtOnce(now, n, all(firstLayer), (colours) => top("edge").map((home) => yellowUp(now, n, colours, home)), [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.yellowCross, "yellowCross", "yellowCross")], 5, "yellowCross");
+    const cross2 = allAtOnce(
+      now,
+      n,
+      all(firstLayer),
+      (colours) => top("edge").map((home) => yellowUp(now, n, colours, home)),
+      [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.yellowCross, "yellowCross", "yellowCross")],
+      5,
+      "yellowCross",
+    );
     push(cross2.step);
     now = cross2.state;
   }
 
-  const face = allAtOnce(now, n, all(firstLayer), (colours) => [...top("edge"), ...top("corner")].map((home) => yellowUp(now, n, colours, home)), [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.sune, "sune", "sune")], 7, "yellowFace");
+  const face = allAtOnce(
+    now,
+    n,
+    all(firstLayer),
+    (colours) => [...top("edge"), ...top("corner")].map((home) => yellowUp(now, n, colours, home)),
+    [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.sune, "sune", "sune")],
+    7,
+    "yellowFace",
+  );
   push(face.step);
   now = face.state;
 
-  const yellowEdgesUp = (colours: Record<CubeFace, string>) => top("edge").map((home) => yellowUp(now, n, colours, home));
-  const corners = allAtOnce(now, n, (colours) => [...all(firstLayer)(colours), ...yellowEdgesUp(colours)], all(top("corner")), [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.cornerCycle, "cornerCycle", "cornerCycle")], 7, "yellowCorners");
+  const yellowEdgesUp = (colours: Record<CubeFace, string>) =>
+    top("edge").map((home) => yellowUp(now, n, colours, home));
+  const corners = allAtOnce(
+    now,
+    n,
+    (colours) => [...all(firstLayer)(colours), ...yellowEdgesUp(colours)],
+    all(top("corner")),
+    [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.cornerCycle, "cornerCycle", "cornerCycle")],
+    7,
+    "yellowCorners",
+  );
   push(corners.step);
   now = corners.state;
 
   if (n === 3) {
-    const edges = allAtOnce(now, n, all([...firstLayer, ...top("corner")]), all(top("edge")), [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.edgeCycle, "edgeCycle", "edgeCycle")], 5, "yellowEdges");
+    const edges = allAtOnce(
+      now,
+      n,
+      all([...firstLayer, ...top("corner")]),
+      all(top("edge")),
+      [...topTurns(n), stepOf(n, SOLVE_ALGORITHMS.edgeCycle, "edgeCycle", "edgeCycle")],
+      5,
+      "yellowEdges",
+    );
     push(edges.step);
   }
   return steps;

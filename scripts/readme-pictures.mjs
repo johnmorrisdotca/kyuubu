@@ -23,7 +23,17 @@ const solved = (steps) => async (page) => {
 };
 
 /** A page of the demo, its main part cropped. */
-const page = (subject, path, target, prepare, ready = "[data-kyuubu], [data-kyuubu-cuboid]") => ({ subject, views: ["desk"], scale: 1, url: path, init: seeded, state: { seed: 2026 }, ready, target, prepare });
+const page = (subject, path, target, prepare, ready = "[data-kyuubu], [data-kyuubu-cuboid]") => ({
+  subject,
+  views: ["desk"],
+  scale: 1,
+  url: path,
+  init: seeded,
+  state: { seed: 2026 },
+  ready,
+  target,
+  prepare,
+});
 
 await takePictures({
   shots: [
@@ -42,7 +52,9 @@ await takePictures({
           await page.goto("http://kyuubu.test/?lang=ja");
           await page.locator("[data-kyuubu]").first().waitFor();
           await solved(3)(page);
-          await page.locator(at("time")).evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 64));
+          await page
+            .locator(at("time"))
+            .evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 64));
         } else {
           await solved(3)(page);
           await page.evaluate(() => window.scrollTo(0, 0));
@@ -53,7 +65,13 @@ await takePictures({
     page("cubes-of-every-size", "/cubes.html?lang=en", "main", undefined),
     page("builder", "/builder.html?lang=en", "main", undefined, at("bld-stage")),
     page("famous-solves", "/famous.html?lang=en", "main", undefined, at("player")),
-    page("cuboid-domino", "/cuboids.html?lang=en", "main", async (page) => { await page.locator(at("pick-domino")).click(); await page.locator(at("scramble")).click(); }),
-    page("cuboid-pillar", "/cuboids.html?lang=en", "main", async (page) => { await page.locator(at("pick-pillar")).click(); await page.locator(at("scramble")).click(); }),
+    page("cuboid-domino", "/cuboids.html?lang=en", "main", async (page) => {
+      await page.locator(at("pick-domino")).click();
+      await page.locator(at("scramble")).click();
+    }),
+    page("cuboid-pillar", "/cuboids.html?lang=en", "main", async (page) => {
+      await page.locator(at("pick-pillar")).click();
+      await page.locator(at("scramble")).click();
+    }),
   ],
 });

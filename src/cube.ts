@@ -17,7 +17,7 @@ import type { CubeAxis, CubeMove, CubeTurns, StickerSlot, Vec3 } from "./types.t
  * @example
  * ```ts
  * import { CUBE_FACE_ORDER } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(CUBE_FACE_ORDER);
  * ```
  */
@@ -27,8 +27,8 @@ export const CUBE_FACE_ORDER = ["U", "R", "F", "D", "L", "B"] as const;
  * @example
  * ```ts
  * import type { CubeFace } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: CubeFace = "U";
  * console.log(value);
  * ```
@@ -40,7 +40,7 @@ export type CubeFace = (typeof CUBE_FACE_ORDER)[number];
  * @example
  * ```ts
  * import { FACE_FRAMES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(FACE_FRAMES).slice(0, 8));
  * ```
  */
@@ -61,7 +61,7 @@ export const FACE_FRAMES: Readonly<Record<CubeFace, { normal: Vec3; right: Vec3;
  * @example
  * ```ts
  * import { faceOfNormal } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(faceOfNormal([0, 1, 0]));
  * ```
  */
@@ -82,7 +82,7 @@ const keyOf = (slot: StickerSlot) => `${slot.centre.join(",")}|${slot.normal.joi
  * @example
  * ```ts
  * import { quarterTurn } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(quarterTurn([1, 0, 0], 2));
  * ```
  */
@@ -102,7 +102,7 @@ const slotsBySize = new Map<number, { slots: StickerSlot[]; index: Map<string, n
  * @example
  * ```ts
  * import { cubeSlots } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(cubeSlots(3).slots.length);
  * ```
  */
@@ -114,7 +114,10 @@ export function cubeSlots(n: number): { slots: readonly StickerSlot[]; index: Re
     const frame = FACE_FRAMES[face];
     for (let row = 0; row < n; row += 1) {
       for (let col = 0; col < n; col += 1) {
-        const centre = add(add(scale(frame.normal, n - 1), scale(frame.right, 2 * col - (n - 1))), scale(frame.down, 2 * row - (n - 1)));
+        const centre = add(
+          add(scale(frame.normal, n - 1), scale(frame.right, 2 * col - (n - 1))),
+          scale(frame.down, 2 * row - (n - 1)),
+        );
         slots.push({ centre, normal: frame.normal });
       }
     }
@@ -135,7 +138,7 @@ export function cubeSlots(n: number): { slots: readonly StickerSlot[]; index: Re
  * @example
  * ```ts
  * import { layerOf } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(layerOf([2, 2, 2], 0, 3));
  * ```
  */
@@ -152,7 +155,7 @@ export function layerOf(centre: Vec3, axis: CubeAxis, n: number): number {
  * @example
  * ```ts
  * import { faceOfSlot } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(faceOfSlot(0, 3));
  * ```
  */
@@ -168,7 +171,7 @@ export function faceOfSlot(at: number, n: number): CubeFace {
  * @example
  * ```ts
  * import { solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(solvedCube(2));
  * ```
  */
@@ -189,7 +192,7 @@ const permutations = new Map<string, Int32Array>();
  * @example
  * ```ts
  * import { parseMove, permutationOf } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(Array.from(permutationOf(3, move)).slice(0, 6));
  * ```
@@ -226,7 +229,7 @@ export function permutationOf(n: number, move: CubeMove): Int32Array {
  * @example
  * ```ts
  * import { moveFits, parseMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(moveFits(3, move));
  * ```
@@ -245,7 +248,7 @@ export function moveFits(n: number, move: CubeMove): boolean {
  * @example
  * ```ts
  * import { parseMove, solvedCube, turnCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const state = solvedCube(3);
  * const move = parseMove("R", 3)!;
  * console.log(turnCube(state, 3, move));
@@ -268,7 +271,7 @@ export function turnCube(state: string, n: number, move: CubeMove): string {
  * @example
  * ```ts
  * import { cubeSolved, parseMoves, solvedCube, turnAll, undoAll } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const state = solvedCube(3);
  * const moves = parseMoves("R U2", 3)!;
  * console.log(cubeSolved(turnAll(state, 3, [...moves, ...undoAll(moves)]), 3));
@@ -290,7 +293,7 @@ export function turnAll(state: string, n: number, moves: readonly CubeMove[]): s
  * @example
  * ```ts
  * import { cubeSolved, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const state = solvedCube(3);
  * console.log(cubeSolved(state, 3));
  * ```
@@ -311,7 +314,7 @@ export function cubeSolved(state: string, n: number): boolean {
  * @example
  * ```ts
  * import { moveNotation, parseMove, undoOf } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(moveNotation(undoOf(move), 3));
  * ```
@@ -328,7 +331,7 @@ export function undoOf(move: CubeMove): CubeMove {
  * @example
  * ```ts
  * import { movesNotation, parseMoves, undoAll } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(movesNotation(undoAll(moves), 3));
  * ```
@@ -345,7 +348,7 @@ export function undoAll(moves: readonly CubeMove[]): CubeMove[] {
  * @example
  * ```ts
  * import { countsAsMove, parseMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const move = parseMove("R", 3)!;
  * console.log(countsAsMove(move));
  * ```
@@ -363,7 +366,7 @@ export function countsAsMove(move: CubeMove): boolean {
  * @example
  * ```ts
  * import { isCubeState, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const state = solvedCube(3);
  * console.log(isCubeState(state, 3));
  * ```
@@ -391,7 +394,7 @@ const AXES = "xyz";
  * @example
  * ```ts
  * import { encodeCubeMoves, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(encodeCubeMoves(moves));
  * ```
@@ -408,7 +411,7 @@ export function encodeCubeMoves(moves: readonly CubeMove[]): string {
  * @example
  * ```ts
  * import { decodeCubeMoves, encodeCubeMoves, parseMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * console.log(decodeCubeMoves(encodeCubeMoves(moves)));
  * ```
@@ -422,7 +425,11 @@ export function decodeCubeMoves(code: string): CubeMove[] | null {
     const turns = Number(code[at + 2]);
     if (axis < 0 || !(turns === 1 || turns === 2 || turns === 3)) return null;
     if (layerChar !== "*" && !/^[0-9]$/.test(layerChar)) return null;
-    moves.push({ axis: axis as CubeAxis, layer: layerChar === "*" ? "all" : Number(layerChar), turns: turns as CubeTurns });
+    moves.push({
+      axis: axis as CubeAxis,
+      layer: layerChar === "*" ? "all" : Number(layerChar),
+      turns: turns as CubeTurns,
+    });
   }
   return moves;
 }

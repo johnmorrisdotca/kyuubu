@@ -16,7 +16,7 @@ import { WORDS, type CubeWords, type KyuubuLanguage } from "./words.ts";
  * ```ts
  * import type { CliWords } from "@johnmorrisdotca/kyuubu";
  * import { STRINGS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: CliWords = STRINGS.en;
  * console.log(value.cliAlreadySolved);
  * ```
@@ -48,7 +48,7 @@ export type CliWords = {
  * ```ts
  * import type { KyuubuStrings } from "@johnmorrisdotca/kyuubu";
  * import { STRINGS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: KyuubuStrings = STRINGS.en;
  * console.log(value.cubeLabel);
  * ```
@@ -137,7 +137,7 @@ const CLI: Readonly<Record<KyuubuLanguage, CliWords>> = {
     cliBadState: "that is not a {n}×{n} cube: it takes {count} letters, {each} each of U, R, F, D, L and B",
     cliNoMethod: "the step-by-step solve is for the 2×2 and the 3×3",
     cliImpossible: "this cube cannot be solved by turning it: a piece has been twisted or swapped",
-    cliNeedsStart: "--verify needs the cube it starts from: --from \"<scramble>\" or --state <state>",
+    cliNeedsStart: '--verify needs the cube it starts from: --from "<scramble>" or --state <state>',
     cliSolvedIn: "Solved. Moves: {count}",
     cliNotSolvedAfter: "Not solved. Moves: {count}",
     cliAlreadySolved: "Already solved",
@@ -154,10 +154,11 @@ const CLI: Readonly<Record<KyuubuLanguage, CliWords>> = {
     cliBadCount: "「{value}」: 一度に作れるスクランブルは1〜100個です",
     cliBadLang: "「{value}」: 言語は en か ja です",
     cliBadMoves: "「{part}」は{n}×{n}のキューブでは回せません",
-    cliBadState: "{n}×{n}のキューブの状態ではありません。U・R・F・D・L・B を{each}個ずつ、合わせて{count}文字が必要です",
+    cliBadState:
+      "{n}×{n}のキューブの状態ではありません。U・R・F・D・L・B を{each}個ずつ、合わせて{count}文字が必要です",
     cliNoMethod: "手順を表示できるのは2×2と3×3だけです",
     cliImpossible: "このキューブは回すだけではそろいません。パーツがねじれているか、入れ替わっています",
-    cliNeedsStart: "--verify には、はじめのキューブが必要です: --from \"<スクランブル>\" または --state <状態>",
+    cliNeedsStart: '--verify には、はじめのキューブが必要です: --from "<スクランブル>" または --state <状態>',
     cliSolvedIn: "完成。手数: {count}",
     cliNotSolvedAfter: "未完成。手数: {count}",
     cliAlreadySolved: "すでに完成しています",
@@ -176,7 +177,7 @@ function both(language: KyuubuLanguage): KyuubuStrings {
  * @example
  * ```ts
  * import { STRINGS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(Object.keys(STRINGS.en).slice(0, 5));
  * ```
  */

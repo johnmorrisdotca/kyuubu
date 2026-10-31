@@ -177,7 +177,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/mark-esm.mjs",
     "test": "vitest run",
-    "lint": "eslint .",
+    "lint": "biome check .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "site": "pnpm build && node scripts/site.mjs",
@@ -195,6 +195,7 @@
     "docs:site": "pnpm build && node scripts/docs-site.mjs build",
     "docs:check": "pnpm build && node scripts/docs-site.mjs check",
     "size": "node scripts/docs-site.mjs size",
+    "format": "biome check --write .",
     "test:demo": "pnpm site && node scripts/docs-site.mjs build && playwright test"
   },
   "peerDependencies": {
@@ -206,14 +207,11 @@
     }
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "2.6.4",
     "@playwright/test": "^1.63.0",
     "@types/react": "^19",
-    "eslint": "^10.11.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
     "react": "^19",
     "typescript": "^5",
-    "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.0",
     "pagefind": "^1.5.2",
     "marked": "^18.0.0",

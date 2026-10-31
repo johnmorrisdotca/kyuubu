@@ -35,7 +35,8 @@ import {
 // The page's own words, in the two languages the package speaks. Set as text, never as HTML.
 const WORDS = {
   en: {
-    pitch: "A turning cube for the browser, 2×2 to 7×7, drawn in CSS 3D. Drag a sticker to turn its layer, or type cubers' notation, and follow the layer-by-layer solve one step at a time.",
+    pitch:
+      "A turning cube for the browser, 2×2 to 7×7, drawn in CSS 3D. Drag a sticker to turn its layer, or type cubers' notation, and follow the layer-by-layer solve one step at a time.",
     name: "Kyuubu is how Japanese says “cube”.",
     nameLink: "About the name",
     toFamous: "Famous solves",
@@ -62,9 +63,11 @@ const WORDS = {
     nextStep: "Show the next step",
     allSteps: "Solve it all",
     showMe: "Show me on the cube",
-    showMeIntro: "Show me on the cube marks the layer to turn and draws an arrow the way to drag it, one move at a time, and waits for you to make it.",
+    showMeIntro:
+      "Show me on the cube marks the layer to turn and draws an arrow the way to drag it, one move at a time, and waits for you to make it.",
     showTyped: "Show me on the cube",
-    stepsOnly: "This page has no step-by-step method for this size, so these two take back every turn made, the last one first.",
+    stepsOnly:
+      "This page has no step-by-step method for this size, so these two take back every turn made, the last one first.",
     itsSolved: "It is solved.",
     uses: "Algorithm:",
     typeLabel: "Moves in notation",
@@ -74,8 +77,10 @@ const WORDS = {
     scrambleWas: "Scramble",
     yourMoves: "Your moves",
     none: "Nothing yet.",
-    notationHelp: "R L U D F B turn a face clockwise. R' is the other way and R2 is a half turn. M E S are the middle layers, x y z the whole cube, and 2R the second layer in on a bigger cube. Rw or r is a wide turn. Anything after // is a comment and is skipped, so a solve can be pasted as it is written; paste a link to alg.cubing.net and it is played on the famous solves page.",
-    saveIntro: "This solve as plain text: the scramble and your moves. Copy it, or paste one here (text or JSON) and load it.",
+    notationHelp:
+      "R L U D F B turn a face clockwise. R' is the other way and R2 is a half turn. M E S are the middle layers, x y z the whole cube, and 2R the second layer in on a bigger cube. Rw or r is a wide turn. Anything after // is a comment and is skipped, so a solve can be pasted as it is written; paste a link to alg.cubing.net and it is played on the famous solves page.",
+    saveIntro:
+      "This solve as plain text: the scramble and your moves. Copy it, or paste one here (text or JSON) and load it.",
     saveLabel: "A solve, as text or JSON",
     copy: "Copy",
     copied: "Copied.",
@@ -86,7 +91,8 @@ const WORDS = {
     csv: "Save as CSV",
     md: "Save as Markdown",
     sql: "Save as SQL",
-    listDownloadHelp: "Markdown makes a table for a note; SQL creates the solves table for a database. MySQL imports need ANSI_QUOTES and NO_BACKSLASH_ESCAPES.",
+    listDownloadHelp:
+      "Markdown makes a table for a note; SQL creates the solves table for a database. MySQL imports need ANSI_QUOTES and NO_BACKSLASH_ESCAPES.",
     solvesTitle: "Solves on this device",
     solvesNone: "Scramble the cube and solve it, and it is listed here.",
     solveSize: "Cube",
@@ -108,7 +114,8 @@ const WORDS = {
     keysDo: "Do this",
     keysDoes: "It does",
     k1: "Drag a sticker",
-    k1does: "Its layer turns with the pointer, forwards and back. Let go early and it goes back; past the point where it brightens, the turn is made",
+    k1does:
+      "Its layer turns with the pointer, forwards and back. Let go early and it goes back; past the point where it brightens, the turn is made",
     speedLabel: "Speed of turns made by keys, notation and the solve",
     speedFast: "Fast",
     speedNormal: "Normal",
@@ -124,15 +131,18 @@ const WORDS = {
     k7does: "The second layer in",
     k8: "Arrow keys",
     k8does: "Look round the cube",
-    exampleLook: "This code makes the cube beside it: the size, theme, colours and turn speed chosen above. Copy it and you have it.",
+    exampleLook:
+      "This code makes the cube beside it: the size, theme, colours and turn speed chosen above. Copy it and you have it.",
     exampleCopied: "Copied.",
     animateScramble: "Show the scramble turning",
     moreTitle: "One on your page",
-    moreText: "Install it, give an element a size, and make a cube in it. React, Vue, Svelte and Angular are in the README.",
+    moreText:
+      "Install it, give an element a size, and make a cube in it. React, Vue, Svelte and Angular are in the README.",
     foot: "Your solves stay on this device. Turn it with a mouse, a finger, the wheel or the keys.",
   },
   ja: {
-    pitch: "ブラウザで回せるキューブです（2×2〜7×7、CSS 3Dで描画）。ステッカーをドラッグして層を回すか、回転記号を入力します。一段ずつそろえる解き方を、1ステップずつ確認できます。",
+    pitch:
+      "ブラウザで回せるキューブです（2×2〜7×7、CSS 3Dで描画）。ステッカーをドラッグして層を回すか、回転記号を入力します。一段ずつそろえる解き方を、1ステップずつ確認できます。",
     name: "「キューブ」は、英語の cube を日本語で書いたものです。",
     nameLink: "名前について（英語）",
     toFamous: "有名なソルブ",
@@ -159,7 +169,8 @@ const WORDS = {
     nextStep: "次のステップ",
     allSteps: "最後までそろえる",
     showMe: "キューブの上で教えて",
-    showMeIntro: "「キューブの上で教えて」は、回す層に印を付け、ドラッグする向きを矢印で示します。1手ずつ、回すのを待ちます。",
+    showMeIntro:
+      "「キューブの上で教えて」は、回す層に印を付け、ドラッグする向きを矢印で示します。1手ずつ、回すのを待ちます。",
     showTyped: "キューブの上で教えて",
     stepsOnly: "このサイズには解き方の手順がありません。この二つのボタンは、回した手を最後から順に戻します。",
     itsSolved: "そろっています。",
@@ -171,8 +182,10 @@ const WORDS = {
     scrambleWas: "スクランブル",
     yourMoves: "回した手順",
     none: "まだありません。",
-    notationHelp: "R L U D F B は面を時計回りに回します。R' は反時計回り、R2 は180度です。M E S は中央の層、x y z はキューブ全体、2R は大きいキューブで外から2番目の層です。Rw や r はワイド（2層回し）です。// のあとはコメントとして読み飛ばすので、ソルブを書かれたまま貼り付けられます。alg.cubing.net のリンクを貼ると「有名なソルブ」のページで再生します。",
-    saveIntro: "いまのソルブをテキストで表示します（スクランブルと回した手順）。コピーするか、ここに貼り付けて（テキストまたはJSON）読み込めます。",
+    notationHelp:
+      "R L U D F B は面を時計回りに回します。R' は反時計回り、R2 は180度です。M E S は中央の層、x y z はキューブ全体、2R は大きいキューブで外から2番目の層です。Rw や r はワイド（2層回し）です。// のあとはコメントとして読み飛ばすので、ソルブを書かれたまま貼り付けられます。alg.cubing.net のリンクを貼ると「有名なソルブ」のページで再生します。",
+    saveIntro:
+      "いまのソルブをテキストで表示します（スクランブルと回した手順）。コピーするか、ここに貼り付けて（テキストまたはJSON）読み込めます。",
     saveLabel: "ソルブ（テキストまたはJSON）",
     copy: "コピー",
     copied: "コピーしました。",
@@ -183,14 +196,16 @@ const WORDS = {
     csv: "CSVで保存",
     md: "Markdownで保存",
     sql: "SQLで保存",
-    listDownloadHelp: "Markdownはメモ用の表、SQLはデータベース用のsolvesテーブルを作ります。MySQLに読み込む場合は、ANSI_QUOTESとNO_BACKSLASH_ESCAPESが必要です。",
+    listDownloadHelp:
+      "Markdownはメモ用の表、SQLはデータベース用のsolvesテーブルを作ります。MySQLに読み込む場合は、ANSI_QUOTESとNO_BACKSLASH_ESCAPESが必要です。",
     solvesTitle: "この端末のソルブ",
     solvesNone: "スクランブルしてそろえると、ここに記録されます。",
     solveSize: "キューブ",
     solveTime: "タイム",
     solveMoves: "手数",
     clear: "記録を消す",
-    lookIntro: "色はすべて、オプションとCSSカスタムプロパティで変えられます。テーマを選ぶか、色をタップして変更します。",
+    lookIntro:
+      "色はすべて、オプションとCSSカスタムプロパティで変えられます。テーマを選ぶか、色をタップして変更します。",
     themeLabel: "テーマ",
     themeStandard: "標準",
     themePaper: "ペーパー",
@@ -205,7 +220,8 @@ const WORDS = {
     keysDo: "操作",
     keysDoes: "動き",
     k1: "ステッカーをドラッグ",
-    k1does: "層がポインターに合わせて前後に回ります。途中で離すと元に戻り、明るくなる位置を過ぎて離すと回転が確定します",
+    k1does:
+      "層がポインターに合わせて前後に回ります。途中で離すと元に戻り、明るくなる位置を過ぎて離すと回転が確定します",
     speedLabel: "キー・回転記号・解き方で回す速さ",
     speedFast: "速い",
     speedNormal: "標準",
@@ -221,11 +237,13 @@ const WORDS = {
     k7does: "外から2番目の層",
     k8: "矢印キー",
     k8does: "見る向きが変わります",
-    exampleLook: "このコードで、横のキューブができます。上で選んだ大きさ、テーマ、色、回す速さが入っています。コピーすれば、そのまま使えます。",
+    exampleLook:
+      "このコードで、横のキューブができます。上で選んだ大きさ、テーマ、色、回す速さが入っています。コピーすれば、そのまま使えます。",
     exampleCopied: "コピーしました。",
     animateScramble: "スクランブルを回して見せる",
     moreTitle: "自分のページに置く",
-    moreText: "インストールして、大きさを決めた要素の中にキューブを作ります。React、Vue、Svelte、Angular の例は README にあります。",
+    moreText:
+      "インストールして、大きさを決めた要素の中にキューブを作ります。React、Vue、Svelte、Angular の例は README にあります。",
     foot: "ソルブの記録はこの端末にだけ保存されます。マウス、指、ホイール、キーボードで回せます。",
   },
 };
@@ -256,13 +274,23 @@ try {
   // A browser that keeps nothing starts with an empty list.
 }
 
-const page = familyLanguage({ id: "kyuubu", words: WORDS, onChange: (lang) => { view.setLocale(lang); guide?.setLocale(lang); draw(); } });
+const page = familyLanguage({
+  id: "kyuubu",
+  words: WORDS,
+  onChange: (lang) => {
+    view.setLocale(lang);
+    guide?.setLocale(lang);
+    draw();
+  },
+});
 const say = (key, values) => fill(page.word(key), values);
 const record = () => ({ size: view.size, scramble, moves });
 
 /** Everything on the page that is made of the cube's state and the language, drawn again. */
 function draw() {
-  document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
+  document
+    .querySelector('[data-say="pageDocs"]')
+    ?.setAttribute("href", page.lang === "ja" ? "docs/ja/index.html" : "docs/index.html");
   const n = view.size;
   $("count").textContent = String(moves.filter(countsAsMove).length);
   $("log").textContent = moves.length === 0 ? say("none") : movesNotation(moves.slice(-60), n);
@@ -272,7 +300,8 @@ function draw() {
   $("guide").hidden = guide === null;
   $("show").setAttribute("aria-pressed", String(guide !== null));
   $("hint").dataset.tone = banner === null ? "" : "good";
-  if (document.activeElement !== $("text")) $("text").value = scramble.length + moves.length === 0 ? "" : toText(record());
+  if (document.activeElement !== $("text"))
+    $("text").value = scramble.length + moves.length === 0 ? "" : toText(record());
   $("saved").textContent = note === null ? "" : say(note);
 
   drawExample();
@@ -295,7 +324,8 @@ function draw() {
     line("b", stageName(last.stage, page.lang));
     line("p", stageSays(last.stage, page.lang));
     line("p", movesNotation(last.moves, n), "fam-notation");
-    for (const name of new Set(last.algorithms)) line("p", `${say("uses")} ${algorithmName(name, page.lang)} · ${SOLVE_ALGORITHMS[name]}`, "fam-fine");
+    for (const name of new Set(last.algorithms))
+      line("p", `${say("uses")} ${algorithmName(name, page.lang)} · ${SOLVE_ALGORITHMS[name]}`, "fam-fine");
   } else if (cubeSolved(view.state, n)) line("p", say("itsSolved"), "fam-muted");
   $("done").replaceChildren(
     ...done.map((one) => {
@@ -311,11 +341,15 @@ function draw() {
   );
 
   for (const button of $("sizes").children) button.setAttribute("aria-pressed", String(Number(button.dataset.n) === n));
-  for (const button of $("themes").children) button.setAttribute("aria-pressed", String(button.dataset.themeName === themeName));
-  for (const button of $("speeds").children) button.setAttribute("aria-pressed", String(Number(button.dataset.ms) === turnMs));
+  for (const button of $("themes").children)
+    button.setAttribute("aria-pressed", String(button.dataset.themeName === themeName));
+  for (const button of $("speeds").children)
+    button.setAttribute("aria-pressed", String(Number(button.dataset.ms) === turnMs));
   for (const input of $("colours").querySelectorAll("input")) {
     input.value = input.dataset.face === "plastic" ? theme.plastic : theme.colours[input.dataset.face];
-    input.previousElementSibling.textContent = say(input.dataset.face === "plastic" ? "plastic" : `face${input.dataset.face}`);
+    input.previousElementSibling.textContent = say(
+      input.dataset.face === "plastic" ? "plastic" : `face${input.dataset.face}`,
+    );
   }
 
   const box = $("solves");
@@ -349,13 +383,21 @@ function draw() {
 /** The code under the page, and the cube beside it, both made from what is chosen above. */
 let example = { key: "", preview: null };
 function drawExample() {
-  const spec = { size: view.size, ...(themeName === "" ? { colours: theme.colours, plastic: theme.plastic } : { theme: themeName }), turnMs, animateScramble };
+  const spec = {
+    size: view.size,
+    ...(themeName === "" ? { colours: theme.colours, plastic: theme.plastic } : { theme: themeName }),
+    turnMs,
+    animateScramble,
+  };
   const code = viewCode(spec);
   $("example-code").textContent = code;
   const key = JSON.stringify(spec);
   if (key === example.key) return;
   example.preview?.destroy();
-  example = { key, preview: new CubeView($("example-preview"), { ...viewOptions(spec, CUBE_THEMES), locale: page.lang }) };
+  example = {
+    key,
+    preview: new CubeView($("example-preview"), { ...viewOptions(spec, CUBE_THEMES), locale: page.lang }),
+  };
 }
 
 const tick = () => {
@@ -445,7 +487,19 @@ function unguide() {
 function make(n, state) {
   unguide();
   view?.destroy();
-  view = new CubeView(stage, { size: n, state, keyboard: "page", theme, locale: page.lang, turnMs, animateScramble, onTurn: (move) => { last = null; turned(move); } });
+  view = new CubeView(stage, {
+    size: n,
+    state,
+    keyboard: "page",
+    theme,
+    locale: page.lang,
+    turnMs,
+    animateScramble,
+    onTurn: (move) => {
+      last = null;
+      turned(move);
+    },
+  });
 }
 
 for (let n = 2; n <= 7; n += 1) {
@@ -586,7 +640,9 @@ $("show").addEventListener("click", () => {
 });
 $("show-typed").addEventListener("click", () => {
   const read = parseSolve($("moves").value, view.size);
-  $("error").textContent = read.ok ? "" : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
+  $("error").textContent = read.ok
+    ? ""
+    : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
   if (!read.ok || read.steps.length === 0) return;
   showMe({ moves: read.steps });
   $("moves").value = "";
@@ -604,7 +660,9 @@ $("type").addEventListener("submit", (event) => {
     return;
   }
   const read = parseSolve(typed, view.size);
-  $("error").textContent = read.ok ? "" : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
+  $("error").textContent = read.ok
+    ? ""
+    : say("badMovesAt", { token: read.fault.token, line: read.fault.line, column: read.fault.column });
   if (!read.ok) return;
   unguide();
   last = null;
@@ -660,14 +718,26 @@ const current = () => (solves.length > 0 ? solves : scramble.length + moves.leng
 $("json").addEventListener("click", () => download("kyuubu-solves.json", "application/json", toJSON(current())));
 $("csv").addEventListener("click", () => download("kyuubu-solves.csv", "text/csv", toCSV(current())));
 const solveColumns = ["time", "size", "scramble", "moves", "count", "solved", "seconds", "seed"];
-const solveRows = () => current().map((record) => {
-  const summary = summarize(record);
-  return { time: record.at === undefined ? null : new Date(record.at).toISOString(), size: record.size,
-    scramble: summary.scramble, moves: summary.moves, count: summary.count, solved: summary.solved,
-    seconds: record.ms === undefined ? null : Number((record.ms / 1000).toFixed(2)), seed: record.seed ?? null };
-});
-$("md").addEventListener("click", () => download("kyuubu-solves.md", "text/markdown", toMarkdown(solveColumns, solveRows())));
-$("sql").addEventListener("click", () => download("kyuubu-solves.sql", "application/sql", toSql("solves", solveColumns, solveRows())));
+const solveRows = () =>
+  current().map((record) => {
+    const summary = summarize(record);
+    return {
+      time: record.at === undefined ? null : new Date(record.at).toISOString(),
+      size: record.size,
+      scramble: summary.scramble,
+      moves: summary.moves,
+      count: summary.count,
+      solved: summary.solved,
+      seconds: record.ms === undefined ? null : Number((record.ms / 1000).toFixed(2)),
+      seed: record.seed ?? null,
+    };
+  });
+$("md").addEventListener("click", () =>
+  download("kyuubu-solves.md", "text/markdown", toMarkdown(solveColumns, solveRows())),
+);
+$("sql").addEventListener("click", () =>
+  download("kyuubu-solves.sql", "application/sql", toSql("solves", solveColumns, solveRows())),
+);
 $("clear").addEventListener("click", () => {
   solves = [];
   keep();

@@ -1,4 +1,12 @@
-import { cuboidSolved, legalCuboidMoves, solvedCuboid, turnAllCuboid, turnCuboid, type CuboidDims, type CuboidMove } from "./model.ts";
+import {
+  cuboidSolved,
+  legalCuboidMoves,
+  solvedCuboid,
+  turnAllCuboid,
+  turnCuboid,
+  type CuboidDims,
+  type CuboidMove,
+} from "./model.ts";
 
 /**
  * SCRAMBLING A CUBOID. A scramble is a list of turns from the solved puzzle
@@ -20,7 +28,7 @@ import { cuboidSolved, legalCuboidMoves, solvedCuboid, turnAllCuboid, turnCuboid
  * @example
  * ```ts
  * import { CUBOID_RANDOM_STATE_MAX } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * console.log(CUBOID_RANDOM_STATE_MAX);
  * ```
  */
@@ -37,7 +45,7 @@ export const CUBOID_RANDOM_STATE_MAX = 20000;
  * @example
  * ```ts
  * import { cuboidScrambleLength } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidScrambleLength(dims));
  * ```
@@ -87,7 +95,7 @@ function stateGraph(dims: CuboidDims): StateGraph | null {
  * @example
  * ```ts
  * import { hasRandomStateScramble } from "@johnmorrisdotca/kyuubu/cuboid";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(hasRandomStateScramble(dims));
  * ```
@@ -119,12 +127,16 @@ export function hasRandomStateScramble(dims: CuboidDims): boolean {
  * ```ts
  * import { cuboidMovesNotation, randomCuboidScramble } from "@johnmorrisdotca/kyuubu/cuboid";
  * import { seededRandom } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const dims = [2, 3, 3] as const;
  * console.log(cuboidMovesNotation(randomCuboidScramble(dims, 8, seededRandom("docs")), dims));
  * ```
  */
-export function randomCuboidScramble(dims: CuboidDims, length?: number, random: () => number = Math.random): CuboidMove[] {
+export function randomCuboidScramble(
+  dims: CuboidDims,
+  length?: number,
+  random: () => number = Math.random,
+): CuboidMove[] {
   const graph = length === undefined ? stateGraph(dims) : null;
   if (graph !== null) {
     let at = 0;
@@ -140,7 +152,8 @@ export function randomCuboidScramble(dims: CuboidDims, length?: number, random: 
   const start = solvedCuboid(dims);
   while (moves.length < wanted || cuboidSolved(turnAllCuboid(start, dims, moves), dims)) {
     const last = moves[moves.length - 1];
-    const choices = last === undefined ? all : all.filter((move) => move.axis !== last.axis || move.layer !== last.layer);
+    const choices =
+      last === undefined ? all : all.filter((move) => move.axis !== last.axis || move.layer !== last.layer);
     moves.push(choices[Math.floor(random() * choices.length)]);
   }
   return moves;

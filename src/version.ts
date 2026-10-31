@@ -3,7 +3,7 @@
  * @example
  * ```ts
  * import { VERSION } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(VERSION);
  * ```
  */

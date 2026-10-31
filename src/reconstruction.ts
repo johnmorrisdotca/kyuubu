@@ -27,7 +27,7 @@ import type { CubeMove } from "./types.ts";
  * ```ts
  * import type { SolveMove } from "@johnmorrisdotca/kyuubu";
  * import { parseSolve } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolveMove = parseSolve("R", 3).steps[0]!;
  * console.log(value.text);
  * ```
@@ -48,8 +48,8 @@ export type SolveMove = {
  * @example
  * ```ts
  * import type { NotationFault } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: NotationFault = { token: "oops", at: 0, line: 1, column: 1, reason: "unknown" };
  * console.log(value.reason);
  * ```
@@ -73,7 +73,7 @@ export type NotationFault = {
  * ```ts
  * import type { SolveReading } from "@johnmorrisdotca/kyuubu";
  * import { parseSolve } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolveReading = parseSolve("R U", 3);
  * console.log(value.ok);
  * ```
@@ -81,7 +81,8 @@ export type NotationFault = {
 export type SolveReading = { ok: true; steps: SolveMove[] } | { ok: false; steps: SolveMove[]; fault: NotationFault };
 
 const BRACKETED: Record<string, "x" | "y" | "z"> = { r: "x", l: "x", u: "y", d: "y", f: "z", b: "z" };
-const TOKEN = /^(\d?)([RLUDFB])(w?)(2'|'2|2|3'|3|'|)$|^(\d?)([rludfb])(2'|'2|2|3'|3|'|)$|^([MESxyz])(2'|'2|2|3'|3|'|)$|^\[([rludfb])(2'|'2|2|3'|3|'|)\]$/;
+const TOKEN =
+  /^(\d?)([RLUDFB])(w?)(2'|'2|2|3'|3|'|)$|^(\d?)([rludfb])(2'|'2|2|3'|3|'|)$|^([MESxyz])(2'|'2|2|3'|3|'|)$|^\[([rludfb])(2'|'2|2|3'|3|'|)\]$/;
 
 /** One move at the head of a run written with no spaces between: a letter, a `w` and how far, and never a number in front. */
 const RUN = /[RLUDFBrludfbMESxyz]w?(?:2'|'2|2|3'|3|'|’)?/y;
@@ -103,7 +104,7 @@ const other = (amount: "cw" | "half" | "ccw") => (amount === "cw" ? "ccw" : amou
  * @example
  * ```ts
  * import { parseSolveMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(parseSolveMove("Rw", 3));
  * ```
  */
@@ -119,7 +120,9 @@ export function parseSolveMove(token: string, n: number): Omit<SolveMove, "at"> 
     const amount = amountOf(lower ? found[7] : found[4]);
     if (!wide) {
       const move = faceMove(face, count === "" ? 1 : Number(count), amount, n);
-      return move === null ? "no-such-layer" : { text: `${count}${face}${suffixText(amount)}`, moves: [move], counts: true };
+      return move === null
+        ? "no-such-layer"
+        : { text: `${count}${face}${suffixText(amount)}`, moves: [move], counts: true };
     }
     const depth = count === "" ? 2 : Number(count);
     if (depth < 2 || depth >= n) return "no-such-layer";
@@ -130,7 +133,8 @@ export function parseSolveMove(token: string, n: number): Omit<SolveMove, "at"> 
   if (found[8] !== undefined) {
     const letter = found[8];
     const amount = amountOf(found[9]);
-    if (letter === "x" || letter === "y" || letter === "z") return { text: `${letter}${suffixText(amount)}`, moves: [wholeMove(letter, amount)], counts: false };
+    if (letter === "x" || letter === "y" || letter === "z")
+      return { text: `${letter}${suffixText(amount)}`, moves: [wholeMove(letter, amount)], counts: false };
     const move = middleMove(letter as "M" | "E" | "S", amount, n);
     return move === null ? "no-such-layer" : { text: `${letter}${suffixText(amount)}`, moves: [move], counts: true };
   }
@@ -153,7 +157,7 @@ export function parseSolveMove(token: string, n: number): Omit<SolveMove, "at"> 
  * @example
  * ```ts
  * import { parseSolve } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(parseSolve("R U2", 3));
  * ```
  */
@@ -217,7 +221,18 @@ export function parseSolve(text: string, n: number): SolveReading {
       RUN.lastIndex = inside;
       const piece = RUN.exec(token);
       const one = piece === null ? "unknown" : parseSolveMove(piece[0], n);
-      if (piece === null || typeof one === "string") return { ok: false, steps, fault: { token, at, line, column: at - lineStart + 1, reason: typeof one === "string" && piece !== null ? one : read } };
+      if (piece === null || typeof one === "string")
+        return {
+          ok: false,
+          steps,
+          fault: {
+            token,
+            at,
+            line,
+            column: at - lineStart + 1,
+            reason: typeof one === "string" && piece !== null ? one : read,
+          },
+        };
       run.push({ ...one, at: at + inside });
       inside += piece[0].length;
     }
@@ -235,7 +250,7 @@ export function parseSolve(text: string, n: number): SolveReading {
  * @example
  * ```ts
  * import { parseSolve, solveMoves } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const reading = parseSolve("R U", 3);
  * const steps = reading.steps;
  * console.log(solveMoves(steps));
@@ -255,7 +270,7 @@ export function solveMoves(steps: readonly SolveMove[]): CubeMove[] {
  * @example
  * ```ts
  * import { applySolve, parseSolve, solvedCube } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const reading = parseSolve("R U", 3);
  * const steps = reading.steps;
  * const state = solvedCube(3);
@@ -276,7 +291,7 @@ export function applySolve(state: string, n: number, steps: readonly SolveMove[]
  * @example
  * ```ts
  * import { parseSolve, solveText } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const reading = parseSolve("R U", 3);
  * const steps = reading.steps;
  * console.log(solveText(steps));
@@ -294,7 +309,7 @@ export function solveText(steps: readonly SolveMove[]): string {
  * @example
  * ```ts
  * import { countSolveMoves, parseSolve } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const reading = parseSolve("R U", 3);
  * const steps = reading.steps;
  * console.log(countSolveMoves(steps));
@@ -309,8 +324,8 @@ export function countSolveMoves(steps: readonly SolveMove[]): number {
  * @example
  * ```ts
  * import type { SolveLink } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: SolveLink = { scramble: "R U", solution: "U' R'", title: "Two turns" };
  * console.log(value.title);
  * ```
@@ -330,7 +345,7 @@ export type SolveLink = { scramble: string; solution: string; title?: string };
  * @example
  * ```ts
  * import { readSolveLink } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(readSolveLink("https://alg.cubing.net/?setup=R_U&alg=U-_R-"));
  * ```
  */
@@ -346,7 +361,9 @@ export function readSolveLink(text: string): SolveLink | null {
     } catch {
       // A link cut short in the copying: read what is there as it stands.
     }
-    return plain.replace(/&#(x?)([0-9a-f]+);/gi, (whole, hex: string, digits: string) => String.fromCodePoint(parseInt(digits, hex === "" ? 10 : 16)));
+    return plain.replace(/&#(x?)([0-9a-f]+);/gi, (whole, hex: string, digits: string) =>
+      String.fromCodePoint(parseInt(digits, hex === "" ? 10 : 16)),
+    );
   };
   const moves = (raw: string | undefined) =>
     (raw ?? "")

@@ -20,7 +20,7 @@ import { DRAG_DECIDE_PX, DRAG_START_PX, moveForRelease, pickDrag } from "./gestu
  * @example
  * ```ts
  * import { HINT_MIN_FACING } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(HINT_MIN_FACING);
  * ```
  */
@@ -31,7 +31,7 @@ export const HINT_MIN_FACING = 0.2;
  * @example
  * ```ts
  * import { HINT_MIN_FOLLOW } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(HINT_MIN_FOLLOW);
  * ```
  */
@@ -42,8 +42,8 @@ export const HINT_MIN_FOLLOW = 0.5;
  * @example
  * ```ts
  * import type { HintArrow } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: HintArrow = { from: [0, 0, 0], along: [0, 1, 0], length: 2, width: 0.25, normal: [0, 0, 1] };
  * console.log(value.length);
  * ```
@@ -67,7 +67,7 @@ export type HintArrow = {
  * ```ts
  * import type { DragHint } from "@johnmorrisdotca/kyuubu";
  * import { dragHint, parseMove, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: DragHint = dragHint(parseMove("R", 3)!, 3, viewMatrix(-30, -20))!;
  * console.log(value.layers);
  * ```
@@ -128,7 +128,7 @@ function oneMovement(moves: readonly CubeMove[]): { axis: CubeAxis; layers: numb
  * @example
  * ```ts
  * import { dragHint, parseMove, viewMatrix } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * const move = parseMove("R", 3)!;
  * console.log(dragHint(move, 3, view));
@@ -217,7 +217,21 @@ export function dragHint(moves: CubeMove | readonly CubeMove[], n: number, view:
       };
     }
   }
-  return best?.hint ?? { axis, layers, turns, seam, slots: lit, face: null, grab: null, drag: null, quarters, atOnce: false, arrow: null };
+  return (
+    best?.hint ?? {
+      axis,
+      layers,
+      turns,
+      seam,
+      slots: lit,
+      face: null,
+      grab: null,
+      drag: null,
+      quarters,
+      atOnce: false,
+      arrow: null,
+    }
+  );
 }
 
 /**
@@ -251,7 +265,7 @@ function oneRotation(moves: readonly CubeMove[]): { axis: CubeAxis; turns: CubeT
  * @example
  * ```ts
  * import { rotationHint, viewMatrix, wholeMove } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const view = viewMatrix(-30, -20);
  * console.log(rotationHint(wholeMove("x", "cw"), 3, view));
  * ```
@@ -265,7 +279,15 @@ export function rotationHint(moves: CubeMove | readonly CubeMove[], n: number, v
   const quarters = turns === 2 ? 2 : turns === 1 ? 1 : -1;
   const way = quarters === -1 ? -1 : 1;
   const across = axisVector(axis);
-  const base = { axis, layers, turns, seam: false, slots: slots.map((_, at) => at), quarters: quarters as 1 | -1 | 2, atOnce: false };
+  const base = {
+    axis,
+    layers,
+    turns,
+    seam: false,
+    slots: slots.map((_, at) => at),
+    quarters: quarters as 1 | -1 | 2,
+    atOnce: false,
+  };
   let best: { score: number; hint: DragHint } | null = null;
   for (const normal of FACE_NORMALS) {
     if (normal[axis] !== 0) continue;
@@ -285,7 +307,13 @@ export function rotationHint(moves: CubeMove | readonly CubeMove[], n: number, v
     const from = centre.map((value, k) => value - (along[k] * length) / 2) as unknown as Vec3;
     best = {
       score,
-      hint: { ...base, face: faceOfNormal(normal), grab: null, drag: [screen[0] / shown, screen[1] / shown], arrow: { from, along, length, width: 2 * n, normal } },
+      hint: {
+        ...base,
+        face: faceOfNormal(normal),
+        grab: null,
+        drag: [screen[0] / shown, screen[1] / shown],
+        arrow: { from, along, length, width: 2 * n, normal },
+      },
     };
   }
   return best?.hint ?? { ...base, face: null, grab: null, drag: null, arrow: null };

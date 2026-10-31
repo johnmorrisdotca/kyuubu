@@ -51,7 +51,16 @@ const {
 
 const read = (path) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
 // The pages the README's long sections moved to, then the README: what the package says about itself is held to the code across all of them. The pages come first, so that a heading is found where its section is written in full.
-const readme = ["docs/CONTROLS.md", "docs/REPLAY.md", "docs/DISPLAY.md", "docs/CUBOIDS-USE.md", "docs/API.md", "README.md"].map(read).join("\n");
+const readme = [
+  "docs/CONTROLS.md",
+  "docs/REPLAY.md",
+  "docs/DISPLAY.md",
+  "docs/CUBOIDS-USE.md",
+  "docs/API.md",
+  "README.md",
+]
+  .map(read)
+  .join("\n");
 const pkg = JSON.parse(read("package.json"));
 const cell = (text) => text.replace(/\\\|/g, "|").trim();
 
@@ -62,7 +71,13 @@ function table(heading, nth = 0) {
   const tables = [];
   let rows = null;
   for (const line of readme.slice(from).split("\n").slice(1)) {
-    if (line.startsWith("|")) (rows ??= []).push(line.split(/(?<!\\)\|/).slice(1, -1).map(cell));
+    if (line.startsWith("|"))
+      (rows ??= []).push(
+        line
+          .split(/(?<!\\)\|/)
+          .slice(1, -1)
+          .map(cell),
+      );
     else if (rows !== null) {
       tables.push(rows.slice(2));
       rows = null;
@@ -79,7 +94,11 @@ function blocks(heading, language) {
   const depth = heading.match(/^#+/)[0].length;
   const rest = readme.slice(from + heading.length);
   const end = rest.search(new RegExp(`\\n#{1,${depth}} `));
-  return [...(end < 0 ? rest : rest.slice(0, end)).matchAll(new RegExp("```" + language + "(?: no-[a-z]+)?\\n([\\s\\S]*?)```", "g"))].map((found) => found[1]);
+  return [
+    ...(end < 0 ? rest : rest.slice(0, end)).matchAll(
+      new RegExp("```" + language + "(?: no-[a-z]+)?\\n([\\s\\S]*?)```", "g"),
+    ),
+  ].map((found) => found[1]);
 }
 
 const codes = (text) => [...text.matchAll(/`([^`]+)`/g)].map((found) => found[1]);
@@ -96,7 +115,16 @@ describe("the README's first examples", () => {
     expect(steps.slice(0, 2).map((step) => step.stage)).toEqual(["hold", "whiteCross"]);
     expect(steps.find((step) => step.stage !== "hold" && step.stage !== "whiteCross").stage).toBe("whiteCorners");
     expect(readme).toContain("// 17 steps: hold, white cross, white corners, …");
-    expect(cubeSolved(turnAll(cube, 3, steps.flatMap((step) => step.moves)), 3)).toBe(true);
+    expect(
+      cubeSolved(
+        turnAll(
+          cube,
+          3,
+          steps.flatMap((step) => step.moves),
+        ),
+        3,
+      ),
+    ).toBe(true);
   });
 
   it("the line for a terminal", () => {
@@ -109,7 +137,9 @@ describe("the README's first examples", () => {
     const cube = turnAll(solvedCube(3), 3, moves);
     expect(readme).toContain(`const cube = turnAll(solvedCube(3), 3, moves);   // "${cube}"`);
     expect(cubeSolved(cube, 3)).toBe(false);
-    expect(readme).toContain(`movesNotation(undoAll(moves), 3);                // "${movesNotation(undoAll(moves), 3)}"`);
+    expect(readme).toContain(
+      `movesNotation(undoAll(moves), 3);                // "${movesNotation(undoAll(moves), 3)}"`,
+    );
     expect(cubeSolved(turnAll(cube, 3, undoAll(moves)), 3)).toBe(true);
     expect(parseMoves("R Q", 3)).toBeNull();
   });
@@ -139,11 +169,15 @@ describe("the README's framework examples", () => {
 
   it("and the plain page is, but for where it finds the files", () => {
     const [html] = blocks("### 2. The view, in plain HTML", "html");
-    expect(check).toContain(html.replace("./node_modules/@johnmorrisdotca/kyuubu/dist/index.js", "./kyuubu/dist/index.js").trimEnd());
+    expect(check).toContain(
+      html.replace("./node_modules/@johnmorrisdotca/kyuubu/dist/index.js", "./kyuubu/dist/index.js").trimEnd(),
+    );
   });
 
   it("names the five it proves, and no other", () => {
-    expect(check).toMatch(/const projects = \{[\s\S]*\n {2}vue: [\s\S]*\n {2}svelte: [\s\S]*\n {2}angular: [\s\S]*\n {2}react: [\s\S]*\n {2}plain: /);
+    expect(check).toMatch(
+      /const projects = \{[\s\S]*\n {2}vue: [\s\S]*\n {2}svelte: [\s\S]*\n {2}angular: [\s\S]*\n {2}react: [\s\S]*\n {2}plain: /,
+    );
     expect(pkg.description).toContain("React, Vue, Svelte, Angular or plain HTML");
     expect(readme).not.toMatch(/\b(Solid|Preact|Lit|Qwik|Ember)\b/);
   });
@@ -163,13 +197,23 @@ describe("the README's notation", () => {
   });
 
   it("and what it says is refused, is", () => {
-    expect([parseMoves("M", 2), parseMoves("4R", 3), parseMoves("Q", 3), parseMoves("Rw", 4), parseMoves("r", 4)]).toEqual([null, null, null, null, null]);
+    expect([
+      parseMoves("M", 2),
+      parseMoves("4R", 3),
+      parseMoves("Q", 3),
+      parseMoves("Rw", 4),
+      parseMoves("r", 4),
+    ]).toEqual([null, null, null, null, null]);
     expect(parseMove("9R", 9)).not.toBeNull();
     expect(turnAll(solvedCube(4), 4, parseMoves("R 2R", 4))).not.toBe(solvedCube(4));
   });
 
   it("the moves in The model are as it prints them", () => {
-    for (const [text, n] of [["R", 3], ["2R'", 4], ["x", 3]]) {
+    for (const [text, n] of [
+      ["R", 3],
+      ["2R'", 4],
+      ["x", 3],
+    ]) {
       const move = parseMove(text, n);
       const shown = `{ axis: ${move.axis}, layer: ${JSON.stringify(move.layer)}, turns: ${move.turns} }`;
       expect(readme).toContain(`parseMove("${text}", ${n});`.padEnd(24) + `// ${shown}`);
@@ -184,20 +228,25 @@ describe("the README on the solve", () => {
     const cube = turnAll(solvedCube(2), 2, parseMoves("R U2 F'", 2));
     const steps = solveSteps(cube, 2);
     const widest = Math.max(...steps.map((step) => stageName(step.stage).length));
-    for (const step of steps) expect(readme).toContain(`// ${stageName(step.stage).padEnd(widest + 2)}${movesNotation(step.moves, 2)}\n`);
+    for (const step of steps)
+      expect(readme).toContain(`// ${stageName(step.stage).padEnd(widest + 2)}${movesNotation(step.moves, 2)}\n`);
     expect(readme).toContain(`stageSays("whiteLayer");          // "${stageSays("whiteLayer")}"`);
     expect(readme).toContain(`stageName("whiteLayer", "ja");    // "${stageName("whiteLayer", "ja")}"`);
   });
 
   it("the algorithms in its table are the method's", () => {
     const rows = table("## A solve a person can follow");
-    expect(rows.map(([name, notation]) => [codes(name)[0], codes(notation)[0]])).toEqual(Object.entries(SOLVE_ALGORITHMS));
+    expect(rows.map(([name, notation]) => [codes(name)[0], codes(notation)[0]])).toEqual(
+      Object.entries(SOLVE_ALGORITHMS),
+    );
   });
 
   it("a scrambled 3×3 comes to something over a hundred moves, and a state no cube can reach has no solve", () => {
     for (const seed of ["a", "b", "c", "d", "e"]) {
       const cube = turnAll(solvedCube(3), 3, randomScramble(3, 25, seededRandom(seed)));
-      const count = solveSteps(cube, 3).flatMap((step) => step.moves).filter(countsAsMove).length;
+      const count = solveSteps(cube, 3)
+        .flatMap((step) => step.moves)
+        .filter(countsAsMove).length;
       expect(count).toBeGreaterThan(60);
       expect(count).toBeLessThan(200);
     }
@@ -213,13 +262,15 @@ describe("the README on dragging a layer", () => {
     const { quartersForRelease, COMMIT_ANGLE, FLICK_SPEED } = kyuubu;
     const shown = [...readme.matchAll(/^quartersForRelease\(([^)]*)\);\s+\/\/ (-?\d):/gm)];
     expect(shown).toHaveLength(6);
-    for (const [, args, result] of shown) expect(quartersForRelease(...args.split(",").map(Number)), args).toBe(Number(result));
+    for (const [, args, result] of shown)
+      expect(quartersForRelease(...args.split(",").map(Number)), args).toBe(Number(result));
     expect(readme).toContain(`**There is a point of no return**, ${COMMIT_ANGLE} degrees unless`);
     expect(FLICK_SPEED).toBeLessThan(0.4);
     const view = read("src/view/view.ts");
     expect(readme).toContain("`--kyuubu-commit-filter` (`brightness(1.14)` unless");
     expect(view).toContain('const COMMIT_FILTER = "brightness(1.14)";');
-    for (const name of ["data-dragging", "data-committed", "data-angle"]) expect(view).toContain(`dataset.${name.slice(5)}`);
+    for (const name of ["data-dragging", "data-committed", "data-angle"])
+      expect(view).toContain(`dataset.${name.slice(5)}`);
   });
 
   it("the demo's hint and controls say it in both languages", () => {
@@ -235,15 +286,28 @@ describe("the README on scrambles", () => {
     expect(movesNotation(scramble.slice(0, 4), 3)).toBe("B L' S' U'");
     expect(readme).toContain("will always begin `B L' S' U'`");
     expect(readme).toContain(`FULL_SCRAMBLE_LENGTHS[4];                               // ${FULL_SCRAMBLE_LENGTHS[4]}`);
-    expect(readme).toContain(`\`${JSON.stringify(FULL_SCRAMBLE_LENGTHS).replace(/"/g, "").replace(/([:,])/g, "$1 ").replace("{", "{ ").replace("}", " }")}\``);
+    expect(readme).toContain(
+      `\`${JSON.stringify(FULL_SCRAMBLE_LENGTHS)
+        .replace(/"/g, "")
+        .replace(/([:,])/g, "$1 ")
+        .replace("{", "{ ")
+        .replace("}", " }")}\``,
+    );
     for (let at = 1; at < scramble.length; at += 1) expect(scramble[at].axis).not.toBe(scramble[at - 1].axis);
   });
 });
 
 describe("the README on the command line", () => {
   /** Each command shown after a `$`, with what is printed under it up to the next blank line. */
-  const shown = [...readme.matchAll(/^\$ kyuubu (.+)\n((?:.+\n)+)/gm)].map((found) => ({ args: found[1], printed: found[2] }));
-  const run = (args, surroundings) => runCli(args.match(/"[^"]*"|\S+/g).map((arg) => arg.replace(/^"|"$/g, "")), surroundings);
+  const shown = [...readme.matchAll(/^\$ kyuubu (.+)\n((?:.+\n)+)/gm)].map((found) => ({
+    args: found[1],
+    printed: found[2],
+  }));
+  const run = (args, surroundings) =>
+    runCli(
+      args.match(/"[^"]*"|\S+/g).map((arg) => arg.replace(/^"|"$/g, "")),
+      surroundings,
+    );
 
   it("prints what it shows being printed", () => {
     expect(shown.length).toBeGreaterThanOrEqual(5);
@@ -271,16 +335,24 @@ describe("the README on the command line", () => {
 });
 
 describe("the README on export and import", () => {
-  const solve = { size: 3, scramble: parseMoves("R U2 F'", 3), moves: parseMoves("F U2 R'", 3), ms: 12340, seed: "club night" };
+  const solve = {
+    size: 3,
+    scramble: parseMoves("R U2 F'", 3),
+    moves: parseMoves("F U2 R'", 3),
+    ms: 12340,
+    seed: "club night",
+  };
 
   it("prints what the three of them write", () => {
     const [shape] = blocks("## Export and import", "json");
     expect(shape).toBe(toJSON(solve));
     expect(readme).toContain("```text\n" + toText(solve) + "```");
-    const [, csv] = blocks("## Export and import", "text");   // the text sample, then the CSV
+    const [, csv] = blocks("## Export and import", "text"); // the text sample, then the CSV
     expect(csv).toBe(toCSV([solve]).replace(/\r\n/g, "\n"));
     const summary = summarize(solve);
-    expect(readme).toContain(`// { scramble: "${summary.scramble}", moves: "${summary.moves}", solved: ${summary.solved}, count: ${summary.count}, start, state, size }`);
+    expect(readme).toContain(
+      `// { scramble: "${summary.scramble}", moves: "${summary.moves}", solved: ${summary.solved}, count: ${summary.count}, start, state, size }`,
+    );
     expect(Object.keys(summary).sort()).toEqual(["count", "moves", "scramble", "size", "solved", "start", "state"]);
   });
 
@@ -306,30 +378,57 @@ describe("the README's reference", () => {
 
   it("names every option and member of the view", () => {
     const view = read("src/view/view.ts");
-    const options = [...view.slice(view.indexOf("export type CubeViewOptions = {"), view.indexOf("const EDGE")).matchAll(/^ {2}(\w+)\??:/gm)].map((found) => found[1]);
+    const options = [
+      ...view
+        .slice(view.indexOf("export type CubeViewOptions = {"), view.indexOf("const EDGE"))
+        .matchAll(/^ {2}(\w+)\??:/gm),
+    ].map((found) => found[1]);
     const told = new Set(table("## `new CubeView(element, options)`").flatMap(([option]) => codes(option)));
     expect(new Set(options)).toEqual(told);
-    const members = [...view.slice(view.indexOf("export class CubeView")).matchAll(/^ {2}(?:get |readonly )?(\w+)(?:\(|:)/gm)].map((found) => found[1]).filter((name) => name !== "constructor");
-    const shown = table("## `new CubeView(element, options)`", 1).flatMap(([member]) => codes(member)).map((text) => text.replace(/\(.*/, ""));
+    const members = [
+      ...view.slice(view.indexOf("export class CubeView")).matchAll(/^ {2}(?:get |readonly )?(\w+)(?:\(|:)/gm),
+    ]
+      .map((found) => found[1])
+      .filter((name) => name !== "constructor");
+    const shown = table("## `new CubeView(element, options)`", 1)
+      .flatMap(([member]) => codes(member))
+      .map((text) => text.replace(/\(.*/, ""));
     expect(new Set(members)).toEqual(new Set(shown));
   });
 
   it("the theming table is the properties, the defaults and the looks there are", () => {
     const rows = table("## Theming");
-    const faces = Object.fromEntries(rows.slice(0, 6).map(([property, option, fallback]) => [codes(option)[0].replace("colours.", ""), [codes(property)[0], codes(fallback)[0]]]));
-    expect(faces).toEqual(Object.fromEntries(Object.keys(DEFAULT_COLOURS).map((face) => [face, [FACE_PROPERTIES[face], DEFAULT_COLOURS[face]]])));
+    const faces = Object.fromEntries(
+      rows
+        .slice(0, 6)
+        .map(([property, option, fallback]) => [
+          codes(option)[0].replace("colours.", ""),
+          [codes(property)[0], codes(fallback)[0]],
+        ]),
+    );
+    expect(faces).toEqual(
+      Object.fromEntries(
+        Object.keys(DEFAULT_COLOURS).map((face) => [face, [FACE_PROPERTIES[face], DEFAULT_COLOURS[face]]]),
+      ),
+    );
     expect(codes(rows[6].join(" "))).toEqual(["--kyuubu-plastic", "plastic", DEFAULT_PLASTIC]);
     const view = read("src/view/view.ts");
-    for (const [property, , fallback] of rows.slice(6)) expect(view).toContain(`var(${codes(property)[0]}, ${fallback === "`#111`" ? "${DEFAULT_PLASTIC}" : codes(fallback)[0]})`);
+    for (const [property, , fallback] of rows.slice(6))
+      expect(view).toContain(
+        `var(${codes(property)[0]}, ${fallback === "`#111`" ? "${DEFAULT_PLASTIC}" : codes(fallback)[0]})`,
+      );
     expect(Object.keys(CUBE_THEMES)).toEqual(["standard", "paper", "stickerless"]);
     const [css] = blocks("## Theming", "css");
-    for (const face of Object.keys(DEFAULT_COLOURS)) expect(css).toContain(`${FACE_PROPERTIES[face]}: ${CUBE_THEMES.paper.colours[face]};`);
+    for (const face of Object.keys(DEFAULT_COLOURS))
+      expect(css).toContain(`${FACE_PROPERTIES[face]}: ${CUBE_THEMES.paper.colours[face]};`);
     expect(css).toContain(`--kyuubu-plastic: ${CUBE_THEMES.paper.plastic};`);
   });
 
   it("the limits are the constants", () => {
     const rows = Object.fromEntries(table("## Limits").map(([limit, value]) => [limit, value]));
-    expect(rows["Sizes the package is made and tested for"]).toBe(`${MIN_RECORD_SIZE}×${MIN_RECORD_SIZE} to ${MAX_RECORD_SIZE}×${MAX_RECORD_SIZE}`);
+    expect(rows["Sizes the package is made and tested for"]).toBe(
+      `${MIN_RECORD_SIZE}×${MIN_RECORD_SIZE} to ${MAX_RECORD_SIZE}×${MAX_RECORD_SIZE}`,
+    );
     expect(rows["Turns in one saved solve, scramble and moves each"]).toBe(MAX_RECORD_MOVES.toLocaleString("en"));
     expect(rows["Solves read from one file"]).toBe(MAX_RECORDS.toLocaleString("en"));
     expect(rows["Characters in a saved seed"]).toBe(String(MAX_RECORD_SEED));
@@ -343,7 +442,41 @@ describe("the README's reference", () => {
     const block = readme.slice(from, readme.indexOf("\n## ", from));
     expect([...block.matchAll(/^- \[/gm)]).toHaveLength(family.length);
     for (const one of family) expect(block).toContain(`- [${one.name}](${familyRepo(one.id)}) (${one.kana}):`);
-    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five", "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty", "thirty-one", "thirty-two"];
+    const words = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "ten",
+      "eleven",
+      "twelve",
+      "thirteen",
+      "fourteen",
+      "fifteen",
+      "sixteen",
+      "seventeen",
+      "eighteen",
+      "nineteen",
+      "twenty",
+      "twenty-one",
+      "twenty-two",
+      "twenty-three",
+      "twenty-four",
+      "twenty-five",
+      "twenty-six",
+      "twenty-seven",
+      "twenty-eight",
+      "twenty-nine",
+      "thirty",
+      "thirty-one",
+      "thirty-two",
+    ];
     expect(block).toContain(`Kyuubu is one of ${words[family.length]} packages`);
     expect(block).toContain("**This package is Kyuubu.**");
     expect(family.length).toBeGreaterThanOrEqual(19);
@@ -354,12 +487,20 @@ describe("the README's reference", () => {
 
 describe("the community files", () => {
   it("SECURITY.md and CODE_OF_CONDUCT.md are the family's master text (the shared .github repository's), a copy of which is kept in scripts/community", () => {
-    for (const file of ["SECURITY.md", "CODE_OF_CONDUCT.md"]) expect(read(file), file).toBe(read(`scripts/community/${file}`));
+    for (const file of ["SECURITY.md", "CODE_OF_CONDUCT.md"])
+      expect(read(file), file).toBe(read(`scripts/community/${file}`));
   });
 
   it("CONTRIBUTING.md carries the family's house rules and the README points to the security policy", () => {
     const contributing = read("CONTRIBUTING.md");
-    for (const rule of ["Open an issue first", "No runtime dependencies", "kebab case", "CC0 or public domain only", "Needs Node 22 or later"]) expect(contributing, rule).toContain(rule);
+    for (const rule of [
+      "Open an issue first",
+      "No runtime dependencies",
+      "kebab case",
+      "CC0 or public domain only",
+      "Needs Node 22 or later",
+    ])
+      expect(contributing, rule).toContain(rule);
     expect(readme).toContain("[security policy](./SECURITY.md)");
   });
 });
@@ -377,7 +518,8 @@ describe("Node", () => {
 describe("the release notes", () => {
   it("are the changelog's section for the version, which the Release workflow puts on the GitHub release", async () => {
     const { releaseNotes } = await import("../scripts/release-notes.mjs");
-    const log = "# Changelog\n\n## [Unreleased]\n\n## [1.2.0] - 2026-01-02\n\n### Added\n\n- A thing.\n\n## [1.1.0] - 2026-01-01\n\n- Older.\n\n[Unreleased]: https://example.test\n";
+    const log =
+      "# Changelog\n\n## [Unreleased]\n\n## [1.2.0] - 2026-01-02\n\n### Added\n\n- A thing.\n\n## [1.1.0] - 2026-01-01\n\n- Older.\n\n[Unreleased]: https://example.test\n";
     expect(releaseNotes(log, "1.2.0")).toBe("### Added\n\n- A thing.");
     expect(releaseNotes(log, "1.1.0")).toBe("- Older.");
     expect(releaseNotes(log, "9.9.9")).toBeNull();
@@ -451,7 +593,8 @@ describe("the demo site", () => {
     const page = read("demo/index.html");
     expect(page.indexOf('href="family.css"')).toBeGreaterThan(0);
     expect(page.indexOf('href="kyuubu.css"')).toBeGreaterThan(page.indexOf('href="family.css"'));
-    for (const name of ["head", "header", "unreviewed", "footer", "script"]) expect(page).toContain(`<!-- family:${name} -->`);
+    for (const name of ["head", "header", "unreviewed", "footer", "script"])
+      expect(page).toContain(`<!-- family:${name} -->`);
     expect(page).not.toMatch(/<style/);
     // Its own stylesheet styles its own classes, and the two variables the family leaves to a page.
     const own = read("demo/kyuubu.css").replace(/\/\*[\s\S]*?\*\//g, "");
@@ -464,27 +607,34 @@ describe("the demo site", () => {
 
   it("has a Japanese line for every English one on the page, with the same places to fill in", async () => {
     const app = read("demo/app.js");
-    const tableText = app.slice(app.indexOf("const WORDS = {"), app.indexOf("\n};\n", app.indexOf("const WORDS = {")) + 3);
+    const tableText = app.slice(
+      app.indexOf("const WORDS = {"),
+      app.indexOf("\n};\n", app.indexOf("const WORDS = {")) + 3,
+    );
     const words = new Function(`${tableText}; return WORDS;`)();
     expect(Object.keys(words.ja)).toEqual(Object.keys(words.en));
     const places = (text) => [...text.matchAll(/\{(\w+)\}/g)].map((found) => found[1]).sort();
     for (const key of Object.keys(words.en)) expect(places(words.ja[key]), key).toEqual(places(words.en[key]));
     // Every word the page asks for is in the table, or is one the family's template brings.
     const page = read("demo/index.html");
-    for (const found of page.matchAll(/data-say(?:-label|-placeholder)?="(\w+)"/g)) expect(Object.keys(words.en), found[1]).toContain(found[1]);
+    for (const found of page.matchAll(/data-say(?:-label|-placeholder)?="(\w+)"/g))
+      expect(Object.keys(words.en), found[1]).toContain(found[1]);
     for (const found of app.matchAll(/say\("(\w+)"/g)) expect(Object.keys(words.en), found[1]).toContain(found[1]);
   });
 });
 
 describe("the source", () => {
   it("has a doc comment on every export", () => {
-    const files = [...readdirSync("src"), ...readdirSync("src/view").map((name) => `view/${name}`)].filter((name) => /\.tsx?$/.test(name) && name !== "index.ts");
+    const files = [...readdirSync("src"), ...readdirSync("src/view").map((name) => `view/${name}`)].filter(
+      (name) => /\.tsx?$/.test(name) && name !== "index.ts",
+    );
     expect(files.length).toBeGreaterThan(10);
     const bare = [];
     for (const file of files) {
       const lines = read(`src/${file}`).split("\n");
       lines.forEach((text, at) => {
-        if (/^export (const|function|type|class) /.test(text) && !lines[at - 1].trim().endsWith("*/")) bare.push(`${file}: ${text}`);
+        if (/^export (const|function|type|class) /.test(text) && !lines[at - 1].trim().endsWith("*/"))
+          bare.push(`${file}: ${text}`);
       });
     }
     expect(bare).toEqual([]);
@@ -506,7 +656,8 @@ describe("the version", () => {
   });
 
   it("the package names built files, a command and what it is", () => {
-    for (const entry of Object.values(pkg.exports)) for (const file of Object.values(entry)) expect(file).toMatch(/^\.\/dist\//);
+    for (const entry of Object.values(pkg.exports))
+      for (const file of Object.values(entry)) expect(file).toMatch(/^\.\/dist\//);
     expect(pkg.publishConfig.exports).toBeUndefined();
     expect(pkg.bin).toEqual({ kyuubu: "bin/kyuubu.mjs" });
     expect(pkg.files).toContain("bin");

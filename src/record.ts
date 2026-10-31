@@ -22,7 +22,7 @@ import { VERSION } from "./version.ts";
  * @example
  * ```ts
  * import { RECORD_FORMAT } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(RECORD_FORMAT);
  * ```
  */
@@ -33,7 +33,7 @@ export const RECORD_FORMAT = 1;
  * @example
  * ```ts
  * import { MIN_RECORD_SIZE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MIN_RECORD_SIZE);
  * ```
  */
@@ -43,7 +43,7 @@ export const MIN_RECORD_SIZE = 2;
  * @example
  * ```ts
  * import { MAX_RECORD_SIZE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_RECORD_SIZE);
  * ```
  */
@@ -53,7 +53,7 @@ export const MAX_RECORD_SIZE = 7;
  * @example
  * ```ts
  * import { MAX_RECORD_MOVES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_RECORD_MOVES);
  * ```
  */
@@ -63,7 +63,7 @@ export const MAX_RECORD_MOVES = 10000;
  * @example
  * ```ts
  * import { MAX_RECORDS } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_RECORDS);
  * ```
  */
@@ -73,7 +73,7 @@ export const MAX_RECORDS = 1000;
  * @example
  * ```ts
  * import { MAX_RECORD_SEED } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(MAX_RECORD_SEED);
  * ```
  */
@@ -85,7 +85,7 @@ export const MAX_RECORD_SEED = 200;
  * ```ts
  * import type { SolveRecord } from "@johnmorrisdotca/kyuubu";
  * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolveRecord = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000 };
  * console.log(summarize(value).solved);
  * ```
@@ -111,7 +111,7 @@ export type SolveRecord = {
  * ```ts
  * import type { SolveSummary } from "@johnmorrisdotca/kyuubu";
  * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: SolveSummary = summarize({ size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)! });
  * console.log(value.solved);
  * ```
@@ -140,7 +140,7 @@ export type SolveSummary = {
  * @example
  * ```ts
  * import { parseMoves, summarize } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(summarize(record));
@@ -160,7 +160,8 @@ export function summarize(record: SolveRecord): SolveSummary {
   };
 }
 
-const list = (records: SolveRecord | readonly SolveRecord[]): readonly SolveRecord[] => (Array.isArray(records) ? records : [records as SolveRecord]);
+const list = (records: SolveRecord | readonly SolveRecord[]): readonly SolveRecord[] =>
+  Array.isArray(records) ? records : [records as SolveRecord];
 
 /**
  * One solve or many, as JSON: `{ "format": 1, "generator": "kyuubu 1.1.0", "solves": [ … ] }`.
@@ -173,7 +174,7 @@ const list = (records: SolveRecord | readonly SolveRecord[]): readonly SolveReco
  * @example
  * ```ts
  * import { parseMoves, toJSON } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(toJSON(record));
@@ -200,7 +201,8 @@ export function toJSON(records: SolveRecord | readonly SolveRecord[]): string {
 function rebuilt(entry: unknown): SolveRecord | null {
   if (typeof entry !== "object" || entry === null) return null;
   const { size, scramble, moves, ms, at, seed } = entry as Record<string, unknown>;
-  if (typeof size !== "number" || !Number.isInteger(size) || size < MIN_RECORD_SIZE || size > MAX_RECORD_SIZE) return null;
+  if (typeof size !== "number" || !Number.isInteger(size) || size < MIN_RECORD_SIZE || size > MAX_RECORD_SIZE)
+    return null;
   if (typeof scramble !== "string" || typeof moves !== "string") return null;
   const mixed = parseMoves(scramble, size);
   const made = parseMoves(moves, size);
@@ -224,7 +226,7 @@ function rebuilt(entry: unknown): SolveRecord | null {
  * @example
  * ```ts
  * import { fromJSON, parseMoves, toJSON } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(fromJSON(toJSON(record))?.length);
@@ -265,7 +267,7 @@ const seconds = (ms: number) => (ms / 1000).toFixed(2);
  * @example
  * ```ts
  * import { parseMoves, toText } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(toText(record));
@@ -294,7 +296,7 @@ export function toText(record: SolveRecord): string {
  * @example
  * ```ts
  * import { fromText, parseMoves, toText } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(fromText(toText(record))?.size);
@@ -330,7 +332,8 @@ export function fromText(text: string): SolveRecord | null {
   if (size < MIN_RECORD_SIZE || size > MAX_RECORD_SIZE) return null;
   const scramble = parseMoves(parts.scramble.join(" "), size);
   const moves = parseMoves(parts.solve.join(" "), size);
-  if (scramble === null || moves === null || scramble.length > MAX_RECORD_MOVES || moves.length > MAX_RECORD_MOVES) return null;
+  if (scramble === null || moves === null || scramble.length > MAX_RECORD_MOVES || moves.length > MAX_RECORD_MOVES)
+    return null;
   if (scramble.length === 0 && moves.length === 0) return null;
   return { size, scramble, moves, ...(ms === undefined ? {} : { ms }), ...(seed === undefined ? {} : { seed }) };
 }
@@ -354,7 +357,7 @@ function cell(value: string | number | boolean | undefined): string {
  * @example
  * ```ts
  * import { parseMoves, toCSV } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const moves = parseMoves("R U2", 3)!;
  * const record = { size: 3, scramble: parseMoves("R", 3)!, moves: parseMoves("R'", 3)!, ms: 1000, seed: "docs" };
  * console.log(toCSV([record]));

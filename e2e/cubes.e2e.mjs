@@ -37,13 +37,22 @@ test.describe("with motion allowed", () => {
 
   test("the cubes keep their box while they turn, and are not selectable", async ({ page }) => {
     await open(page);
-    const boxes = async () => page.locator(id("cube-row")).evaluate((row) => [...row.querySelectorAll("kyuubu-scramble")].map((el) => { const box = el.getBoundingClientRect(); return `${Math.round(box.width)}×${Math.round(box.height)}`; }));
+    const boxes = async () =>
+      page.locator(id("cube-row")).evaluate((row) =>
+        [...row.querySelectorAll("kyuubu-scramble")].map((el) => {
+          const box = el.getBoundingClientRect();
+          return `${Math.round(box.width)}×${Math.round(box.height)}`;
+        }),
+      );
     const before = await boxes();
     expect(before[2]).toBe("72×72");
     await tap(page, '#paces button[data-pace="fast"]');
     await page.waitForTimeout(1500);
     expect(await boxes()).toEqual(before);
-    const selectable = await page.locator("kyuubu-scramble").first().evaluate((el) => getComputedStyle(el.querySelector("[data-kyuubu]")).userSelect);
+    const selectable = await page
+      .locator("kyuubu-scramble")
+      .first()
+      .evaluate((el) => getComputedStyle(el.querySelector("[data-kyuubu]")).userSelect);
     expect(selectable).toBe("none");
   });
 
@@ -68,7 +77,9 @@ test.describe("with motion allowed", () => {
   test("the embed turns a cube at the pace in its address, and pauses when asked", async ({ page }) => {
     const errors = await open(page, "embed-scramble.html#pace=0.5&scale=small&size=2");
     const first = await page.locator("[data-kyuubu]").getAttribute("data-state");
-    await expect.poll(() => page.locator("[data-kyuubu]").getAttribute("data-state"), { timeout: 6000 }).not.toBe(first);
+    await expect
+      .poll(() => page.locator("[data-kyuubu]").getAttribute("data-state"), { timeout: 6000 })
+      .not.toBe(first);
     expect(await page.locator("[data-kyuubu] [data-slot]").count()).toBe(24);
     await page.goto("http://kyuubu.test/embed-scramble.html#paused=1&scale=small&size=2");
     await expect(page.locator("[data-kyuubu]")).toBeVisible();
@@ -112,7 +123,9 @@ test("in Japanese, the words change and the page still fits", async ({ page }) =
   await sound(page, errors);
 });
 
-test("a cube with no scale leaves its box as the page sized it, and one given a scale gives it back", async ({ page }) => {
+test("a cube with no scale leaves its box as the page sized it, and one given a scale gives it back", async ({
+  page,
+}) => {
   await open(page);
   const result = await page.evaluate(async () => {
     const { CubeView } = await import("/dist/index.js");

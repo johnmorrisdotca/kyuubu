@@ -23,7 +23,7 @@ import { FAMOUS_SOLVE_DATA } from "./famous.data.ts";
  * ```ts
  * import type { FamousSolve } from "@johnmorrisdotca/kyuubu/famous";
  * import { FAMOUS_SOLVES } from "@johnmorrisdotca/kyuubu/famous";
- * 
+ *
  * const value: FamousSolve = FAMOUS_SOLVES[0]!;
  * console.log(value.solver);
  * ```
@@ -66,7 +66,7 @@ export type FamousSolve = {
  * @example
  * ```ts
  * import { FAMOUS_SOLVES } from "@johnmorrisdotca/kyuubu/famous";
- * 
+ *
  * console.log(FAMOUS_SOLVES.slice(0, 3).map((solve) => solve.id));
  * ```
  */
@@ -80,7 +80,7 @@ export const FAMOUS_SOLVES: readonly FamousSolve[] = FAMOUS_SOLVE_DATA;
  * @example
  * ```ts
  * import { FAMOUS_SOLVES, famousSolve } from "@johnmorrisdotca/kyuubu/famous";
- * 
+ *
  * console.log(famousSolve(FAMOUS_SOLVES[0]!.id)?.solver);
  * ```
  */

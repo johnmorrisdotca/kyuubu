@@ -16,7 +16,7 @@ import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
  * @example
  * ```ts
  * import { SCRAMBLE_PACES } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(SCRAMBLE_PACES);
  * ```
  */
@@ -27,8 +27,8 @@ export const SCRAMBLE_PACES = { fast: 0.5, normal: 1, slow: 4 } as const;
  * @example
  * ```ts
  * import type { ScramblePace } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ScramblePace = "slow";
  * console.log(value);
  * ```
@@ -40,7 +40,7 @@ export type ScramblePace = keyof typeof SCRAMBLE_PACES;
  * @example
  * ```ts
  * import { SCRAMBLE_SHORTEST } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(SCRAMBLE_SHORTEST);
  * ```
  */
@@ -51,7 +51,7 @@ export const SCRAMBLE_SHORTEST = 0.2;
  * @example
  * ```ts
  * import { SCRAMBLE_DEFAULT_PACE } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(SCRAMBLE_DEFAULT_PACE);
  * ```
  */
@@ -62,8 +62,8 @@ export const SCRAMBLE_DEFAULT_PACE = SCRAMBLE_PACES.normal;
  * @example
  * ```ts
  * import type { Scrambled } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: Scrambled = { size: 3, busy: false, turn: (move) => console.log(move) };
  * console.log(value.size);
  * ```
@@ -79,8 +79,8 @@ export type Scrambled = {
  * @example
  * ```ts no-run
  * import type { ScramblePage } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: ScramblePage = document;
  * console.log(value.hidden);
  * ```
@@ -96,8 +96,8 @@ export type ScramblePage = {
  * @example
  * ```ts
  * import type { KeepScramblingOptions } from "@johnmorrisdotca/kyuubu";
- * 
- * 
+ *
+ *
  * const value: KeepScramblingOptions = { pace: "slow", autoplay: false, reducedMotion: true };
  * console.log(value.pace);
  * ```
@@ -123,7 +123,7 @@ export type KeepScramblingOptions = {
  * ```ts no-run
  * import type { KeepScramblingHandle } from "@johnmorrisdotca/kyuubu";
  * import { keepScrambling } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const value: KeepScramblingHandle = keepScrambling({ size: 3, busy: false, turn: () => {} }, { autoplay: false });
  * console.log(value.running);
  * ```
@@ -149,7 +149,7 @@ export type KeepScramblingHandle = {
  * @example
  * ```ts
  * import { paceSeconds } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(paceSeconds("slow"));
  * ```
  */
@@ -170,7 +170,7 @@ export function paceSeconds(pace: number | ScramblePace | undefined): number {
  * @example
  * ```ts
  * import { nextTurn, seededRandom } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(nextTurn(3, null, seededRandom("docs"), true));
  * ```
  */
@@ -187,7 +187,7 @@ export function nextTurn(n: number, last: CubeMove | null, random: () => number,
  * @example
  * ```ts
  * import { prefersReducedMotion } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * console.log(prefersReducedMotion());
  * ```
  */
@@ -205,7 +205,7 @@ export function prefersReducedMotion(): boolean {
  * @example
  * ```ts no-run
  * import { CubeView, keepScrambling } from "@johnmorrisdotca/kyuubu";
- * 
+ *
  * const host = document.createElement("div");
  * host.style.cssText = "width:160px;height:160px;position:relative";
  * document.body.append(host);
