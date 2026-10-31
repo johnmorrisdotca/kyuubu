@@ -9,7 +9,7 @@
   <a href="./LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-2f5d4a"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
-  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="38.0 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-38.0%20kB-2f5d4a"></a>
+  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="38.5 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-38.5%20kB-2f5d4a"></a>
   <a href="https://www.npmjs.com/package/@johnmorrisdotca/kyuubu#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 

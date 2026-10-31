@@ -2,48 +2,48 @@
   "measured": "esbuild 0.28.2, bundled, minified, ES2020, gzip level 9",
   "entries": {
     ".": {
-      "minified": 115147,
-      "gzip": 37994
+      "minified": 115224,
+      "gzip": 38503
     },
     "./react": {
-      "minified": 92250,
-      "gzip": 29331
+      "minified": 92325,
+      "gzip": 29510
     },
     "./famous": {
       "minified": 5970,
-      "gzip": 1840
+      "gzip": 1850
     },
     "./player": {
-      "minified": 85603,
-      "gzip": 28720
+      "minified": 85683,
+      "gzip": 28610
     },
     "./element": {
-      "minified": 91874,
-      "gzip": 30793
+      "minified": 91955,
+      "gzip": 30676
     },
     "./element/define": {
-      "minified": 91744,
-      "gzip": 30736
+      "minified": 91825,
+      "gzip": 30608
     },
     "./cuboid": {
-      "minified": 29527,
-      "gzip": 9419
+      "minified": 29536,
+      "gzip": 9452
     },
     "./cuboid/draw": {
-      "minified": 23873,
-      "gzip": 8753
+      "minified": 23911,
+      "gzip": 8846
     },
     "./cuboid/play": {
-      "minified": 59307,
-      "gzip": 19431
+      "minified": 59351,
+      "gzip": 19568
     },
     "./cuboid/element": {
-      "minified": 62136,
-      "gzip": 20252
+      "minified": 62180,
+      "gzip": 20187
     },
     "./cuboid/element/define": {
-      "minified": 62083,
-      "gzip": 20214
+      "minified": 62127,
+      "gzip": 20156
     }
   }
 }
