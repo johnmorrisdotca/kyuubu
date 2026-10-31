@@ -1,5 +1,5 @@
 import { cubeSolved, solvedCube, undoOf } from "./cube.ts";
-import { applySolve, parseSolve, type NotationFault, type SolveMove } from "./reconstruction.ts";
+import { applySolve, type NotationFault, parseSolve, type SolveMove } from "./reconstruction.ts";
 import type { CubeMove } from "./types.ts";
 
 /**

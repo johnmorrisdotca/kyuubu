@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  SOLVE_ALGORITHMS,
   countsAsMove,
   cubeSolved,
   joinTurns,
   movesNotation,
   parseMoves,
   randomScramble,
-  solveSteps,
-  solvedCube,
-  turnAll,
+  SOLVE_ALGORITHMS,
   type SolveStep,
+  solvedCube,
+  solveSteps,
+  turnAll,
 } from "../src/index.ts";
 
 /** A seeded random source, so a failure names a scramble that can be run again. */

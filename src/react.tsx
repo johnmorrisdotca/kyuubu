@@ -1,10 +1,10 @@
-import { useEffect, useImperativeHandle, useRef, type CSSProperties, type Ref } from "react";
+import { type CSSProperties, type Ref, useEffect, useImperativeHandle, useRef } from "react";
 
 import type { CubeFace } from "./cube.ts";
+import { type MoveListHandle, type MoveListOptions, mountMoveList } from "./move-list.ts";
 import { CUBE_SCALE_INTERACTIVE } from "./scale.ts";
 import type { CubeMove } from "./types.ts";
-import { mountMoveList, type MoveListHandle, type MoveListOptions } from "./move-list.ts";
-import { CubeView, type CubeTheme, type CubeViewOptions } from "./view/view.ts";
+import { type CubeTheme, CubeView, type CubeViewOptions } from "./view/view.ts";
 
 /** What a parent can ask of the cube on the screen.
  *

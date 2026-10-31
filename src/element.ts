@@ -190,9 +190,9 @@ export function defineCube(name: string = CUBE_ELEMENT_NAME): void {
 }
 
 export {
+  defineScramble,
+  type KyuubuScrambleElement,
+  paceFromAttribute,
   SCRAMBLE_ELEMENT_ATTRIBUTES,
   SCRAMBLE_ELEMENT_NAME,
-  defineScramble,
-  paceFromAttribute,
-  type KyuubuScrambleElement,
 } from "./scramble-element.ts";

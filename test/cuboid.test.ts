@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
-
-import { seededRandom } from "../src/index.ts";
 import {
   CUBOID_MAX_SIDE,
   CUBOID_PRESETS,
   CUBOID_RANDOM_STATE_MAX,
-  HALF_TURN_COMMIT,
+  type CuboidDims,
+  type CuboidMove,
   cuboidDragAngle,
   cuboidFaces,
   cuboidMoveLegal,
@@ -18,6 +17,7 @@ import {
   cuboidSlots,
   cuboidSolved,
   cuboidStickerCount,
+  HALF_TURN_COMMIT,
   halfTurnOnly,
   hasRandomStateScramble,
   isCuboidDims,
@@ -39,9 +39,8 @@ import {
   turnCuboid,
   undoCuboidMove,
   undoCuboidMoves,
-  type CuboidDims,
-  type CuboidMove,
 } from "../src/cuboid/index.ts";
+import { seededRandom } from "../src/index.ts";
 import { viewMatrix } from "../src/view/geometry.ts";
 
 const dimsOf = (text: string) => parseCuboidDims(text)!;
@@ -333,9 +332,9 @@ describe("a scramble", () => {
       // Sixty turns, and one or two more where the sixty came to solved.
       expect(scramble.length).toBeGreaterThanOrEqual(60);
       expect(scramble.length).toBeLessThanOrEqual(62);
-      scramble
-        .slice(1)
-        .forEach((move, at) => expect(move.axis !== scramble[at].axis || move.layer !== scramble[at].layer).toBe(true));
+      scramble.slice(1).forEach((move, at) => {
+        expect(move.axis !== scramble[at].axis || move.layer !== scramble[at].layer).toBe(true);
+      });
       expect(randomCuboidScramble(dims, 60, seededRandom("club night"))).toEqual(scramble);
       expect(randomCuboidScramble(dims, 60, seededRandom("another"))).not.toEqual(scramble);
     }

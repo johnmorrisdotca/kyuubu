@@ -1,4 +1,4 @@
-import { WORDS, fill, type CubeWords, type KyuubuLanguage } from "./words.ts";
+import { type CubeWords, fill, type KyuubuLanguage, WORDS } from "./words.ts";
 
 /**
  * A MOVE IN A FEW PLAIN WORDS, for the line that says what the code on the

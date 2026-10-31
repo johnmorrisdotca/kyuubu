@@ -1,6 +1,7 @@
 // The cuboids page: a turning puzzle shaped like a box, from the named ones to any a×b×c, drawn the way the cube is.
 /* global familyLanguage */
-import { CUBE_THEMES } from "./dist/index.js";
+
+import { CuboidView } from "./dist/cuboid/draw.js";
 import {
   CUBOID_MAX_SIDE,
   CUBOID_PRESETS,
@@ -17,7 +18,7 @@ import {
   solvedCuboid,
   undoCuboidMove,
 } from "./dist/cuboid/index.js";
-import { CuboidView } from "./dist/cuboid/draw.js";
+import { CUBE_THEMES } from "./dist/index.js";
 import "./dist/cuboid/element-define.js";
 
 // The page's own words, in the two languages the package speaks. Set as text, never as HTML.

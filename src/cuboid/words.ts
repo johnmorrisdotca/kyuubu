@@ -89,7 +89,7 @@ export function faultSays(fault: CuboidFault, token: string, language: KyuubuLan
     "half-turn-only": words.faultHalfTurnOnly,
     "whole-puzzle": words.faultWholePuzzle,
   }[fault];
-  return fill(text, { token, half: token.replace(/['2]$/, "") + "2" });
+  return fill(text, { token, half: `${token.replace(/['2]$/, "")}2` });
 }
 
 /**

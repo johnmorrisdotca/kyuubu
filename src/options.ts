@@ -1,6 +1,6 @@
+import { REPLAY_SPEEDS } from "./replay.ts";
 import { CUBE_SCALES } from "./scale.ts";
 import { SCRAMBLE_PACES } from "./scrambler.ts";
-import { REPLAY_SPEEDS } from "./replay.ts";
 import type { KyuubuLanguage } from "./words.ts";
 
 /**

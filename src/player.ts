@@ -1,18 +1,18 @@
+import { solvedCube } from "./cube.ts";
+import { type GuideHandle, mountGuide } from "./guide-panel.ts";
+import { type MoveListGroup, type MoveListHandle, mountMoveList } from "./move-list.ts";
+import { moveName } from "./move-name.ts";
 import {
   planReplay,
-  Replay,
   REPLAY_SPEEDS,
+  Replay,
   type ReplayFault,
   type ReplayPlan,
   type ReplaySource,
   type ReplayStatus,
 } from "./replay.ts";
-import { solvedCube } from "./cube.ts";
-import { mountGuide, type GuideHandle } from "./guide-panel.ts";
-import { mountMoveList, type MoveListGroup, type MoveListHandle } from "./move-list.ts";
-import { moveName } from "./move-name.ts";
-import { CubeView, type CubeTheme } from "./view/view.ts";
-import { fill, languageOf, WORDS, type KyuubuLanguage } from "./words.ts";
+import { type CubeTheme, CubeView } from "./view/view.ts";
+import { fill, type KyuubuLanguage, languageOf, WORDS } from "./words.ts";
 
 /**
  * A SOLVE ON A PAGE: a cube, and under it the few controls a person needs to

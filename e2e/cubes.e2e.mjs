@@ -1,8 +1,6 @@
 // The turning cubes page and the embed that goes with it, by real presses and a real clock.
 import { expect, test } from "@playwright/test";
-
-import { id, sound, tap } from "./page.mjs";
-import { serve } from "./page.mjs";
+import { id, serve, sound, tap } from "./page.mjs";
 
 const state = (page, which) => page.locator(`#widget-${which} [data-kyuubu]`).getAttribute("data-state");
 const open = async (page, address = "cubes.html?lang=en") => {

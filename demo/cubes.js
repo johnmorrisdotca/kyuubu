@@ -2,7 +2,7 @@
 /* global familyLanguage */
 import { CUBE_THEMES, CubeView } from "./dist/index.js";
 import "./dist/element-define.js";
-import { scrambleFrame, scrambleIframe, scrambleTag, scrambleAttributes, SCALE_PX } from "./snippets.js";
+import { SCALE_PX, scrambleAttributes, scrambleFrame, scrambleIframe, scrambleTag } from "./snippets.js";
 
 const $ = (id) => document.getElementById(id);
 

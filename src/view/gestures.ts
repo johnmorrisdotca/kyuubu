@@ -1,7 +1,7 @@
 import { layerOf } from "../cube.ts";
 import type { CubeAxis, CubeMove, CubeTurns, StickerSlot, Vec3 } from "../types.ts";
 
-import { apply, axisOf, axisVector, cross, onScreen, type Mat3 } from "./geometry.ts";
+import { apply, axisOf, axisVector, cross, type Mat3, onScreen } from "./geometry.ts";
 
 /**
  * FROM A HAND TO A TURN: which layer a drag, a wheel or a key means, worked

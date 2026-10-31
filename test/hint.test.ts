@@ -1,26 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  type CubeAxis,
+  type CubeMove,
+  type CubeTurns,
+  cubeSlots,
   DRAG_DECIDE_PX,
   DRAG_START_PX,
-  HINT_MIN_FACING,
-  HINT_MIN_FOLLOW,
-  cubeSlots,
   dragAngle,
   dragHint,
-  rotationHint,
+  HINT_MIN_FACING,
+  HINT_MIN_FOLLOW,
   layerOf,
+  type Mat3,
   moveForRelease,
   moveNotation,
   parseMove,
   parseSolve,
   pickDrag,
   quartersForRelease,
+  rotationHint,
   viewMatrix,
-  type CubeAxis,
-  type CubeMove,
-  type CubeTurns,
-  type Mat3,
 } from "../src/index.ts";
 import { apply, onScreen } from "../src/view/geometry.ts";
 
@@ -242,7 +242,9 @@ describe("the arrow for a turn of the whole cube", () => {
           const heading = velocity[0] * along[0] * sign + velocity[1] * along[1] * sign + velocity[2] * along[2] * sign;
           expect(heading).toBeCloseTo(1, 9);
           // And it is the middle of the side.
-          middle.forEach((value, k) => expect(value).toBeCloseTo(normal[k] * n, 9));
+          middle.forEach((value, k) => {
+            expect(value).toBeCloseTo(normal[k] * n, 9);
+          });
           expect(hint.quarters).toBe(move.turns === 2 ? 2 : move.turns === 1 ? 1 : -1);
         }
       }

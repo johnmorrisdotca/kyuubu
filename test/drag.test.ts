@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   COMMIT_ANGLE,
+  cubeSlots,
   DRAG_DECIDE_PX,
   DRAG_START_PX,
-  FLICK_SPEED,
-  cubeSlots,
   dragAngle,
+  FLICK_SPEED,
   moveForRelease,
   moveNotation,
   pastCommit,

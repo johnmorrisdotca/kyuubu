@@ -1,3 +1,5 @@
+import type { CubeAxis, CubeTurns, StickerSlot } from "../types.ts";
+import { axisOf, axisVector, cross, type Mat3, onScreen } from "../view/geometry.ts";
 import {
   COMMIT_ANGLE,
   DRAG_CLEAR_RATIO,
@@ -6,11 +8,8 @@ import {
   FLICK_ANGLE,
   FLICK_SPEED,
 } from "../view/gestures.ts";
-import { axisOf, axisVector, cross, onScreen, type Mat3 } from "../view/geometry.ts";
-import type { CubeAxis, CubeTurns, StickerSlot } from "../types.ts";
-
+import { type CuboidDims, type CuboidMove, cuboidLayerOf, halfTurnOnly, legalTurns } from "./model.ts";
 import { cuboidFaceMove, cuboidMiddleMove } from "./notation.ts";
-import { cuboidLayerOf, halfTurnOnly, legalTurns, type CuboidDims, type CuboidMove } from "./model.ts";
 
 /**
  * FROM A HAND TO A TURN on a cuboid: the cube's gestures (`view/gestures.ts`)

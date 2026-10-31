@@ -11,7 +11,11 @@ const clipboard = (page) =>
   page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: { writeText: async (text) => void (window.__copied = text) },
+      value: {
+        writeText: async (text) => {
+          window.__copied = text;
+        },
+      },
     });
   });
 const code = (page) => page.locator(id("example-code"));

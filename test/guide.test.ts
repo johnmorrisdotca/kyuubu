@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  Guide,
+  type CubeMove,
   cubeSolved,
+  Guide,
   movementSays,
   movementText,
   parseMove,
@@ -12,10 +13,9 @@ import {
   readKey,
   rotationKeys,
   seededRandom,
-  solveSteps,
   solvedCube,
+  solveSteps,
   turnAll,
-  type CubeMove,
   type Vec3,
 } from "../src/index.ts";
 

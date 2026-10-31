@@ -1,11 +1,10 @@
-import { FAMILY, familyRepo } from "../scripts/family-template.mjs";
 // The documents that are made from the source, or that quote it, checked against it.
 // Plain JavaScript, so that reading files needs no Node types. `pnpm docs:make` rewrites what is made.
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import process from "node:process";
-
 import { describe, expect, it } from "vitest";
+import { FAMILY, familyRepo } from "../scripts/family-template.mjs";
 
 import * as kyuubu from "../src/index.ts";
 
@@ -71,14 +70,15 @@ function table(heading, nth = 0) {
   const tables = [];
   let rows = null;
   for (const line of readme.slice(from).split("\n").slice(1)) {
-    if (line.startsWith("|"))
-      (rows ??= []).push(
+    if (line.startsWith("|")) {
+      if (rows === null) rows = [];
+      rows.push(
         line
           .split(/(?<!\\)\|/)
           .slice(1, -1)
           .map(cell),
       );
-    else if (rows !== null) {
+    } else if (rows !== null) {
       tables.push(rows.slice(2));
       rows = null;
     }
@@ -96,7 +96,7 @@ function blocks(heading, language) {
   const end = rest.search(new RegExp(`\\n#{1,${depth}} `));
   return [
     ...(end < 0 ? rest : rest.slice(0, end)).matchAll(
-      new RegExp("```" + language + "(?: no-[a-z]+)?\\n([\\s\\S]*?)```", "g"),
+      new RegExp(`\`\`\`${language}(?: no-[a-z]+)?\\n([\\s\\S]*?)\`\`\``, "g"),
     ),
   ].map((found) => found[1]);
 }
@@ -216,7 +216,7 @@ describe("the README's notation", () => {
     ]) {
       const move = parseMove(text, n);
       const shown = `{ axis: ${move.axis}, layer: ${JSON.stringify(move.layer)}, turns: ${move.turns} }`;
-      expect(readme).toContain(`parseMove("${text}", ${n});`.padEnd(24) + `// ${shown}`);
+      expect(readme).toContain(`${`parseMove("${text}", ${n});`.padEnd(24)}// ${shown}`);
     }
     expect(readme).toContain(`// "${encodeCubeMoves(parseMoves("R U2 F'", 3))}"`);
     expect(readme).toContain(`so a solved 2×2 is \`${solvedCube(2)}\``);
@@ -346,7 +346,7 @@ describe("the README on export and import", () => {
   it("prints what the three of them write", () => {
     const [shape] = blocks("## Export and import", "json");
     expect(shape).toBe(toJSON(solve));
-    expect(readme).toContain("```text\n" + toText(solve) + "```");
+    expect(readme).toContain(`\`\`\`text\n${toText(solve)}\`\`\``);
     const [, csv] = blocks("## Export and import", "text"); // the text sample, then the CSV
     expect(csv).toBe(toCSV([solve]).replace(/\r\n/g, "\n"));
     const summary = summarize(solve);
@@ -373,7 +373,7 @@ describe("the README's reference", () => {
     const names = [...Object.keys(kyuubu), ...types, ...react];
     expect(names.length).toBeGreaterThan(80);
     expect(react).toEqual(["KyuubuHandle", "KyuubuProps", "Kyuubu", "KyuubuMovesProps", "KyuubuMoves"]);
-    for (const name of names) expect(readme, name).toMatch(new RegExp("`[^`\\n]*\\b" + name + "\\b[^`\\n]*`"));
+    for (const name of names) expect(readme, name).toMatch(new RegExp(`\`[^\`\\n]*\\b${name}\\b[^\`\\n]*\``));
   });
 
   it("names every option and member of the view", () => {
@@ -642,8 +642,10 @@ describe("the source", () => {
 
   it("holds no control character and no mention of how it was made", () => {
     for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "demo/app.js", "src/cli.ts"]) {
-      // eslint-disable-next-line no-control-regex
-      expect(read(file), file).not.toMatch(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/);
+      const controls = new RegExp(
+        `[${String.fromCharCode(0)}-${String.fromCharCode(8)}${String.fromCharCode(11)}${String.fromCharCode(12)}${String.fromCharCode(14)}-${String.fromCharCode(31)}]`,
+      );
+      expect(read(file), file).not.toMatch(controls);
     }
   });
 });

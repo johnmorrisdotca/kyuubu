@@ -1,9 +1,9 @@
 import { cubeSolved, undoOf } from "./cube.ts";
-import { Guide, movementSays, movementText, rotationKeys, type GuideHeard, type GuideSource } from "./guide.ts";
+import { Guide, type GuideHeard, type GuideSource, movementSays, movementText, rotationKeys } from "./guide.ts";
 import { movesNotation } from "./notation.ts";
 import type { CubeMove } from "./types.ts";
 import type { CubeView } from "./view/view.ts";
-import { WORDS, fill, languageOf, stageName, stageSays, type CubeWords, type KyuubuLanguage } from "./words.ts";
+import { type CubeWords, fill, type KyuubuLanguage, languageOf, stageName, stageSays, WORDS } from "./words.ts";
 
 /**
  * THE GUIDE BESIDE A CUBE: the next movement in notation and in words, how

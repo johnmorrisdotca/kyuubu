@@ -1,4 +1,4 @@
-import { faceMove, middleMove, wholeMove, type CubeFaceLetter } from "../notation.ts";
+import { type CubeFaceLetter, faceMove, middleMove, wholeMove } from "../notation.ts";
 import type { CubeMove } from "../types.ts";
 
 /**

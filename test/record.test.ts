@@ -1,23 +1,23 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  MAX_RECORD_MOVES,
-  RECORD_FORMAT,
-  VERSION,
   fromJSON,
   fromText,
+  MAX_RECORD_MOVES,
   parseMoves,
+  RECORD_FORMAT,
   randomScramble,
+  type SolveRecord,
   seededRandom,
-  solveSteps,
   solvedCube,
+  solveSteps,
   summarize,
   toCSV,
   toJSON,
   toText,
   turnAll,
   undoAll,
-  type SolveRecord,
+  VERSION,
 } from "../src/index.ts";
 
 const moves = (text: string, n = 3) => parseMoves(text, n)!;

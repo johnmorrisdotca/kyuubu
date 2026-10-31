@@ -1,9 +1,8 @@
 // The builder: a control for every choice the package lists, a live cube that follows them, the code that makes exactly
 // that cube in every format, and the choices in the address. The copied code is run, and rebuilds the same cube.
 import { expect, test } from "@playwright/test";
-
-import { CUBE_OPTIONS, CUBE_OPTION_GROUPS } from "../dist/index.js";
 import { MAKERS } from "../demo/builder-code.js";
+import { CUBE_OPTION_GROUPS, CUBE_OPTIONS } from "../dist/index.js";
 
 import { serve } from "./page.mjs";
 
@@ -25,7 +24,11 @@ const clipboard = (page) =>
   page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: { writeText: async (text) => void (window.__copied = text) },
+      value: {
+        writeText: async (text) => {
+          window.__copied = text;
+        },
+      },
     });
   });
 const maker = (page, name) => page.locator(`#bld-makers [data-maker="${name}"]`).click();

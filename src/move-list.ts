@@ -1,5 +1,5 @@
 import { moveName } from "./move-name.ts";
-import { WORDS, fill, languageOf, type KyuubuLanguage } from "./words.ts";
+import { fill, type KyuubuLanguage, languageOf, WORDS } from "./words.ts";
 
 /**
  * THE MOVES AS A ROW OF BUTTONS: each move of a scramble or a solve written
@@ -175,7 +175,7 @@ export function mountMoveList(host: HTMLElement, options: MoveListOptions): Move
   };
   const home = () => {
     const first = groups.findIndex((group) => group.main === true);
-    const from = first < 0 ? 0 : first;
+    const from = Math.max(first, 0);
     return groups.slice(0, from).reduce((sum, group) => sum + group.items.length, 0);
   };
   const end = () => {

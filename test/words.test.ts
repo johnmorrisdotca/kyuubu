@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  SOLVE_ALGORITHMS,
-  STRINGS,
-  WORDS,
   algorithmName,
   fill,
   languageOf,
-  stageName,
-  stageSays,
+  SOLVE_ALGORITHMS,
   type SolveAlgorithm,
   type SolveStage,
+  STRINGS,
+  stageName,
+  stageSays,
+  WORDS,
 } from "../src/index.ts";
 
 const STAGES: SolveStage[] = [

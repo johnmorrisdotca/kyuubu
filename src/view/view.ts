@@ -1,31 +1,31 @@
 import {
   CUBE_FACE_ORDER,
-  FACE_FRAMES,
+  type CubeFace,
   cubeSlots,
+  FACE_FRAMES,
   faceOfNormal,
   layerOf,
   solvedCube,
   turnCube,
-  type CubeFace,
 } from "../cube.ts";
-import { CUBE_SCALE_INTERACTIVE, cubeWidthPx, type CubeScale } from "../scale.ts";
-import { WORDS, fill, languageOf, type KyuubuLanguage } from "../words.ts";
+import { CUBE_SCALE_INTERACTIVE, type CubeScale, cubeWidthPx } from "../scale.ts";
 import type { CubeAxis, CubeMove, StickerSlot, Vec3 } from "../types.ts";
+import { fill, type KyuubuLanguage, languageOf, WORDS } from "../words.ts";
 
-import { apply, axisVector, cross, multiply, placement, rotation, viewMatrix, type Mat3 } from "./geometry.ts";
+import { apply, axisVector, cross, type Mat3, multiply, placement, rotation, viewMatrix } from "./geometry.ts";
 import {
   COMMIT_ANGLE,
+  type DragPick,
   dragAngle,
-  movesForRelease,
   moveForWheel,
+  movesForRelease,
   pastCommit,
   pickDrag,
   quartersForRelease,
-  seamsAt,
-  type DragPick,
   type Seam,
+  seamsAt,
 } from "./gestures.ts";
-import { dragHint, rotationHint, type DragHint } from "./hint.ts";
+import { type DragHint, dragHint, rotationHint } from "./hint.ts";
 import { readKey } from "./keys.ts";
 
 /**
@@ -829,7 +829,8 @@ export class CubeView {
   /** Where the hint's arrow is drawn from here, or nowhere: no side of the layer (or, for the whole cube, of the sides it turns) can be seen, or a layer is turning. */
   private drawHint(view: Mat3, scale: number, lens: number): void {
     const moves = this.hintMoves;
-    const whole = moves !== null && moves.some((move) => move.layer === "all");
+    let whole = false;
+    if (moves !== null) whole = moves.some((move) => move.layer === "all");
     const hint = moves === null ? null : whole ? rotationHint(moves, this.n, view) : dragHint(moves, this.n, view);
     // A turn of the whole cube is drawn an arrow, but is not a drag: `hint` stays null for it, as it always has.
     this.hintNow = whole ? null : hint;
@@ -1063,7 +1064,11 @@ export class CubeView {
           return inside ? "0px" : corner;
         });
         round = radii.join("|");
-        if (was?.round !== round) place.corners.forEach((one, k) => (element.style[one.property] = radii[k]));
+        if (was?.round !== round) {
+          place.corners.forEach((one, k) => {
+            element.style[one.property] = radii[k];
+          });
+        }
       }
       place.drawn = { transform, visible: facing, z, round: round || (was?.round ?? "") };
     }

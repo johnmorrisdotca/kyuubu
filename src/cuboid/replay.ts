@@ -1,8 +1,8 @@
-import { MAX_REPLAY_STEPS, REPLAY_STEP_MS, type ReplayPlan } from "../replay.ts";
 import type { SolveMove } from "../reconstruction.ts";
+import { MAX_REPLAY_STEPS, REPLAY_STEP_MS, type ReplayPlan } from "../replay.ts";
 
-import { cuboidSolved, isCuboidDims, solvedCuboid, turnCuboid, type CuboidDims, type CuboidMove } from "./model.ts";
-import { cuboidMoveNotation, readCuboidMoves, type CuboidFault } from "./notation.ts";
+import { type CuboidDims, type CuboidMove, cuboidSolved, isCuboidDims, solvedCuboid, turnCuboid } from "./model.ts";
+import { type CuboidFault, cuboidMoveNotation, readCuboidMoves } from "./notation.ts";
 
 /**
  * A SOLVE ON A CUBOID PLAYED BACK: a scramble and the moves that solved it,

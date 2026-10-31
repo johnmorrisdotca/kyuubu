@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CUBE_SCALE_PX,
   CUBE_SCALES,
-  SCRAMBLE_PACES,
-  SCRAMBLE_SHORTEST,
+  type CubeMove,
   cubeWidthPx,
   isCubeScale,
   keepScrambling,
   nextTurn,
   paceSeconds,
+  SCRAMBLE_PACES,
+  SCRAMBLE_SHORTEST,
   seededRandom,
-  type CubeMove,
 } from "../src/index.ts";
 
 /** A page that can be hidden and shown, and says so to whoever listens. */

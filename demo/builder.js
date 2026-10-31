@@ -1,9 +1,10 @@
-import { FAMILY_EMBED_BUILDER_WORDS } from "./family-embed-builder.js";
 // The package supplies its words and preview; the shared builder draws the controls and code.
 import { CUBE_THEMES, CubeView, DEFAULT_COLOURS, DEFAULT_PLASTIC } from "./dist/index.js";
 import { mountPlayer } from "./dist/player.js";
+import { FAMILY_EMBED_BUILDER_WORDS } from "./family-embed-builder.js";
 import "./dist/element-define.js";
 import { builder } from "./builder-code.js";
+
 const WORDS = {
   en: {
     ...FAMILY_EMBED_BUILDER_WORDS.en,

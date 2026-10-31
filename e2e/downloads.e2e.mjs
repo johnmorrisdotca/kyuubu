@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { expect, test } from "@playwright/test";
-import { open, panel, tap, id, sound } from "./page.mjs";
+import { id, open, panel, sound, tap } from "./page.mjs";
 
 test("solve history downloads contain the same rows in Markdown and executable SQL", async ({ page }) => {
   const errors = await open(page);

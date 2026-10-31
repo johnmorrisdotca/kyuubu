@@ -1,4 +1,4 @@
-import { WORDS, type CubeWords, type KyuubuLanguage } from "./words.ts";
+import { type CubeWords, type KyuubuLanguage, WORDS } from "./words.ts";
 
 /**
  * EVERY WORD THE PACKAGE SAYS TO A PERSON, in English and Japanese, in one

@@ -1,7 +1,7 @@
 import { seededRandom } from "./random.ts";
 import { reflectAttributes } from "./reflect.ts";
-import { CUBE_SCALES, isCubeScale, type CubeScale } from "./scale.ts";
-import { SCRAMBLE_PACES, keepScrambling, type KeepScramblingHandle, type ScramblePace } from "./scrambler.ts";
+import { CUBE_SCALES, type CubeScale, isCubeScale } from "./scale.ts";
+import { type KeepScramblingHandle, keepScrambling, SCRAMBLE_PACES, type ScramblePace } from "./scrambler.ts";
 import { CUBE_THEMES, CubeView } from "./view/view.ts";
 import { languageOf } from "./words.ts";
 

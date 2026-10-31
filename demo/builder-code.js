@@ -1,5 +1,5 @@
 // Package-specific view and player calls; the shared builder owns controls, attributes, tabs and URLs.
-import { CUBE_OPTIONS, CUBE_OPTION_GROUPS, CUBE_OPTIONS_LEFT_OUT, VERSION } from "../dist/index.js";
+import { CUBE_OPTION_GROUPS, CUBE_OPTIONS, CUBE_OPTIONS_LEFT_OUT, VERSION } from "../dist/index.js";
 import { familyEmbedBuilder } from "../scripts/family-template.mjs";
 export const PACKAGE = "@johnmorrisdotca/kyuubu";
 export const SITE = "https://johnmorrisdotca.github.io/kyuubu/";

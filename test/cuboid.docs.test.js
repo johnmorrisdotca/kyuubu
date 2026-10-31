@@ -2,8 +2,6 @@
 import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
-
-import { seededRandom } from "../src/index.ts";
 import {
   CUBOID_MAX_SIDE,
   CUBOID_PRESETS,
@@ -16,6 +14,7 @@ import {
   solvedCuboid,
   turnAllCuboid,
 } from "../src/cuboid/index.ts";
+import { seededRandom } from "../src/index.ts";
 
 describe("the README on cuboids", () => {
   const readme = `${readFileSync("docs/CUBOIDS-USE.md", "utf8")}\n${readFileSync("README.md", "utf8")}`;

@@ -1,5 +1,5 @@
 import { turnCube } from "./cube.ts";
-import { faceMove, middleMove, wholeMove, type CubeFaceLetter } from "./notation.ts";
+import { type CubeFaceLetter, faceMove, middleMove, wholeMove } from "./notation.ts";
 import type { CubeMove } from "./types.ts";
 
 /**
@@ -361,7 +361,7 @@ export function readSolveLink(text: string): SolveLink | null {
     } catch {
       // A link cut short in the copying: read what is there as it stands.
     }
-    return plain.replace(/&#(x?)([0-9a-f]+);/gi, (whole, hex: string, digits: string) =>
+    return plain.replace(/&#(x?)([0-9a-f]+);/gi, (_whole, hex: string, digits: string) =>
       String.fromCodePoint(parseInt(digits, hex === "" ? 10 : 16)),
     );
   };

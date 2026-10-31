@@ -1,21 +1,23 @@
+import type { CubeFace } from "../cube.ts";
 import { CUBE_FACE_ORDER, FACE_FRAMES, faceOfNormal } from "../cube.ts";
 import type { CubeAxis, StickerSlot, Vec3 } from "../types.ts";
+import { apply, axisVector, type Mat3, multiply, placement, rotation, viewMatrix } from "../view/geometry.ts";
 import { COMMIT_ANGLE } from "../view/gestures.ts";
-import { apply, axisVector, multiply, placement, rotation, viewMatrix, type Mat3 } from "../view/geometry.ts";
-import { DEFAULT_COLOURS, FACE_PROPERTIES, DEFAULT_PLASTIC, type CubeTheme } from "../view/view.ts";
-import { fill, languageOf, type KyuubuLanguage } from "../words.ts";
-import type { CubeFace } from "../cube.ts";
+import { type CubeTheme, DEFAULT_COLOURS, DEFAULT_PLASTIC, FACE_PROPERTIES } from "../view/view.ts";
+import { fill, type KyuubuLanguage, languageOf } from "../words.ts";
 
 import {
+  type CuboidDragPick,
   cuboidDragAngle,
   cuboidMoveForRelease,
   cuboidPastCommit,
   cuboidQuartersForRelease,
   pickCuboidDrag,
   readCuboidKey,
-  type CuboidDragPick,
 } from "./gestures.ts";
 import {
+  type CuboidDims,
+  type CuboidMove,
   cuboidFaces,
   cuboidLayerOf,
   cuboidMoveLegal,
@@ -24,8 +26,6 @@ import {
   isCuboidDims,
   solvedCuboid,
   turnCuboid,
-  type CuboidDims,
-  type CuboidMove,
 } from "./model.ts";
 import { CUBOID_WORDS } from "./words.ts";
 
@@ -520,7 +520,11 @@ export class CuboidView {
           return inside ? "0px" : corner;
         });
         round = radii.join("|");
-        if (was?.round !== round) place.corners.forEach((one, k) => (element.style[one.property] = radii[k]));
+        if (was?.round !== round) {
+          place.corners.forEach((one, k) => {
+            element.style[one.property] = radii[k];
+          });
+        }
       }
       place.drawn = { transform, visible: facing, z, round: round || (was?.round ?? "") };
     }

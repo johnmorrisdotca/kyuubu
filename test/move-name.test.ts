@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { WORDS, moveName, parseSolve, planReplay } from "../src/index.ts";
+import { moveName, parseSolve, planReplay, WORDS } from "../src/index.ts";
 
 const en = (code: string) => moveName(code);
 const ja = (code: string) => moveName(code, "ja");

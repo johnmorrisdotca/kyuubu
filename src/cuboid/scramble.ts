@@ -1,11 +1,11 @@
 import {
+  type CuboidDims,
+  type CuboidMove,
   cuboidSolved,
   legalCuboidMoves,
   solvedCuboid,
   turnAllCuboid,
   turnCuboid,
-  type CuboidDims,
-  type CuboidMove,
 } from "./model.ts";
 
 /**

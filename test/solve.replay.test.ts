@@ -13,14 +13,14 @@ import {
 } from "../src/reconstruction.ts";
 import {
   planReplay,
-  Replay,
   REPLAY_LOOP_REST_MS,
   REPLAY_SCRAMBLE_STEP_MS,
   REPLAY_SCRUB_TURNS,
   REPLAY_STEP_MS,
-  scrubPath,
+  Replay,
   type ReplayClock,
   type ReplayCube,
+  scrubPath,
 } from "../src/replay.ts";
 import type { CubeMove } from "../src/types.ts";
 
@@ -529,7 +529,9 @@ describe("a step back is the move turned the other way", () => {
     let state = solvedCube(n);
     const turned: CubeMove[][] = [];
     const cube: ReplayCube = {
-      setState: (next) => void (state = next),
+      setState: (next) => {
+        state = next;
+      },
       turnTogether: (moves) => {
         turned.push([...moves]);
         state = turnAll(state, n, moves);

@@ -1,27 +1,26 @@
 // The demo page: a cube on the felt, and everything the package does beside it.
 /* global familyLanguage */
-import { toMarkdown, toSql } from "./downloads.js";
-import { viewCode, viewOptions } from "./snippets.js";
+
 import {
+  algorithmName,
   CUBE_FACE_ORDER,
   CUBE_THEMES,
   CubeView,
-  FULL_SCRAMBLE_LENGTHS,
-  SOLVABLE_SIZES,
-  SOLVE_ALGORITHMS,
-  algorithmName,
   countsAsMove,
   cubeSolved,
+  FULL_SCRAMBLE_LENGTHS,
   fill,
   fromJSON,
   fromText,
   mountGuide,
   movesNotation,
   parseSolve,
-  readSolveLink,
   randomScramble,
-  solveSteps,
+  readSolveLink,
+  SOLVABLE_SIZES,
+  SOLVE_ALGORITHMS,
   solvedCube,
+  solveSteps,
   stageName,
   stageSays,
   summarize,
@@ -31,6 +30,8 @@ import {
   undoAll,
   undoOf,
 } from "./dist/index.js";
+import { toMarkdown, toSql } from "./downloads.js";
+import { viewCode, viewOptions } from "./snippets.js";
 
 // The page's own words, in the two languages the package speaks. Set as text, never as HTML.
 const WORDS = {

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  SEAM_BAND,
   applySolve,
   cubeSlots,
   dragHint,
   movesForRelease,
   parseSolve,
   pickDrag,
+  SEAM_BAND,
   seamsAt,
   solvedCube,
   turnAll,

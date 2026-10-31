@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  type CubeMove,
   countsAsMove,
   cubeSlots,
   cubeSolved,
@@ -15,7 +16,6 @@ import {
   turnAll,
   turnCube,
   undoAll,
-  type CubeMove,
 } from "../src/index.ts";
 
 const SIZES = [2, 3, 4, 5, 6, 7];
@@ -131,7 +131,10 @@ describe("writing turns down", () => {
 describe("scrambles", () => {
   it("are the length asked, never turn one axis twice running, and never leave the cube solved", () => {
     let seed = 7;
-    const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+    const random = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
     for (const n of SIZES) {
       const scramble = randomScramble(n, 25, random);
       expect(scramble.length).toBeGreaterThanOrEqual(25);
@@ -143,7 +146,10 @@ describe("scrambles", () => {
   it("are the same from the same random numbers", () => {
     const from = (start: number) => {
       let seed = start;
-      return () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+      return () => {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
+      };
     };
     expect(randomScramble(3, 20, from(42))).toEqual(randomScramble(3, 20, from(42)));
     expect(randomScramble(3, 20, from(42))).not.toEqual(randomScramble(3, 20, from(43)));

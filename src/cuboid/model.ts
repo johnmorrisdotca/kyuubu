@@ -1,4 +1,4 @@
-import { CUBE_FACE_ORDER, FACE_FRAMES, quarterTurn, type CubeFace } from "../cube.ts";
+import { CUBE_FACE_ORDER, type CubeFace, FACE_FRAMES, quarterTurn } from "../cube.ts";
 import type { CubeAxis, CubeTurns, StickerSlot, Vec3 } from "../types.ts";
 
 /**

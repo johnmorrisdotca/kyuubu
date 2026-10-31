@@ -2,9 +2,8 @@ import { reflectAttributes } from "../reflect.ts";
 import type { ReplayStatus } from "../replay.ts";
 import { CUBE_THEMES } from "../view/view.ts";
 import { languageOf } from "../words.ts";
-
-import { mountCuboidPlayer, type CuboidPlayerHandle } from "./play.ts";
-import { parseCuboidDims, type CuboidDims } from "./model.ts";
+import { type CuboidDims, parseCuboidDims } from "./model.ts";
+import { type CuboidPlayerHandle, mountCuboidPlayer } from "./play.ts";
 
 /**
  * THE CUBOID PLAYER AS A CUSTOM ELEMENT, for a page with no framework and for

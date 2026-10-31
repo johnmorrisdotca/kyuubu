@@ -1,6 +1,20 @@
 export {
+  type CuboidDragPick,
+  type CuboidKeyReading,
+  cuboidDragAngle,
+  cuboidMoveForRelease,
+  cuboidPastCommit,
+  cuboidQuartersForRelease,
+  HALF_TURN_COMMIT,
+  pickCuboidDrag,
+  readCuboidKey,
+} from "./gestures.ts";
+export {
   CUBOID_MAX_SIDE,
   CUBOID_MIN_SIDE,
+  type CuboidDims,
+  type CuboidFace,
+  type CuboidMove,
   cuboidFaces,
   cuboidLayerOf,
   cuboidMoveLegal,
@@ -22,11 +36,11 @@ export {
   turnCuboid,
   undoCuboidMove,
   undoCuboidMoves,
-  type CuboidDims,
-  type CuboidFace,
-  type CuboidMove,
 } from "./model.ts";
 export {
+  type CuboidFault,
+  type CuboidLineReading,
+  type CuboidReading,
   cuboidFaceMove,
   cuboidMiddleMove,
   cuboidMoveNotation,
@@ -35,27 +49,13 @@ export {
   parseCuboidMoves,
   readCuboidMove,
   readCuboidMoves,
-  type CuboidFault,
-  type CuboidLineReading,
-  type CuboidReading,
 } from "./notation.ts";
+export { CUBOID_PRESETS, type CuboidPreset, cuboidPreset } from "./presets.ts";
+export { type CuboidReplayFault, type CuboidReplayPlan, type CuboidReplaySource, planCuboidReplay } from "./replay.ts";
 export {
   CUBOID_RANDOM_STATE_MAX,
   cuboidScrambleLength,
   hasRandomStateScramble,
   randomCuboidScramble,
 } from "./scramble.ts";
-export { CUBOID_PRESETS, cuboidPreset, type CuboidPreset } from "./presets.ts";
-export { CUBOID_WORDS, cuboidMoveName, faultSays, type CuboidWords } from "./words.ts";
-export { planCuboidReplay, type CuboidReplayFault, type CuboidReplayPlan, type CuboidReplaySource } from "./replay.ts";
-export {
-  HALF_TURN_COMMIT,
-  cuboidDragAngle,
-  cuboidMoveForRelease,
-  cuboidPastCommit,
-  cuboidQuartersForRelease,
-  pickCuboidDrag,
-  readCuboidKey,
-  type CuboidDragPick,
-  type CuboidKeyReading,
-} from "./gestures.ts";
+export { CUBOID_WORDS, type CuboidWords, cuboidMoveName, faultSays } from "./words.ts";

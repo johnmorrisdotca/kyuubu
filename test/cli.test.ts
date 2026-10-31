@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  MAX_CLI_COUNT,
-  MAX_CLI_LENGTH,
-  STRINGS,
-  VERSION,
   cubeNet,
   cubeSolved,
   isCubeState,
+  MAX_CLI_COUNT,
+  MAX_CLI_LENGTH,
   parseMoves,
   runCli,
+  STRINGS,
   solvedCube,
   turnAll,
+  VERSION,
 } from "../src/index.ts";
 
 const run = (args: string[], surroundings = {}) => runCli(args, surroundings);
@@ -122,12 +122,12 @@ describe("the command line's turns", () => {
   });
 
   it("colours the cube only on a terminal that shows colour, and never in JSON", () => {
-    const escape = String.fromCharCode(27);
-    expect(run(["--apply", "R"], { colour: true }).out).toContain(`${escape}[48;2;`);
-    expect(run(["--apply", "R"], { colour: false }).out).not.toContain(escape);
-    expect(run(["--apply", "R"], { colour: true, env: { NO_COLOR: "1" } }).out).not.toContain(escape);
-    expect(run(["--apply", "R", "--no-color"], { colour: true }).out).not.toContain(escape);
-    expect(run(["--apply", "R", "--json"], { colour: true }).out).not.toContain(escape);
+    const ansi = String.fromCharCode(27);
+    expect(run(["--apply", "R"], { colour: true }).out).toContain(`${ansi}[48;2;`);
+    expect(run(["--apply", "R"], { colour: false }).out).not.toContain(ansi);
+    expect(run(["--apply", "R"], { colour: true, env: { NO_COLOR: "1" } }).out).not.toContain(ansi);
+    expect(run(["--apply", "R", "--no-color"], { colour: true }).out).not.toContain(ansi);
+    expect(run(["--apply", "R", "--json"], { colour: true }).out).not.toContain(ansi);
     expect(JSON.parse(run(["--apply", "R", "--json"]).out)).toMatchObject({
       format: 1,
       size: 3,

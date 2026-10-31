@@ -1,9 +1,9 @@
 import { cubeSolved, turnAll, undoOf } from "./cube.ts";
 import { moveNotation, movesNotation } from "./notation.ts";
 import { parseSolve, type SolveMove } from "./reconstruction.ts";
-import { solveSteps, type SolveStage } from "./solve.ts";
+import { type SolveStage, solveSteps } from "./solve.ts";
 import type { CubeAxis, CubeMove, CubeTurns } from "./types.ts";
-import { WORDS, fill, type CubeWords, type KyuubuLanguage } from "./words.ts";
+import { type CubeWords, fill, type KyuubuLanguage, WORDS } from "./words.ts";
 
 /**
  * A SOLVE TO FOLLOW WITH YOUR OWN HANDS: a list of moves, or the method's

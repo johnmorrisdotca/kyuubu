@@ -1,11 +1,11 @@
-import { mountMoveList, type MoveListGroup, type MoveListHandle } from "../move-list.ts";
+import { type MoveListGroup, type MoveListHandle, mountMoveList } from "../move-list.ts";
 import { REPLAY_SPEEDS, Replay, type ReplayCube, type ReplayStatus } from "../replay.ts";
 import type { CubeTheme } from "../view/view.ts";
-import { WORDS, fill, languageOf, type CubeWords, type KyuubuLanguage } from "../words.ts";
+import { type CubeWords, fill, type KyuubuLanguage, languageOf, WORDS } from "../words.ts";
 
 import { CuboidView } from "./draw.ts";
-import { isCuboidDims, solvedCuboid, type CuboidDims, type CuboidMove } from "./model.ts";
-import { planCuboidReplay, type CuboidReplayFault, type CuboidReplayPlan, type CuboidReplaySource } from "./replay.ts";
+import { type CuboidDims, type CuboidMove, isCuboidDims, solvedCuboid } from "./model.ts";
+import { type CuboidReplayFault, type CuboidReplayPlan, type CuboidReplaySource, planCuboidReplay } from "./replay.ts";
 import { CUBOID_WORDS, cuboidMoveName, faultSays } from "./words.ts";
 
 /**

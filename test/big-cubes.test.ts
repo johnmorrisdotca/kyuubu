@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  FULL_SCRAMBLE_LENGTHS,
   applySolve,
+  type CubeMove,
   cubeSolved,
   decodeCubeMoves,
   encodeCubeMoves,
+  FULL_SCRAMBLE_LENGTHS,
   faceMove,
   moveNotation,
   parseMove,
@@ -16,7 +17,6 @@ import {
   solvedCube,
   turnAll,
   undoAll,
-  type CubeMove,
 } from "../src/index.ts";
 
 const BIG = [6, 7] as const;

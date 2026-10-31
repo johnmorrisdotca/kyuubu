@@ -90,7 +90,7 @@ export async function sound(page, errors) {
           el.closest("[data-kyuubu], [data-kyuubu-cuboid], .fam-table-box, pre") === null &&
           el.getBoundingClientRect().right > window.innerWidth + 0.5,
       )
-      .map((el) => el.tagName + "." + el.className);
+      .map((el) => `${el.tagName}.${el.className}`);
     return { over: document.documentElement.scrollWidth - window.innerWidth, small, wide };
   });
   expect(found.over, "the page scrolls sideways").toBeLessThanOrEqual(0);

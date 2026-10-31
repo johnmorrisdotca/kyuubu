@@ -1,7 +1,7 @@
-import { cubeSlots, faceOfNormal, layerOf, type CubeFace } from "../cube.ts";
+import { type CubeFace, cubeSlots, faceOfNormal, layerOf } from "../cube.ts";
 import type { CubeAxis, CubeMove, CubeTurns, Vec3 } from "../types.ts";
 
-import { apply, axisVector, cross, onScreen, type Mat3 } from "./geometry.ts";
+import { apply, axisVector, cross, type Mat3, onScreen } from "./geometry.ts";
 import { DRAG_DECIDE_PX, DRAG_START_PX, moveForRelease, pickDrag } from "./gestures.ts";
 
 /**

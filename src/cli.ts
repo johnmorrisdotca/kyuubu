@@ -1,13 +1,13 @@
-import { CUBE_FACE_ORDER, countsAsMove, cubeSolved, isCubeState, solvedCube, turnAll, type CubeFace } from "./cube.ts";
+import { CUBE_FACE_ORDER, type CubeFace, countsAsMove, cubeSolved, isCubeState, solvedCube, turnAll } from "./cube.ts";
 import { movesNotation, parseMove } from "./notation.ts";
 import { seededRandom } from "./random.ts";
 import { MAX_RECORD_SIZE, MIN_RECORD_SIZE, RECORD_FORMAT } from "./record.ts";
 import { FULL_SCRAMBLE_LENGTHS, randomScramble } from "./scramble.ts";
-import { SOLVABLE_SIZES, SOLVE_ALGORITHMS, solveSteps, type SolveStep } from "./solve.ts";
-import { STRINGS, type KyuubuStrings } from "./strings.ts";
-import { fill, languageOf, stageName, type KyuubuLanguage } from "./words.ts";
+import { SOLVABLE_SIZES, SOLVE_ALGORITHMS, type SolveStep, solveSteps } from "./solve.ts";
+import { type KyuubuStrings, STRINGS } from "./strings.ts";
 import type { CubeMove } from "./types.ts";
 import { VERSION } from "./version.ts";
+import { fill, type KyuubuLanguage, languageOf, stageName } from "./words.ts";
 
 /**
  * THE COMMAND LINE, as a pure function: `kyuubu` in a terminal is this, handed

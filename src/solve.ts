@@ -1,4 +1,4 @@
-import { CUBE_FACE_ORDER, cubeSlots, faceOfNormal, permutationOf, turnAll, type CubeFace } from "./cube.ts";
+import { CUBE_FACE_ORDER, type CubeFace, cubeSlots, faceOfNormal, permutationOf, turnAll } from "./cube.ts";
 import { parseMoves, wholeMove } from "./notation.ts";
 import type { CubeMove, Vec3 } from "./types.ts";
 
@@ -195,7 +195,7 @@ function pieceHome(state: string, n: number, colours: Record<CubeFace, string>, 
 
 /** A piece's yellow sticker, which has only to face up. */
 function yellowUp(state: string, n: number, colours: Record<CubeFace, string>, home: Cubie): Piece {
-  const top = new Set(cubeSlots(n).slots.flatMap((slot, at) => (faceAt(n, at) === "U" ? [at] : [])));
+  const top = new Set(cubeSlots(n).slots.flatMap((_slot, at) => (faceAt(n, at) === "U" ? [at] : [])));
   const wants = home.slots.map((slot) => colours[faceAt(n, slot)]);
   const key = [...wants].sort().join("");
   const now = cubiesOf(n).find(
@@ -266,7 +266,9 @@ function searchFor(
   const stickers = pieces.flatMap((piece) => piece.stickers);
   const ends = pieces.map((piece) => piece.stickers.length);
   const positions = Array.from({ length: most + 1 }, () => new Int32Array(stickers.length));
-  stickers.forEach((sticker, at) => (positions[0][at] = sticker.from));
+  stickers.forEach((sticker, at) => {
+    positions[0][at] = sticker.from;
+  });
   const path: Step[] = [];
 
   const home = (at: Int32Array, piece: number, offset: number) => {

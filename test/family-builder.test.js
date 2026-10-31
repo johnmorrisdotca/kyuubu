@@ -76,7 +76,7 @@ describe("a package-independent embed builder", () => {
       compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.ESNext },
     }).outputText;
     const body = compiled.replace(/^import .*;$/gm, "").replace("export function", "function");
-    const render = new Function("_jsx", body + "\nreturn Example();");
+    const render = new Function("_jsx", `${body}\nreturn Example();`);
     expect(render((_tag, props) => props).label).toBe(label);
   });
   it("offers the host formats, image fallback and plain URL only when the maker supports them", () => {

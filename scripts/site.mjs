@@ -5,8 +5,8 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 
 import { API_CSS, apiPage } from "./api.mjs";
 import {
-  FAMILY_SCRIPT,
   FAMILY_EMBED_BUILDER_WORDS,
+  FAMILY_SCRIPT,
   familyEmbedBuilder,
   familyFooter,
   familyHead,
@@ -117,7 +117,7 @@ const parts = {
 };
 
 const fillPage = (file) =>
-  readFileSync(`demo/${file}`, "utf8").replace(/<!-- family:(\w+) -->/g, (whole, name) => {
+  readFileSync(`demo/${file}`, "utf8").replace(/<!-- family:(\w+) -->/g, (_whole, name) => {
     if (!(name in parts)) throw new Error(`demo/${file} asks for family:${name}, which the template does not have`);
     return parts[name];
   });

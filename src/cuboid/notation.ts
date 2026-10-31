@@ -1,6 +1,6 @@
 import type { CubeAxis, CubeTurns } from "../types.ts";
 
-import { legalTurns, type CuboidDims, type CuboidMove } from "./model.ts";
+import { type CuboidDims, type CuboidMove, legalTurns } from "./model.ts";
 
 /**
  * THE CUBOID'S NOTATION, the cube's own (`notation.ts`): R, L, U, D, F and B

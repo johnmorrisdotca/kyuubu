@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { CUBOID_ELEMENT_ATTRIBUTES } from "../src/cuboid/element.ts";
 import { CUBE_ELEMENT_ATTRIBUTES } from "../src/element.ts";
-import { CUBE_OPTIONS, CUBE_OPTIONS_LEFT_OUT, CUBE_OPTION_GROUPS, CUBE_THEMES, REPLAY_SPEEDS } from "../src/index.ts";
+import { CUBE_OPTION_GROUPS, CUBE_OPTIONS, CUBE_OPTIONS_LEFT_OUT, CUBE_THEMES, REPLAY_SPEEDS } from "../src/index.ts";
 import { SCRAMBLE_ELEMENT_ATTRIBUTES } from "../src/scramble-element.ts";
 
 const read = (path) => readFileSync(path, "utf8");
