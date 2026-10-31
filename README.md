@@ -762,7 +762,7 @@ it is yours.
 ```ts no-check
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.13.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.13.1", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -788,7 +788,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.13.0",
+  "generator": "kyuubu 1.13.1",
   "solves": [
     {
       "size": 3,
@@ -1141,7 +1141,7 @@ the page, is for the [security policy](./SECURITY.md), not a public issue.
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release is 1.13.0: the shared embed builder, Markdown and SQL downloads of solve histories, and the documentation site with a checked example for every export.
+The latest release, 1.13.1, changes nothing a player sees.
 
 ## Licence
 
