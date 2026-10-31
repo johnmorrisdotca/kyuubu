@@ -17,12 +17,12 @@ const keysOf = (path, opening, closing = "\n};") => {
   return [...block.matchAll(/^ {2}(\w+)\??:/gm)].map((found) => found[1]);
 };
 
-const view = keysOf("src/view/view.ts", "export type CubeViewOptions = {");
+const view = keysOf("src/view/view-types.ts", "export type CubeViewOptions = {");
 const player = [
   ...keysOf("src/player.ts", "export type PlayerOptions = ReplaySource & {"),
   ...keysOf("src/replay.ts", "export type ReplaySource = {"),
 ];
-const cuboid = keysOf("src/cuboid/draw.ts", "export type CuboidViewOptions = {");
+const cuboid = keysOf("src/cuboid/draw-types.ts", "export type CuboidViewOptions = {");
 const cuboidPlayer = [
   ...keysOf("src/cuboid/play.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"),
   ...keysOf("src/cuboid/replay.ts", "export type CuboidReplaySource = {"),

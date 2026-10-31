@@ -14,6 +14,9 @@ src/
 ├── cli.ts               the command line as a pure function: arguments in, text and an exit code out
 ├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
 ├── cuboid/               the cuboid: a box-shaped turning puzzle, a × b × c from 1 to 7 on a side
+│   ├── draw-hands.ts     the pointer and the keys that turn a cuboid, and the queue of turns they make
+│   ├── draw-scene.ts     where each sticker and the plastic of a cuboid sit
+│   ├── draw-types.ts     the options and the numbers a cuboid on the screen is drawn from
 │   ├── draw.ts           the "/cuboid/draw" entry: the cuboid drawn in CSS 3D, turned by drag, key and code
 │   ├── element-define.ts the "/cuboid/element/define" entry: registers <kyuubu-cuboid> by being imported
 │   ├── element.ts        the "/cuboid/element" entry: a solve on a cuboid as a <kyuubu-cuboid> custom element
@@ -33,10 +36,12 @@ src/
 ├── guide-panel.ts       the panel beside a cube: the next movement in notation and words, and an arrow on the cube
 ├── guide.ts             a solve to follow with your own hands, one movement at a time, with detours taken back
 ├── index.ts             the main entry: the cube, notation, solver, famous solves, and the player to mount
+├── options.data.ts      the choices a builder page draws, and the ones it leaves out
 ├── options.ts           every choice the package offers, as a list a builder page is drawn from
 ├── move-list.ts         the moves of a scramble or a solve as buttons, the one just made marked and scrolled into view
 ├── move-name.ts         what a move turns, in a few plain words, in English and Japanese
 ├── notation.ts          the standard notation, for reading a move out and for the keys that make one
+├── player.data.ts       the player's stylesheet
 ├── player.ts            the "/player" entry: a solve on a page, with play, pause, step and speed controls
 ├── random.ts            a seeded random source
 ├── react.tsx            the "/react" entry: the cube as a React component
@@ -58,6 +63,9 @@ src/
     ├── gestures.ts  from a hand to a turn: which layer a drag or a wheel means
     ├── hint.ts      where to drag: the sticker and the direction that make a given turn
     ├── keys.ts      the keyboard, in the notation cubers write
+    ├── view-hands.ts the pointer, the wheel and the keys, and the queue of turns they make
+    ├── view-scene.ts where each sticker, the plastic and the hint arrow sit
+    ├── view-types.ts colours, options and the numbers the cube is drawn from
     └── view.ts      the cube on the screen: every sticker placed by one matrix3d, with no canvas or framework
 ```
 

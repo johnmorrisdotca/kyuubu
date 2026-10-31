@@ -266,7 +266,9 @@ describe("the README on dragging a layer", () => {
       expect(quartersForRelease(...args.split(",").map(Number)), args).toBe(Number(result));
     expect(readme).toContain(`**There is a point of no return**, ${COMMIT_ANGLE} degrees unless`);
     expect(FLICK_SPEED).toBeLessThan(0.4);
-    const view = read("src/view/view.ts");
+    const view = ["src/view/view-types.ts", "src/view/view-scene.ts", "src/view/view-hands.ts", "src/view/view.ts"]
+      .map(read)
+      .join("\n");
     expect(readme).toContain("`--kyuubu-commit-filter` (`brightness(1.14)` unless");
     expect(view).toContain('const COMMIT_FILTER = "brightness(1.14)";');
     for (const name of ["data-dragging", "data-committed", "data-angle"])
@@ -377,16 +379,21 @@ describe("the README's reference", () => {
   });
 
   it("names every option and member of the view", () => {
-    const view = read("src/view/view.ts");
+    const types = read("src/view/view-types.ts");
     const options = [
-      ...view
-        .slice(view.indexOf("export type CubeViewOptions = {"), view.indexOf("const EDGE"))
+      ...types
+        .slice(types.indexOf("export type CubeViewOptions = {"), types.indexOf("const EDGE"))
         .matchAll(/^ {2}(\w+)\??:/gm),
     ].map((found) => found[1]);
     const told = new Set(table("## `new CubeView(element, options)`").flatMap(([option]) => codes(option)));
     expect(new Set(options)).toEqual(told);
+    const cube = read("src/view/view.ts");
+    const scene = read("src/view/view-scene.ts");
     const members = [
-      ...view.slice(view.indexOf("export class CubeView")).matchAll(/^ {2}(?:get |readonly )?(\w+)(?:\(|:)/gm),
+      ...cube
+        .slice(cube.indexOf("export class CubeView"))
+        .matchAll(/^ {2}(?!protected )(?:override )?(?:get |readonly )?(\w+)(?:\(|:)/gm),
+      ...scene.matchAll(/^ {2}readonly (\w+):/gm),
     ]
       .map((found) => found[1])
       .filter((name) => name !== "constructor");
@@ -412,7 +419,7 @@ describe("the README's reference", () => {
       ),
     );
     expect(codes(rows[6].join(" "))).toEqual(["--kyuubu-plastic", "plastic", DEFAULT_PLASTIC]);
-    const view = read("src/view/view.ts");
+    const view = read("src/view/view-scene.ts");
     for (const [property, , fallback] of rows.slice(6))
       expect(view).toContain(
         `var(${codes(property)[0]}, ${fallback === "`#111`" ? "${DEFAULT_PLASTIC}" : codes(fallback)[0]})`,
@@ -535,7 +542,7 @@ describe("the README's accessibility", () => {
   it("says what the source does: a labelled application that takes focus, a live guide, an alert, buttons that report pressed, reduced motion", () => {
     const section = readme.slice(readme.indexOf("## Accessibility"), readme.indexOf("## Browser support"));
     expect(section.length).toBeGreaterThan(500);
-    const view = read("src/view/view.ts");
+    const view = ["src/view/view-scene.ts", "src/view/view-hands.ts"].map(read).join("\n");
     expect(view).toContain('this.root.setAttribute("role", "application")');
     expect(view).toContain("this.root.tabIndex = 0");
     expect(view).toContain('this.options.keyboard === "focus"');
