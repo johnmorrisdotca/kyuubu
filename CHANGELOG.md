@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Biome replaces ESLint as the formatter and linter, with the family's shared settings in `scripts/biome-family.json`; `pnpm lint` checks formatting too, and `pnpm format` applies it. The code is formatted once to 120 columns. Nothing a user of the package sees has changed.
 - TypeScript targets ES2022 and refuses switch fallthrough and unmarked overrides.
+- `pnpm check` also holds every source file to at most 500 lines of code (`scripts/check-size.mjs`; blank lines, comments, tests and data files are not counted). The cube's colours and options are `view/view-types.ts`, where its stickers sit is `view/view-scene.ts`, and the hands that turn it are `view/view-hands.ts`. The cuboid is split the same way (`cuboid/draw-types.ts`, `draw-scene.ts`, `draw-hands.ts`). The option table is `options.data.ts` and the player's stylesheet is `player.data.ts`.
 
 ## [1.13.0] - 2026-10-14
 
