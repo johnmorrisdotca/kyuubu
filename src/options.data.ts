@@ -145,7 +145,7 @@ export const CUBE_OPTIONS: readonly CubeOption[] = [
     names: { player: "cloth", cube: "cloth", cuboidPlayer: "cloth", cuboidElement: "cloth" },
     say: {
       en: { label: "Cloth", help: "The cloth on the stage behind the cube. Unless said, the stage is clear." },
-      ja: { label: "テーブルの色", help: "キューブの後ろの台の色です。指定がなければ透明です。" },
+      ja: { label: "テーブルの色", help: "キューブの後ろのテーブルの色です。指定がなければ透明です。" },
     },
   },
   face("U", "colour-up", ["Top colour", "The colour of the top face."], ["上の色", "上の面の色です。"]),
