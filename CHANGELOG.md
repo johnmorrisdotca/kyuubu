@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-11-02
+
 ### Added
 
 - A player's stage can be laid in the family's five cloths: `<kyuubu-cube cloth="blue">`, `<kyuubu-cuboid cloth="blue">`, the `cloth` player option, the `cloth` embed parameter and Builder option, and `KYUUBU_CLOTHS`, `isCloth` and `clothVars`.
@@ -446,7 +448,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.13.1...v1.14.0
 [1.13.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.12.0...v1.13.0
 [1.8.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.0...v1.8.1
 [1.7.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.6.0...v1.7.0
