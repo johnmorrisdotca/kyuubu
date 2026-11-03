@@ -15,6 +15,7 @@ src/
 ├── cloth.ts             the five cloths a player's stage may be laid in
 ├── cube.ts              the turning cube as pure functions over a string, one letter a sticker
 ├── cuboid/               the cuboid: a box-shaped turning puzzle, a × b × c from 1 to 7 on a side
+│   ├── dims.ts           the sides of a cuboid: reading, naming and comparing them
 │   ├── draw-hands.ts     the pointer and the keys that turn a cuboid, and the queue of turns they make
 │   ├── draw-scene.ts     where each sticker and the plastic of a cuboid sit
 │   ├── draw-types.ts     the options and the numbers a cuboid on the screen is drawn from
@@ -26,8 +27,12 @@ src/
 │   ├── model.ts          the cuboid as pure functions over a string: slots, legal turns, turns, solved
 │   ├── notation.ts       the notation read and written for a cuboid, with the reason a move is refused
 │   ├── play.ts           the "/cuboid/play" entry: a solve on a cuboid with play, step, speed and repeat
+│   ├── play-types.ts     the player's options and handle, its stylesheet and its speed names
 │   ├── presets.ts        the named shapes, each with its name and what is special about it
 │   ├── replay.ts         a solve on a cuboid read, checked and timed for the replay the cube uses
+├── replay-plan.ts       planning a replay from a solve, and the path of the scrub slider
+├── replay-types.ts      the pace, plan, source, status and options of a replay
+│   ├── slots.ts          the faces and the sticker slots of a cuboid of each size
 │   ├── scramble.ts       a state drawn uniformly where the puzzle is small, a random walk where it is not
 │   └── words.ts          the cuboid's own words, in English and Japanese
 ├── element-define.ts    the "/element/define" entry: registers the custom elements by being imported
@@ -43,6 +48,7 @@ src/
 ├── move-name.ts         what a move turns, in a few plain words, in English and Japanese
 ├── notation.ts          the standard notation, for reading a move out and for the keys that make one
 ├── player.data.ts       the player's stylesheet
+├── player-types.ts      the player's options, what mounting it returns, and its speed names
 ├── player.ts            the "/player" entry: a solve on a page, with play, pause, step and speed controls
 ├── random.ts            a seeded random source
 ├── react.tsx            the "/react" entry: the cube as a React component
@@ -55,6 +61,9 @@ src/
 ├── scramble.ts          how long a full scramble is for each size, and making one from a seed
 ├── scrambler.ts         a cube that turns one random layer, waits, and turns another, at a pace you choose
 ├── solve.ts             a layer-by-layer solve a person can follow, step by step, for any size
+├── solve-cubies.ts      finding each cubie and its home on a cube of any size
+├── solve-search.ts      the short searches that bring one piece home
+├── solve-types.ts       the stages, parts, steps and algorithms of a solve
 ├── strings.ts           every word the package says to a person, in English and Japanese
 ├── types.ts             the vocabulary of a turning cube of any size
 ├── version.ts           the package's version, as in package.json
