@@ -1,3 +1,5 @@
+<p align="center"><a href="https://johnmorrisdotca.github.io/kyuubu/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/thumbnail-dark.png"><img src="https://raw.githubusercontent.com/johnmorrisdotca/kyuubu/main/docs/images/thumbnail.png" alt="Kyuubu: a 2×2, a 3×3, a 4×4 and a 5×5 cube, each scrambled, drawn in CSS 3D." width="1200"></picture></a></p>
+
 <h1 align="center">Kyuubu <sub>キューブ</sub> — Twisty cube puzzle for the browser</h1>
 
 <p align="center"><strong>A turning cube for the browser, with a solve you can follow.</strong><br>

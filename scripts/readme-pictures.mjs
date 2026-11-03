@@ -74,4 +74,46 @@ await takePictures({
       await page.locator(at("scramble")).click();
     }),
   ],
+  // The family's thumbnail, dark thumbnail and icon (scripts/family-thumbnail.mjs): a 2×2, a 3×3, a 4×4 and a 5×5, each
+  // drawn by the package's own CubeView and scrambled from a fixed seed, off the felt; the icon is the 3×3 alone.
+  thumbnail: {
+    url: "/?lang=en",
+    init: seeded,
+    state: { seed: 2026 },
+    ready: "[data-kyuubu]",
+    target: "#thumbnail-stage",
+    icon: { target: "#thumbnail-icon" },
+    label: "Kyuubu キューブ",
+    async prepare(page) {
+      await page.evaluate(async () => {
+        const { CubeView, FULL_SCRAMBLE_LENGTHS, randomScramble, seededRandom } = await import("./dist/index.js");
+        const box = (id, width) =>
+          `<div id="${id}" style="position:relative;width:${width}px;height:${width}px;flex:none"></div>`;
+        document.body.replaceChildren();
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          `<div id="thumbnail-stage" style="display:flex;align-items:center;gap:8px;width:max-content;padding:8px">${[
+            box("cube-2", 250),
+            box("cube-3", 300),
+            box("cube-4", 300),
+            box("cube-5", 300),
+          ].join(
+            "",
+          )}</div><div id="thumbnail-icon" style="width:max-content;padding:8px">${box("cube-icon", 420)}</div>`,
+        );
+        for (const [id, size] of [
+          ["cube-2", 2],
+          ["cube-3", 3],
+          ["cube-4", 4],
+          ["cube-5", 5],
+          ["cube-icon", 3],
+        ]) {
+          const view = new CubeView(document.getElementById(id), { size, keyboard: "none", interactive: false });
+          view.scramble(randomScramble(size, FULL_SCRAMBLE_LENGTHS[size], seededRandom(`thumbnail-${size}`)), {
+            animate: false,
+          });
+        }
+      });
+    },
+  },
 });

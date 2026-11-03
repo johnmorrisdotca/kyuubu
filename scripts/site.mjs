@@ -13,8 +13,10 @@ import {
   familyHeader,
   familyUnreviewed,
 } from "./family-template.mjs";
+import { publishThumbnails, thumbnailHead } from "./family-thumbnail.mjs";
 
 const id = "kyuubu";
+const ALT = "Kyuubu: a 2×2, a 3×3, a 4×4 and a 5×5 cube, each scrambled, drawn in CSS 3D.";
 const parts = {
   head: familyHead({
     id,
@@ -115,6 +117,8 @@ const parts = {
   footer: familyFooter({ id }),
   script: `<script>${FAMILY_SCRIPT}</script>`,
 };
+// The front page's link preview is the family's card (scripts/family-thumbnail.mjs).
+parts.head += `\n    ${thumbnailHead(JSON.parse(readFileSync("package.json", "utf8")), { alt: ALT })}`;
 
 const fillPage = (file) =>
   readFileSync(`demo/${file}`, "utf8").replace(/<!-- family:(\w+) -->/g, (_whole, name) => {
@@ -149,6 +153,8 @@ for (const file of [
 cpSync("docs/cube.png", "site/cube.png");
 cpSync("docs/cuboids.jpg", "site/cuboids.jpg");
 cpSync("dist", "site/dist", { recursive: true });
+// The family's card, dark card and icon, at <site>/thumbnail.png, thumbnail-dark.png and icon.png.
+publishThumbnails(".", "site");
 // The API reference, made from the source: every export of every entry point.
 writeFileSync("site/api.css", API_CSS);
 writeFileSync(
