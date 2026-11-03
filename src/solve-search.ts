@@ -24,6 +24,7 @@ function composed(n: number, moves: readonly CubeMove[]): Int32Array {
   return to;
 }
 
+/** One named step of a solve: the algorithm for a group of moves, read for a cube of this size. */
 export function stepOf(n: number, text: string, group: string, algorithm?: SolveAlgorithm): Step {
   const moves = parseMoves(text, n)!;
   return { moves, to: composed(n, moves), group, algorithm };
@@ -141,6 +142,7 @@ export function holding(state: string, n: number): CubeMove[] {
 
 type Layer = "top" | "middle" | "bottom";
 
+/** The edge or corner pieces in one layer of a cube of this size. */
 export function cubiesIn(n: number, layer: Layer, kind: "edge" | "corner"): Cubie[] {
   const y = layer === "top" ? n - 1 : layer === "bottom" ? -(n - 1) : 0;
   return cubiesOf(n).filter((cubie) => cubie.centre[1] === y && cubie.slots.length === (kind === "corner" ? 3 : 2));

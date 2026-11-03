@@ -3,12 +3,14 @@ import type { Vec3 } from "./types.ts";
 
 /** The colour a person calls white: the up face's letter in a solved cube. */
 export const WHITE: CubeFace = "U";
+/** The face across from each face. */
 export const OPPOSITE: Record<CubeFace, CubeFace> = { U: "D", D: "U", R: "L", L: "R", F: "B", B: "F" };
 
 /* ------------------------------------------------------------------ */
 /* Pieces                                                              */
 /* ------------------------------------------------------------------ */
 
+/** A piece of the cube that moves as one: its centre and the sticker slots it carries. */
 export type Cubie = { centre: Vec3; slots: number[] };
 
 const cubiesBySize = new Map<number, Cubie[]>();
@@ -29,6 +31,7 @@ export function cubiesOf(n: number): Cubie[] {
   return made;
 }
 
+/** The face a sticker slot lies on. */
 export const faceAt = (n: number, slot: number): CubeFace => faceOfNormal(cubeSlots(n).slots[slot].normal);
 
 /** The colour each face is solved to, as the cube is now held: its centre on a 3×3; on a 2×2, read off the piece at the back left of the bottom, which the 2×2's first step never moves. */
@@ -57,6 +60,7 @@ export function faceColours(state: string, n: number): Record<CubeFace, string> 
  * on the top.
  */
 type Tracked = { from: number; allowed: Set<number> };
+/** A piece followed through a solve: each of its stickers and the slots it may sit in. */
 export type Piece = { stickers: Tracked[] };
 
 /** Where the piece whose home is `home` is now, and the slot each of its stickers belongs in. */

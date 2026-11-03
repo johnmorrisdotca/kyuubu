@@ -19,12 +19,12 @@ const keysOf = (path, opening, closing = "\n};") => {
 
 const view = keysOf("src/view/view-types.ts", "export type CubeViewOptions = {");
 const player = [
-  ...keysOf("src/player.ts", "export type PlayerOptions = ReplaySource & {"),
-  ...keysOf("src/replay.ts", "export type ReplaySource = {"),
+  ...keysOf("src/player-types.ts", "export type PlayerOptions = ReplaySource & {"),
+  ...keysOf("src/replay-types.ts", "export type ReplaySource = {"),
 ];
 const cuboid = keysOf("src/cuboid/draw-types.ts", "export type CuboidViewOptions = {");
 const cuboidPlayer = [
-  ...keysOf("src/cuboid/play.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"),
+  ...keysOf("src/cuboid/play-types.ts", "export type CuboidPlayerOptions = CuboidReplaySource & {"),
   ...keysOf("src/cuboid/replay.ts", "export type CuboidReplaySource = {"),
 ];
 const names = (maker) =>

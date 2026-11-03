@@ -4,6 +4,7 @@ import type { ReplayClock, ReplayCube, ReplayOptions, ReplayPlan, ReplayStatus }
 import { REPLAY_LOOP_REST_MS, REPLAY_SCRAMBLE_STEP_MS, REPLAY_SCRUB_MS } from "./replay-types.ts";
 
 export { planReplay, scrubPath } from "./replay-plan.ts";
+/** The vocabulary of a replay, kept beside it in replay-types.ts. */
 export type {
   ReplayClock,
   ReplayCube,

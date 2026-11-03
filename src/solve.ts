@@ -7,6 +7,7 @@ import type { SolvePart, SolveStage, SolveStep } from "./solve-types.ts";
 import { SOLVABLE_SIZES, SOLVE_ALGORITHMS } from "./solve-types.ts";
 import type { CubeMove } from "./types.ts";
 
+/** The vocabulary of a solve, kept beside it in solve-types.ts. */
 export type { SolveAlgorithm, SolvePart, SolveStage, SolveStep } from "./solve-types.ts";
 export { SOLVABLE_SIZES, SOLVE_ALGORITHMS } from "./solve-types.ts";
 

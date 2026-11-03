@@ -105,6 +105,7 @@ export type PlayerHandle = {
 
 const STYLE_ID = "kyuubu-player-style";
 
+/** Puts the player's stylesheet in the document once. */
 export function addStyle(doc: Document): void {
   if (doc.getElementById(STYLE_ID) !== null) return;
   const style = doc.createElement("style");
@@ -113,5 +114,6 @@ export function addStyle(doc: Document): void {
   doc.head.append(style);
 }
 
+/** The name a speed is shown by, such as "1×". */
 export const speedName = (speed: number) =>
   speed === 1 ? "1×" : speed === 0.5 ? "½×" : speed === 0.25 ? "¼×" : `${speed}×`;

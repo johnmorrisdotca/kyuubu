@@ -10,6 +10,7 @@ import { planReplay, REPLAY_SPEEDS, Replay, type ReplayFault, type ReplayPlan, t
 import { CubeView } from "./view/view.ts";
 import { fill, type KyuubuLanguage, languageOf, WORDS } from "./words.ts";
 
+/** The player's options and the handle mounting it returns, kept beside it in player-types.ts. */
 export type { PlayerHandle, PlayerOptions } from "./player-types.ts";
 
 export { PLAYER_CSS };
