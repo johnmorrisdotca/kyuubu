@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["./scripts/biome-family.json"],
+  "files": { "includes": ["!demo/downloads.js"] },
+  "overrides": [
+    {
+      // Off in tests only: they check the code the builder writes for other frameworks, whose strings hold a literal ${...}.
+      "includes": ["test/**"],
+      "linter": { "rules": { "suspicious": { "noTemplateCurlyInString": "off" } } }
+    }
+  ]
+}

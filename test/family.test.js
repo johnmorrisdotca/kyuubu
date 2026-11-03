@@ -102,7 +102,7 @@ describe("the files every package shares", () => {
 
 describe("the code style", () => {
   it("is checked by Biome with the family's settings, and `pnpm check` runs the format and lint check and the size check", () => {
-    expect(JSON.parse(read("biome.json")).extends).toEqual(["./scripts/biome-family.json"]);
+    expect(JSON.parse(read("biome.jsonc").replace(/^\s*\/\/.*$/gm, "")).extends).toEqual(["./scripts/biome-family.json"]);
     expect(pkg.scripts.lint).toBe("biome check .");
     expect(pkg.scripts.format).toBe("biome check --write .");
     expect(pkg.scripts["check:size"]).toBe("node scripts/check-size.mjs");
