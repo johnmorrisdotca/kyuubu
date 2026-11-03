@@ -1,107 +1,40 @@
-// The documents that are made from the source, or that quote it, checked against it.
-// Plain JavaScript, so that reading files needs no Node types. `pnpm docs:make` rewrites what is made.
-import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import process from "node:process";
 import { describe, expect, it } from "vitest";
-import { FAMILY, familyRepo } from "../scripts/family-template.mjs";
-
 import * as kyuubu from "../src/index.ts";
-
-const {
-  CUBE_THEMES,
-  DEFAULT_COLOURS,
-  DEFAULT_PLASTIC,
-  FACE_PROPERTIES,
-  FULL_SCRAMBLE_LENGTHS,
-  MAX_CLI_COUNT,
-  MAX_CLI_LENGTH,
-  MAX_RECORDS,
-  MAX_RECORD_MOVES,
-  MAX_RECORD_SEED,
-  MAX_RECORD_SIZE,
-  MIN_RECORD_SIZE,
-  SOLVABLE_SIZES,
-  SOLVE_ALGORITHMS,
-  STRINGS,
-  VERSION,
+import {
+  blocks,
+  codes,
   countsAsMove,
   cubeSolved,
   encodeCubeMoves,
+  FULL_SCRAMBLE_LENGTHS,
   fromJSON,
   fromText,
+  MAX_CLI_COUNT,
+  MAX_CLI_LENGTH,
   movesNotation,
   parseMove,
   parseMoves,
+  pkg,
   randomScramble,
+  read,
+  readme,
   runCli,
+  SOLVABLE_SIZES,
+  SOLVE_ALGORITHMS,
+  STRINGS,
   seededRandom,
-  solveSteps,
   solvedCube,
+  solveSteps,
   stageName,
   stageSays,
   summarize,
+  table,
   toCSV,
   toJSON,
   toText,
   turnAll,
   undoAll,
-} = kyuubu;
-
-const read = (path) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
-// The pages the README's long sections moved to, then the README: what the package says about itself is held to the code across all of them. The pages come first, so that a heading is found where its section is written in full.
-const readme = [
-  "docs/CONTROLS.md",
-  "docs/REPLAY.md",
-  "docs/DISPLAY.md",
-  "docs/CUBOIDS-USE.md",
-  "docs/API.md",
-  "README.md",
-]
-  .map(read)
-  .join("\n");
-const pkg = JSON.parse(read("package.json"));
-const cell = (text) => text.replace(/\\\|/g, "|").trim();
-
-/** The rows of the table under a heading: each row's cells. */
-function table(heading, nth = 0) {
-  const from = readme.indexOf(heading);
-  if (from < 0) throw new Error(`the README has no “${heading}”`);
-  const tables = [];
-  let rows = null;
-  for (const line of readme.slice(from).split("\n").slice(1)) {
-    if (line.startsWith("|")) {
-      if (rows === null) rows = [];
-      rows.push(
-        line
-          .split(/(?<!\\)\|/)
-          .slice(1, -1)
-          .map(cell),
-      );
-    } else if (rows !== null) {
-      tables.push(rows.slice(2));
-      rows = null;
-    }
-    if (line.startsWith("## ") || tables.length > nth) break;
-  }
-  return tables[nth];
-}
-
-/** The code blocks of one language under a heading, up to the next heading of the same depth or less. */
-function blocks(heading, language) {
-  const from = readme.indexOf(heading);
-  if (from < 0) throw new Error(`the README has no “${heading}”`);
-  const depth = heading.match(/^#+/)[0].length;
-  const rest = readme.slice(from + heading.length);
-  const end = rest.search(new RegExp(`\\n#{1,${depth}} `));
-  return [
-    ...(end < 0 ? rest : rest.slice(0, end)).matchAll(
-      new RegExp(`\`\`\`${language}(?: no-[a-z]+)?\\n([\\s\\S]*?)\`\`\``, "g"),
-    ),
-  ].map((found) => found[1]);
-}
-
-const codes = (text) => [...text.matchAll(/`([^`]+)`/g)].map((found) => found[1]);
+} from "./docs.fixture.js";
 
 describe("the README's first examples", () => {
   it("the 30 seconds", () => {
@@ -363,315 +296,5 @@ describe("the README on export and import", () => {
     expect(fromText(toText(solve))).toEqual(solve);
     expect(fromText("R U R' U'")).toMatchObject({ size: 3 });
     expect(fromText("3×3\nSOLVE: R")).toMatchObject({ size: 3, moves: parseMoves("R", 3) });
-  });
-});
-
-describe("the README's reference", () => {
-  const source = read("src/index.ts");
-  const types = [...source.matchAll(/\btype (\w+)/g)].map((found) => found[1]);
-  const react = [...read("src/react.tsx").matchAll(/^export (?:function|type) (\w+)/gm)].map((found) => found[1]);
-
-  it("names every export, in code", () => {
-    const names = [...Object.keys(kyuubu), ...types, ...react];
-    expect(names.length).toBeGreaterThan(80);
-    expect(react).toEqual(["KyuubuHandle", "KyuubuProps", "Kyuubu", "KyuubuMovesProps", "KyuubuMoves"]);
-    for (const name of names) expect(readme, name).toMatch(new RegExp(`\`[^\`\\n]*\\b${name}\\b[^\`\\n]*\``));
-  });
-
-  it("names every option and member of the view", () => {
-    const types = read("src/view/view-types.ts");
-    const options = [
-      ...types
-        .slice(types.indexOf("export type CubeViewOptions = {"), types.indexOf("const EDGE"))
-        .matchAll(/^ {2}(\w+)\??:/gm),
-    ].map((found) => found[1]);
-    const told = new Set(table("## `new CubeView(element, options)`").flatMap(([option]) => codes(option)));
-    expect(new Set(options)).toEqual(told);
-    const cube = read("src/view/view.ts");
-    const scene = read("src/view/view-scene.ts");
-    const members = [
-      ...cube
-        .slice(cube.indexOf("export class CubeView"))
-        .matchAll(/^ {2}(?!protected )(?:override )?(?:get |readonly )?(\w+)(?:\(|:)/gm),
-      ...scene.matchAll(/^ {2}readonly (\w+):/gm),
-    ]
-      .map((found) => found[1])
-      .filter((name) => name !== "constructor");
-    const shown = table("## `new CubeView(element, options)`", 1)
-      .flatMap(([member]) => codes(member))
-      .map((text) => text.replace(/\(.*/, ""));
-    expect(new Set(members)).toEqual(new Set(shown));
-  });
-
-  it("the theming table is the properties, the defaults and the looks there are", () => {
-    const rows = table("## Theming");
-    const faces = Object.fromEntries(
-      rows
-        .slice(0, 6)
-        .map(([property, option, fallback]) => [
-          codes(option)[0].replace("colours.", ""),
-          [codes(property)[0], codes(fallback)[0]],
-        ]),
-    );
-    expect(faces).toEqual(
-      Object.fromEntries(
-        Object.keys(DEFAULT_COLOURS).map((face) => [face, [FACE_PROPERTIES[face], DEFAULT_COLOURS[face]]]),
-      ),
-    );
-    expect(codes(rows[6].join(" "))).toEqual(["--kyuubu-plastic", "plastic", DEFAULT_PLASTIC]);
-    const view = read("src/view/view-scene.ts");
-    for (const [property, , fallback] of rows.slice(6))
-      expect(view).toContain(
-        `var(${codes(property)[0]}, ${fallback === "`#111`" ? "${DEFAULT_PLASTIC}" : codes(fallback)[0]})`,
-      );
-    expect(Object.keys(CUBE_THEMES)).toEqual(["standard", "paper", "stickerless"]);
-    const [css] = blocks("## Theming", "css");
-    for (const face of Object.keys(DEFAULT_COLOURS))
-      expect(css).toContain(`${FACE_PROPERTIES[face]}: ${CUBE_THEMES.paper.colours[face]};`);
-    expect(css).toContain(`--kyuubu-plastic: ${CUBE_THEMES.paper.plastic};`);
-  });
-
-  it("the limits are the constants", () => {
-    const rows = Object.fromEntries(table("## Limits").map(([limit, value]) => [limit, value]));
-    expect(rows["Sizes the package is made and tested for"]).toBe(
-      `${MIN_RECORD_SIZE}×${MIN_RECORD_SIZE} to ${MAX_RECORD_SIZE}×${MAX_RECORD_SIZE}`,
-    );
-    expect(rows["Turns in one saved solve, scramble and moves each"]).toBe(MAX_RECORD_MOVES.toLocaleString("en"));
-    expect(rows["Solves read from one file"]).toBe(MAX_RECORDS.toLocaleString("en"));
-    expect(rows["Characters in a saved seed"]).toBe(String(MAX_RECORD_SEED));
-    expect(rows["A scramble from the command line"]).toBe(`1 to ${MAX_CLI_LENGTH.toLocaleString("en")} turns`);
-    expect(rows["Scrambles from the command line at once"]).toBe(String(MAX_CLI_COUNT));
-  });
-
-  it("lists every package of the family, once, with its kana, as the demo's footer does, and the trademark once", () => {
-    const family = FAMILY;
-    const from = readme.indexOf("### The family");
-    const block = readme.slice(from, readme.indexOf("\n## ", from));
-    expect([...block.matchAll(/^- \[/gm)]).toHaveLength(family.length);
-    for (const one of family) expect(block).toContain(`- [${one.name}](${familyRepo(one.id)}) (${one.kana}):`);
-    const words = [
-      "zero",
-      "one",
-      "two",
-      "three",
-      "four",
-      "five",
-      "six",
-      "seven",
-      "eight",
-      "nine",
-      "ten",
-      "eleven",
-      "twelve",
-      "thirteen",
-      "fourteen",
-      "fifteen",
-      "sixteen",
-      "seventeen",
-      "eighteen",
-      "nineteen",
-      "twenty",
-      "twenty-one",
-      "twenty-two",
-      "twenty-three",
-      "twenty-four",
-      "twenty-five",
-      "twenty-six",
-      "twenty-seven",
-      "twenty-eight",
-      "twenty-nine",
-      "thirty",
-      "thirty-one",
-      "thirty-two",
-    ];
-    expect(block).toContain(`Kyuubu is one of ${words[family.length]} packages`);
-    expect(block).toContain("**This package is Kyuubu.**");
-    expect(family.length).toBeGreaterThanOrEqual(19);
-    expect(readme.match(/is a trademark of its owner/g)).toHaveLength(1);
-    expect(readme).toContain("**Japanese: included; not yet reviewed by a native reader.");
-  });
-});
-
-describe("the community files", () => {
-  it("SECURITY.md and CODE_OF_CONDUCT.md are the family's master text (the shared .github repository's), a copy of which is kept in scripts/community", () => {
-    for (const file of ["SECURITY.md", "CODE_OF_CONDUCT.md"])
-      expect(read(file), file).toBe(read(`scripts/community/${file}`));
-  });
-
-  it("CONTRIBUTING.md carries the family's house rules and the README points to the security policy", () => {
-    const contributing = read("CONTRIBUTING.md");
-    for (const rule of [
-      "Open an issue first",
-      "No runtime dependencies",
-      "kebab case",
-      "CC0 or public domain only",
-      "Needs Node 22 or later",
-    ])
-      expect(contributing, rule).toContain(rule);
-    expect(readme).toContain("[security policy](./SECURITY.md)");
-  });
-});
-
-describe("Node", () => {
-  it("is 22 or later in the package, the README, CONTRIBUTING and CI, and never 20", () => {
-    expect(pkg.engines.node).toBe(">=22");
-    expect(readme).toContain("Node 22 or later");
-    expect(readme).not.toMatch(/Node 20/);
-    expect(read("CONTRIBUTING.md")).not.toMatch(/Node 20/);
-    expect(read(".github/workflows/ci.yml")).toContain("node: [22, 24]");
-  });
-});
-
-describe("the release notes", () => {
-  it("are the changelog's section for the version, which the Release workflow puts on the GitHub release", async () => {
-    const { releaseNotes } = await import("../scripts/release-notes.mjs");
-    const log =
-      "# Changelog\n\n## [Unreleased]\n\n## [1.2.0] - 2026-01-02\n\n### Added\n\n- A thing.\n\n## [1.1.0] - 2026-01-01\n\n- Older.\n\n[Unreleased]: https://example.test\n";
-    expect(releaseNotes(log, "1.2.0")).toBe("### Added\n\n- A thing.");
-    expect(releaseNotes(log, "1.1.0")).toBe("- Older.");
-    expect(releaseNotes(log, "9.9.9")).toBeNull();
-    expect(releaseNotes(log, "Unreleased")).toBeNull();
-    expect(releaseNotes(read("CHANGELOG.md"), VERSION)?.length).toBeGreaterThan(40);
-    const workflow = read(".github/workflows/release.yml");
-    expect(workflow).toContain("scripts/release-notes.mjs");
-    expect(workflow).not.toContain("See CHANGELOG.md.");
-  });
-});
-
-describe("the README's accessibility", () => {
-  it("says what the source does: a labelled application that takes focus, a live guide, an alert, buttons that report pressed, reduced motion", () => {
-    const section = readme.slice(readme.indexOf("## Accessibility"), readme.indexOf("## Browser support"));
-    expect(section.length).toBeGreaterThan(500);
-    const view = ["src/view/view-scene.ts", "src/view/view-hands.ts"].map(read).join("\n");
-    expect(view).toContain('this.root.setAttribute("role", "application")');
-    expect(view).toContain("this.root.tabIndex = 0");
-    expect(view).toContain('this.options.keyboard === "focus"');
-    expect(read("src/guide-panel.ts")).toContain('"aria-live", "polite"');
-    expect(read("src/guide-panel.ts")).toContain('"role", "alert"');
-    expect(read("src/player.ts")).toContain('"aria-pressed"');
-    expect(read("src/player.ts")).toContain('"aria-label", say("playerScrub")');
-    expect(view).toContain("prefers-reduced-motion: reduce");
-    expect(read("src/scrambler.ts")).toContain("prefers-reduced-motion: reduce");
-    expect(readme).toContain("e2e/properties.e2e.mjs");
-  });
-});
-
-describe("the list of Japanese strings", () => {
-  const line = (text) => text.replace(/\|/g, "\\|").replace(/\n/g, "<br>");
-  const lines = [
-    "# Kyuubu's words, in English and Japanese",
-    "",
-    "Made from `src/words.ts` and `src/strings.ts` by `pnpm docs:make`; a test fails if the two differ, so this list is never out of date.",
-    "",
-    "**The Japanese has not yet been reviewed by a native reader.** If a line reads wrongly or unnaturally, please",
-    "open a *Fix a translation* issue with the string's name. `{n}` and the other braces are filled in when shown.",
-    "",
-    "| Name | English | Japanese |",
-    "| --- | --- | --- |",
-    ...Object.keys(STRINGS.en).map((key) => `| \`${key}\` | ${line(STRINGS.en[key])} | ${line(STRINGS.ja[key])} |`),
-    "",
-  ];
-  const made = lines.join("\n");
-
-  it("is what the source makes: run `pnpm docs:make` after changing a string", () => {
-    if (process.env.UPDATE_DOCS === "1") writeFileSync("docs/strings-ja.md", made);
-    expect(read("docs/strings-ja.md")).toBe(made);
-  });
-});
-
-describe("the demo site", () => {
-  const sha = (text) => createHash("sha256").update(text).digest("hex");
-  // The family's one stylesheet and one template, as every package carries them. A package never edits either.
-  const FAMILY_CSS = "c1e392564a7fd94d0bb5cfaefb6d4fedfd147fc3e27f3a7afd8d8dac8c94a227";
-  const FAMILY_TEMPLATE = "fcc192026cf284303344e108b20e6181126607c670a881a6b3bf8479da26ab03";
-
-  it("wears the family's stylesheet, byte for byte", () => {
-    const css = read("demo/family.css");
-    const [first, ...rest] = css.split("\n");
-    expect(first).toBe(`/* sha256 of every line after this one: ${FAMILY_CSS} */`);
-    expect(sha(rest.join("\n"))).toBe(FAMILY_CSS);
-  });
-
-  it("and uses the family's header and footer, unchanged", () => {
-    expect(sha(read("scripts/family-template.mjs"))).toBe(FAMILY_TEMPLATE);
-  });
-
-  it("loads the family's stylesheet before its own, and restyles nothing of the family's", () => {
-    const page = read("demo/index.html");
-    expect(page.indexOf('href="family.css"')).toBeGreaterThan(0);
-    expect(page.indexOf('href="kyuubu.css"')).toBeGreaterThan(page.indexOf('href="family.css"'));
-    for (const name of ["head", "header", "unreviewed", "footer", "script"])
-      expect(page).toContain(`<!-- family:${name} -->`);
-    expect(page).not.toMatch(/<style/);
-    // Its own stylesheet styles its own classes, and the two variables the family leaves to a page.
-    const own = read("demo/kyuubu.css").replace(/\/\*[\s\S]*?\*\//g, "");
-    for (const rule of own.matchAll(/(^|\})\s*([^{}@]+)\{/g)) {
-      const selector = rule[2].trim();
-      if (selector === ":root") continue;
-      expect(selector, selector).toMatch(/\.cube-|\.more pre/);
-    }
-  });
-
-  it("has a Japanese line for every English one on the page, with the same places to fill in", async () => {
-    const app = read("demo/app.js");
-    const tableText = app.slice(
-      app.indexOf("const WORDS = {"),
-      app.indexOf("\n};\n", app.indexOf("const WORDS = {")) + 3,
-    );
-    const words = new Function(`${tableText}; return WORDS;`)();
-    expect(Object.keys(words.ja)).toEqual(Object.keys(words.en));
-    const places = (text) => [...text.matchAll(/\{(\w+)\}/g)].map((found) => found[1]).sort();
-    for (const key of Object.keys(words.en)) expect(places(words.ja[key]), key).toEqual(places(words.en[key]));
-    // Every word the page asks for is in the table, or is one the family's template brings.
-    const page = read("demo/index.html");
-    for (const found of page.matchAll(/data-say(?:-label|-placeholder)?="(\w+)"/g))
-      expect(Object.keys(words.en), found[1]).toContain(found[1]);
-    for (const found of app.matchAll(/say\("(\w+)"/g)) expect(Object.keys(words.en), found[1]).toContain(found[1]);
-  });
-});
-
-describe("the source", () => {
-  it("has a doc comment on every export", () => {
-    const files = [...readdirSync("src"), ...readdirSync("src/view").map((name) => `view/${name}`)].filter(
-      (name) => /\.tsx?$/.test(name) && name !== "index.ts",
-    );
-    expect(files.length).toBeGreaterThan(10);
-    const bare = [];
-    for (const file of files) {
-      const lines = read(`src/${file}`).split("\n");
-      lines.forEach((text, at) => {
-        if (/^export (const|function|type|class) /.test(text) && !lines[at - 1].trim().endsWith("*/"))
-          bare.push(`${file}: ${text}`);
-      });
-    }
-    expect(bare).toEqual([]);
-  });
-
-  it("holds no control character and no mention of how it was made", () => {
-    for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "demo/app.js", "src/cli.ts"]) {
-      const controls = new RegExp(
-        `[${String.fromCharCode(0)}-${String.fromCharCode(8)}${String.fromCharCode(11)}${String.fromCharCode(12)}${String.fromCharCode(14)}-${String.fromCharCode(31)}]`,
-      );
-      expect(read(file), file).not.toMatch(controls);
-    }
-  });
-});
-
-describe("the version", () => {
-  it("is the same in the package, in the code and in the changelog", () => {
-    expect(VERSION).toBe(pkg.version);
-    expect(read("CHANGELOG.md")).toContain(`## [${VERSION}]`);
-    expect(readme).toContain(`"generator": "kyuubu ${VERSION}"`);
-  });
-
-  it("the package names built files, a command and what it is", () => {
-    for (const entry of Object.values(pkg.exports))
-      for (const file of Object.values(entry)) expect(file).toMatch(/^\.\/dist\//);
-    expect(pkg.publishConfig.exports).toBeUndefined();
-    expect(pkg.bin).toEqual({ kyuubu: "bin/kyuubu.mjs" });
-    expect(pkg.files).toContain("bin");
-    expect(pkg.dependencies).toBeUndefined();
-    expect(pkg.description.length).toBeLessThanOrEqual(250);
-    expect(new Set(pkg.keywords).size).toBe(pkg.keywords.length);
   });
 });
