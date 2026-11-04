@@ -23,8 +23,6 @@ const KNOWN_OVER = {
   // Family files, copied from johnmorrisdotca/.github; split there and synced (MODULES-276, MODULES-277).
   "scripts/docs-site.mjs": 1378,
   "scripts/family-template.mjs": 995,
-  // Single classes and a page script that need a design change first (MODULES-299 to MODULES-301).
-  "demo/app.js": 749,
 };
 
 const files = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })

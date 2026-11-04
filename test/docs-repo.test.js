@@ -125,12 +125,12 @@ describe("the demo site", () => {
   });
 
   it("has a Japanese line for every English one on the page, with the same places to fill in", async () => {
-    const app = read("demo/app.js");
+    const app = read("demo/app-words.js");
     const tableText = app.slice(
-      app.indexOf("const WORDS = {"),
-      app.indexOf("\n};\n", app.indexOf("const WORDS = {")) + 3,
+      app.indexOf("export const WORDS = {"),
+      app.indexOf("\n};\n", app.indexOf("export const WORDS = {")) + 3,
     );
-    const words = new Function(`${tableText}; return WORDS;`)();
+    const words = new Function(`${tableText.replace("export ", "")}; return WORDS;`)();
     expect(Object.keys(words.ja)).toEqual(Object.keys(words.en));
     const places = (text) => [...text.matchAll(/\{(\w+)\}/g)].map((found) => found[1]).sort();
     for (const key of Object.keys(words.en)) expect(places(words.ja[key]), key).toEqual(places(words.en[key]));
@@ -160,7 +160,14 @@ describe("the source", () => {
   });
 
   it("holds no control character and no mention of how it was made", () => {
-    for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "demo/app.js", "src/cli.ts"]) {
+    for (const file of [
+      "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "demo/app.js",
+      "demo/app-words.js",
+      "src/cli.ts",
+    ]) {
       const controls = new RegExp(
         `[${String.fromCharCode(0)}-${String.fromCharCode(8)}${String.fromCharCode(11)}${String.fromCharCode(12)}${String.fromCharCode(14)}-${String.fromCharCode(31)}]`,
       );

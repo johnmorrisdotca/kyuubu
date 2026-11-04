@@ -209,7 +209,7 @@ describe("the README on dragging a layer", () => {
   });
 
   it("the demo's hint and controls say it in both languages", () => {
-    const app = read("demo/app.js");
+    const app = read("demo/app-words.js");
     expect(app).toContain("let go early and it goes back");
     expect(app).toContain("途中で離すと元に戻ります");
   });
