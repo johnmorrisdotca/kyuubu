@@ -73,8 +73,10 @@ src/
     ├── gestures.ts  from a hand to a turn: which layer a drag or a wheel means
     ├── hint.ts      where to drag: the sticker and the direction that make a given turn
     ├── keys.ts      the keyboard, in the notation cubers write
+    ├── view-arrow.ts the hint arrow: the element it is drawn in, and the arrow itself
     ├── view-hands.ts the pointer, the wheel and the keys, and the queue of turns they make
-    ├── view-scene.ts where each sticker, the plastic and the hint arrow sit
+    ├── view-scene.ts where each sticker and the plastic sit
+    ├── view-seams.ts the plastic that fills the gap a turn opens, and the seams a pointer takes hold of
     ├── view-types.ts colours, options and the numbers the cube is drawn from
     └── view.ts      the cube on the screen: every sticker placed by one matrix3d, with no canvas or framework
 ```
