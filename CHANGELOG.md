@@ -4,8 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.14.1] - 2026-11-03
+
+### Changed
+
 - Biome reports no warnings: `biome.jsonc` (with its one-line reason) turns off `noTemplateCurlyInString` in `test/` only, where the strings are the code the builder writes for other frameworks. Nothing a user of the package sees has changed.
-- Source files over 500 lines are split by what they do (the replay, the player, the solver, the cuboid model and player, and their tests), with the same exports and no change to the package. `pnpm check` now runs `scripts/check-max-lines.mjs`, which fails a file over 500 lines.
+- Source files over 500 lines are split by what they do (the replay, the player, the solver, the cuboid model and player, the cube's scene and hands, the demo page's script, and their tests), with the same exports and no change to the package. `pnpm check` now runs `scripts/check-max-lines.mjs`, which fails a file over 500 lines.
 - The README opens with the package's thumbnail, and the demo carries it as its link preview (og:image) and publishes the card, a dark card and an icon on Pages at `thumbnail.png`, `thumbnail-dark.png` and `icon.png`.
 
 ## [1.14.0] - 2026-11-02
@@ -452,7 +456,8 @@ The first stable release, published as a tarball on GitHub Releases.
 - `Kyuubu`, a React component around `CubeView`.
 - A live demo on GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.14.1...HEAD
+[1.14.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.13.1...v1.14.0
 [1.13.0]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.12.0...v1.13.0
 [1.8.1]: https://github.com/johnmorrisdotca/kyuubu/compare/v1.8.0...v1.8.1

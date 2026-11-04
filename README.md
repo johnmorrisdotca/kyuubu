@@ -11,7 +11,7 @@
   <a href="./LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-2f5d4a"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
-  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="39.0 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-39.0%20kB-2f5d4a"></a>
+  <a href="https://johnmorrisdotca.github.io/kyuubu/docs/api/main/index.html"><img alt="38.7 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-38.7%20kB-2f5d4a"></a>
   <a href="https://www.npmjs.com/package/@johnmorrisdotca/kyuubu#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
@@ -764,7 +764,7 @@ it is yours.
 ```ts no-check
 const solve = { size: 3, scramble: parseMoves("R U2 F'", 3)!, moves: parseMoves("F U2 R'", 3)!, ms: 12340, seed: "club night" };
 
-toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.14.0", "solves": [ … ] }
+toJSON(solve);        // { "format": 1, "generator": "kyuubu 1.14.1", "solves": [ … ] }
 fromJSON(text);       // the solves back again, or null if it is not an export
 toText(solve);        // a few lines for a chat or a note
 fromText(text);       // the solve back again, or null
@@ -790,7 +790,7 @@ The shape of the JSON, which is what to keep if you keep solves:
 ```json
 {
   "format": 1,
-  "generator": "kyuubu 1.14.0",
+  "generator": "kyuubu 1.14.1",
   "solves": [
     {
       "size": 3,
@@ -1145,7 +1145,7 @@ the page, is for the [security policy](./SECURITY.md), not a public issue.
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release, 1.14.0, lets a player's stage be laid in the family's five cloths.
+The latest release, 1.14.1, changes nothing a player sees.
 
 ## Licence
 
