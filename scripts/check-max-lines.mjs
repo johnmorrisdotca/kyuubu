@@ -25,7 +25,6 @@ const KNOWN_OVER = {
   "scripts/family-template.mjs": 995,
   // Single classes and a page script that need a design change first (MODULES-299 to MODULES-301).
   "src/view/view-hands.ts": 565,
-  "src/view/view-scene.ts": 536,
   "demo/app.js": 749,
 };
 
